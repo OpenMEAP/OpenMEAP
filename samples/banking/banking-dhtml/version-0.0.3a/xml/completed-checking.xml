@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<result xmlns="com.openmeap.samples.banking.model">
+	<transactions account-number="*6303" owner="Jon Schang">
+		<trans balance="3833.0" amount="1300.0" desc="Celerity" date="2011-03-01+03:00" acct-number="*6303" status="completed" type="deposit"/>
+		<trans balance="1581.0" amount="2000.0" desc="xto SAVINGS(*6323)" date="2011-03-01+03:00" acct-number="*6303" status="completed" type="withdraw"/>
+		<trans balance="1731.0" amount="150.0" desc="xfr SAVINGS(*6323)" date="2011-03-01+03:00" acct-number="*6303" status="completed" type="deposit"/>
+		<trans balance="3593.0" amount="240.0" desc="Mega Groceries, Inc." date="2011-03-02+03:00" acct-number="*6303" status="completed" type="withdraw"/>
+		<trans balance="3581.0" amount="12.0" desc="Mega Convenience Chain, Inc." date="2011-03-02+03:00" acct-number="*6303" status="completed" type="withdraw"/>
+		<trans balance="1881.0" amount="150.0" desc="xfr SAVINGS(*6323)" date="2011-03-02+03:00" acct-number="*6303" status="completed" type="deposit"/>
+		<trans balance="2031.0" amount="150.0" desc="xfr SAVINGS(*6323)" date="2011-03-03+03:00" acct-number="*6303" status="completed" type="deposit"/>
+		<trans balance="631.0" amount="1400.0" desc="xto SAVINGS(*6323)" date="2011-03-04+03:00" acct-number="*6303" status="completed" type="withdraw"/>
+	</transactions>
+</result>

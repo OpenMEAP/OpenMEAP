@@ -1,0 +1,62 @@
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+ 
+At the moment there is one sample and one test SLIC.  The test SLIC will 
+eventually be used in automation testing, while no changes are currently
+anticipated for the sample SLIC.  The instructions for each are essentially 
+the same.
+ 
++==================
+1) Every shell session
+
+Correct the environment variables in this file to match your environment
+
+	$ . ./${OPENMEAP_HOME}/build-tools/scripts/setEnv.sh
+	
++==================
+2) The Banking sample
+
+The Banking sample build script is setup to create an initial SLIC deployment
+build and 3 versions to upload into the OpenMEAP Admin interface.
+
+What you call them in the admin interface is up to you, but there must be a
+version with the same identifier as appears in the client.properties file
+(specifically, there must be a version 0.0.0a).  This requirement will change
+in some update prior to the beta release of OpenMEAP.
+
+The following command will 
+
+	$ cd ${OPENMEAP_HOME}/samples/banking
+	
+The following will create the Android and iOS Banking sample clients
+(only Android on non-Macs)
+	
+	$ ant create
+
+The following will build the Android and iOS Banking sample clients
+(only Android on non-Macs)	
+	
+	$ ant build
+	
+To create the 3 versions for uploading into /openmeap-admin-web/interface/
+	
+	$ ant package-versions

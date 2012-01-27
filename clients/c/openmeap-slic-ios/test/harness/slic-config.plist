@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>com.openmeap.slic.pullUpdates</key>
+	<string>0</string>
+	<key>com.openmeap.slic.updateFrequency</key>
+	<string>0</string>
+	<key>com.openmeap.slic.appName</key>
+	<string>OpenMEAP Integration Tests</string>
+	<key>com.openmeap.slic.appTitle</key>
+	<string>off</string>
+	<key>com.openmeap.slic.appVersion</key>
+	<string>0.0.1a</string>
+	<key>com.openmeap.slic.appMgmtServiceUrl</key>
+	<string>none</string>
+	<key>com.openmeap.slic.deviceType</key>
+	<string>iOS</string>
+	<key>com.openmeap.slic.packagedAppRoot</key>
+	<string>original/</string>
+	<key>com.openmeap.slic.version</key>
+	<string>0.0.1a</string>
+</dict>
+</plist>

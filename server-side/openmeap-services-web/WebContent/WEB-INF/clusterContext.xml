@@ -1,0 +1,50 @@
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ############################################################################### 
+ -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:jee="http://www.springframework.org/schema/jee"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+  http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services-2.0.xsd
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+  
+	<bean id="clusterServiceNotifierConfig" class="com.openmeap.cluster.ClusterServiceNotifierConfig">
+		<constructor-arg ref="modelManager"/>
+	</bean>
+	
+	<bean id="modelServiceRefreshNotifier" class="com.openmeap.model.service.ModelServiceRefreshNotifier">
+		<property name="configBeanName" value="clusterServiceNotifierConfig"/>
+		<property name="httpRequestExecuter">
+			<bean class="com.openmeap.util.FileHandlingHttpRequestExecuterImpl"/>
+		</property>
+	</bean>	
+	<bean id="modelServiceRefreshHandler" class="com.openmeap.model.service.ModelServiceRefreshHandler">
+		<property name="modelManager" ref="modelManager"/>
+	</bean>
+	
+	<bean id="archiveUploadHandler" class="com.openmeap.model.service.ArchiveUploadHandler">
+		<property name="modelManager" ref="modelManager"/>
+	</bean>
+	
+</beans>

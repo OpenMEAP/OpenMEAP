@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+-->
+<project name="openmeap-slic-android" default="dist">
+
+	<import file="../../../build-tools/ant_scripts/shared.xml"/>
+	<import file="../../../build-tools/ant_scripts/client_android.xml"/>
+	
+	<property name="openmeap.project.current.file.ivy" value="${openmeap.project.slic.java.android}/ivy.xml"/>
+	<property name="openmeap.project.current.dist" value="${openmeap.project.slic.java.android.dist.jar}"/>
+	<property name="openmeap.project.current.dist.ext" value="jar"/>
+	<property name="ivy.retrieve.pattern" value="${openmeap.project.slic.java.android}/libs/${openmeap.ivy.retrieve.pattern}"/>
+	
+	<property name="java.target" value="${openmeap.targetJdk}" />
+	<property name="java.source" value="${openmeap.targetJdk}" />
+	
+    <!-- The local.properties file is created and updated by the 'android' tool.
+         It contains the path to the SDK. It should *NOT* be checked into
+         Version Control Systems. -->
+    <loadproperties srcFile="local.properties" />
+
+    <loadproperties srcFile="project.properties" />
+
+	<property name="sdk.dir" value="${android.sdk.home}"/>
+	
+	<target name="dist" depends="dist-base,resolve">
+		<ant dir="${openmeap.project.slic.java.android}" antfile="${sdk.dir}/tools/ant/build.xml" target="release"/>
+		<!--<copyfile src="bin/openmeap-slic-android.jar" dest="${openmeap.dist.artifacts}"/>-->
+	</target>
+	
+	<target name="clean">
+		<ant dir="${openmeap.project.slic.java.android}" antfile="${sdk.dir}/tools/ant/build.xml" target="clean"/>
+		<delete dir="libs" quiet="true" failonerror="false" includes="**/*"/>
+	</target>
+	
+	<target name="release" depends="dist"/>
+	<target name="debug" depends="dist"/>
+	<target name="nodep"/>
+
+</project>

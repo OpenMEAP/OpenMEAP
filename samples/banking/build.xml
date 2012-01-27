@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+-->
+<project name="openmeap-slic-samples-banking" basedir="." default="create">
+	<description>This script is for the OpenMEAP Banking Samples</description>
+
+	<property file="client.properties"/>
+	<property name="dev.slic.android.name" value="BankingSLICAndroid"/>
+	<property name="dev.slic.ios.name" value="BankingSLICiOS"/>
+	<property name="openmeap.ant.scripts.path" value="../../build-tools/ant_scripts"/>
+	
+	<condition property="isNotMac" value="true">
+		<not><os family="mac"/></not>
+	</condition>
+	
+	<import file="${openmeap.ant.scripts.path}/shared.xml"/>
+	
+	<target name="clean" description="Cleans the Android and iOS projects">
+		<delete includeemptydirs="true" quiet="true">
+			<fileset dir="${dev.slic.android.name}" includes="**/*"/>
+			<fileset dir="${dev.slic.ios.name}" includes="**/*"/>
+		</delete>
+	</target>
+	
+	<target name="create" depends="create-ios,create-android" description="Creates the Android and iOS projects"/>
+	<target name="build" depends="build-ios,build-android" description="Builds the Android and iOS projects"/>
+
+	<target name="create-android" depends="clean">
+		<mkdir dir="${dev.slic.android.name}"/>
+		<ant antfile="${openmeap.ant.scripts.path}/client_android.xml" target="create-project"/>
+	</target>
+	<target name="create-ios" depends="clean" unless="isNotMac">
+		<mkdir dir="${dev.slic.ios.name}"/>
+		<ant antfile="${openmeap.ant.scripts.path}/client_ios.xml" target="create-project"/>
+	</target>
+	
+	<target name="build-android">
+		<ant antfile="${openmeap.ant.scripts.path}/client_android.xml" target="build-debug"/>
+	</target>
+	<target name="build-ios" unless="isNotMac">
+		<ant antfile="${openmeap.ant.scripts.path}/client_ios.xml" target="build-debug"/>
+	</target>
+	
+	<target name="package-versions" description="Packages up the 3 versions">
+		<package-version file="version-0.0.1a.zip" dir="banking-dhtml/version-0.0.1a"/>
+		<package-version file="version-0.0.2a.zip" dir="banking-dhtml/version-0.0.2a"/>
+		<package-version file="version-0.0.3a.zip" dir="banking-dhtml/version-0.0.3a"/>
+	</target>
+	
+</project>

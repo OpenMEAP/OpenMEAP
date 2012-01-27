@@ -1,0 +1,1 @@
+DERP${targetedText!}${tail!}

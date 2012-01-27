@@ -1,0 +1,204 @@
+<?xml version="1.0"?>
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+-->
+<project xmlns:ivy="antlib:org.apache.ivy.ant" default="help">
+
+	<import file="./shared.xml"/>
+	
+	<property environment="env"/>
+
+	<!-- BEGIN setup the android.sdk.home property -->
+	<condition property="android.sdk.home.avail">
+		<or>
+			<isset property="android.sdk.home"/>
+			<isset property="env.ANDROID_SDK_HOME"/>
+		</or>
+	</condition>
+	<fail unless="android.sdk.home.avail">
+		Either &quot;android.sdk.home&quot; property is not set 
+		or there is no ANDROID_SDK_HOME environment variable to fall-back on.  
+		One of these should be a directory path pointing to the root of the 
+		OpenMEAP source distribution.
+	</fail>
+	<condition property="android.sdk.home" value="${env.ANDROID_SDK_HOME}">
+		<not><isset property="android.sdk.home"/></not>
+	</condition>
+	<!-- END setup the android.sdk.home property -->
+	
+	
+	<target name="-setup-client-properties" depends="-pre-create-project,setup-client-properties">
+		<!-- some device specific properties -->
+		<property name="openmeap.slic.providerAuthority" value="${openmeap.slic.package}.fileprovider"/>
+		<property name="openmeap.slic.android.activity" value="MainActivity"/>
+		<property name="openmeap.slic.android.projectName" value="${openmeap.slic.projectName}"/>
+		<property name="openmeap.slic.android.target" value="Google Inc.:Google APIs:8"/>
+		
+		<!-- generic slic properties -->
+		<property name="openmeap.slic.android.path" location="${user.dir}"/>
+		<property name="openmeap.slic.absPath" location="${openmeap.slic.android.path}"/>		
+		<property name="openmeap.slic.assets.dest.absPath" location="${openmeap.slic.absPath}/assets/${openmeap.slic.packagedAppRoot}"/>
+		
+		<property name="openmeap.slic.android.artifact.release.unsigned.unaligned"
+				value="${openmeap.slic.android.path}/bin/${openmeap.slic.projectName}-release-unsigned.apk"/>
+		<property name="openmeap.slic.android.artifact.release.signed.unaligned"
+				value="${openmeap.slic.android.path}/bin/${openmeap.slic.projectName}-release-signed-unaligned.apk"/>
+		<property name="openmeap.slic.android.artifact.release.signed.aligned"
+				value="${openmeap.slic.android.path}/bin/${openmeap.slic.projectName}-release-signed-aligned.apk"/>
+	</target>
+	<target name="-pre-create-project">			
+		<property name="openmeap.slic.deviceType" value="Android"/>
+		<property name="openmeap.home.relative" 
+				value="${openmeap.home}" 
+				basedir="${openmeap.slic.absPath}" 
+				relative="yes" />
+	</target>
+	
+	<target name="build-debug" depends="-setup-client-properties" description="Build an OpenMEAP Android SLIC project for debug.">
+		<ant dir="${openmeap.slic.absPath}" antfile="${openmeap.project.build}/ant_scripts/client_android.xml" target="copy-slic-assets"/>
+		<ant dir="${openmeap.slic.absPath}" antfile="build.xml" target="debug"/>
+	</target>
+	<target name="build-release" depends="-setup-client-properties" description="Build an OpenMEAP Android SLIC project for release.">
+		<ant dir="${openmeap.slic.absPath}" antfile="${openmeap.project.build}/ant_scripts/client_android.xml" target="copy-slic-assets"/>
+		<ant dir="${openmeap.slic.absPath}" antfile="build.xml" target="release"/>
+	</target>
+	
+	<target name="package-debug" depends="build-debug" description="Build and package an OpenMEAP Android SLIC project for debug."/>
+	<target name="package-release" depends="-setup-client-properties,build-release" description="Build and package an OpenMEAP Android SLIC project for release.">
+		
+		<available file="${openmeap.slic.android.path}/bin/${openmeap.slic.projectName}-release-unsigned.apk" 
+				property="openmeap.slic.android.apk.exists"/>
+		
+		<fail unless="openmeap.slic.android.apk.exists" 
+				message="The application must be build before it can be signed."/>
+		<fail unless="openmeap.slic.android.keyStore" 
+				message="openmeap.slic.android.keyStore is a required property for packaging.  It must be the path to the keystore to use."/>
+		<fail unless="openmeap.slic.android.keyStorePassword" 
+				message="openmeap.slic.android.keyStorePassword is a required property for packaging.  It must be the password of used to access the keystore."/>
+		<fail unless="openmeap.slic.android.keyAlias" 
+				message="openmeap.slic.android.keyAlias is a required property for packaging.  It must be the alias within the keystore to sign with."/>
+		<fail unless="openmeap.slic.android.keyPassword" 
+				message="openmeap.slic.android.keyPassword is a required property for packaging.  It must be the password for the alias within the keystore."/>
+		
+		<copy file="${openmeap.slic.android.artifact.release.unsigned.unaligned}" 
+				tofile="${openmeap.slic.android.artifact.release.signed.unaligned}"/>
+		
+		<condition property="jarsigner" 
+				value="${android.sdk.home}tools/jarsigner.exe"
+				else="${android.sdk.home}tools/jarsigner">
+			<os family="windows"/>
+		</condition>
+		<exec dir="${openmeap.slic.absPath}" executable="${jarsigner}">
+			<arg value="-verbose"/>
+			<arg value="-keystore"/><arg value="${openmeap.slic.android.keyStore}"/>
+			<arg value="-storepass"/><arg value="${openmeap.slic.android.keyStorePassword}"/>
+			<arg value="-keypass"/><arg value="${openmeap.slic.android.keyPassword}"/>
+			<arg value="${openmeap.slic.android.artifact.release.signed.unaligned}"/>
+			<arg value="${openmeap.slic.android.keyAlias}"/>
+		</exec>
+		
+		<condition property="zipalign" 
+				value="${android.sdk.home}tools/zipalign.exe"
+				else="${android.sdk.home}tools/zipalign">
+			<os family="windows"/>
+		</condition>
+		<exec dir="${openmeap.slic.absPath}" executable="${zipalign}">
+			<arg value="-v"/>
+			<arg value="4"/>
+			<arg value="${openmeap.slic.android.artifact.release.signed.unaligned}"/>
+			<arg value="${openmeap.slic.android.artifact.release.signed.aligned}"/>
+		</exec>
+		
+	</target>
+	
+	<target name="create-project" depends="-setup-client-properties" description="Creates an OpenMEAP Android SLIC from the specified properties.">
+		
+		<mkdir dir="${openmeap.slic.android.path}"/>
+
+		<ant antfile="${openmeap.project.build}/ant_scripts/client_android.xml" target="-create-project"/>
+		
+		<!-- additional copy -->
+		<mkdir dir="${openmeap.slic.android.path}/assets/${openmeap.slic.packagedAppRoot}"/>
+		
+		<copy file="${openmeap.slic.icon}" 
+						tofile="${openmeap.slic.android.path}/res/drawable/icon.png"/>
+		
+		<copy file="${openmeap.project.build}/template/android/slic-config.properties" 
+						tofile="${openmeap.slic.android.path}/assets/slic-config.properties" overwrite="true"/>
+		
+		<copy file="${openmeap.project.build}/template/android/AndroidManifest.xml" 
+						tofile="${openmeap.slic.android.path}/AndroidManifest.xml" overwrite="true"/>
+		
+		<ant antfile="${openmeap.project.build}/ant_scripts/client_android.xml" target="copy-slic-assets"/>
+		
+		<!-- replace appName -->
+		<replace file="${openmeap.slic.android.path}/res/values/strings.xml">
+			<replacefilter token="&gt;${openmeap.slic.android.activity}&lt;" 
+				value="&gt;&lt;![CDATA[${openmeap.slic.appName}]]&gt;&lt;"/>
+		</replace>
+		
+		<!-- broader scope of replacements -->
+		<replace dir="${openmeap.slic.android.path}" includes="**/*">
+			<replacefilter token="@@OPENMEAP_HOME@@" value="${openmeap.home.relative}"/>
+			<replacefilter token="@@PROJECT_NAME@@" value="${openmeap.slic.android.projectName}"/>
+			
+			<replacefilter token="@@openmeap.slic.package@@" value="${openmeap.slic.package}"/>
+			<replacefilter token="@@openmeap.slic.providerAuthority@@" value="${openmeap.slic.providerAuthority}"/>
+			<replacefilter token="@@openmeap.slic.pullUpdates@@" value="${openmeap.slic.pullUpdates}"/>
+			<replacefilter token="@@openmeap.slic.updateFrequency@@" value="${openmeap.slic.updateFrequency}"/>
+			<replacefilter token="@@openmeap.slic.appTitle@@" value="${openmeap.slic.appTitle}"/>
+			<replacefilter token="@@openmeap.slic.packagedAppRoot@@" value="${openmeap.slic.packagedAppRoot}"/>
+			<replacefilter token="@@openmeap.slic.developmentMode@@" value="${openmeap.slic.developmentMode}"/>
+			<replacefilter token="@@openmeap.slic.deviceType@@" value="${openmeap.slic.deviceType}"/>
+			<replacefilter token="@@openmeap.slic.appMgmtServiceUrl@@" value="${openmeap.slic.appMgmtServiceUrl}"/>
+			<replacefilter token="@@openmeap.slic.appName@@" value="${openmeap.slic.appName}"/>
+			<replacefilter token="@@openmeap.slic.appVersion@@" value="${openmeap.slic.appVersion}"/>
+			<replacefilter token="@@openmeap.slic.version@@" value="${openmeap.revision}"/>
+		</replace>
+		
+	</target>
+	
+	
+	<target name="-create-project">
+		<property name="android.lib.dir" value="${openmeap.project.slic.java.android}" relative="yes" basedir="${openmeap.slic.absPath}"/>
+		<condition property="android" value="${android.sdk.home}/tools/android.bat" 
+				else="${android.sdk.home}/tools/android">
+			<os family="windows"/>
+		</condition>
+		<exec dir="." executable="${android}">
+			<arg value="create"/><arg value="project"/>
+			<arg value="--target"/><arg value="${openmeap.slic.android.target}"/>
+			<arg value="--path"/><arg value="${openmeap.slic.android.path}"/>
+			<arg value="--activity"/><arg value="${openmeap.slic.android.activity}"/>
+			<arg value="--package"/><arg value="${openmeap.slic.package}"/>
+			<arg value="--name"/><arg value="${openmeap.slic.android.projectName}"/>
+		</exec>
+		<exec dir="." executable="${android}">
+			<arg value="update"/><arg value="project"/>
+			<arg value="--target"/><arg value="${openmeap.slic.android.target}"/>
+			<arg value="--path"/><arg value="${openmeap.slic.android.path}"/>
+			<arg value="--library"/><arg value="${android.lib.dir}"/>
+		</exec>
+	</target>
+	
+</project>

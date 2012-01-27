@@ -1,0 +1,33 @@
+<div class="mobile-message"><span class="welcome">Welcome <span class="username"/></span>
+
+<h1>My Accounts</h1>
+</div>
+<div id="accountOverviews" style="clear:both;">
+	<div id="accountRows"/>
+</div>
+
+<!-- TEMPLATES BELOW HERE -->
+
+<div id="accountRowTemplate" style="display:none;">
+		<table class="overview">	
+			<tbody>			
+				<tr>
+					<th>Account Name</th>
+					<td><a class="accountName" href="javascript:void(0);"><span class="accountName name"/></a></td>
+				</tr>
+				<tr>
+					<th>Account Number</th>
+					<td><span class="accountNumber number"/></td>
+				</tr>
+				<tr>
+					<th>Posted Bal.</th>
+					<td><span class="postedBalance dollarFormat posted"/></td>
+				</tr>
+				<tr>
+					<th class="last">Available</th>
+					<td class="last"><span class="availableBalance dollarFormat available"/></td>
+				</tr>
+			</tbody>		
+		</table>
+		<div style="clear:both"></div>
+</div>

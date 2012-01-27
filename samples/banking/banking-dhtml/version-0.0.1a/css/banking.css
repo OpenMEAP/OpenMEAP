@@ -1,0 +1,271 @@
+@import url(hdpi.css);
+@media only screen and (-webkit-device-pixel-ratio:1.5)" href="hdpi.css {
+    /* Put CSS for high density (hdpi) Android layouts in here */
+}
+
+html, body {
+	font: 12px/15px sans-serif;
+	background: #E5ECF3;
+	padding: 0;
+	color: #000;
+	margin: 0;
+	text-align: center;
+}
+h1 {
+	font-size: 1.6em;
+	line-height: 1.75em;
+	margin-top: 0;
+}
+/* =Base Components
+-------------------------------------------------------*/
+#header {
+    background-color: #8499ac;
+    color: #FFFFFF;
+    font-size: 1.2em;
+    font-weight: bold;
+    min-height: 1%;
+    padding: 14px;
+    text-align: center;
+}
+.logoutlink {
+	margin-top: 10px;	
+	text-align: center;
+}
+#mainBodyDiv{
+	margin: 0 10px;
+	padding: 0;
+}
+.mobile-message {
+	text-align: center;
+	margin-bottom: 10px;	
+}
+
+.mobile-message p {
+
+}
+/* =Login Form
+-------------------------------------------------------*/
+
+#mobile-login {
+	background-color: #E5ECF3;
+}
+#mobile-login fieldset {
+	border: none;
+}
+#mobile-login legend {
+	display: none;
+}
+#mobile-login label {
+	display: none;
+}
+#mobile-login input{
+    border-color: #80A1C1;
+    color: #7BA2C2;
+    display: block;
+    font-size: 15px;
+    height: 31px;
+    margin: 0 auto 20px;
+    width: 234px;
+}
+h1.login {
+	padding-top: 10px;
+}
+#mobile-login input.button {
+    -moz-border-radius: 8px 8px 8px 8px;
+    -webkit-border-radius: 8px 8px 8px 8px;
+    border-radius: 8px 8px 8px 8px;
+	background-image: -webkit-gradient(
+	    linear,
+	    left bottom,
+	    left top,
+	    color-stop(0.04, rgb(41,222,0)),
+	    color-stop(0.19, rgb(25,152,0)),
+    	color-stop(0.95, rgb(101,251,101))
+	);
+	background-image: -moz-linear-gradient(
+	    center bottom,
+	    rgb(41,222,0) 4%,
+	    rgb(25,152,0) 19%,
+    	rgb(101,251,101) 95%
+	);
+	color: #FFF;
+	border: 1px solid #188f00;  
+	display: block;
+	font-size: 1.15em;
+	font-weight: bold;
+    margin: 0 auto;
+    padding: 3px;
+	text-decoration: none;
+	width: 230px;
+}
+
+/* =Account Information
+-------------------------------------------------------*/
+
+
+/* =Account Overview
+-------------------------------------------------------*/
+span.welcome {
+	font-size: 1.5em;
+    line-height: 1.75em;
+}
+#accountOverviews {
+	margin: 0 auto;
+	text-align: center;
+}
+#accountRows {
+	display: inline-block;
+	width: 100%;
+}
+table.overview {
+    -moz-border-radius: 5px 5px 5px 5px;
+    -moz-box-shadow: 0 0 5px 5px #CCC;
+    -webkit-border-radius: 5px 5px 5px 5px;
+    -webkit-box-shadow: 0 0 5px 5px #CCC;
+    border-radius: 5px 5px 5px 5px;
+    box-shadow: 0 0 5px 5px #CCC;    	
+	background-color: #FFF;
+	border: 1px solid #CCC;
+	border-collapse: collapse;
+	margin:0 0 20px;
+	width: 100%;
+}
+
+table.overview tbody {
+}
+table.overview tr {
+	width: auto
+}
+table.overview th, table.overview td {
+    border-bottom: 1px dotted #CCCCCC;
+    padding: 10px;
+    width: 50%;
+}
+table.overview th{
+	text-align: left;
+}
+table.overview td {
+	text-align: right;
+}
+table.overview .last {
+	border: none;
+}
+
+div.transfer-btn a {
+    -moz-border-radius: 8px 8px 8px 8px;
+    -webkit-border-radius: 8px 8px 8px 8px;
+    border-radius: 8px 8px 8px 8px;
+	background-image: -webkit-gradient(
+	    linear,
+	    left bottom,
+	    left top,
+	    color-stop(0.04, rgb(41,222,0)),
+	    color-stop(0.19, rgb(25,152,0)),
+    	color-stop(0.95, rgb(101,251,101))
+	);
+	background-image: -moz-linear-gradient(
+	    center bottom,
+	    rgb(41,222,0) 4%,
+	    rgb(25,152,0) 19%,
+    	rgb(101,251,101) 95%
+	);
+    border: 1px solid #188f00;
+	color: #FFF;    
+	display: block;
+	font-size: 1.15em;
+	font-weight: bold;
+    margin: 0 auto;
+    padding: 6px 0 5px;
+	text-decoration: none;
+	width: 200px;
+}
+
+/* =Transaction Table
+-------------------------------------------------------*/
+#transTable {
+    -moz-border-radius: 5px 5px 5px 5px;
+    -moz-box-shadow: 0 0 5px 5px #CCC;
+    -webkit-border-radius: 5px 5px 5px 5px;
+    -webkit-box-shadow: 0 0 5px 5px #CCC;
+    border-radius: 5px 5px 5px 5px;
+    box-shadow: 0 0 5px 5px #CCC;    
+    background-color: #FFF;
+    border: 1px solid #CCC;
+    border-collapse: collapse;
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+}
+#transTable tr{
+	width: 100%;
+}
+#transTable tr td{
+    border-bottom: 1px dotted #CCC;
+    font-size: 0.85em;
+    padding: 5px 10px;	
+}
+#transTable tr th {
+	padding: 5px 10px;
+}
+#transTable th.date {
+	width: 10%;
+}
+#transTable th.description {
+	width: 60%;
+}
+#transTable th.activity, #transTable th.balance {
+	width: 15%;
+}
+/* =Transfer Funds
+-------------------------------------------------------*/
+ul.transfer-funds {
+	clear: both;
+	margin: 0;
+	padding: 0;
+}
+
+ul.transfer-funds li {
+	list-style-type: none;
+}
+
+ul.transfer-funds li select, ul.transfer-funds li input {
+	float: right;
+}
+
+div.transfer {
+	font-weight: bold;
+}
+div.transfer input, div.transfer select {
+	margin-bottom: 10px;
+}
+#transferAmountId {
+	width: 180px;
+}
+#submitButtonId {
+    -moz-border-radius: 8px 8px 8px 8px;
+    -webkit-border-radius: 8px 8px 8px 8px;
+    border-radius: 8px 8px 8px 8px;
+	background-image: -webkit-gradient(
+	    linear,
+	    left bottom,
+	    left top,
+	    color-stop(0.04, rgb(41,222,0)),
+	    color-stop(0.19, rgb(25,152,0)),
+    	color-stop(0.95, rgb(101,251,101))
+	);
+	background-image: -moz-linear-gradient(
+	    center bottom,
+	    rgb(41,222,0) 4%,
+	    rgb(25,152,0) 19%,
+    	rgb(101,251,101) 95%
+	);
+    border: 1px solid #188f00;
+	color: #FFF;    
+	display: block;
+	font-size: 1.15em;
+	font-weight: bold;
+    margin: 10px auto;
+    padding: 3px;
+	text-decoration: none;
+	width: 170px;
+}

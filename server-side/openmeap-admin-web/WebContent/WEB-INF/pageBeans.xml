@@ -1,0 +1,261 @@
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ############################################################################### 
+ -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+  http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services-2.0.xsd
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<!-- PAGE BEANS -->
+
+	<bean id="loginPage" scope="prototype" class="com.openmeap.web.GenericDocumentProcessor">
+		<property name="templateTree">
+			<bean class="com.openmeap.web.FreeMarkerSection">
+				<property name="configuration" ref="freeMarkerConfiguration"/>
+				<property name="sectionBacking" ref="layoutSectionBacking"/>
+				<property name="templatePath" value="layout-main.ftl"/>
+				<property name="templateVariables">
+					<map>
+						<entry key="page">
+							<map>
+								<entry key="title" value="OpenMEAP Administrative Interface"/>
+							</map>
+						</entry>
+					</map>
+				</property>
+				<property name="children">
+					<map>
+						<entry key="body"><ref bean="loginSection"/></entry>
+						<entry key="footer"><ref bean="footerSection"/></entry>
+					</map>
+				</property>
+			</bean>
+		</property>
+		<property name="processesFormData" value="false"/>
+	</bean>
+	
+	<bean id="mainOptionsPage" scope="prototype" class="com.openmeap.web.GenericDocumentProcessor">
+		<property name="templateTree">
+			<bean class="com.openmeap.web.FreeMarkerSection">
+				<property name="configuration" ref="freeMarkerConfiguration"/>
+				<property name="sectionBacking" ref="layoutSectionBacking"/>
+				<property name="templatePath" value="layout-main.ftl"/>
+				<property name="templateVariables">
+					<map>
+						<entry key="page">
+							<map>
+								<entry key="title" value="OpenMEAP Administrative Interface"/>
+							</map>
+						</entry>
+					</map>
+				</property>
+				<property name="children">
+					<map>
+						<entry key="mainMenu"><ref bean="headerSection"/></entry>
+						<entry key="mainOptionsRow"><ref bean="mainOptionsRowSection"/></entry>
+						<entry key="messages"><ref bean="messagesSection"/></entry>
+						<entry key="subMenu"><ref bean="subnavigationSection"/></entry>
+						<entry key="body"><ref bean="mainOptionsSection"/></entry>
+						<entry key="footer"><ref bean="footerSection"/></entry>
+					</map>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="addModifyAppPage" scope="prototype" class="com.openmeap.web.GenericDocumentProcessor">
+		<property name="templateTree">
+			<bean class="com.openmeap.web.FreeMarkerSection">
+				<property name="configuration" ref="freeMarkerConfiguration"/>
+				<property name="sectionBacking" ref="layoutSectionBacking"/>
+				<property name="templatePath" value="layout-main.ftl"/>
+				<property name="templateVariables">
+					<map>
+						<entry key="page">
+							<map>
+								<entry key="title" value="Add/Modify Application - OpenMEAP Administrative Interface"/>
+							</map>
+						</entry>
+					</map>
+				</property>
+				<property name="children">
+					<map>
+						<entry key="mainMenu"><ref bean="headerSection"/></entry>
+						<entry key="mainOptionsRow"><ref bean="mainOptionsRowSection"/></entry>
+						<entry key="messages"><ref bean="messagesSection"/></entry>
+						<entry key="subMenu"><ref bean="subnavigationSection"/></entry>
+						<entry key="body"><ref bean="addModifyAppSection"/></entry>
+						<entry key="footer"><ref bean="footerSection"/></entry>
+					</map>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="addModifyAppVersionPage" scope="prototype" class="com.openmeap.web.GenericDocumentProcessor">
+		<property name="templateTree">
+			<bean class="com.openmeap.web.FreeMarkerSection">
+				<property name="configuration" ref="freeMarkerConfiguration"/>
+				<property name="sectionBacking" ref="layoutSectionBacking"/>
+				<property name="templatePath" value="layout-main.ftl"/>
+				<property name="templateVariables">
+					<map>
+						<entry key="page">
+							<map>
+								<entry key="title" value="Add/Modify Application Version - OpenMEAP Administrative Interface"/>
+							</map>
+						</entry>
+					</map>
+				</property>
+				<property name="children">
+					<map>
+						<entry key="mainMenu"><ref bean="headerSection"/></entry>
+						<entry key="mainOptionsRow"><ref bean="mainOptionsRowSection"/></entry>
+						<entry key="messages"><ref bean="messagesSection"/></entry>
+						<entry key="subMenu"><ref bean="subnavigationSection"/></entry>
+						<entry key="body"><ref bean="addModifyAppVersionSection"/></entry>
+						<entry key="footer"><ref bean="footerSection"/></entry>
+					</map>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="appListingsPage" scope="prototype" class="com.openmeap.web.GenericDocumentProcessor">
+		<property name="templateTree">
+			<bean class="com.openmeap.web.FreeMarkerSection">
+				<property name="configuration" ref="freeMarkerConfiguration"/>
+				<property name="sectionBacking" ref="layoutSectionBacking"/>
+				<property name="templatePath" value="layout-main.ftl"/>
+				<property name="templateVariables">
+					<map>
+						<entry key="page">
+							<map>
+								<entry key="title" value="Application Listings - OpenMEAP Administrative Interface"/>
+							</map>
+						</entry>
+					</map>
+				</property>
+				<property name="children">
+					<map>
+						<entry key="mainMenu"><ref bean="headerSection"/></entry>
+						<entry key="mainOptionsRow"><ref bean="mainOptionsRowSection"/></entry>
+						<entry key="messages"><ref bean="messagesSection"/></entry>
+						<entry key="subMenu"><ref bean="subnavigationSection"/></entry>
+						<entry key="body"><ref bean="appListingsSection"/></entry>
+						<entry key="footer"><ref bean="footerSection"/></entry>
+					</map>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="appVersionListingsPage" scope="prototype" class="com.openmeap.web.GenericDocumentProcessor">
+		<property name="templateTree">
+			<bean class="com.openmeap.web.FreeMarkerSection">
+				<property name="configuration" ref="freeMarkerConfiguration"/>
+				<property name="sectionBacking" ref="layoutSectionBacking"/>
+				<property name="templatePath" value="layout-main.ftl"/>
+				<property name="templateVariables">
+					<map>
+						<entry key="page">
+							<map>
+								<entry key="title" value="Application Version Listings - OpenMEAP Administrative Interface"/>
+							</map>
+						</entry>
+					</map>
+				</property>
+				<property name="children">
+					<map>
+						<entry key="mainMenu"><ref bean="headerSection"/></entry>
+						<entry key="mainOptionsRow"><ref bean="mainOptionsRowSection"/></entry>
+						<entry key="messages"><ref bean="messagesSection"/></entry>
+						<entry key="subMenu"><ref bean="subnavigationSection"/></entry>
+						<entry key="body"><ref bean="appVersionListingsSection"/></entry>
+						<entry key="footer"><ref bean="footerSection"/></entry>
+					</map>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="settingsPage" scope="prototype" class="com.openmeap.web.GenericDocumentProcessor">
+		<property name="templateTree">
+			<bean class="com.openmeap.web.FreeMarkerSection">
+				<property name="configuration" ref="freeMarkerConfiguration"/>
+				<property name="sectionBacking" ref="layoutSectionBacking"/>
+				<property name="templatePath" value="layout-main.ftl"/>
+				<property name="templateVariables">
+					<map>
+						<entry key="page">
+							<map>
+								<entry key="title" value="Settings &amp; Preferences - OpenMEAP Administrative Interface"/>
+							</map>
+						</entry>
+					</map>
+				</property>
+				<property name="children">
+					<map>
+						<entry key="mainMenu"><ref bean="headerSection"/></entry>
+						<entry key="mainOptionsRow"><ref bean="mainOptionsRowSection"/></entry>
+						<entry key="messages"><ref bean="messagesSection"/></entry>
+						<entry key="subMenu"><ref bean="subnavigationSection"/></entry>
+						<entry key="body"><ref bean="settingsSection"/></entry>
+						<entry key="footer"><ref bean="footerSection"/></entry>
+					</map>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="deploymentListingsPage" scope="prototype" class="com.openmeap.web.GenericDocumentProcessor">
+		<property name="templateTree">
+			<bean class="com.openmeap.web.FreeMarkerSection">
+				<property name="configuration" ref="freeMarkerConfiguration"/>
+				<property name="sectionBacking" ref="layoutSectionBacking"/>
+				<property name="templatePath" value="layout-main.ftl"/>
+				<property name="templateVariables">
+					<map>
+						<entry key="page">
+							<map>
+								<entry key="title" value="Deployment Listings - OpenMEAP Administrative Interface"/>
+							</map>
+						</entry>
+					</map>
+				</property>
+				<property name="children">
+					<map>
+						<entry key="mainMenu"><ref bean="headerSection"/></entry>
+						<entry key="mainOptionsRow"><ref bean="mainOptionsRowSection"/></entry>
+						<entry key="messages"><ref bean="messagesSection"/></entry>
+						<entry key="body"><ref bean="deploymentListingsSection"/></entry>
+						<entry key="footer"><ref bean="footerSection"/></entry>
+					</map>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+</beans>

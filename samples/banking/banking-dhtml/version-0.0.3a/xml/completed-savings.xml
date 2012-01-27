@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<result xmlns="com.openmeap.samples.banking.model">
+	<transactions account-number="*6323" owner="Jon Schang">
+		<trans balance="17533.0" amount="2000.0" desc="xfr CHECKING(*6303)" date="2011-03-01+03:00" acct-number="*6323" status="completed" type="deposit"/>
+		<trans balance="17383.0" amount="150.0" desc="xto CHECKING(*6303)" date="2011-03-01+03:00" acct-number="*6323" status="completed" type="withdraw"/>
+		<trans balance="17233.0" amount="150.0" desc="xto CHECKING(*6303)" date="2011-03-02+03:00" acct-number="*6323" status="completed" type="withdraw"/>
+		<trans balance="17083.0" amount="150.0" desc="xto CHECKING(*6303)" date="2011-03-03+03:00" acct-number="*6323" status="completed" type="withdraw"/>
+		<trans balance="18483.0" amount="1400.0" desc="xfr CHECKING(*6303)" date="2011-03-04+03:00" acct-number="*6323" status="completed" type="deposit"/>
+	</transactions>
+</result>

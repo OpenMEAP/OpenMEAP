@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+-->
+<project name="openmeap-services-web" default="dist">
+	<description>
+		This is the ant build script for cleaning, compiling, and packaging
+		the OpenMEAP services web project.
+		It assumes that 3rd party library dependencies reside in ../build-toolstools/src/META-INF/lib
+		It assumes that OpenMEAP projects that it is dependent on are located at ../build-toolstools/dist
+	</description>
+
+	<import file="../../build-tools/ant_scripts/shared.xml"/>
+	<property name="openmeap.project.current.file.ivy" value="${openmeap.project.services-web}/ivy.xml"/>
+	<property name="openmeap.project.current.dist" value="${openmeap.project.services-web.dist.war}"/>
+	<property name="openmeap.project.current.dist.ext" value="war"/>
+	<property name="ivy.retrieve.pattern" value="${openmeap.project.services-web.dist}/WEB-INF/lib/${openmeap.ivy.retrieve.pattern}"/>
+	<property name="openmeap.ivy.cachepath.conf" value="compile"/>
+	<property name="openmeap.ivy.retrieve.conf" value="core"/>
+
+	<!-- BEGIN CLEAN SECTION +++++++++++++++++++++++++++++++++++++ -->
+	
+	<target name="clean">
+		<delete file="${openmeap.project.services-web.dist.war}"/>
+		<delete includeemptydirs="true" quiet="true">
+			<fileset dir="bin" includes="**/*"/>
+			<fileset dir="build" includes="**/*"/>
+			<fileset dir="${openmeap.project.services-web.dist}" includes="**/*"/>
+		</delete>
+	</target>
+	
+	<!-- END CLEAN SECTION +++++++++++++++++++++++++++++++++++++++ -->
+	
+	<!-- BEGIN COMPILE SECTION ++++++++++++++++++++++++++++++++++++ -->
+	
+	<target name="compile" depends="resolve">
+		<mkdir dir="build/classes"/>
+		<copy todir="build/classes">
+			<fileset dir="src" includes="*.properties"/>
+		</copy>
+		<javac debug="true" debuglevel="${openmeap.debuglevel}" target="${openmeap.targetJdk}" destdir="build/classes" classpathref="openmeap.classpath">
+			<src path="src"/>
+		</javac>
+	</target>
+	
+	<!-- END COMPILE SECTION +++++++++++++++++++++++++++++++++++++ -->
+	
+	<target name="export-war" depends="dist-base,compile">
+		<copy todir="${openmeap.project.services-web.dist}/">
+			<fileset dir="WebContent" includes="**/*"/>
+		</copy>
+		<copy todir="${openmeap.project.services-web.dist}/WEB-INF">
+			<fileset dir="build" includes="**/*"/>
+		</copy>
+		<war destfile="${openmeap.project.services-web.dist.war}" 
+			webxml="${openmeap.project.services-web.dist}/WEB-INF/web.xml"
+			basedir="${openmeap.project.services-web.dist}">
+			<manifest/>
+		</war>
+	</target>
+	
+	<target name="dist" depends="clean,export-war"/>
+	
+</project>

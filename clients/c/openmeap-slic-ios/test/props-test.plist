@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>com.openmeap.slic.version</key>
+	<string>0.0.1a</string>
+	<key>com.openmeap.slic.packagedAppRoot</key>
+	<string>original/</string>
+	<key>com.openmeap.slic.deviceType</key>
+	<string>iOS</string>
+	<key>com.openmeap.slic.appMgmtServiceUrl</key>
+	<string>none</string>
+	<key>com.openmeap.slic.appVersion</key>
+	<string>0.0.1a</string>
+	<key>com.openmeap.slic.appTitle</key>
+	<string>off</string>
+	<key>com.openmeap.slic.appName</key>
+	<string>OpenMEAP Integration Tests</string>
+	<key>com.openmeap.slic.pullUpdates</key>
+	<string>0</string>
+	<key>com.openmeap.slic.updateFrequency</key>
+	<string>(-1)</string>
+	<key>item_one</key>
+	<string>test_value</string>
+	<key>item_two</key>
+	<string>another_test</string>
+</dict>
+</plist>

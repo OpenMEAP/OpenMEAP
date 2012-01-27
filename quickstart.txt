@@ -1,0 +1,124 @@
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+ 
+
+OpenMEAP was created in 
+	xCode 4.2
+	Eclipse IDE for Java EE Developers (w/ the IvyDE plugin)
+http://www.eclipse.org/
+http://ant.apache.org/ivy/ivyde/
+
+OpenMEAP web projects have been tested on Apache Tomcat 5.5 and 6.0
+http://tomcat.apache.org/
+
+OpenMEAP command-line requires Apache Ant 1.8 or greater.
+http://ant.apache.org/
+
+
++==================
+1) Every shell session
+
+Correct the environment variables in this file to match your environment
+(setEnv.bat file if running in Windows)
+
+	$ . ./${OPENMEAP_HOME}/build-tools/scripts/setEnv.sh
+
++==================
+2) Building the web projects
+	
+Build the web projects (only need to do this once)
+Builds openmeap-admin-web.war and openmeap-services-web.war
+These can be dropped in apache tomcat's webapps directory
+
+You'll need to login to /openmeap-admin-web/interface/ 
+with a user who has the two roles openmeap-admin and openmeap-user
+so, you'll need to update the tomcat-users.xml in tomcat's conf directory
+
+	$ cd ${OPENMEAP_HOME}/build-tools
+	$ ant dist-all-web
+	
+The resulting artifacts will end up in ${OPENMEAP_HOME}/build-tools/dist
+
++==================
+3) Creating and building clients
+	
+Create an arbitrarily located/named directory for new SLICs
+
+	$ mkdir ~/om_client
+	$ cd ~/om_client
+
+Copy over the client.properties template provided
+
+	om_client $ cp $OPENMEAP_HOME/build-tools/template/client.properties .
+
+Correct the properties to match your environment
+
+	om_client $ vi client.properties
+	
+Create the assets folder (whatever you updated client.properties with)
+and copy in the openmeap.js
+
+	om_client $ mkdir assets
+	om_client $ cd assets
+	assets $ cp ${OPENMEAP_HOME}/clients/shared/javascript/openmeap.js .
+	
+Create DHTML application
+
+	assets $ vi index.html
+	...
+	assets $ cd .. 
+
+List what you can do (illustrative, here, only)
+
+	om_client $ om_ios.sh -p
+
+Create and build your iOS project.  Opens and runs in xCode 4.2
+
+	om_client $ om_ios.sh create-project -propertyfile client.properties
+	om_client $ om_ios.sh build-debug -propertyfile client.properties
+
+Create and build your android project.  Install to a device using adb
+See the android docs for how to do this.  The build.xml in the android
+SLIC directory is what was created by the android sdk.
+
+	om_client $ om_android.sh create-project -propertyfile client.properties
+	om_client $ om_android.sh build-debug -propertyfile client.properties
+
++==================	
+*) Import Android SLIC projects into Eclipse
+
+In order to import an Android project into into Eclipse,
+you must first make sure to import the openmeap-shared, openmeap-slic-core,
+and openmeap-slic-android projects into the target workspace.
+
+Because you must import these, you must also specify the openmeap.home
+and android.sdk.home ant properties as mentioned in the quickstart-eclipse.txt
+file.
+
+Next you must choose you must create a New Android project, 
+then select to create from existing source.  The source root
+must be whereever you directed the command-line script to create
+the SLIC.
+ 
+
+
+

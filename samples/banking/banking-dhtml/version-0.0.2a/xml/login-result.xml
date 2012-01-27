@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<result xmlns="com.openmeap.samples.banking.model">
+	<login owner="Jon Schang" auth-token="ca551b82-bcc0-4383-8af4-44a409b98eec.a73fdf5e846eade7b5b362fdbb4aada87a0eea60">
+		<accounts owner="Jon Schang">
+			<account available="18483.0" posted="18483.0" number="*6323" owner="Jon Schang" type="savings"/>
+			<account available="631.0" posted="631.0" number="*6303" owner="Jon Schang" type="checking"/>
+		</accounts>
+	</login>
+</result>

@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+-->
+<project name="openmeap-slic-core" basedir="." default="dist">
+	
+	<import file="../../../build-tools/ant_scripts/shared.xml"/>
+	
+	<property name="openmeap.project.current.file.ivy" value="${openmeap.project.slic.java.core}/ivy.xml"/>
+	<property name="openmeap.project.current.dist" value="${openmeap.project.slic.java.core.dist.jar}"/>
+	<property name="openmeap.project.current.dist.ext" value="jar"/>
+	
+	<target name="clean">
+		<delete dir="bin" includes="**/*" excludes="deleteme*.txt" failonerror="false" quiet="true"/>
+		<delete file="${openmeap.project.slic.java.core.dist.jar}" failonerror="false" quiet="true"/>
+	</target> 
+	
+	<target name="compile" depends="resolve">
+		<javac debug="true" 
+				debuglevel="${openmeap.debuglevel}" 
+				target="${openmeap.targetJdk}" 
+				destdir="bin" 
+				classpathref="openmeap.classpath">
+			<src path="src"/>
+		</javac>
+	</target>
+	
+	<target name="export-jar" depends="dist-base,compile">
+		<jar jarfile="${openmeap.project.slic.java.core.dist.jar}" basedir="bin">
+			<manifest/>
+		</jar>
+	</target>
+	
+	<target name="dist" depends="compile,export-jar"/>
+	
+</project>

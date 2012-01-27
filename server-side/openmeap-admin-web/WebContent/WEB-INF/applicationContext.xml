@@ -1,0 +1,114 @@
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ############################################################################### 
+ -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:aop="http://www.springframework.org/schema/aop"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+  http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services-2.0.xsd
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+  http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+	<bean id="servletContext" class="org.springframework.web.context.support.ServletContextFactoryBean"/>
+
+	<bean id="freeMarkerConfiguration" class="freemarker.template.Configuration">
+		<property name="templateLoader">
+			<bean class="freemarker.cache.WebappTemplateLoader">
+				<constructor-arg ref="servletContext"/>
+				<constructor-arg value="/WEB-INF/ftl"/>
+			</bean>
+		</property>
+		<property name="objectWrapper">
+			<bean class="freemarker.ext.beans.BeansWrapper">
+				<property name="simpleMapWrapper" value="true"/>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- RESOURCES USED FOR PROCESSING -->
+	<import resource="classpath:/META-INF/persistenceContext.xml"/>
+	<import resource="persistenceContext.xml"/>
+	<import resource="clusterContext.xml"/>
+	
+	<bean name="authorizer" class="com.openmeap.AuthorizerImpl" scope="request">
+		<aop:scoped-proxy/>
+	</bean>
+	
+	<!-- REUSE OR AJAX POSTABLE SECTION BEANS -->
+	<import resource="templateSectionBeans.xml"/>
+	
+	<!-- PAGE BEANS -->
+	<import resource="pageBeans.xml"/>
+
+	<bean id="layoutSectionBacking" scope="prototype" class="com.openmeap.web.LayoutBacking">
+		<property name="linkTags">
+			<list>
+				<bean class="com.openmeap.web.html.LinkTag"><constructor-arg value="../css/960.css"/></bean>
+				<bean class="com.openmeap.web.html.LinkTag"><constructor-arg value="../css/common.css"/></bean>
+			</list>
+		</property>
+		<property name="scriptTags">
+			<list>
+				<bean class="com.openmeap.web.html.ScriptTag"><constructor-arg value="../js/jquery-1.5.2.min.js"/></bean>
+				<bean class="com.openmeap.web.html.ScriptTag"><constructor-arg value="../js/jquery.tabs.js"/></bean>
+			</list>
+		</property>
+	</bean>
+
+	<!-- ANCHOR BEANS -->
+
+	<bean id="mainNavigationAnchorListBacking" scope="prototype" class="com.openmeap.admin.web.backing.AnchorListBacking">
+		<property name="processingTargetIds">
+			<list>
+				<value type="java.lang.String">com.openmeap.admin.web.MainNavigationLinks</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="mainOptionsAnchor" class="com.openmeap.web.html.Anchor">
+		<property name="url" value="?bean=mainOptionsPage"/>
+		<property name="title" value="Main Options Page"/>
+		<property name="content" value="Main Options Page"/>
+	</bean>
+	<bean id="addModifyAppAnchor" class="com.openmeap.web.html.Anchor">
+		<property name="url" value="?bean=addModifyAppPage"/>
+		<property name="title" value="Add an Application"/>
+		<property name="content" value="Add an Application"/>
+	</bean>
+	<bean id="appListingsAnchor" class="com.openmeap.web.html.Anchor">
+		<property name="url" value="?bean=appListingsPage"/>
+		<property name="title" value="List Applications"/>
+		<property name="content" value="List Applications"/>
+	</bean>
+	<bean id="settingsAnchor" class="com.openmeap.web.html.Anchor">
+		<property name="url" value="?bean=settingsPage"/>
+		<property name="title" value="Settings"/>
+		<property name="content" value="Settings"/>
+	</bean>
+	<bean id="logoutAnchor" class="com.openmeap.web.html.Anchor">
+		<property name="url" value="?logout"/>
+		<property name="title" value="Logout"/>
+		<property name="content" value="Logout"/>
+	</bean>
+
+</beans>

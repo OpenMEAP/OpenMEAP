@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ############################################################################### 
+ -->
+<persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
+	
+	<persistence-unit name="openmeap-jpa" transaction-type="RESOURCE_LOCAL">
+	
+		<!-- <provider>org.hibernate.ejb.HibernatePersistence</provider> -->
+		
+		<class>com.openmeap.model.dto.Application</class>
+		<class>com.openmeap.model.dto.Deployment</class>
+		<class>com.openmeap.model.dto.ApplicationArchive</class>
+		<class>com.openmeap.model.dto.ApplicationVersion</class>
+		<class>com.openmeap.model.dto.ApplicationInstallation</class>
+		<class>com.openmeap.model.dto.GlobalSettings</class>
+		<class>com.openmeap.model.dto.ClusterNode</class>
+		
+		<properties>
+			<!-- <property name="hibernate.hbm2ddl.auto" value="true" /> -->
+			<!-- <property name="hibernate.show_sql" value="true" /> -->
+			<!-- <property name="org.hibernate.ejb.event.EJB3AutoFlushEventListener" value="auto-flush/." /> -->
+			<property name="hibernate.query.factory_class" value="org.hibernate.hql.classic.ClassicQueryTranslatorFactory"/>
+			<!-- <property name="hibernate.ejb.cfgfile" value="/META-INF/hibernate.cfg.xml"/> -->
+		</properties>
+		
+		
+	</persistence-unit>
+	
+</persistence>

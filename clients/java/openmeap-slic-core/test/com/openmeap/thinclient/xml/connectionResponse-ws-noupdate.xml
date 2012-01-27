@@ -1,0 +1,7 @@
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+   <S:Body>
+      <ns3:connectionOpenResponse xmlns:ns3="com.openmeap.protocol.ws" xmlns:ns2="com.openmeap.protocol.dto">
+         <return auth-token="${AUTH_TOKEN}"/>
+      </ns3:connectionOpenResponse>
+   </S:Body>
+</S:Envelope>

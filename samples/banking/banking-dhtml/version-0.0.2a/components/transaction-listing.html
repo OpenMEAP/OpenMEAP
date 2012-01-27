@@ -1,0 +1,29 @@
+<div class="mobile-message"><h1>Transactions for <span class="name"/> Acct#<span class="number"/></h1>
+
+<p><a href="#page=accountsOverview">Back to Account Overviews</a></p>
+</div>
+<table id="transTable">
+	<thead>	
+	<tr>
+		<th class="date">Date</th>
+		<!--<th>Type</th>-->
+		<th class="description">Description</th>
+		<!--<th>Withdrawal</th>
+		<th>Deposit</th>-->
+		<th class="activity">Activity</th>
+		<th class="balance">Balance</th>
+	</tr>
+	</thead>
+	<tbody>	
+	<tr id="transTemplateRow" style="display:none;">
+		<td><span class="date"/></td>
+		<!--<td><span class="type"/></td>-->
+		<td><span class="desc"/></td>
+		<!--<td><span class="withdraw dollarFormat">&nbsp;</span></td>
+		<td><span class="deposit dollarFormat">&nbsp;</span></td>-->
+		<td><span class="deposit withdraw dollarFormat">&nbsp;</span></td>
+		<td><span class="balance dollarFormat"/></td>
+	</tr>
+	</tbody>
+
+</table>

@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ############################################################################### 
+ -->
+<project name="openmeap-shared-serverside" default="dist">
+
+	<import file="../../build-tools/ant_scripts/shared.xml"/>
+	<property name="openmeap.project.current.file.ivy" value="${openmeap.project.shared-serverside}/ivy.xml"/>
+	<property name="openmeap.project.current.dist" value="${openmeap.project.shared-serverside.dist.jar}"/>
+	<property name="openmeap.project.current.dist.ext" value="jar"/>
+	<property name="openmeap.ivy.cachepath.conf" value="core"/>
+	<property name="openmeap.ivy.retrieve.conf" value="core"/>
+
+	<!-- BEGIN CLEAN SECTION +++++++++++++++++++++++++++++++++++++ -->
+	
+	<target name="clean-generated-sources">
+		<delete includeemptydirs="true" quiet="true">
+			<fileset dir="gen" includes="**/*" excludes="deleteme*"/>
+		</delete>
+	</target>
+	
+	<target name="clean" depends="clean-generated-sources">
+		<delete file="${openmeap.project.shared-serverside.dist.jar}"/>
+		<delete includeemptydirs="true" quiet="true">
+			<fileset dir="bin" includes="**/*"/>
+		</delete>
+	</target>
+	
+	<!-- END CLEAN SECTION +++++++++++++++++++++++++++++++++++++++ -->
+		
+	<!-- BEGIN GENERATE SECTION ++++++++++++++++++++++++++++++++++ -->
+			
+	<!-- //TODO: figure out how to get the XJCTask functional. -->
+	<!-- <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask" classpathref="openmeap.classpath"/> -->
+	<target name="generate-sources" depends="clean-generated-sources"> 
+		<description>
+			Create and populate the ./gen/ directory with the source resulting 
+			from running XJC against the schemas in schema.
+		</description>
+		 
+		<mkdir dir="gen"/>
+		<mkdir dir="bin"/>
+		
+		<!-- Start Schema-compile template. -->
+		<exec executable="xjc">
+			<arg value="src/com/openmeap/cluster/node/config/cluster-node-configuration.xsd"/>
+			<arg value="-xmlschema"/>
+			<arg value="-d"/><arg value="gen"/>
+			<arg value="-p"/><arg value="com.openmeap.cluster.node.config"/>
+		</exec>
+		<!-- End Schema-compile template. -->
+		
+	</target>
+		
+	<!-- END GENERATE SECTION +++++++++++++++++++++++++++++++++++++ -->
+	
+	<!-- BEGIN COMPILE SECTION ++++++++++++++++++++++++++++++++++++ -->
+	
+	<target name="compile" depends="generate-sources,resolve">
+		<mkdir dir="bin"/>
+		<javac debug="true" debuglevel="${openmeap.debuglevel}" 
+				target="${openmeap.targetJdk}" 
+				destdir="bin" 
+				classpathref="openmeap.classpath">
+			<src path="gen"/>
+			<src path="src"/>
+		</javac>
+		<copy todir="bin/META-INF">
+			<fileset dir="src/META-INF" includes="**/*"/>
+		</copy>
+		<copy todir="bin">
+			<fileset dir="src" includes="openmeap-jpa.properties"/>
+		</copy>
+		<copy todir="bin/com/openmeap/cluster/node/config">
+			<fileset dir="src/com/openmeap/cluster/node/config" includes="**/*.xsd"/>
+		</copy>
+	</target>
+	
+	<!-- END COMPILE SECTION +++++++++++++++++++++++++++++++++++++ -->
+	
+	<target name="export-jar" depends="dist-base,compile">
+		<jar jarfile="${openmeap.project.shared-serverside.dist.jar}" basedir="bin">
+			<manifest/>
+		</jar>
+	</target>
+	
+	<target name="dist" depends="clean,export-jar"/>
+	
+</project>

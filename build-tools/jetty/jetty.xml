@@ -1,0 +1,237 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+<Configure id="Server" class="org.mortbay.jetty.Server">
+ 
+    <!-- =========================================================== -->
+    <!-- Server Thread Pool                                          -->
+    <!-- =========================================================== -->
+    <Set name="ThreadPool">
+      <New class="org.mortbay.thread.QueuedThreadPool">
+        <!-- initial threads set to 10 -->
+        <Set name="minThreads">10</Set>
+ 
+        <!-- the thread pool will grow only up to 200 -->
+        <Set name="maxThreads">200</Set>
+ 
+        <!-- indicates that having 20 and below, the pool will be considered low on threads -->
+        <Set name="lowThreads">20</Set>
+ 
+        <!-- The number of queued jobs (or idle threads) needed before the thread pool is grown (or shrunk) -->
+        <Set name="SpawnOrShrinkAt">2</Set>
+      </New>
+    </Set>
+ 
+ 
+ 
+    <!-- =========================================================== -->
+    <!-- Set connectors                                              -->
+    <!-- =========================================================== -->
+ 
+    <Call name="addConnector">
+      <Arg>
+          <New class="org.mortbay.jetty.nio.SelectChannelConnector">
+            <!-- the ip address or domain to bind -->
+            <Set name="host"><SystemProperty name="jetty.host" default="127.0.0.1"/></Set>
+ 
+            <!-- the port to use/bind, defaults to 8080 if property not set -->
+            <Set name="port"><SystemProperty name="jetty.port" default="8080"/></Set>
+ 
+            <!-- the time in milliseconds when a connection is considered idle -->
+            <Set name="maxIdleTime">300000</Set>
+ 
+            <!-- the number of acceptors (their job is to accept the connection and dispatch to thread pool) -->
+            <Set name="Acceptors">2</Set>
+ 
+            <!-- should the connection statistics be turned on? (Not advisable in production) -->
+            <Set name="statsOn">false</Set>
+ 
+            <!-- the confidential port -->
+            <Set name="confidentialPort"><SystemProperty name="jetty.sslPort" default="8443"/></Set>
+ 
+            <!-- indicates the minimum number of connections when the server is considered low on resources -->
+        <Set name="lowResourcesConnections">20000</Set>
+ 
+            <!-- when low on resources, this indicates the maximum time (milliseconds) a connection must be idle to not be closed -->
+        <Set name="lowResourcesMaxIdleTime">5000</Set>
+          </New>
+      </Arg>
+    </Call>
+ 
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- To add a HTTPS SSL connector                                    -->
+    <!-- mixin jetty-ssl.xml:                                            -->
+    <!--   java -jar start.jar etc/jetty.xml etc/jetty-ssl.xml           -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+ 
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- To add a HTTP blocking connector                                -->
+    <!-- mixin jetty-bio.xml:                                            -->
+    <!--   java -jar start.jar etc/jetty.xml etc/jetty-bio.xml           -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+ 
+ 
+    <!-- =========================================================== -->
+    <!-- Set handler Collection Structure                            -->
+    <!-- =========================================================== -->
+    <Set name="handler">
+      <!-- the collection of handlers that will handle the request -->
+      <New id="Handlers" class="org.mortbay.jetty.handler.HandlerCollection">
+        <Set name="handlers">
+         <Array type="org.mortbay.jetty.Handler">
+           <!-- primarily handles the request and maps the request to a ContextHandler -->
+           <Item>
+             <New id="Contexts" class="org.mortbay.jetty.handler.ContextHandlerCollection"/>
+           </Item>
+ 
+           <!-- The default handler ... handles the request if not yet handled -->
+           <Item>
+             <New id="DefaultHandler" class="org.mortbay.jetty.handler.DefaultHandler"/>
+           </Item>
+ 
+           <!-- The handler for your request logs -->
+           <Item>
+             <New id="RequestLog" class="org.mortbay.jetty.handler.RequestLogHandler"/>
+           </Item>
+         </Array>
+        </Set>
+      </New>
+    </Set>
+ 
+    <!-- =========================================================== -->
+    <!-- Configure the context deployer                              -->
+    <!-- A context deployer will deploy contexts described in        -->
+    <!-- configuration files discovered in a directory.              -->
+    <!-- The configuration directory can be scanned for hot          -->
+    <!-- deployments at the configured scanInterval.                 -->
+    <!--                                                             -->
+    <!-- This deployer is configured to deploy contexts configured   -->
+    <!-- in the $JETTY_HOME/contexts directory                       -->
+    <!--                                                             -->
+    <!-- =========================================================== -->
+    <Call name="addLifeCycle">
+      <Arg>
+        <New class="org.mortbay.jetty.deployer.ContextDeployer">
+          <!-- the ContextHandlerCollection to modify once a webapp is added or removed (Allows Hot Deployment) -->
+          <Set name="contexts"><Ref id="Contexts"/></Set>
+ 
+          <!-- the directory which will contain your context.xml files -->
+          <Set name="configurationDir"><SystemProperty name="jetty.home" default="."/>/contexts</Set>
+ 
+          <!-- the interval in milliseconds to periodically scan the configurationDir -->
+          <Set name="scanInterval">5</Set>
+        </New>
+      </Arg>
+    </Call>
+ 
+    <!-- =========================================================== -->
+    <!-- Configure the webapp deployer.                              -->
+    <!-- A webapp  deployer will deploy standard webapps discovered  -->
+    <!-- in a directory at startup, without the need for additional  -->
+    <!-- configuration files.    It does not support hot deploy or   -->
+    <!-- non standard contexts (see ContextDeployer above).          -->
+    <!--                                                             -->
+    <!-- This deployer is configured to deploy webapps from the      -->
+    <!-- $JETTY_HOME/webapps directory                               -->
+    <!--                                                             -->
+    <!-- Normally only one type of deployer need be used.            -->
+    <!--                                                             -->
+    <!-- =========================================================== -->
+    <Call name="addLifeCycle">
+      <Arg>
+        <New class="org.mortbay.jetty.deployer.WebAppDeployer">
+          <!-- the ContextHandlerCollection to add the webapps to -->
+          <Set name="contexts"><Ref id="Contexts"/></Set>
+ 
+          <!-- the directory where all the webapps are located (can be exploded or packaged as war -->
+          <Set name="webAppDir"><SystemProperty name="jetty.webapps" default="."/></Set>
+ 
+          <!-- indicates whether to lookup/load from the parent class loader first-->
+      <Set name="parentLoaderPriority">false</Set>
+ 
+          <!-- indicates whether to extract the webapp if it is packaged as a war -->
+      <Set name="extract">true</Set>
+ 
+          <!-- indicates whether a deployed webapp on a certain contextPath should have a duplicate webapp deployment -->
+      <Set name="allowDuplicates">false</Set>
+ 
+          <!-- the default descriptor to use to be applied before a webapps' web.xml -->
+          <Set name="defaultsDescriptor"><SystemProperty name="jetty.webDefault" default="./etc/webdefault.xml"/></Set>
+        </New>
+      </Arg>
+    </Call>
+ 
+    <!-- =========================================================== -->
+    <!-- Configure Authentication Realms                             -->
+    <!-- Realms may be configured for the entire server here, or     -->
+    <!-- they can be configured for a specific web app in a context  -->
+    <!-- configuration (see $(jetty.home)/contexts/test.xml for an   -->
+    <!-- example).                                                   -->
+    <!-- =========================================================== -->
+    <Set name="UserRealms">
+      <Array type="org.mortbay.jetty.security.UserRealm">
+        <Item>
+          <!-- this realm uses a properties file to store/read the user/password/roles -->
+          <New class="org.mortbay.jetty.security.HashUserRealm">
+            <!-- the name of the realm -->
+            <Set name="name">Test Realm</Set>
+ 
+            <!-- the location of the property file to load from -->
+            <Set name="config"><SystemProperty name="jetty.realmConfig" default="./etc/realm.properties"/></Set>
+ 
+            <!-- the interval in seconds to periodically scan for any changes and refresh/reload if changed -->
+            <Set name="refreshInterval">0</Set>
+          </New>
+        </Item>
+      </Array>
+    </Set>
+ 
+    <!-- =========================================================== -->
+    <!-- Configure Request Log                                       -->
+    <!-- Request logs  may be configured for the entire server here, -->
+    <!-- or they can be configured for a specific web app in a       -->
+    <!-- contexts configuration (see $(jetty.home)/contexts/test.xml -->
+    <!-- for an example).                                            -->
+    <!-- =========================================================== -->
+    <Ref id="RequestLog">
+      <Set name="requestLog">
+        <New id="RequestLogImpl" class="org.mortbay.jetty.NCSARequestLog">
+          <!-- the output file name of the log file. Name of the file will be date formatted -->
+          <Set name="filename"><SystemProperty name="jetty.logs" default="./logs"/>/yyyy_mm_dd.request.log</Set>
+ 
+          <!-- the date format -->
+          <Set name="filenameDateFormat">yyyy_MM_dd</Set>
+ 
+          <!-- the days to retain the log file -->
+          <Set name="retainDays">90</Set>
+ 
+          <!-- indicates if the new lines should be appended on an existing log file -->
+          <Set name="append">true</Set>
+ 
+          <!-- indicates if the lines logged to the file will be in extended format -->
+          <Set name="extended">true</Set>
+ 
+          <!-- Indicates if the cookie logs should be included in the log file -->
+          <Set name="logCookies">false</Set>
+ 
+          <!-- the timezone of the log -->
+          <Set name="LogTimeZone">GMT</Set>
+        </New>
+      </Set>
+    </Ref>
+ 
+    <!-- =========================================================== -->
+    <!-- extra options                                               -->
+    <!-- =========================================================== -->
+ 
+    <!-- Stops the server when ctrl+c is pressed (registers to Runtime.addShutdownHook) 
+    <Set name="stopAtShutdown">true</Set> -->
+ 
+    <!-- send the server version in the response header? -->
+    <Set name="sendServerVersion">true</Set>
+ 
+    <!-- send the date header in the response header? -->
+    <Set name="sendDateHeader">true</Set>
+ 
+    <!-- allows requests(prior to shutdown) to finish gracefully -->
+    <Set name="gracefulShutdown">1000</Set>
+</Configure>

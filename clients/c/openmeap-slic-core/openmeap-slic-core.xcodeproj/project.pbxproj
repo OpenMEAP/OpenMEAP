@@ -1,0 +1,605 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9208DB1713AED13000DE894C /* network.c in Sources */ = {isa = PBXBuildFile; fileRef = 9208DB1613AED13000DE894C /* network.c */; };
+		923EB9A81380855400BB8BBB /* config.c in Sources */ = {isa = PBXBuildFile; fileRef = 923EB9A71380855400BB8BBB /* config.c */; };
+		9245728713CA51F300EA6D73 /* prefs.c in Sources */ = {isa = PBXBuildFile; fileRef = 9245728513CA51F300EA6D73 /* prefs.c */; };
+		9245728813CA51F300EA6D73 /* props.c in Sources */ = {isa = PBXBuildFile; fileRef = 9245728613CA51F300EA6D73 /* props.c */; };
+		925FD2021391D193004FEA8D /* storage-test.c in Sources */ = {isa = PBXBuildFile; fileRef = 925FD2001391D193004FEA8D /* storage-test.c */; };
+		925FD32513931D8B004FEA8D /* dict.c in Sources */ = {isa = PBXBuildFile; fileRef = 925FD32413931D8B004FEA8D /* dict.c */; };
+		925FD38113932369004FEA8D /* dict-test.c in Sources */ = {isa = PBXBuildFile; fileRef = 925FD37F13932369004FEA8D /* dict-test.c */; };
+		925FD535139429F6004FEA8D /* config-test.c in Sources */ = {isa = PBXBuildFile; fileRef = 925FD533139429F6004FEA8D /* config-test.c */; };
+		925FD6131398692A004FEA8D /* string.c in Sources */ = {isa = PBXBuildFile; fileRef = 925FD6121398692A004FEA8D /* string.c */; };
+		925FD6CD13987697004FEA8D /* string-test.c in Sources */ = {isa = PBXBuildFile; fileRef = 925FD6CB13987697004FEA8D /* string-test.c */; };
+		925FD83A139C1234004FEA8D /* mem.c in Sources */ = {isa = PBXBuildFile; fileRef = 925FD839139C1234004FEA8D /* mem.c */; };
+		92955DED1435DB1D00B65337 /* jsapi-test.c in Sources */ = {isa = PBXBuildFile; fileRef = 92955DEC1435DB1D00B65337 /* jsapi-test.c */; };
+		9297882E137618FF00FF14A4 /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = 9297882A137618FF00FF14A4 /* error.c */; };
+		9297882F137618FF00FF14A4 /* openmeap-slic-core.c in Sources */ = {isa = PBXBuildFile; fileRef = 9297882B137618FF00FF14A4 /* openmeap-slic-core.c */; };
+		92B6B70D145AD1A40013EB48 /* cJSON.c in Sources */ = {isa = PBXBuildFile; fileRef = 92B6B703145AD1A40013EB48 /* cJSON.c */; };
+		92C19A2513B6F96C00A87521 /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = 92C19A2413B6F96C00A87521 /* zip.c */; };
+		92C19A2713B6F99300A87521 /* zip-test.c in Sources */ = {isa = PBXBuildFile; fileRef = 92C19A2613B6F99300A87521 /* zip-test.c */; };
+		92C19C0D13B8029400A87521 /* test.zip in CopyFiles */ = {isa = PBXBuildFile; fileRef = 92C19C0113B8021F00A87521 /* test.zip */; };
+		92C19C7C13B937E300A87521 /* crypt.h in Headers */ = {isa = PBXBuildFile; fileRef = 92C19C7713B937E300A87521 /* crypt.h */; };
+		92C19C7D13B937E300A87521 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 92C19C7813B937E300A87521 /* ioapi.c */; };
+		92C19C7E13B937E300A87521 /* ioapi.h in Headers */ = {isa = PBXBuildFile; fileRef = 92C19C7913B937E300A87521 /* ioapi.h */; };
+		92C19C7F13B937E300A87521 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = 92C19C7A13B937E300A87521 /* unzip.c */; };
+		92C19C8013B937E300A87521 /* unzip.h in Headers */ = {isa = PBXBuildFile; fileRef = 92C19C7B13B937E300A87521 /* unzip.h */; };
+		92C19E7413BBD05B00A87521 /* digest.c in Sources */ = {isa = PBXBuildFile; fileRef = 92C19E7313BBD05B00A87521 /* digest.c */; };
+		92C1A08D13BBF25600A87521 /* storage-default.c in Sources */ = {isa = PBXBuildFile; fileRef = 92C1A08C13BBF25600A87521 /* storage-default.c */; };
+		92C1A08E13BBF25600A87521 /* storage-default.c in Sources */ = {isa = PBXBuildFile; fileRef = 92C1A08C13BBF25600A87521 /* storage-default.c */; };
+		92C1A0E813BBF66E00A87521 /* storage-mock.c in Sources */ = {isa = PBXBuildFile; fileRef = 92D8DB681389334D00FA7158 /* storage-mock.c */; };
+		92C1A10113BBF6E100A87521 /* libopenmeap-slic-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC046055464E500DB518D /* libopenmeap-slic-core.a */; };
+		92C1A17B13BD38B400A87521 /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = 92C1A17913BD38B400A87521 /* sha1.c */; };
+		92C1A17C13BD38B400A87521 /* sha1.h in Headers */ = {isa = PBXBuildFile; fileRef = 92C1A17A13BD38B400A87521 /* sha1.h */; };
+		92C1A27113BD458A00A87521 /* digest-test.c in Sources */ = {isa = PBXBuildFile; fileRef = 92C1A26F13BD458A00A87521 /* digest-test.c */; };
+		92C1A33113BD54FE00A87521 /* md5.c in Sources */ = {isa = PBXBuildFile; fileRef = 92C1A32F13BD54FE00A87521 /* md5.c */; };
+		92C79EE114CE4EC90000697E /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 92C79EE014CE4EC90000697E /* libz.dylib */; };
+		92C79EE214CE4ED40000697E /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 92C79EE014CE4EC90000697E /* libz.dylib */; };
+		92D8DB1B1388020200FA7158 /* unit-tests.c in Sources */ = {isa = PBXBuildFile; fileRef = 9297881C137618D800FF14A4 /* unit-tests.c */; };
+		92D8DB761389791100FA7158 /* update.c in Sources */ = {isa = PBXBuildFile; fileRef = 92D8DB751389791100FA7158 /* update.c */; };
+		92D8DC87138B4AF300FA7158 /* storage.c in Sources */ = {isa = PBXBuildFile; fileRef = 92D8DC86138B4AF300FA7158 /* storage.c */; };
+		92D8DCB5138C9A2F00FA7158 /* network-mock.c in Sources */ = {isa = PBXBuildFile; fileRef = 92D8DB651389334D00FA7158 /* network-mock.c */; };
+		92D8DCB6138C9A2F00FA7158 /* prefs-mock.c in Sources */ = {isa = PBXBuildFile; fileRef = 92D8DB661389334D00FA7158 /* prefs-mock.c */; };
+		92D8DCB7138C9A2F00FA7158 /* props-mock.c in Sources */ = {isa = PBXBuildFile; fileRef = 92D8DB671389334D00FA7158 /* props-mock.c */; };
+		92D8DCE9138F281300FA7158 /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = 92D8DCE8138F281300FA7158 /* list.c */; };
+		92D8DD5E1391245100FA7158 /* core-test.c in Sources */ = {isa = PBXBuildFile; fileRef = 92D8DD5A1391245100FA7158 /* core-test.c */; };
+		92D8DD5F1391245100FA7158 /* error-test.c in Sources */ = {isa = PBXBuildFile; fileRef = 92D8DD5C1391245100FA7158 /* error-test.c */; };
+		92D8DD691391247B00FA7158 /* list-test.c in Sources */ = {isa = PBXBuildFile; fileRef = 92D8DD671391247B00FA7158 /* list-test.c */; };
+		92DA232E13A187CB000EF246 /* update-test.c in Sources */ = {isa = PBXBuildFile; fileRef = 92DA232C13A187CB000EF246 /* update-test.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		92C1A0FF13BBF6D400A87521 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
+			remoteInfo = "openmeap-slic-core";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		92C19C1613B8029E00A87521 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				92C19C0D13B8029400A87521 /* test.zip in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		9208DB1613AED13000DE894C /* network.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = network.c; path = src/network.c; sourceTree = "<group>"; };
+		920D8D6714531011002E3F07 /* include */ = {isa = PBXFileReference; lastKnownFileType = folder; path = include; sourceTree = "<group>"; };
+		9234FF1413A59BFE00DF2AB0 /* network-mock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "network-mock.h"; path = "test/mock/network-mock.h"; sourceTree = "<group>"; };
+		923EB9A71380855400BB8BBB /* config.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = config.c; path = src/config.c; sourceTree = "<group>"; };
+		9245728513CA51F300EA6D73 /* prefs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = prefs.c; path = src/prefs.c; sourceTree = "<group>"; };
+		9245728613CA51F300EA6D73 /* props.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = props.c; path = src/props.c; sourceTree = "<group>"; };
+		925FD2001391D193004FEA8D /* storage-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "storage-test.c"; path = "test/storage-test.c"; sourceTree = "<group>"; };
+		925FD2011391D193004FEA8D /* storage-test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "storage-test.h"; path = "test/storage-test.h"; sourceTree = "<group>"; };
+		925FD32413931D8B004FEA8D /* dict.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dict.c; path = src/dict.c; sourceTree = "<group>"; };
+		925FD37F13932369004FEA8D /* dict-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "dict-test.c"; path = "test/dict-test.c"; sourceTree = "<group>"; };
+		925FD38013932369004FEA8D /* dict-test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "dict-test.h"; path = "test/dict-test.h"; sourceTree = "<group>"; };
+		925FD533139429F6004FEA8D /* config-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "config-test.c"; path = "test/config-test.c"; sourceTree = "<group>"; };
+		925FD534139429F6004FEA8D /* config-test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "config-test.h"; path = "test/config-test.h"; sourceTree = "<group>"; };
+		925FD6121398692A004FEA8D /* string.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = string.c; path = src/string.c; sourceTree = "<group>"; };
+		925FD6CB13987697004FEA8D /* string-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "string-test.c"; path = "test/string-test.c"; sourceTree = "<group>"; };
+		925FD6CC13987697004FEA8D /* string-test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "string-test.h"; path = "test/string-test.h"; sourceTree = "<group>"; };
+		925FD839139C1234004FEA8D /* mem.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mem.c; path = src/mem.c; sourceTree = "<group>"; };
+		92955DEC1435DB1D00B65337 /* jsapi-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "jsapi-test.c"; path = "test/jsapi-test.c"; sourceTree = "<group>"; };
+		929787361375B04300FF14A4 /* unit-tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "unit-tests-Info.plist"; sourceTree = "<group>"; };
+		9297881C137618D800FF14A4 /* unit-tests.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "unit-tests.c"; path = "test/unit-tests.c"; sourceTree = "<group>"; };
+		9297881D137618D800FF14A4 /* unit-tests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "unit-tests.h"; path = "test/unit-tests.h"; sourceTree = "<group>"; };
+		9297882A137618FF00FF14A4 /* error.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = error.c; path = src/error.c; sourceTree = "<group>"; };
+		9297882B137618FF00FF14A4 /* openmeap-slic-core.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "openmeap-slic-core.c"; path = "src/openmeap-slic-core.c"; sourceTree = "<group>"; };
+		92B6B703145AD1A40013EB48 /* cJSON.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cJSON.c; sourceTree = "<group>"; };
+		92B6B704145AD1A40013EB48 /* cJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cJSON.h; sourceTree = "<group>"; };
+		92C19A2413B6F96C00A87521 /* zip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zip.c; path = src/zip.c; sourceTree = "<group>"; };
+		92C19A2613B6F99300A87521 /* zip-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "zip-test.c"; path = "test/zip-test.c"; sourceTree = "<group>"; };
+		92C19A2A13B6F9BB00A87521 /* zip-test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "zip-test.h"; path = "test/zip-test.h"; sourceTree = "<group>"; };
+		92C19C0113B8021F00A87521 /* test.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = test.zip; sourceTree = "<group>"; };
+		92C19C7713B937E300A87521 /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crypt.h; path = "3rd_party/minzip-1.01h/crypt.h"; sourceTree = "<group>"; };
+		92C19C7813B937E300A87521 /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ioapi.c; path = "3rd_party/minzip-1.01h/ioapi.c"; sourceTree = "<group>"; };
+		92C19C7913B937E300A87521 /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ioapi.h; path = "3rd_party/minzip-1.01h/ioapi.h"; sourceTree = "<group>"; };
+		92C19C7A13B937E300A87521 /* unzip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = unzip.c; path = "3rd_party/minzip-1.01h/unzip.c"; sourceTree = "<group>"; };
+		92C19C7B13B937E300A87521 /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = unzip.h; path = "3rd_party/minzip-1.01h/unzip.h"; sourceTree = "<group>"; };
+		92C19C8113B9380300A87521 /* libz.1.2.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.3.dylib; path = usr/lib/libz.1.2.3.dylib; sourceTree = SDKROOT; };
+		92C19E7313BBD05B00A87521 /* digest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = digest.c; path = src/digest.c; sourceTree = "<group>"; };
+		92C1A08C13BBF25600A87521 /* storage-default.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "storage-default.c"; path = "src/storage-default.c"; sourceTree = "<group>"; };
+		92C1A17913BD38B400A87521 /* sha1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sha1.c; path = "3rd_party/digest-sha1/sha1.c"; sourceTree = "<group>"; };
+		92C1A17A13BD38B400A87521 /* sha1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sha1.h; path = "3rd_party/digest-sha1/sha1.h"; sourceTree = "<group>"; };
+		92C1A26F13BD458A00A87521 /* digest-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "digest-test.c"; path = "test/digest-test.c"; sourceTree = "<group>"; };
+		92C1A27013BD458A00A87521 /* digest-test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "digest-test.h"; path = "test/digest-test.h"; sourceTree = "<group>"; };
+		92C1A32F13BD54FE00A87521 /* md5.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = md5.c; path = "3rd_party/digest-md5/md5.c"; sourceTree = "<group>"; };
+		92C1A33B13BD555700A87521 /* md5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = md5.h; path = "3rd_party/digest-md5/md5.h"; sourceTree = "<group>"; };
+		92C79EE014CE4EC90000697E /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		92D8DAFC1388015F00FA7158 /* openmeap-slic-core-tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "openmeap-slic-core-tests-Info.plist"; sourceTree = "<group>"; };
+		92D8DB14138801D700FA7158 /* openmeap-slic-core-tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "openmeap-slic-core-tests"; sourceTree = BUILT_PRODUCTS_DIR; };
+		92D8DB651389334D00FA7158 /* network-mock.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "network-mock.c"; path = "test/mock/network-mock.c"; sourceTree = "<group>"; };
+		92D8DB661389334D00FA7158 /* prefs-mock.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "prefs-mock.c"; path = "test/mock/prefs-mock.c"; sourceTree = "<group>"; };
+		92D8DB671389334D00FA7158 /* props-mock.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "props-mock.c"; path = "test/mock/props-mock.c"; sourceTree = "<group>"; };
+		92D8DB681389334D00FA7158 /* storage-mock.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "storage-mock.c"; path = "test/mock/storage-mock.c"; sourceTree = "<group>"; };
+		92D8DB751389791100FA7158 /* update.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = update.c; path = src/update.c; sourceTree = "<group>"; };
+		92D8DC86138B4AF300FA7158 /* storage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = storage.c; path = src/storage.c; sourceTree = "<group>"; };
+		92D8DCE8138F281300FA7158 /* list.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = list.c; path = src/list.c; sourceTree = "<group>"; };
+		92D8DD5A1391245100FA7158 /* core-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "core-test.c"; path = "test/core-test.c"; sourceTree = "<group>"; };
+		92D8DD5B1391245100FA7158 /* core-test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "core-test.h"; path = "test/core-test.h"; sourceTree = "<group>"; };
+		92D8DD5C1391245100FA7158 /* error-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "error-test.c"; path = "test/error-test.c"; sourceTree = "<group>"; };
+		92D8DD5D1391245100FA7158 /* error-test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "error-test.h"; path = "test/error-test.h"; sourceTree = "<group>"; };
+		92D8DD671391247B00FA7158 /* list-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "list-test.c"; path = "test/list-test.c"; sourceTree = "<group>"; };
+		92D8DD681391247B00FA7158 /* list-test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "list-test.h"; path = "test/list-test.h"; sourceTree = "<group>"; };
+		92DA232C13A187CB000EF246 /* update-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "update-test.c"; path = "test/update-test.c"; sourceTree = "<group>"; };
+		92DA232D13A187CB000EF246 /* update-test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "update-test.h"; path = "test/update-test.h"; sourceTree = "<group>"; };
+		D2AAC046055464E500DB518D /* libopenmeap-slic-core.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libopenmeap-slic-core.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		92D8DB12138801D700FA7158 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				92C79EE214CE4ED40000697E /* libz.dylib in Frameworks */,
+				92C1A10113BBF6E100A87521 /* libopenmeap-slic-core.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D289987405E68DCB004EDB86 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				92C79EE114CE4EC90000697E /* libz.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* openmeap-slic-core */ = {
+			isa = PBXGroup;
+			children = (
+				92C79EE014CE4EC90000697E /* libz.dylib */,
+				920D8D6714531011002E3F07 /* include */,
+				92C1A17613BD387A00A87521 /* 3rd_Party */,
+				9297873F1375B10800FF14A4 /* Test */,
+				08FB7795FE84155DC02AAC07 /* Source */,
+				C6A0FF2B0290797F04C91782 /* Documentation */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+				929787361375B04300FF14A4 /* unit-tests-Info.plist */,
+				92D8DAFC1388015F00FA7158 /* openmeap-slic-core-tests-Info.plist */,
+				92C19C8113B9380300A87521 /* libz.1.2.3.dylib */,
+			);
+			name = "openmeap-slic-core";
+			sourceTree = "<group>";
+		};
+		08FB7795FE84155DC02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				9245728513CA51F300EA6D73 /* prefs.c */,
+				9245728613CA51F300EA6D73 /* props.c */,
+				92C19E7313BBD05B00A87521 /* digest.c */,
+				92C19A2413B6F96C00A87521 /* zip.c */,
+				925FD839139C1234004FEA8D /* mem.c */,
+				925FD6121398692A004FEA8D /* string.c */,
+				925FD32413931D8B004FEA8D /* dict.c */,
+				92D8DCE8138F281300FA7158 /* list.c */,
+				92D8DC86138B4AF300FA7158 /* storage.c */,
+				92C1A08C13BBF25600A87521 /* storage-default.c */,
+				92D8DB751389791100FA7158 /* update.c */,
+				9297882A137618FF00FF14A4 /* error.c */,
+				9297882B137618FF00FF14A4 /* openmeap-slic-core.c */,
+				923EB9A71380855400BB8BBB /* config.c */,
+				9208DB1613AED13000DE894C /* network.c */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D2AAC046055464E500DB518D /* libopenmeap-slic-core.a */,
+				92D8DB14138801D700FA7158 /* openmeap-slic-core-tests */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9297873F1375B10800FF14A4 /* Test */ = {
+			isa = PBXGroup;
+			children = (
+				92955DEC1435DB1D00B65337 /* jsapi-test.c */,
+				92C1A26F13BD458A00A87521 /* digest-test.c */,
+				92C1A27013BD458A00A87521 /* digest-test.h */,
+				92C19C0013B8021F00A87521 /* data */,
+				92C19A2A13B6F9BB00A87521 /* zip-test.h */,
+				92C19A2613B6F99300A87521 /* zip-test.c */,
+				92DA232C13A187CB000EF246 /* update-test.c */,
+				92DA232D13A187CB000EF246 /* update-test.h */,
+				925FD6CB13987697004FEA8D /* string-test.c */,
+				925FD6CC13987697004FEA8D /* string-test.h */,
+				925FD533139429F6004FEA8D /* config-test.c */,
+				925FD534139429F6004FEA8D /* config-test.h */,
+				925FD37F13932369004FEA8D /* dict-test.c */,
+				925FD38013932369004FEA8D /* dict-test.h */,
+				925FD2001391D193004FEA8D /* storage-test.c */,
+				925FD2011391D193004FEA8D /* storage-test.h */,
+				92D8DD671391247B00FA7158 /* list-test.c */,
+				92D8DD681391247B00FA7158 /* list-test.h */,
+				92D8DD5A1391245100FA7158 /* core-test.c */,
+				92D8DD5B1391245100FA7158 /* core-test.h */,
+				92D8DD5C1391245100FA7158 /* error-test.c */,
+				92D8DD5D1391245100FA7158 /* error-test.h */,
+				92D8DB5F138804DE00FA7158 /* Mock */,
+				9297881C137618D800FF14A4 /* unit-tests.c */,
+				9297881D137618D800FF14A4 /* unit-tests.h */,
+			);
+			name = Test;
+			sourceTree = "<group>";
+		};
+		92B6B702145AD1A40013EB48 /* cJSON */ = {
+			isa = PBXGroup;
+			children = (
+				92B6B703145AD1A40013EB48 /* cJSON.c */,
+				92B6B704145AD1A40013EB48 /* cJSON.h */,
+			);
+			name = cJSON;
+			path = 3rd_party/cJSON;
+			sourceTree = "<group>";
+		};
+		92C19A0D13B6AC5000A87521 /* MiniZip-1.01h */ = {
+			isa = PBXGroup;
+			children = (
+				92C19C7713B937E300A87521 /* crypt.h */,
+				92C19C7813B937E300A87521 /* ioapi.c */,
+				92C19C7913B937E300A87521 /* ioapi.h */,
+				92C19C7A13B937E300A87521 /* unzip.c */,
+				92C19C7B13B937E300A87521 /* unzip.h */,
+			);
+			name = "MiniZip-1.01h";
+			sourceTree = "<group>";
+		};
+		92C19C0013B8021F00A87521 /* data */ = {
+			isa = PBXGroup;
+			children = (
+				92C19C0113B8021F00A87521 /* test.zip */,
+			);
+			name = data;
+			path = test/data;
+			sourceTree = "<group>";
+		};
+		92C1A17613BD387A00A87521 /* 3rd_Party */ = {
+			isa = PBXGroup;
+			children = (
+				92B6B702145AD1A40013EB48 /* cJSON */,
+				92C1A17813BD389A00A87521 /* digest-sha1 */,
+				92C1A17713BD388D00A87521 /* digest-md5 */,
+				92C19A0D13B6AC5000A87521 /* MiniZip-1.01h */,
+			);
+			name = 3rd_Party;
+			sourceTree = "<group>";
+		};
+		92C1A17713BD388D00A87521 /* digest-md5 */ = {
+			isa = PBXGroup;
+			children = (
+				92C1A33B13BD555700A87521 /* md5.h */,
+				92C1A32F13BD54FE00A87521 /* md5.c */,
+			);
+			name = "digest-md5";
+			sourceTree = "<group>";
+		};
+		92C1A17813BD389A00A87521 /* digest-sha1 */ = {
+			isa = PBXGroup;
+			children = (
+				92C1A17913BD38B400A87521 /* sha1.c */,
+				92C1A17A13BD38B400A87521 /* sha1.h */,
+			);
+			name = "digest-sha1";
+			sourceTree = "<group>";
+		};
+		92D8DB5F138804DE00FA7158 /* Mock */ = {
+			isa = PBXGroup;
+			children = (
+				9234FF1413A59BFE00DF2AB0 /* network-mock.h */,
+				92D8DB651389334D00FA7158 /* network-mock.c */,
+				92D8DB661389334D00FA7158 /* prefs-mock.c */,
+				92D8DB671389334D00FA7158 /* props-mock.c */,
+				92D8DB681389334D00FA7158 /* storage-mock.c */,
+			);
+			name = Mock;
+			sourceTree = "<group>";
+		};
+		C6A0FF2B0290797F04C91782 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Documentation;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D2AAC043055464E500DB518D /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				92C19C7C13B937E300A87521 /* crypt.h in Headers */,
+				92C19C7E13B937E300A87521 /* ioapi.h in Headers */,
+				92C19C8013B937E300A87521 /* unzip.h in Headers */,
+				92C1A17C13BD38B400A87521 /* sha1.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		92D8DB13138801D700FA7158 /* openmeap-slic-core-tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 92D8DB18138801EB00FA7158 /* Build configuration list for PBXNativeTarget "openmeap-slic-core-tests" */;
+			buildPhases = (
+				92C19C1613B8029E00A87521 /* CopyFiles */,
+				92D8DB11138801D700FA7158 /* Sources */,
+				92D8DB12138801D700FA7158 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				92C1A10013BBF6D400A87521 /* PBXTargetDependency */,
+			);
+			name = "openmeap-slic-core-tests";
+			productName = "openmeap-slic-core-tests";
+			productReference = 92D8DB14138801D700FA7158 /* openmeap-slic-core-tests */;
+			productType = "com.apple.product-type.tool";
+		};
+		D2AAC045055464E500DB518D /* openmeap-slic-core */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB91EB08733DB70010E9CD /* Build configuration list for PBXNativeTarget "openmeap-slic-core" */;
+			buildPhases = (
+				D2AAC043055464E500DB518D /* Headers */,
+				D2AAC044055464E500DB518D /* Sources */,
+				D289987405E68DCB004EDB86 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "openmeap-slic-core";
+			productName = "openmeap-slic-core";
+			productReference = D2AAC046055464E500DB518D /* libopenmeap-slic-core.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB91EF08733DB70010E9CD /* Build configuration list for PBXProject "openmeap-slic-core" */;
+			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 08FB7794FE84155DC02AAC07 /* openmeap-slic-core */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D2AAC045055464E500DB518D /* openmeap-slic-core */,
+				92D8DB13138801D700FA7158 /* openmeap-slic-core-tests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		92D8DB11138801D700FA7158 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				92C1A0E813BBF66E00A87521 /* storage-mock.c in Sources */,
+				92D8DD691391247B00FA7158 /* list-test.c in Sources */,
+				92D8DD5E1391245100FA7158 /* core-test.c in Sources */,
+				92D8DD5F1391245100FA7158 /* error-test.c in Sources */,
+				92D8DCB5138C9A2F00FA7158 /* network-mock.c in Sources */,
+				92D8DCB6138C9A2F00FA7158 /* prefs-mock.c in Sources */,
+				92D8DCB7138C9A2F00FA7158 /* props-mock.c in Sources */,
+				92D8DB1B1388020200FA7158 /* unit-tests.c in Sources */,
+				925FD2021391D193004FEA8D /* storage-test.c in Sources */,
+				925FD38113932369004FEA8D /* dict-test.c in Sources */,
+				925FD535139429F6004FEA8D /* config-test.c in Sources */,
+				925FD6CD13987697004FEA8D /* string-test.c in Sources */,
+				92DA232E13A187CB000EF246 /* update-test.c in Sources */,
+				92C19A2713B6F99300A87521 /* zip-test.c in Sources */,
+				92C1A08E13BBF25600A87521 /* storage-default.c in Sources */,
+				92C1A27113BD458A00A87521 /* digest-test.c in Sources */,
+				92955DED1435DB1D00B65337 /* jsapi-test.c in Sources */,
+				92B6B70D145AD1A40013EB48 /* cJSON.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D2AAC044055464E500DB518D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9297882E137618FF00FF14A4 /* error.c in Sources */,
+				9297882F137618FF00FF14A4 /* openmeap-slic-core.c in Sources */,
+				923EB9A81380855400BB8BBB /* config.c in Sources */,
+				92D8DB761389791100FA7158 /* update.c in Sources */,
+				92D8DC87138B4AF300FA7158 /* storage.c in Sources */,
+				92D8DCE9138F281300FA7158 /* list.c in Sources */,
+				925FD32513931D8B004FEA8D /* dict.c in Sources */,
+				925FD6131398692A004FEA8D /* string.c in Sources */,
+				925FD83A139C1234004FEA8D /* mem.c in Sources */,
+				9208DB1713AED13000DE894C /* network.c in Sources */,
+				92C19A2513B6F96C00A87521 /* zip.c in Sources */,
+				92C19C7D13B937E300A87521 /* ioapi.c in Sources */,
+				92C19C7F13B937E300A87521 /* unzip.c in Sources */,
+				92C19E7413BBD05B00A87521 /* digest.c in Sources */,
+				92C1A08D13BBF25600A87521 /* storage-default.c in Sources */,
+				92C1A17B13BD38B400A87521 /* sha1.c in Sources */,
+				92C1A33113BD54FE00A87521 /* md5.c in Sources */,
+				9245728713CA51F300EA6D73 /* prefs.c in Sources */,
+				9245728813CA51F300EA6D73 /* props.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		92C1A10013BBF6D400A87521 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D2AAC045055464E500DB518D /* openmeap-slic-core */;
+			targetProxy = 92C1A0FF13BBF6D400A87521 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB91EC08733DB70010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_SYMBOL_SEPARATION = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					"${PROJECT_DIR}/3rd_party/**",
+					"${PROJECT_DIR}/include",
+				);
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "openmeap-slic-core";
+				USER_HEADER_SEARCH_PATHS = "";
+			};
+			name = Debug;
+		};
+		1DEB91ED08733DB70010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/3rd_party/zlib-1.2.5\"",
+				);
+				PRODUCT_NAME = "openmeap-slic-core";
+			};
+			name = Release;
+		};
+		1DEB91F008733DB70010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.6;
+			};
+			name = Debug;
+		};
+		1DEB91F108733DB70010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.6;
+			};
+			name = Release;
+		};
+		92D8DB16138801D700FA7158 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = include;
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/3rd_party/zlib-1.2.5\"",
+				);
+				OTHER_LDFLAGS = "";
+				PREBINDING = NO;
+				PRELINK_LIBS = "";
+				PRODUCT_NAME = "openmeap-slic-core-tests";
+			};
+			name = Debug;
+		};
+		92D8DB17138801D700FA7158 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../../Library/check-0.9.8\"",
+					"\"$(SRCROOT)/3rd_party/zlib-1.2.5\"",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "openmeap-slic-core-tests";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB91EB08733DB70010E9CD /* Build configuration list for PBXNativeTarget "openmeap-slic-core" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB91EC08733DB70010E9CD /* Debug */,
+				1DEB91ED08733DB70010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB91EF08733DB70010E9CD /* Build configuration list for PBXProject "openmeap-slic-core" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB91F008733DB70010E9CD /* Debug */,
+				1DEB91F108733DB70010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		92D8DB18138801EB00FA7158 /* Build configuration list for PBXNativeTarget "openmeap-slic-core-tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				92D8DB16138801D700FA7158 /* Debug */,
+				92D8DB17138801D700FA7158 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

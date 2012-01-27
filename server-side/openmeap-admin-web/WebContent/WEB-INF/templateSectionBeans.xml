@@ -1,0 +1,168 @@
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ############################################################################### 
+ -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+  http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services-2.0.xsd
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<bean id="messagesSection" scope="prototype" class="com.openmeap.web.FreeMarkerSection">
+		<property name="configuration" ref="freeMarkerConfiguration"/>
+		<property name="templatePath" value="messages.ftl"/>
+		<property name="sectionBacking">
+			<bean class="com.openmeap.admin.web.backing.MessagesBacking"/>
+		</property>
+	</bean>
+
+	<bean id="headerSection" scope="prototype" class="com.openmeap.web.FreeMarkerSection">
+		<property name="configuration" ref="freeMarkerConfiguration"/>
+		<property name="templatePath" value="menu-options-anchors-list.ftl"/>
+		<property name="children">
+			<map>
+				<entry key="menuList">
+					<bean class="com.openmeap.web.FreeMarkerSection">
+						<property name="configuration" ref="freeMarkerConfiguration"/>
+						<property name="templatePath" value="list-anchors.ftl"/>
+						<property name="sectionBacking" ref="mainNavigationAnchorListBacking"/>
+						<property name="templateVariables">
+							<map>
+								<entry key="links">
+									<list>
+										<ref bean="mainOptionsAnchor"/>
+										<ref bean="appListingsAnchor"/>
+										<ref bean="addModifyAppAnchor"/>
+										<ref bean="settingsAnchor"/>
+										<ref bean="logoutAnchor"/>
+									</list>
+								</entry>
+							</map>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="subnavigationSection" scope="prototype" class="com.openmeap.web.FreeMarkerSection">
+		<property name="configuration" ref="freeMarkerConfiguration"/>
+		<property name="templatePath" value="list-anchors.ftl"/>
+		<property name="sectionBacking">
+			<bean id="mainNavigationAnchorListBacking" scope="prototype" class="com.openmeap.admin.web.backing.AnchorListBacking">
+				<property name="processingTargetIds">
+					<list>
+						<value type="java.lang.String">com.openmeap.admin.web.SubNavigationLinks</value>
+					</list>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="footerSection" scope="prototype" class="com.openmeap.web.FreeMarkerSection">
+		<property name="configuration" ref="freeMarkerConfiguration"/>
+		<property name="templatePath" value="default-footer.ftl"/>
+		<property name="templateVariables">
+			<map>
+				<entry key="currentTime"><bean class="java.util.Date"/></entry>
+			</map>
+		</property>
+	</bean>	
+	
+	<bean id="mainOptionsSection" scope="prototype" class="com.openmeap.web.FreeMarkerSection">
+		<property name="configuration" ref="freeMarkerConfiguration"/>
+		<property name="templatePath" value="list-anchors.ftl"/>
+	</bean>
+	
+	<bean id="mainOptionsRowSection" scope="prototype" class="com.openmeap.web.FreeMarkerSection">
+		<property name="configuration" ref="freeMarkerConfiguration"/>
+		<property name="templatePath" value="menu-options-row.ftl"/>
+	</bean>
+	
+	<bean id="appListingsSection" scope="prototype" class="com.openmeap.web.FreeMarkerSection">
+		<property name="configuration" ref="freeMarkerConfiguration"/>
+		<property name="templatePath" value="list-applications.ftl"/>
+		<property name="sectionBacking">
+			<bean class="com.openmeap.admin.web.backing.ApplicationListingsBacking">
+				<property name="modelManager" ref="modelManager"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="appVersionListingsSection" scope="prototype" class="com.openmeap.web.FreeMarkerSection">
+		<property name="configuration" ref="freeMarkerConfiguration"/>
+		<property name="templatePath" value="list-application-versions.ftl"/>
+		<property name="sectionBacking">
+			<bean class="com.openmeap.admin.web.backing.ApplicationVersionListingsBacking">
+				<property name="modelManager" ref="modelManager"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="addModifyAppSection" scope="prototype" class="com.openmeap.web.FreeMarkerSection">
+		<property name="configuration" ref="freeMarkerConfiguration"/>
+		<property name="templatePath" value="form-application-addmodify.ftl"/>
+		<property name="sectionBacking">
+			<bean class="com.openmeap.admin.web.backing.AddModifyApplicationBacking">
+				<property name="modelManager" ref="modelManager"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="addModifyAppVersionSection" scope="prototype" class="com.openmeap.web.FreeMarkerSection">
+		<property name="configuration" ref="freeMarkerConfiguration"/>
+		<property name="templatePath" value="form-application-version-addmodify.ftl"/>
+		<property name="sectionBacking">
+			<bean class="com.openmeap.admin.web.backing.AddModifyApplicationVersionBacking">
+				<property name="modelManager" ref="modelManager"/>
+				<property name="archiveUploadNotifier" ref="archiveUploadNotifier"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="settingsSection" scope="prototype" class="com.openmeap.web.FreeMarkerSection">
+		<property name="configuration" ref="freeMarkerConfiguration"/>
+		<property name="templatePath" value="settings.ftl"/>
+		<property name="sectionBacking">
+			<bean class="com.openmeap.admin.web.backing.GlobalSettingsBacking">
+				<property name="modelManager" ref="modelManager"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="loginSection" scope="prototype" class="com.openmeap.web.FreeMarkerSection">
+		<property name="configuration" ref="freeMarkerConfiguration"/>
+		<property name="templatePath" value="form-login.ftl"/>
+	</bean>
+	
+	<bean id="deploymentListingsSection" scope="prototype" class="com.openmeap.web.FreeMarkerSection">
+		<property name="configuration" ref="freeMarkerConfiguration"/>
+		<property name="templatePath" value="list-deployments.ftl"/>
+		<property name="sectionBacking">
+			<bean class="com.openmeap.admin.web.backing.DeploymentListingsBacking">
+				<property name="modelManager" ref="modelManager"/>
+			</bean>
+		</property>
+	</bean>
+  
+</beans>

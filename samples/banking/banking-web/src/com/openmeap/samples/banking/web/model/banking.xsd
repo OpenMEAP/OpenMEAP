@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="com.openmeap.samples.banking.model" 
+	xmlns:tns="com.openmeap.samples.banking.model" 
+	elementFormDefault="qualified">
+	
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+ -->
+	
+	<simpleType name="AccountType">
+		<restriction base="string">
+			<enumeration value="checking"/>
+			<enumeration value="savings"/>
+		</restriction>
+	</simpleType>
+	
+	<simpleType name="TransactionStatus">
+		<restriction base="string">
+			<enumeration value="pending"/>
+			<enumeration value="completed"/>
+		</restriction>
+	</simpleType>
+	
+	<simpleType name="TransactionType">
+		<restriction base="string">
+			<enumeration value="deposit"/>
+			<enumeration value="withdraw"/>
+		</restriction>
+	</simpleType>
+	
+	<simpleType name="TransferDirectionType">
+		<restriction base="string">
+			<enumeration value="in"/>
+			<enumeration value="out"/>
+		</restriction>
+	</simpleType>
+	
+	<simpleType name="DollarAmount">
+		<restriction base="decimal">
+			<fractionDigits value="2"/>
+		</restriction>
+	</simpleType>
+	
+	<simpleType name="PositiveDollarAmount">
+		<restriction base="tns:DollarAmount">
+			<minInclusive value="0"/>
+		</restriction>
+	</simpleType>
+	
+	<simpleType name="AccountNumber">
+		<restriction base="string"/>
+	</simpleType>
+	
+	<complexType name="Accounts">
+		<choice>
+			<element name="account" type="tns:Account" minOccurs="0" maxOccurs="unbounded"/>
+		</choice>
+		<attribute name="owner" type="string"/>
+	</complexType>
+	
+	<complexType name="Transactions">
+		<choice>
+			<element name="trans" type="tns:Transaction" minOccurs="0" maxOccurs="unbounded"/>
+		</choice>
+		<attribute name="owner" type="string"/>
+		<attribute name="account-number" type="tns:AccountNumber"/>
+	</complexType>
+	
+	<complexType name="Account">
+		<attribute name="type" type="tns:AccountType"/>
+		<attribute name="owner" type="string"/>
+		<attribute name="number" type="tns:AccountNumber"/>
+		<attribute name="posted" type="tns:DollarAmount"/>
+		<attribute name="available" type="tns:DollarAmount"/>
+	</complexType>
+	
+	<complexType name="Transaction">
+		<attribute name="type" type="tns:TransactionType"/>
+		<attribute name="status" type="tns:TransactionStatus"/>
+		<attribute name="acct-number" type="tns:AccountNumber"/>
+		<attribute name="date" type="date"/>
+		<attribute name="desc" type="string"/>
+		<attribute name="amount" type="tns:PositiveDollarAmount"/>
+		<attribute name="balance" type="tns:DollarAmount"/>
+	</complexType>
+	
+	<complexType name="LoginResult">
+		<choice>
+			<element name="accounts" type="tns:Accounts" minOccurs="0" maxOccurs="1"/>
+		</choice>
+		<attribute name="auth-token" type="string"/>
+		<attribute name="owner" type="string"/>
+	</complexType>
+	
+	<simpleType name="ErrorType">
+		<restriction base="string">
+			<enumeration value="param-missing"/>
+			<enumeration value="param-bad"/>
+			<enumeration value="auth-failed"/>
+			<enumeration value="login-failed"/>
+			<enumeration value="undefined"/>
+		</restriction>
+	</simpleType>
+	
+	<complexType name="Error">
+		<attribute name="code" type="tns:ErrorType"/>
+		<attribute name="message" type="string"/>
+	</complexType>
+	
+	<element name="result">
+		<complexType>
+			<choice>
+				<element name="login" type="tns:LoginResult"/>
+				<element name="transactions" type="tns:Transactions"/>
+				<element name="accounts" type="tns:Accounts"/>
+				<element name="error" type="tns:Error"/>
+			</choice>
+		</complexType>
+	</element>
+	
+</schema>

@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+-->
+<project name="openmeap-shared" basedir="." default="dist">
+	
+	<import file="../../build-tools/ant_scripts/shared.xml"/>
+	<property name="openmeap.project.current.file.ivy" value="${openmeap.project.shared}/ivy.xml"/>
+	<property name="openmeap.project.current.dist" value="${openmeap.project.shared.dist.jar}"/>
+	<property name="openmeap.project.current.dist.ext" value="jar"/>
+
+	<!-- BEGIN CLEAN SECTION +++++++++++++++++++++++++++++++++++++ -->
+	
+	<target name="clean">
+		<delete file="${openmeap.dist.project.shared.jar}"/>
+		<delete includeemptydirs="true" quiet="true">
+			<fileset dir="bin" includes="**/*"/>
+		</delete>
+	</target>
+	
+	<!-- END CLEAN SECTION +++++++++++++++++++++++++++++++++++++++ -->
+		
+	<!-- BEGIN COMPILE SECTION ++++++++++++++++++++++++++++++++++++ -->
+	
+	<target name="compile" depends="resolve">
+		<mkdir dir="bin"/>
+		<javac debug="true" debuglevel="${openmeap.debuglevel}" 
+				target="${openmeap.targetJdk}" 
+				destdir="bin" 
+				classpathref="openmeap.classpath">
+			<src path="src"/>
+		</javac>
+		<copy todir="bin/META-INF">
+			<fileset dir="src/META-INF" includes="**/*"/>
+		</copy>
+	</target>
+	
+	<!-- END COMPILE SECTION +++++++++++++++++++++++++++++++++++++ -->
+	
+	<target name="export-jar" depends="dist-base,compile">
+		<jar jarfile="${openmeap.project.shared.dist.jar}" basedir="bin">
+			<manifest/>
+		</jar>
+	</target>
+	
+	<target name="dist" depends="clean,export-jar"/>
+	
+</project>

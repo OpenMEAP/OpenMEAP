@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ############################################################################### 
+ -->
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee">
+
+	<display-name>openmeap-services-web</display-name>
+	
+	<!-- <security-role><role-name>openmeap-user</role-name></security-role>
+	<security-constraint> 
+		<web-resource-collection>
+			<web-resource-name>applicationManagementEndpoint</web-resource-name>
+			<url-pattern>/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>openmeap-user</role-name>
+		</auth-constraint>
+	</security-constraint> 
+	<login-config>
+		<auth-method>BASIC</auth-method>
+		<realm-name>default</realm-name>
+	</login-config>-->
+	
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.htm</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>default.html</welcome-file>
+		<welcome-file>default.htm</welcome-file>
+		<welcome-file>default.jsp</welcome-file>
+	</welcome-file-list>
+	
+	<context-param>  
+		<param-name>log4jConfigLocation</param-name>  
+		<param-value>/WEB-INF/log4j.xml</param-value>  
+	</context-param>
+	
+	<session-config>
+		<session-timeout>60</session-timeout>
+	</session-config>  
+	
+	<!-- <listener>  
+		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>  
+	</listener> -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	</listener> 
+  
+	<servlet>
+		<servlet-name>applicationManagementEndpoint</servlet-name>
+		<servlet-class>com.openmeap.services.ApplicationManagementServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>applicationManagementEndpoint</servlet-name>
+		<url-pattern>/application-management/*</url-pattern>
+	</servlet-mapping>
+	  
+	<servlet>
+		<servlet-name>serviceManagementEndpoint</servlet-name>
+		<servlet-class>com.openmeap.services.ServiceManagementServlet</servlet-class>
+	</servlet>  
+	<servlet-mapping>
+		<servlet-name>serviceManagementEndpoint</servlet-name>
+		<url-pattern>/service-management/*</url-pattern>
+	</servlet-mapping>
+	
+</web-app>

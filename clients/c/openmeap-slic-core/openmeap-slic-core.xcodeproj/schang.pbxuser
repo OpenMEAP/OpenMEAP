@@ -1,0 +1,1480 @@
+// !$*UTF8*$!
+{
+	08FB7793FE84155DC02AAC07 /* Project object */ = {
+		activeBuildConfigurationName = Debug;
+		activeExecutable = 92D8DB15138801D700FA7158 /* openmeap-slic-core-tests */;
+		activeTarget = 92D8DB13138801D700FA7158 /* openmeap-slic-core-tests */;
+		addToTargets = (
+			92D8DB13138801D700FA7158 /* openmeap-slic-core-tests */,
+		);
+		breakpoints = (
+		);
+		codeSenseManager = 929787241375AF6700FF14A4 /* Code sense */;
+		executables = (
+			92D8DB15138801D700FA7158 /* openmeap-slic-core-tests */,
+		);
+		perUserDictionary = {
+			"PBXConfiguration.PBXBreakpointsDataSource.v1:1CA1AED706398EBD00589147" = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXBreakpointsDataSource_BreakpointID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					20,
+					198,
+					20,
+					99,
+					99,
+					29,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXBreakpointsDataSource_ActionID,
+					PBXBreakpointsDataSource_TypeID,
+					PBXBreakpointsDataSource_BreakpointID,
+					PBXBreakpointsDataSource_UseID,
+					PBXBreakpointsDataSource_LocationID,
+					PBXBreakpointsDataSource_ConditionID,
+					PBXBreakpointsDataSource_IgnoreCountID,
+					PBXBreakpointsDataSource_ContinueID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXExecutablesDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXExecutablesDataSource_NameID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					22,
+					300,
+					625,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXExecutablesDataSource_ActiveFlagID,
+					PBXExecutablesDataSource_NameID,
+					PBXExecutablesDataSource_CommentsID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					835,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					795,
+					60,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 340989089;
+			PBXWorkspaceStateSaveDate = 340989089;
+		};
+		perUserProjectItems = {
+			920D8D2214530935002E3F07 /* PBXTextBookmark */ = 920D8D2214530935002E3F07 /* PBXTextBookmark */;
+			920D8D9F145312D5002E3F07 /* PBXTextBookmark */ = 920D8D9F145312D5002E3F07 /* PBXTextBookmark */;
+			920D8E0414531994002E3F07 /* PBXTextBookmark */ = 920D8E0414531994002E3F07 /* PBXTextBookmark */;
+			920D8E0514531994002E3F07 /* PBXTextBookmark */ = 920D8E0514531994002E3F07 /* PBXTextBookmark */;
+			920D8E0614531994002E3F07 /* PBXTextBookmark */ = 920D8E0614531994002E3F07 /* PBXTextBookmark */;
+			920D8E0714531994002E3F07 /* PBXTextBookmark */ = 920D8E0714531994002E3F07 /* PBXTextBookmark */;
+			920D8E0814531994002E3F07 /* PBXTextBookmark */ = 920D8E0814531994002E3F07 /* PBXTextBookmark */;
+			920D8E0914531994002E3F07 /* PBXTextBookmark */ = 920D8E0914531994002E3F07 /* PBXTextBookmark */;
+			920D8E0A14531994002E3F07 /* PBXTextBookmark */ = 920D8E0A14531994002E3F07 /* PBXTextBookmark */;
+			92520D041443941800B0F531 /* PBXTextBookmark */ = 92520D041443941800B0F531 /* PBXTextBookmark */;
+			92520D051443941800B0F531 /* PBXTextBookmark */ = 92520D051443941800B0F531 /* PBXTextBookmark */;
+			92520D081443941800B0F531 /* PBXTextBookmark */ = 92520D081443941800B0F531 /* PBXTextBookmark */;
+			92520D091443941800B0F531 /* PBXTextBookmark */ = 92520D091443941800B0F531 /* PBXTextBookmark */;
+			92520D0A1443941800B0F531 /* PBXTextBookmark */ = 92520D0A1443941800B0F531 /* PBXTextBookmark */;
+			92520D0B1443941800B0F531 /* PBXTextBookmark */ = 92520D0B1443941800B0F531 /* PBXTextBookmark */;
+			92520D0C1443941800B0F531 /* PBXTextBookmark */ = 92520D0C1443941800B0F531 /* PBXTextBookmark */;
+			92520D0D1443941800B0F531 /* PBXTextBookmark */ = 92520D0D1443941800B0F531 /* PBXTextBookmark */;
+			92520D0E1443941800B0F531 /* PBXTextBookmark */ = 92520D0E1443941800B0F531 /* PBXTextBookmark */;
+			92520D111443941800B0F531 /* PBXTextBookmark */ = 92520D111443941800B0F531 /* PBXTextBookmark */;
+			92520D121443941800B0F531 /* PBXTextBookmark */ = 92520D121443941800B0F531 /* PBXTextBookmark */;
+			92520D141443941800B0F531 /* PBXTextBookmark */ = 92520D141443941800B0F531 /* PBXTextBookmark */;
+			92520D151443941800B0F531 /* PBXTextBookmark */ = 92520D151443941800B0F531 /* PBXTextBookmark */;
+			92520D161443941800B0F531 /* PBXTextBookmark */ = 92520D161443941800B0F531 /* PBXTextBookmark */;
+			92520D171443941800B0F531 /* PBXTextBookmark */ = 92520D171443941800B0F531 /* PBXTextBookmark */;
+			92520D181443941800B0F531 /* PBXTextBookmark */ = 92520D181443941800B0F531 /* PBXTextBookmark */;
+			92520D191443941800B0F531 /* PBXTextBookmark */ = 92520D191443941800B0F531 /* PBXTextBookmark */;
+			92520D1A1443941800B0F531 /* PBXTextBookmark */ = 92520D1A1443941800B0F531 /* PBXTextBookmark */;
+			92520D1B1443941800B0F531 /* PBXTextBookmark */ = 92520D1B1443941800B0F531 /* PBXTextBookmark */;
+			92520D1C1443941800B0F531 /* PBXTextBookmark */ = 92520D1C1443941800B0F531 /* PBXTextBookmark */;
+			92520D1F1443941800B0F531 /* PBXTextBookmark */ = 92520D1F1443941800B0F531 /* PBXTextBookmark */;
+			92520D201443941800B0F531 /* PBXTextBookmark */ = 92520D201443941800B0F531 /* PBXTextBookmark */;
+			92520D211443941800B0F531 /* PBXTextBookmark */ = 92520D211443941800B0F531 /* PBXTextBookmark */;
+			92520D2A1443941800B0F531 /* PBXTextBookmark */ = 92520D2A1443941800B0F531 /* PBXTextBookmark */;
+			92520D341443941800B0F531 /* PBXTextBookmark */ = 92520D341443941800B0F531 /* PBXTextBookmark */;
+			925427BE144C4E3D009DB1D9 /* PlistBookmark */ = 925427BE144C4E3D009DB1D9 /* PlistBookmark */;
+			925427BF144C4E3D009DB1D9 /* PBXTextBookmark */ = 925427BF144C4E3D009DB1D9 /* PBXTextBookmark */;
+			92542830144E5423009DB1D9 /* PBXTextBookmark */ = 92542830144E5423009DB1D9 /* PBXTextBookmark */;
+			92542831144E5423009DB1D9 /* PBXTextBookmark */ = 92542831144E5423009DB1D9 /* PBXTextBookmark */;
+			92542832144E5423009DB1D9 /* PBXTextBookmark */ = 92542832144E5423009DB1D9 /* PBXTextBookmark */;
+			92542834144E5423009DB1D9 /* PBXTextBookmark */ = 92542834144E5423009DB1D9 /* PBXTextBookmark */;
+			92542835144E5423009DB1D9 /* PBXTextBookmark */ = 92542835144E5423009DB1D9 /* PBXTextBookmark */;
+			92542836144E5423009DB1D9 /* PBXTextBookmark */ = 92542836144E5423009DB1D9 /* PBXTextBookmark */;
+			92542837144E5423009DB1D9 /* PBXTextBookmark */ = 92542837144E5423009DB1D9 /* PBXTextBookmark */;
+			92542838144E5423009DB1D9 /* PBXTextBookmark */ = 92542838144E5423009DB1D9 /* PBXTextBookmark */;
+			9254283B144E5423009DB1D9 /* PBXTextBookmark */ = 9254283B144E5423009DB1D9 /* PBXTextBookmark */;
+			9254283E144E5423009DB1D9 /* PBXTextBookmark */ = 9254283E144E5423009DB1D9 /* PBXTextBookmark */;
+			9254283F144E5423009DB1D9 /* PBXTextBookmark */ = 9254283F144E5423009DB1D9 /* PBXTextBookmark */;
+			92542841144E5423009DB1D9 /* PBXTextBookmark */ = 92542841144E5423009DB1D9 /* PBXTextBookmark */;
+			92542842144E5423009DB1D9 /* PBXTextBookmark */ = 92542842144E5423009DB1D9 /* PBXTextBookmark */;
+			92542845144E5423009DB1D9 /* PBXTextBookmark */ = 92542845144E5423009DB1D9 /* PBXTextBookmark */;
+			92542846144E5423009DB1D9 /* PBXTextBookmark */ = 92542846144E5423009DB1D9 /* PBXTextBookmark */;
+			9254284E144E54CF009DB1D9 /* PBXTextBookmark */ = 9254284E144E54CF009DB1D9 /* PBXTextBookmark */;
+			9285E4A113C2856A00B9EBD8 /* PBXTextBookmark */ = 9285E4A113C2856A00B9EBD8 /* PBXTextBookmark */;
+			928D21F613C1144B00032A27 /* PBXTextBookmark */ = 928D21F613C1144B00032A27 /* PBXTextBookmark */;
+			928D21F713C1144B00032A27 /* PBXTextBookmark */ = 928D21F713C1144B00032A27 /* PBXTextBookmark */;
+			928D21F813C1144B00032A27 /* PBXTextBookmark */ = 928D21F813C1144B00032A27 /* PBXTextBookmark */;
+			928D21F913C1144B00032A27 /* PBXTextBookmark */ = 928D21F913C1144B00032A27 /* PBXTextBookmark */;
+			928D21FC13C1144B00032A27 /* PBXTextBookmark */ = 928D21FC13C1144B00032A27 /* PBXTextBookmark */;
+			92C1A18F13BD3F4200A87521 /* PBXTextBookmark */ = 92C1A18F13BD3F4200A87521 /* PBXTextBookmark */;
+			92C1A19113BD3F4200A87521 /* PBXTextBookmark */ = 92C1A19113BD3F4200A87521 /* PBXTextBookmark */;
+			92C1A19413BD3F4200A87521 /* PBXTextBookmark */ = 92C1A19413BD3F4200A87521 /* PBXTextBookmark */;
+			92C1A2DA13BD4DDD00A87521 /* PBXTextBookmark */ = 92C1A2DA13BD4DDD00A87521 /* PBXTextBookmark */;
+			92C1A2E313BD4F8200A87521 /* PBXTextBookmark */ = 92C1A2E313BD4F8200A87521 /* PBXTextBookmark */;
+			92C1A31A13BD537700A87521 /* PBXTextBookmark */ = 92C1A31A13BD537700A87521 /* PBXTextBookmark */;
+			92D8DDCD13912F3200FA7158 /* PBXTextBookmark */ = 92D8DDCD13912F3200FA7158 /* PBXTextBookmark */;
+		};
+		sourceControlManager = 929787231375AF6700FF14A4 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	9208DB1613AED13000DE894C /* network.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 465}}";
+			sepNavSelRange = "{298, 0}";
+			sepNavVisRange = "{0, 1854}";
+			sepNavWindowFrame = "{{15, 138}, {1036, 885}}";
+		};
+	};
+	920D8D2214530935002E3F07 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 925FD6CB13987697004FEA8D /* string-test.c */;
+		name = "string-test.c: 50";
+		rLen = 0;
+		rLoc = 2504;
+		rType = 0;
+		vrLen = 1327;
+		vrLoc = 1831;
+	};
+	920D8D9F145312D5002E3F07 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 9234FF1413A59BFE00DF2AB0 /* network-mock.h */;
+		name = "network-mock.h: 15";
+		rLen = 0;
+		rLoc = 1081;
+		rType = 0;
+		vrLen = 1094;
+		vrLoc = 975;
+	};
+	920D8E0414531994002E3F07 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92D8DB651389334D00FA7158 /* network-mock.c */;
+		name = "network-mock.c: 21";
+		rLen = 0;
+		rLoc = 1568;
+		rType = 0;
+		vrLen = 2092;
+		vrLoc = 894;
+	};
+	920D8E0514531994002E3F07 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 925FD37F13932369004FEA8D /* dict-test.c */;
+		name = "dict-test.c: 49";
+		rLen = 0;
+		rLoc = 2368;
+		rType = 0;
+		vrLen = 1345;
+		vrLoc = 2644;
+	};
+	920D8E0614531994002E3F07 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 9297881C137618D800FF14A4 /* unit-tests.c */;
+		name = "unit-tests.c: 42";
+		rLen = 0;
+		rLoc = 2036;
+		rType = 0;
+		vrLen = 1581;
+		vrLoc = 651;
+	};
+	920D8E0714531994002E3F07 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92D8DCE8138F281300FA7158 /* list.c */;
+		name = "list.c: 143";
+		rLen = 0;
+		rLoc = 4448;
+		rType = 0;
+		vrLen = 928;
+		vrLoc = 3657;
+	};
+	920D8E0814531994002E3F07 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 9297881D137618D800FF14A4 /* unit-tests.h */;
+		name = "unit-tests.h: 97";
+		rLen = 0;
+		rLoc = 3372;
+		rType = 0;
+		vrLen = 1714;
+		vrLoc = 570;
+	};
+	920D8E0914531994002E3F07 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 925FD839139C1234004FEA8D /* mem.c */;
+		name = "mem.c: 122";
+		rLen = 0;
+		rLoc = 3971;
+		rType = 0;
+		vrLen = 966;
+		vrLoc = 3253;
+	};
+	920D8E0A14531994002E3F07 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 925FD839139C1234004FEA8D /* mem.c */;
+		name = "mem.c: 99";
+		rLen = 0;
+		rLoc = 3516;
+		rType = 0;
+		vrLen = 1070;
+		vrLoc = 3081;
+	};
+	9234FF1413A59BFE00DF2AB0 /* network-mock.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 533}}";
+			sepNavSelRange = "{1081, 0}";
+			sepNavVisRange = "{975, 1094}";
+		};
+	};
+	923EB986137F41CC00BB8BBB /* config.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = config.h;
+		path = "/Users/schang/openmeap/clients/c/openmeap-slic-core/include/openmeap/config.h";
+		sourceTree = "<absolute>";
+	};
+	923EB9A41380837A00BB8BBB /* props.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = props.h;
+		path = "/Users/schang/openmeap/clients/c/openmeap-slic-core/include/openmeap/props.h";
+		sourceTree = "<absolute>";
+	};
+	923EB9A71380855400BB8BBB /* config.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 1963}}";
+			sepNavSelRange = "{1046, 33}";
+			sepNavVisRange = "{1708, 955}";
+			sepNavWindowFrame = "{{649, 60}, {631, 718}}";
+		};
+	};
+	9245728513CA51F300EA6D73 /* prefs.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 533}}";
+			sepNavSelRange = "{1307, 0}";
+			sepNavVisRange = "{327, 1806}";
+		};
+	};
+	9245728613CA51F300EA6D73 /* props.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 491}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1834}";
+		};
+	};
+	92520D041443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C19E7313BBD05B00A87521 /* digest.c */;
+		name = "digest.c: 18";
+		rLen = 0;
+		rLoc = 1376;
+		rType = 0;
+		vrLen = 2107;
+		vrLoc = 0;
+	};
+	92520D051443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 9245728613CA51F300EA6D73 /* props.c */;
+		name = "props.c: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 1834;
+		vrLoc = 0;
+	};
+	92520D081443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92955DEC1435DB1D00B65337 /* jsapi-test.c */;
+		name = "jsapi-test.c: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 1707;
+		vrLoc = 0;
+	};
+	92520D091443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C1A26F13BD458A00A87521 /* digest-test.c */;
+		name = "digest-test.c: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 2088;
+		vrLoc = 0;
+	};
+	92520D0A1443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C1A27013BD458A00A87521 /* digest-test.h */;
+		name = "digest-test.h: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 1813;
+		vrLoc = 0;
+	};
+	92520D0B1443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C19A2A13B6F9BB00A87521 /* zip-test.h */;
+		name = "zip-test.h: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 1804;
+		vrLoc = 0;
+	};
+	92520D0C1443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C19A2613B6F99300A87521 /* zip-test.c */;
+		name = "zip-test.c: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 2090;
+		vrLoc = 0;
+	};
+	92520D0D1443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92DA232C13A187CB000EF246 /* update-test.c */;
+		name = "update-test.c: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 2075;
+		vrLoc = 0;
+	};
+	92520D0E1443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92DA232D13A187CB000EF246 /* update-test.h */;
+		name = "update-test.h: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 1822;
+		vrLoc = 0;
+	};
+	92520D111443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 925FD533139429F6004FEA8D /* config-test.c */;
+		name = "config-test.c: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 2141;
+		vrLoc = 0;
+	};
+	92520D121443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 925FD534139429F6004FEA8D /* config-test.h */;
+		name = "config-test.h: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 1812;
+		vrLoc = 0;
+	};
+	92520D141443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 925FD38013932369004FEA8D /* dict-test.h */;
+		name = "dict-test.h: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 1806;
+		vrLoc = 0;
+	};
+	92520D151443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 925FD2001391D193004FEA8D /* storage-test.c */;
+		name = "storage-test.c: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 1991;
+		vrLoc = 0;
+	};
+	92520D161443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 925FD2011391D193004FEA8D /* storage-test.h */;
+		name = "storage-test.h: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 2203;
+		vrLoc = 0;
+	};
+	92520D171443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92D8DD671391247B00FA7158 /* list-test.c */;
+		name = "list-test.c: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 1964;
+		vrLoc = 0;
+	};
+	92520D181443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92D8DD681391247B00FA7158 /* list-test.h */;
+		name = "list-test.h: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 1793;
+		vrLoc = 0;
+	};
+	92520D191443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92D8DD5A1391245100FA7158 /* core-test.c */;
+		name = "core-test.c: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 1852;
+		vrLoc = 0;
+	};
+	92520D1A1443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92D8DD5B1391245100FA7158 /* core-test.h */;
+		name = "core-test.h: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 1784;
+		vrLoc = 0;
+	};
+	92520D1B1443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92D8DD5C1391245100FA7158 /* error-test.c */;
+		name = "error-test.c: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 2061;
+		vrLoc = 0;
+	};
+	92520D1C1443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92D8DD5D1391245100FA7158 /* error-test.h */;
+		name = "error-test.h: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 1792;
+		vrLoc = 0;
+	};
+	92520D1F1443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92D8DB661389334D00FA7158 /* prefs-mock.c */;
+		name = "prefs-mock.c: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 2240;
+		vrLoc = 0;
+	};
+	92520D201443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92D8DB671389334D00FA7158 /* props-mock.c */;
+		name = "props-mock.c: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 2084;
+		vrLoc = 0;
+	};
+	92520D211443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92D8DB681389334D00FA7158 /* storage-mock.c */;
+		name = "storage-mock.c: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 2289;
+		vrLoc = 0;
+	};
+	92520D2A1443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92978838137619CA00FF14A4 /* error.h */;
+		name = "error.h: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 2219;
+		vrLoc = 0;
+	};
+	92520D341443941800B0F531 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 929787361375B04300FF14A4 /* unit-tests-Info.plist */;
+		name = "unit-tests-Info.plist: 2";
+		rLen = 1709;
+		rLoc = 39;
+		rType = 0;
+		vrLen = 2254;
+		vrLoc = 0;
+	};
+	925427BE144C4E3D009DB1D9 /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = 92D8DAFC1388015F00FA7158 /* openmeap-slic-core-tests-Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+		);
+		name = "/Users/schang/openmeap/clients/c/openmeap-slic-core/openmeap-slic-core-tests-Info.plist";
+		rLen = 0;
+		rLoc = 9223372036854775808;
+	};
+	925427BF144C4E3D009DB1D9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 925FD6CC13987697004FEA8D /* string-test.h */;
+		name = "string-test.h: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 1822;
+		vrLoc = 0;
+	};
+	92542830144E5423009DB1D9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 925FD837139C1225004FEA8D /* mem.h */;
+		name = "mem.h: 19";
+		rLen = 0;
+		rLoc = 1407;
+		rType = 0;
+		vrLen = 1774;
+		vrLoc = 570;
+	};
+	92542831144E5423009DB1D9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92D8DC86138B4AF300FA7158 /* storage.c */;
+		name = "storage.c: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 2393;
+		vrLoc = 0;
+	};
+	92542832144E5423009DB1D9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 9245728513CA51F300EA6D73 /* prefs.c */;
+		name = "prefs.c: 18";
+		rLen = 0;
+		rLoc = 1307;
+		rType = 0;
+		vrLen = 1806;
+		vrLoc = 327;
+	};
+	92542834144E5423009DB1D9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 925FD32613931DA5004FEA8D /* dict.h */;
+		name = "dict.h: 78";
+		rLen = 34;
+		rLoc = 3223;
+		rType = 0;
+		vrLen = 1012;
+		vrLoc = 2298;
+	};
+	92542835144E5423009DB1D9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C19E7113BBD04100A87521 /* digest.h */;
+		name = "digest.h: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 2006;
+		vrLoc = 0;
+	};
+	92542836144E5423009DB1D9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 923EB986137F41CC00BB8BBB /* config.h */;
+		name = "config.h: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 1108;
+		vrLoc = 1299;
+	};
+	92542837144E5423009DB1D9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C19A1F13B6AE1400A87521 /* zip.h */;
+		name = "zip.h: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 970;
+		vrLoc = 1763;
+	};
+	92542838144E5423009DB1D9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 9208DB1613AED13000DE894C /* network.c */;
+		name = "network.c: 5";
+		rLen = 0;
+		rLoc = 298;
+		rType = 0;
+		vrLen = 1854;
+		vrLoc = 0;
+	};
+	9254283B144E5423009DB1D9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 9297882A137618FF00FF14A4 /* error.c */;
+		name = "error.c: 8";
+		rLen = 0;
+		rLoc = 515;
+		rType = 0;
+		vrLen = 921;
+		vrLoc = 1821;
+	};
+	9254283E144E5423009DB1D9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C1A09113BBF2E800A87521 /* storage-default.h */;
+		name = "storage-default.h: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 2425;
+		vrLoc = 0;
+	};
+	9254283F144E5423009DB1D9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 9297883B137619CA00FF14A4 /* storage.h */;
+		name = "storage.h: 59";
+		rLen = 0;
+		rLoc = 3419;
+		rType = 0;
+		vrLen = 2372;
+		vrLoc = 2251;
+	};
+	92542841144E5423009DB1D9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 9297883A137619CA00FF14A4 /* prefs.h */;
+		name = "prefs.h: 23";
+		rLen = 0;
+		rLoc = 1707;
+		rType = 0;
+		vrLen = 1573;
+		vrLoc = 1218;
+	};
+	92542842144E5423009DB1D9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 923EB9A41380837A00BB8BBB /* props.h */;
+		name = "props.h: 28";
+		rLen = 0;
+		rLoc = 1811;
+		rType = 0;
+		vrLen = 1462;
+		vrLoc = 894;
+	};
+	92542845144E5423009DB1D9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92D8DCEA138F281D00FA7158 /* list.h */;
+		name = "list.h: 32";
+		rLen = 0;
+		rLoc = 1883;
+		rType = 0;
+		vrLen = 1033;
+		vrLoc = 1542;
+	};
+	92542846144E5423009DB1D9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92955DE81435DACD00B65337 /* jsapi.h */;
+		name = "jsapi.h: 82";
+		rLen = 0;
+		rLoc = 3386;
+		rType = 0;
+		vrLen = 1204;
+		vrLoc = 2236;
+	};
+	9254284E144E54CF009DB1D9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92955DEA1435DAE700B65337 /* jsapi.c */;
+		name = "jsapi.c: 39";
+		rLen = 0;
+		rLoc = 2131;
+		rType = 0;
+		vrLen = 1240;
+		vrLoc = 2005;
+	};
+	925FD2001391D193004FEA8D /* storage-test.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 1274}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 1991}";
+			sepNavWindowFrame = "{{38, 300}, {797, 702}}";
+		};
+	};
+	925FD2011391D193004FEA8D /* storage-test.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 689}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 2203}";
+			sepNavWindowFrame = "{{15, 654}, {619, 369}}";
+		};
+	};
+	925FD32413931D8B004FEA8D /* dict.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {916, 3302}}";
+			sepNavSelRange = "{2591, 0}";
+			sepNavVisRange = "{2780, 635}";
+			sepNavWindowFrame = "{{408, 84}, {673, 944}}";
+		};
+	};
+	925FD32613931DA5004FEA8D /* dict.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = dict.h;
+		path = "/Users/schang/openmeap/clients/c/openmeap-slic-core/include/openmeap/dict.h";
+		sourceTree = "<absolute>";
+	};
+	925FD37F13932369004FEA8D /* dict-test.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {916, 1261}}";
+			sepNavSelRange = "{2765, 0}";
+			sepNavVisRange = "{2221, 742}";
+			sepNavWindowFrame = "{{8, 78}, {862, 521}}";
+		};
+	};
+	925FD38013932369004FEA8D /* dict-test.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 491}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 1806}";
+			sepNavWindowFrame = "{{38, 259}, {768, 743}}";
+		};
+	};
+	925FD533139429F6004FEA8D /* config-test.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 1300}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 2141}";
+			sepNavWindowFrame = "{{61, 279}, {690, 702}}";
+		};
+	};
+	925FD534139429F6004FEA8D /* config-test.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 491}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 1812}";
+		};
+	};
+	925FD6121398692A004FEA8D /* string.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 4082}}";
+			sepNavSelRange = "{6645, 0}";
+			sepNavVisRange = "{6392, 492}";
+			sepNavWindowFrame = "{{6, 60}, {760, 718}}";
+		};
+	};
+	925FD6CB13987697004FEA8D /* string-test.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {916, 1131}}";
+			sepNavSelRange = "{3312, 0}";
+			sepNavVisRange = "{2662, 781}";
+			sepNavWindowFrame = "{{61, 134}, {610, 847}}";
+		};
+	};
+	925FD6CC13987697004FEA8D /* string-test.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 488}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 1822}";
+		};
+	};
+	925FD837139C1225004FEA8D /* mem.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = mem.h;
+		path = "/Users/schang/openmeap/clients/c/openmeap-slic-core/include/openmeap/mem.h";
+		sourceTree = "<absolute>";
+	};
+	925FD839139C1234004FEA8D /* mem.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 1859}}";
+			sepNavSelRange = "{3516, 0}";
+			sepNavVisRange = "{3081, 1070}";
+			sepNavWindowFrame = "{{38, 155}, {610, 847}}";
+		};
+	};
+	9285E4A113C2856A00B9EBD8 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C19C7913B937E300A87521 /* ioapi.h */;
+		name = "ioapi.h: 38";
+		rLen = 0;
+		rLoc = 830;
+		rType = 0;
+		vrLen = 2143;
+		vrLoc = 383;
+	};
+	928D21F613C1144B00032A27 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C1A33B13BD555700A87521 /* md5.h */;
+		name = "md5.h: 16";
+		rLen = 0;
+		rLoc = 353;
+		rType = 0;
+		vrLen = 1208;
+		vrLoc = 0;
+	};
+	928D21F713C1144B00032A27 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C1A32F13BD54FE00A87521 /* md5.c */;
+		name = "md5.c: 19";
+		rLen = 0;
+		rLoc = 787;
+		rType = 0;
+		vrLen = 2104;
+		vrLoc = 0;
+	};
+	928D21F813C1144B00032A27 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C1A17A13BD38B400A87521 /* sha1.h */;
+		name = "sha1.h: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 1574;
+		vrLoc = 0;
+	};
+	928D21F913C1144B00032A27 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C1A17913BD38B400A87521 /* sha1.c */;
+		name = "sha1.c: 324";
+		rLen = 0;
+		rLoc = 8758;
+		rType = 0;
+		vrLen = 1508;
+		vrLoc = 1382;
+	};
+	928D21FC13C1144B00032A27 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C19C7713B937E300A87521 /* crypt.h */;
+		name = "crypt.h: 16";
+		rLen = 0;
+		rLoc = 605;
+		rType = 0;
+		vrLen = 2215;
+		vrLoc = 0;
+	};
+	92955DE81435DACD00B65337 /* jsapi.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = jsapi.h;
+		path = "/Users/schang/openmeap/clients/c/openmeap-slic-core/include/openmeap/jsapi.h";
+		sourceTree = "<absolute>";
+	};
+	92955DEA1435DAE700B65337 /* jsapi.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 1066}}";
+			sepNavSelRange = "{2131, 0}";
+			sepNavVisRange = "{2005, 1240}";
+		};
+	};
+	92955DEC1435DB1D00B65337 /* jsapi-test.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 491}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 1707}";
+		};
+	};
+	929787231375AF6700FF14A4 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
+		};
+	};
+	929787241375AF6700FF14A4 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	929787361375B04300FF14A4 /* unit-tests-Info.plist */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 585}}";
+			sepNavSelRange = "{39, 1709}";
+			sepNavVisRange = "{0, 2254}";
+			sepNavWindowFrame = "{{15, 60}, {1028, 718}}";
+		};
+	};
+	9297881C137618D800FF14A4 /* unit-tests.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 702}}";
+			sepNavSelRange = "{2036, 0}";
+			sepNavVisRange = "{651, 1581}";
+			sepNavWindowFrame = "{{153, 60}, {1234, 889}}";
+		};
+	};
+	9297881D137618D800FF14A4 /* unit-tests.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 1898}}";
+			sepNavSelRange = "{3372, 0}";
+			sepNavVisRange = "{570, 1714}";
+			sepNavWindowFrame = "{{107, 176}, {1028, 763}}";
+		};
+	};
+	9297882A137618FF00FF14A4 /* error.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 1144}}";
+			sepNavSelRange = "{515, 0}";
+			sepNavVisRange = "{1821, 921}";
+			sepNavWindowFrame = "{{142, 115}, {1028, 763}}";
+		};
+	};
+	9297882B137618FF00FF14A4 /* openmeap-slic-core.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 485}}";
+			sepNavSelRange = "{1727, 0}";
+			sepNavVisRange = "{0, 1743}";
+			sepNavWindowFrame = "{{15, 60}, {1028, 718}}";
+		};
+	};
+	92978838137619CA00FF14A4 /* error.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = error.h;
+		path = "/Users/schang/openmeap/clients/c/openmeap-slic-core/include/openmeap/error.h";
+		sourceTree = "<absolute>";
+	};
+	9297883A137619CA00FF14A4 /* prefs.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = prefs.h;
+		path = "/Users/schang/openmeap/clients/c/openmeap-slic-core/include/openmeap/prefs.h";
+		sourceTree = "<absolute>";
+	};
+	9297883B137619CA00FF14A4 /* storage.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = storage.h;
+		path = "/Users/schang/openmeap/clients/c/openmeap-slic-core/include/openmeap/storage.h";
+		sourceTree = "<absolute>";
+	};
+	92C19A1F13B6AE1400A87521 /* zip.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = zip.h;
+		path = "/Users/schang/openmeap/clients/c/openmeap-slic-core/include/openmeap/zip.h";
+		sourceTree = "<absolute>";
+	};
+	92C19A2413B6F96C00A87521 /* zip.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 4017}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 2319}";
+			sepNavWindowFrame = "{{131, 145}, {1215, 883}}";
+		};
+	};
+	92C19A2613B6F99300A87521 /* zip-test.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 728}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 2090}";
+			sepNavWindowFrame = "{{415, 164}, {731, 864}}";
+		};
+	};
+	92C19A2A13B6F9BB00A87521 /* zip-test.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 491}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 1804}";
+		};
+	};
+	92C19C7713B937E300A87521 /* crypt.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1031, 1703}}";
+			sepNavSelRange = "{605, 0}";
+			sepNavVisRange = "{0, 2215}";
+		};
+	};
+	92C19C7813B937E300A87521 /* ioapi.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 2418}}";
+			sepNavSelRange = "{1855, 0}";
+			sepNavVisRange = "{1693, 524}";
+			sepNavWindowFrame = "{{15, 60}, {1182, 718}}";
+		};
+	};
+	92C19C7913B937E300A87521 /* ioapi.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1182, 988}}";
+			sepNavSelRange = "{830, 0}";
+			sepNavVisRange = "{383, 2143}";
+			sepNavWindowFrame = "{{15, 60}, {750, 968}}";
+		};
+	};
+	92C19C7A13B937E300A87521 /* unzip.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1031, 22503}}";
+			sepNavSelRange = "{49081, 0}";
+			sepNavVisRange = "{48411, 1706}";
+			sepNavWindowFrame = "{{15, 60}, {750, 968}}";
+		};
+	};
+	92C19C7B13B937E300A87521 /* unzip.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {691, 4745}}";
+			sepNavSelRange = "{2343, 7}";
+			sepNavVisRange = "{1766, 2209}";
+			sepNavWindowFrame = "{{856, 60}, {750, 968}}";
+		};
+	};
+	92C19E7113BBD04100A87521 /* digest.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = digest.h;
+		path = "/Users/schang/openmeap/clients/c/openmeap-slic-core/include/openmeap/digest.h";
+		sourceTree = "<absolute>";
+	};
+	92C19E7313BBD05B00A87521 /* digest.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 1287}}";
+			sepNavSelRange = "{1376, 0}";
+			sepNavVisRange = "{0, 2107}";
+			sepNavWindowFrame = "{{38, 117}, {1036, 885}}";
+		};
+	};
+	92C1A08C13BBF25600A87521 /* storage-default.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 5031}}";
+			sepNavSelRange = "{1780, 0}";
+			sepNavVisRange = "{1218, 1412}";
+			sepNavWindowFrame = "{{649, 99}, {1011, 929}}";
+		};
+	};
+	92C1A09113BBF2E800A87521 /* storage-default.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = "storage-default.h";
+		path = "/Users/schang/openmeap/clients/c/openmeap-slic-core/include/openmeap/storage-default.h";
+		sourceTree = "<absolute>";
+	};
+	92C1A17913BD38B400A87521 /* sha1.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1031, 4836}}";
+			sepNavSelRange = "{8758, 0}";
+			sepNavVisRange = "{1382, 1508}";
+		};
+	};
+	92C1A17A13BD38B400A87521 /* sha1.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1031, 759}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1574}";
+		};
+	};
+	92C1A18E13BD3F4200A87521 /* sha.c */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.c;
+		name = sha.c;
+		path = "/Users/schang/Downloads/sha1-c/sha.c";
+		sourceTree = "<absolute>";
+	};
+	92C1A18F13BD3F4200A87521 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C1A19013BD3F4200A87521 /* sha1.c */;
+		name = "sha1.c: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 1640;
+		vrLoc = 8742;
+	};
+	92C1A19013BD3F4200A87521 /* sha1.c */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.c;
+		name = sha1.c;
+		path = "/Users/schang/Downloads/sha1-c/sha1.c";
+		sourceTree = "<absolute>";
+	};
+	92C1A19113BD3F4200A87521 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C1A19213BD3F4200A87521 /* sha1.h */;
+		name = "sha1.h: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 1500;
+		vrLoc = 0;
+	};
+	92C1A19213BD3F4200A87521 /* sha1.h */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
+		name = sha1.h;
+		path = "/Users/schang/Downloads/sha1-c/sha1.h";
+		sourceTree = "<absolute>";
+	};
+	92C1A19413BD3F4200A87521 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C1A19513BD3F4200A87521 /* wrapper.c */;
+		name = "wrapper.c: 4";
+		rLen = 1462;
+		rLoc = 39;
+		rType = 0;
+		vrLen = 1072;
+		vrLoc = 429;
+	};
+	92C1A19513BD3F4200A87521 /* wrapper.c */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.c;
+		name = wrapper.c;
+		path = /Users/schang/Downloads/digest/wrapper.c;
+		sourceTree = "<absolute>";
+	};
+	92C1A26F13BD458A00A87521 /* digest-test.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 819}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 2088}";
+		};
+	};
+	92C1A27013BD458A00A87521 /* digest-test.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 491}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 1813}";
+		};
+	};
+	92C1A2DA13BD4DDD00A87521 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C1A2DB13BD4DDD00A87521 /* sha.c */;
+		name = "sha.c: 17";
+		rLen = 0;
+		rLoc = 484;
+		rType = 0;
+		vrLen = 1446;
+		vrLoc = 976;
+	};
+	92C1A2DB13BD4DDD00A87521 /* sha.c */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.c;
+		name = sha.c;
+		path = "/Users/schang/openmeap/clients/c/openmeap-slic-core/3rd_party/digest-sha1/sha.c";
+		sourceTree = "<absolute>";
+	};
+	92C1A2DD13BD4DDD00A87521 /* Md5.c */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.c;
+		name = Md5.c;
+		path = /Users/schang/Downloads/Md5.c;
+		sourceTree = "<absolute>";
+	};
+	92C1A2E313BD4F8200A87521 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C1A2DD13BD4DDD00A87521 /* Md5.c */;
+		name = "Md5.c: 513";
+		rLen = 0;
+		rLoc = 18865;
+		rType = 0;
+		vrLen = 2577;
+		vrLoc = 2431;
+	};
+	92C1A31A13BD537700A87521 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92C1A18E13BD3F4200A87521 /* sha.c */;
+		name = "sha.c: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 1481;
+		vrLoc = 731;
+	};
+	92C1A32F13BD54FE00A87521 /* md5.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1031, 4108}}";
+			sepNavSelRange = "{787, 0}";
+			sepNavVisRange = "{0, 2104}";
+		};
+	};
+	92C1A33B13BD555700A87521 /* md5.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1031, 759}}";
+			sepNavSelRange = "{353, 0}";
+			sepNavVisRange = "{0, 1208}";
+		};
+	};
+	92D8DAFC1388015F00FA7158 /* openmeap-slic-core-tests-Info.plist */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 598}}";
+			sepNavSelRange = "{1388, 0}";
+			sepNavVisRange = "{530, 1880}";
+			sepNavWindowFrame = "{{84, 258}, {690, 702}}";
+		};
+	};
+	92D8DB13138801D700FA7158 /* openmeap-slic-core-tests */ = {
+		activeExec = 0;
+		executables = (
+			92D8DB15138801D700FA7158 /* openmeap-slic-core-tests */,
+		);
+	};
+	92D8DB15138801D700FA7158 /* openmeap-slic-core-tests */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		dataTipCustomDataFormattersEnabled = 1;
+		dataTipShowTypeColumn = 1;
+		dataTipSortType = 0;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "openmeap-slic-core-tests";
+		savedGlobals = {
+		};
+		showTypeColumn = 0;
+		sourceDirectories = (
+		);
+		variableFormatDictionary = {
+			$cs = 1;
+			$ds = 1;
+			$eflags = 1;
+			$es = 1;
+			$fctrl = 1;
+			$fioff = 1;
+			$fiseg = 1;
+			$fooff = 1;
+			$fop = 1;
+			$foseg = 1;
+			$fs = 1;
+			$fstat = 1;
+			$ftag = 1;
+			$gs = 1;
+			$mxcsr = 1;
+			$r10 = 1;
+			$r11 = 1;
+			$r12 = 1;
+			$r13 = 1;
+			$r14 = 1;
+			$r15 = 1;
+			$r8 = 1;
+			$r9 = 1;
+			$rax = 1;
+			$rbp = 1;
+			$rbx = 1;
+			$rcx = 1;
+			$rdi = 1;
+			$rdx = 1;
+			$rip = 1;
+			$rsi = 1;
+			$rsp = 1;
+			$ss = 1;
+		};
+	};
+	92D8DB651389334D00FA7158 /* network-mock.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1300, 741}}";
+			sepNavSelRange = "{1568, 0}";
+			sepNavVisRange = "{894, 2092}";
+			sepNavWindowFrame = "{{518, 60}, {631, 718}}";
+		};
+	};
+	92D8DB661389334D00FA7158 /* prefs-mock.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 949}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 2240}";
+			sepNavWindowFrame = "{{107, 237}, {690, 702}}";
+		};
+	};
+	92D8DB671389334D00FA7158 /* props-mock.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 585}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 2084}";
+			sepNavWindowFrame = "{{15, 280}, {768, 743}}";
+		};
+	};
+	92D8DB681389334D00FA7158 /* storage-mock.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 1248}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 2289}";
+			sepNavWindowFrame = "{{323, 99}, {1011, 929}}";
+		};
+	};
+	92D8DB751389791100FA7158 /* update.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 4784}}";
+			sepNavSelRange = "{0, 1707}";
+			sepNavVisRange = "{1380, 1166}";
+			sepNavWindowFrame = "{{20, 60}, {962, 718}}";
+		};
+	};
+	92D8DC86138B4AF300FA7158 /* storage.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 1274}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 2393}";
+			sepNavWindowFrame = "{{340, 60}, {750, 718}}";
+		};
+	};
+	92D8DCE8138F281300FA7158 /* list.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {916, 2431}}";
+			sepNavSelRange = "{2712, 0}";
+			sepNavVisRange = "{2311, 556}";
+			sepNavWindowFrame = "{{364, 230}, {1028, 763}}";
+		};
+	};
+	92D8DCEA138F281D00FA7158 /* list.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = list.h;
+		path = "/Users/schang/openmeap/clients/c/openmeap-slic-core/include/openmeap/list.h";
+		sourceTree = "<absolute>";
+	};
+	92D8DD5A1391245100FA7158 /* core-test.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 491}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 1852}";
+			sepNavWindowFrame = "{{38, 118}, {760, 884}}";
+		};
+	};
+	92D8DD5B1391245100FA7158 /* core-test.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 491}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 1784}";
+		};
+	};
+	92D8DD5C1391245100FA7158 /* error-test.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 715}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 2061}";
+			sepNavWindowFrame = "{{620, 116}, {1028, 763}}";
+		};
+	};
+	92D8DD5D1391245100FA7158 /* error-test.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 491}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 1792}";
+			sepNavWindowFrame = "{{32, 112}, {1028, 763}}";
+		};
+	};
+	92D8DD671391247B00FA7158 /* list-test.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 1157}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 1964}";
+			sepNavWindowFrame = "{{153, 134}, {1028, 763}}";
+		};
+	};
+	92D8DD681391247B00FA7158 /* list-test.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 491}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 1793}";
+		};
+	};
+	92D8DDCD13912F3200FA7158 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 92D8DDCE13912F3200FA7158 /* check_log.c */;
+		name = "check_log.c: 38";
+		rLen = 0;
+		rLoc = 1151;
+		rType = 0;
+		vrLen = 809;
+		vrLoc = 729;
+	};
+	92D8DDCE13912F3200FA7158 /* check_log.c */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.c;
+		name = check_log.c;
+		path = "/Users/schang/Library/check-0.9.8/src/check_log.c";
+		sourceTree = "<absolute>";
+	};
+	92DA232C13A187CB000EF246 /* update-test.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {916, 3276}}";
+			sepNavSelRange = "{11845, 3}";
+			sepNavVisRange = "{11653, 498}";
+			sepNavWindowFrame = "{{241, 310}, {760, 718}}";
+		};
+	};
+	92DA232D13A187CB000EF246 /* update-test.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1013, 491}}";
+			sepNavSelRange = "{1707, 0}";
+			sepNavVisRange = "{0, 1822}";
+			sepNavWindowFrame = "{{653, 144}, {760, 884}}";
+		};
+	};
+	D2AAC045055464E500DB518D /* openmeap-slic-core */ = {
+		activeExec = 0;
+	};
+}

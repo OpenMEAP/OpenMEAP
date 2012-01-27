@@ -1,0 +1,178 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+  http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services-2.0.xsd
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<!--
+	This is the source of all test ModelEntity's, regardless
+	of whether they are put in the SQLite DB or whether they
+	are pulled through the MockModelService 
+	-->
+
+	<bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer"> 
+		<property name="customEditors"> 
+			<map> 
+				<entry key="java.util.Date"> 
+					<bean class="org.springframework.beans.propertyeditors.CustomDateEditor"> 
+						<constructor-arg index="0"> 
+							<bean class="java.text.SimpleDateFormat"> 
+								<constructor-arg><value>yyyy/MMM/dd</value></constructor-arg> 
+							</bean> 
+						</constructor-arg> 
+						<constructor-arg index="1"><value>true</value></constructor-arg> 
+					</bean> 
+				</entry> 
+			</map> 
+		</property> 
+	</bean> 
+
+	<bean id="GlobalSettings_1" class="com.openmeap.model.dto.GlobalSettings">
+		<property name="id" value="1"/>
+		<property name="temporaryStoragePath" value="/tmp"/>
+		<property name="serviceManagementAuthSalt" value="PuppyScrumMaster12345"/>
+		<property name="externalServiceUrlPrefix" value="http://localhost:8080/openmeap-service-web"/>
+		<property name="clusterNodes">
+			<map>
+				<entry key="http://localhost:8080/openmeap-service-web">
+					<bean class="com.openmeap.model.dto.ClusterNode">
+						<property name="serviceWebUrlPrefix" value="http://localhost:8080/openmeap-service-web"/>
+						<property name="fileSystemStoragePathPrefix" value="/tmp"/>
+					</bean>
+				</entry>
+				<entry key="http://localhost:8080/openmeap-service-web2">
+					<bean class="com.openmeap.model.dto.ClusterNode">
+						<property name="serviceWebUrlPrefix" value="http://localhost:8080/openmeap-service-web2"/>
+						<property name="fileSystemStoragePathPrefix" value="/tmp"/>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="Application_1" class="com.openmeap.model.dto.Application">
+		<property name="id" value="1"/>
+		<property name="name" value="Application.name"/>
+		<property name="description" value="Application.description"/>
+		<property name="trackInstalls" value="false"/>
+		<property name="proxyAuthSalt" value="Application.authSalt.1"/>
+		<property name="proxiedBaseUrl" value="Application.proxiedBaseUrl"/>
+		<property name="deployments">
+			<list>
+				<ref bean="Application1_Deployment1"/>
+				<ref bean="Application1_Deployment2"/>
+				<ref bean="Application1_Deployment3"/>
+			</list>
+		</property>
+		<property name="versions">
+			<map>
+				<entry key="ApplicationVersion.identifier.1"><ref bean="ApplicationVersion_1"/></entry>
+				<entry key="ApplicationVersion.identifier.2"><ref bean="ApplicationVersion_2"/></entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="Application1_Deployment1" class="com.openmeap.model.dto.Deployment">
+		<property name="id" value="1"/>
+		<property name="type" value="OPTIONAL"/>
+		<property name="application" ref="Application_1"/>
+		<property name="applicationVersion" ref="ApplicationVersion_1"/>
+		<property name="createDate" value="2011/JAN/01"/>
+	</bean>
+	<bean id="Application1_Deployment2" class="com.openmeap.model.dto.Deployment">
+		<property name="id" value="2"/>
+		<property name="type" value="REQUIRED"/>
+		<property name="application" ref="Application_1"/>
+		<property name="applicationVersion" ref="ApplicationVersion_1"/>
+		<property name="createDate" value="2011/JAN/02"/>
+	</bean>
+	<bean id="Application1_Deployment3" class="com.openmeap.model.dto.Deployment">
+		<property name="id" value="3"/>
+		<property name="type" value="REQUIRED"/>
+		<property name="application" ref="Application_1"/>
+		<property name="applicationVersion" ref="ApplicationVersion_2"/>
+		<property name="createDate" value="2011/JAN/03"/>
+	</bean>
+	
+	<bean id="ApplicationVersion_1" class="com.openmeap.model.dto.ApplicationVersion">
+		<property name="id" value="1"/>
+		<property name="identifier" value="ApplicationVersion.identifier.1"/>
+		<property name="application" ref="Application_1"/>
+		<property name="archive" ref="ApplicationArchive_1"/>
+		<property name="notes" value="ApplicationVersion.notes.1"/>
+	</bean>
+	<bean id="ApplicationVersion_2" class="com.openmeap.model.dto.ApplicationVersion">
+		<property name="id" value="2"/>
+		<property name="identifier" value="ApplicationVersion.identifier.2"/>
+		<property name="application" ref="Application_1"/>
+		<property name="archive" ref="ApplicationArchive_2"/>
+		<property name="notes" value="ApplicationVersion.notes.2"/>
+	</bean>
+	
+	<bean id="ApplicationArchive_1" class="com.openmeap.model.dto.ApplicationArchive">
+		<property name="url" value="ApplicationArchive.url.1"/>
+		<property name="id" value="1"/>
+		<property name="hash" value="ApplicationArchive.hash.1"/>
+		<property name="hashAlgorithm" value="SHA1"/>
+		<property name="bytesLength" value="100000"/>
+		<property name="bytesLengthUncompressed" value="100000"/>
+		<property name="version" ref="ApplicationVersion_1" />
+	</bean>
+	<bean id="ApplicationArchive_2" class="com.openmeap.model.dto.ApplicationArchive">
+		<property name="url" value="ApplicationArchive.url.2"/>
+		<property name="id" value="2"/>
+		<property name="hash" value="ApplicationArchive.hash.2"/>
+		<property name="hashAlgorithm" value="MD5"/>
+		<property name="bytesLength" value="100000"/>
+		<property name="bytesLengthUncompressed" value="100000"/>
+		<property name="version" ref="ApplicationVersion_2" />
+	</bean>
+	
+	<bean id="ApplicationInstallation_1" class="com.openmeap.model.dto.ApplicationInstallation">
+		<property name="uuid" value="Device.uuid.1"/>
+		<property name="applicationVersion" ref="ApplicationVersion_2"/>
+	</bean>
+
+	<bean id="mockModel" class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="targetMapClass" value="java.util.HashMap"/>
+		<property name="sourceMap">
+			<map>
+				<entry key="GlobalSettings">
+					<map>
+						<entry key="1"><ref bean="GlobalSettings_1"/></entry>
+					</map>
+				</entry>
+				<entry key="Application">
+					<map>
+						<entry key="1"><ref bean="Application_1"/></entry>
+					</map>
+				</entry>
+				<entry key="Deployment">
+					<map>
+						<entry key="1"><ref bean="Application1_Deployment1"/></entry>
+						<entry key="2"><ref bean="Application1_Deployment2"/></entry>
+						<entry key="3"><ref bean="Application1_Deployment3"/></entry>
+					</map>
+				</entry>
+				<entry key="ApplicationVersion">
+					<map>
+						<entry key="1"><ref bean="ApplicationVersion_1"/></entry>
+						<entry key="2"><ref bean="ApplicationVersion_2"/></entry>
+					</map>
+				</entry>
+				<entry key="ApplicationArchive">
+					<map>
+						<entry key="1"><ref bean="ApplicationArchive_1"/></entry>
+						<entry key="2"><ref bean="ApplicationArchive_2"/></entry>
+					</map>
+				</entry>
+				<entry key="ApplicationInstallation">
+					<map>
+						<entry key="Device.uuid.1"><ref bean="ApplicationInstallation_1"/></entry>
+					</map>
+				</entry>
+			</map>
+		</property>
+	</bean>
+</beans>

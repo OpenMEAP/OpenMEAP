@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+-->
+<ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
+	<info revision="${openmeap.revision}"
+	    organisation="com.openmeap"
+	    module="integration-testing"
+	    status="integration">
+	</info>
+	
+	<configurations>
+		<conf name="core"/>
+	</configurations>
+	
+	<dependencies>
+		<dependency org="org.mortbay.jetty" name="jetty-ant" rev="6.1.9" conf="core->default" />
+		<dependency org="org.mortbay.jetty" name="jetty" rev="6.1.9" conf="core->default" />
+		<dependency org="javax.servlet" name="servlet-api" rev="3.0-alpha-1" conf="core->default"/>
+	</dependencies>
+	
+</ivy-module>

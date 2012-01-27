@@ -1,0 +1,80 @@
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+ 
+The following is a quick-start set of instructions for setting up an
+OpenMEAP development environment in Eclipse for Java EE developers.
+
+1) Install the Android SDK
+
+2) Create a new workspace in Eclipse (not at openmeap home)
+
+3) De-select to build automatically from the project drop-down
+
+4) Install the Android Development Tools for Eclipse, using the instructions here:
+	http://developer.android.com/sdk/eclipse-adt.html#installing
+	
+5) Install IvyDE using the instructions here:
+	http://ant.apache.org/ivy/ivyde/history/latest-milestone/install.html
+
+6) Setup the Ant properties
+- Open workspace preferences, expand ant, select runtime, 
+  then click the properties tab
+- Add an "openmeap.home" property entry pointing to where you have the openmeap 
+  source package unzipped
+- Add an "android.sdk.home" property entry pointing to where you have the 
+  android sdk installed.
+
+7) Correct/verify the Android SDK location
+Still in workspace preferences, select the Android tab
+correct the Android sdk location, if this wasn't covered by the ADT install
+
+8) Install the Apache Tomcat 5.5 server runtime (required by admin and services)
+- Download and unzip Apache Tomcat 5.5 somewhere you are comfortable with it 
+  living
+- Open workspace preferences, expand "Server", select "Runtime environments"
+- Click "Add"
+- Select "Apache 5.5"
+- Browse to where you downloaded and unzipped Apache Tomcat 5.5
+
+9) Import all the projects
+- Right-click on the "Package Explorer" pane,
+- Select Import, then "Import ..."
+- Expand General, then select "Import projects into workspace"
+- In "Select root directory" browse to the OpenMEAP source root
+- Seeing that all the projects are selected for import,
+- Click finish
+
+10) Build all the projects
+For the least pain, build the projects in this order
+
+	openmeap-shared
+	openmeap-shared-serverside
+	openmeap-admin-web
+	openmeap-services-web
+	
+	openmeap-slic-core
+	openmeap-slic-android
+		
+	openmeap-slic-android-test (not used yet)
+	
+	banking-web
+	

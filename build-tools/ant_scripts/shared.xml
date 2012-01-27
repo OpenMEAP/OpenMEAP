@@ -1,0 +1,195 @@
+<?xml version="1.0"?>
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+-->
+<project basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+	
+		<target name="license" unless="openmeap.license.shown">
+			<property name="openmeap.license.shown" value="true"/>
+			<echo><![CDATA[
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+			]]></echo>	
+		</target>
+	
+	<!-- SETUP START -->
+	<macrodef name="openmeap-setup">
+		<sequential>
+			<property environment="env"/>	
+		
+			<!-- setup the openmeap.home property -->
+			<condition property="openmeap.home.avail">
+				<or>
+					<isset property="openmeap.home"/>
+					<isset property="env.OPENMEAP_HOME"/>
+				</or>
+			</condition>
+			<fail unless="openmeap.home.avail">
+				Either &quot;openmeap.home&quot; property is not set 
+				or there is no OPENMEAP_HOME environment variable to fall-back on.  
+				One of these should be a directory path pointing to the root of the 
+				OpenMEAP source distribution.
+			</fail>
+			<property name="openmeap.home" value="${env.OPENMEAP_HOME}"/>
+			
+			<!-- pull in the openmeap.properties file -->
+			<property name="openmeap.properties" value="${openmeap.home}/build-tools/ant.properties"/>
+			<fail unless="openmeap.home.avail" message="Could not find ${openmeap.properties}"/>
+			<property file="${openmeap.properties}"/>
+			
+			<!-- setup ivy and make sure all our dependencies are pulled in -->
+			<path id="ivy.lib.path">
+			    <fileset dir="${openmeap.project.build}/lib" includes="*.jar"/>
+			</path>
+		</sequential>
+	</macrodef>
+	<openmeap-setup/>
+	<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+	
+	<!-- shared ivy targets -->
+	
+	<target name="clean-ivy-cache">
+		<ivy:cleancache/>
+	</target>
+	
+	<macrodef name="ivy-resolve">
+		<sequential>
+			<property name="openmeap.project.current.file.ivy" value="${openmeap.project.build}/ivy.xml"/>
+			<property name="ivy.retrieve.pattern" value="${openmeap.ivy.retrieve.path}/${openmeap.ivy.retrieve.pattern}"/>
+			<property name="openmeap.ivy.cachepath.conf" value="*"/>
+			<property name="openmeap.ivy.cachefileset.conf" value="*"/>
+			<property name="openmeap.ivy.retrieve.conf" value="*"/>
+			<property name="openmeap.ivy.settings" value="${openmeap.project.build}/ivysettings.xml"/>
+				
+			<ivy:configure file="${openmeap.ivy.settings}"/>
+			<ivy:resolve conf="*" file="${openmeap.project.current.file.ivy}" log="verbose"/>
+			<ivy:cachepath conf="${openmeap.ivy.cachepath.conf}" pathid="openmeap.classpath"/>
+			<ivy:cachefileset conf="${openmeap.ivy.cachefileset.conf}" setid="openmeap.fileset.lib"/>
+			<ivy:retrieve conf="${openmeap.ivy.retrieve.conf}" file="${openmeap.project.current.file.ivy}" sync="true"/>
+		</sequential>
+	</macrodef>
+	<target name="resolve">
+		<ivy-resolve/>
+	</target>
+
+	<target name="publish-local" depends="clean,dist">
+		<ivy:publish forcedeliver="true" overwrite="true" resolver="local" pubrevision="${openmeap.revision}"
+				srcivypattern="${openmeap.dist.artifacts}/openmeap-${ivy.module}.[ext]"
+				artifactspattern="${openmeap.dist.artifacts}/openmeap-${ivy.module}.[ext]">
+		   <artifact name="${ivy.module}" type="${openmeap.project.current.dist.ext}"/>
+		</ivy:publish>
+	</target>
+	
+	<!-- shared client targets -->
+	
+	<target name="setup-client-properties">
+	
+		<fail unless="openmeap.slic.package" 
+				message="openmeap.slic.package must be the package name for the project activity"/>
+		
+		<property name="openmeap.slic.pullUpdates"     value="true"/>
+		<property name="openmeap.slic.updateFrequency" value="86400"/>
+		<property name="openmeap.slic.appTitle"        value="${openmeap.slic.appName}"/>
+		<property name="openmeap.slic.packagedAppRoot" value="original/"/>
+		<property name="openmeap.slic.developmentMode" value="false"/>
+		<property name="openmeap.slic.icon"            value="${openmeap.project.slic.java.android}/res/drawable/icon.png"/>
+		
+		<condition property="com.slic.serviceUrlNeeded">
+			<equals arg1="${openmeap.slic.pullUpdates}" arg2="true"/>
+		</condition>
+		<fail if="com.slic.serviceUrlNeeded" unless="openmeap.slic.appMgmtServiceUrl" 
+				message="openmeap.slic.appMgmtServiceUrl must be specified when openmeap.slic.pullUpdates is true"/>
+		<fail unless="openmeap.slic.appName" 
+				message="openmeap.slic.appName is a required property"/>
+		<fail unless="openmeap.slic.appVersion" 
+				message="openmeap.slic.appVersion is a required property"/>
+		<fail unless="openmeap.slic.assets" 
+				message="openmeap.slic.assets must point to the root directory of the HTML5 application to bundle with the SLIC"/>
+		<fail unless="openmeap.slic.deviceType" 
+				message="openmeap.slic.deviceType must be set"/>
+		
+		<property name="openmeap.slic.assets.absPath" location="${openmeap.slic.assets}"/>
+	</target>
+	
+	<target name="-setup-client-properties"/>
+	
+	<target name="copy-slic-assets" depends="-setup-client-properties,copy-slic-openmeap-js">
+		<delete dir="${openmpea.slic.assets.dest.absPath}" quiet="true"/>
+		<copy todir="${openmeap.slic.assets.dest.absPath}" includeemptydirs="true">
+			<fileset dir="${openmeap.slic.assets.absPath}"/> 
+		</copy>
+	</target>
+	<target name="copy-slic-openmeap-js" if="openmeap.slic.apiJs">
+		<copy overwrite="true"
+			file="${openmeap.file.api-javascript}"
+			tofile="${openmeap.slic.assets.dest.absPath}/js/openmeap.js"/>
+	</target>
+	
+	<!-- universally shared targets -->
+	
+	<target name="help" depends="license">
+		<echo>To obtain a list of targets, call "ant -f ${ant.file} -p".</echo>
+	</target>
+	
+	<target name="dist-base">
+		<mkdir dir="${openmeap.dist.artifacts}"/>
+	</target>
+	
+	<macrodef name="package-version">
+		<attribute name="file"/>
+		<attribute name="dir"/>
+		<sequential>
+			<copy todir="package.tmp">
+				<fileset dir="@{dir}"/>
+			</copy>
+			<copy file="${openmeap.file.api-javascript}" todir="package.tmp/js" />
+			<zip destfile="@{file}" basedir="package.tmp"/>
+			<delete dir="package.tmp"/>
+		</sequential>
+	</macrodef>
+
+	<!-- overrides -->
+	
+	<target name="clean"></target>
+	<target name="dist"></target>
+	
+</project>

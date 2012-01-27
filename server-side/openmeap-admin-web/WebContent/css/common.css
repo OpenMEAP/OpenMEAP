@@ -1,0 +1,198 @@
+/*
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+ */
+
+/*-------------------------------------------------------
+OpenMEAP Admin Interface Stylesheet
+Version 1.0
+Author: Lam Nguyen
+lam@openmeap.com
+-------------------------------------------------------*/
+
+html {
+    overflow-y: scroll;
+}
+
+body {
+	background: url(../img/bg/header.jpg) repeat-x 0 0;
+	font: 70%/1.4em Helvetica, Arial;
+	margin: 0;
+	
+}
+
+#wrapper {
+	margin: 0 auto;
+}
+
+#header {
+	height: 90px;
+}
+
+
+#footer {
+	background: url(../img/bg/footer.jpg) repeat-x 0 0 #FFEAF6;
+	display: block;
+	height: 100px;
+}
+
+#content-wrapper {
+}
+
+.row {
+	display: block;
+	margin-bottom: 25px;
+}
+
+.clearfix {
+	clear: both;
+}
+
+/* =Main Menu
+-----------------------------------------------------------------------*/
+#main-menu, #support {
+	background: url(../img/bg/tab.png) repeat-x 0 0 transparent;
+    border: 1px solid #C7CEED;
+	min-height: 200px;
+    padding: 0 10px;
+    width: 180px;
+}
+#main-menu h2, #support h2 {
+    color: #003A6F;
+    margin-top: 6px;
+}
+#main-menu ul {
+	margin: 0;
+	padding: 0;
+}
+#main-menu ul li {
+    background: url("../img/icon/plus.gif") no-repeat scroll 0 3px transparent;
+    list-style-type: none;
+    margin: 5px 0;
+	padding: 0 0 0 15px;
+}
+
+.menu-buttons {
+	display: inline-block;
+}
+.menu-buttons img{
+	margin-right: 7px;
+}
+.menu-buttons img.last {
+	margin-right: 0;
+}
+.menu-buttons a img {
+	border: 0;
+}
+
+
+/* = Header
+-----------------------------------------------------------------------*/
+#header {
+	background: url(../img/logo-OpenMEAP.png) no-repeat 0 25px transparent;
+}
+
+/* = Menu Options
+-----------------------------------------------------------------------*/
+
+#admin-header, #messages, #main-content {
+	display: inline-block;
+}
+
+#main-content {
+    background: url("../img/bg/tab.png") repeat-x scroll 0 0 transparent;
+    border: 1px solid #C7CEED;
+    min-height: 427px;
+    padding: 0 10px;
+    width: 660px;
+}
+#main-content h2 {
+    color: #003A6F;
+    margin-top: 6px;
+}
+#main-content fieldset {
+	border: none;
+}
+#main-content legend {
+    border-bottom: 1px solid #ECECEC;
+    font-size: 1.35em;
+    font-weight: bold;
+    width: 100%;
+}
+
+/* =Error Messages
+-------------------------------------------------------*/
+#messages ul {
+	padding-left: 20px;
+}
+
+#messages ul li {
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+/* =Form Styling
+-------------------------------------------------------*/
+#main-content form {
+	padding-top: 10px;
+}
+form dl dd {
+	margin: 5px 0 10px;
+}
+form dl dt {
+	font-weight: bold;
+}
+form span.copy {
+	font-weight: normal;
+}
+form input[type=text] {
+	width: 78%;
+}
+/* =Table - Application List
+-------------------------------------------------------*/
+table.application-list, table.application-version {
+	border-collapse:collapse;
+	margin-top: 10px;
+	width: 100%;
+}
+
+table.application-list th, table.application-list td, table.application-version th, table.application-version td {
+	border: 1px solid #859bb2;
+	padding: 5px;	
+}
+
+table.application-list th, table.application-version th {
+	background-color: #cfdbef;
+	color: #003A6F;
+	font-weight: bold;
+	text-align: left;
+}
+
+/* =Footer
+----------------------------------------------------------*/
+#admin-footer {
+    background: url("../img/bg/fiber.gif") repeat scroll 0 0 #90A1B1;
+    color: #FFFFFF;
+    font-weight: bold;
+    height: 30px;
+    padding-top: 10px;
+}

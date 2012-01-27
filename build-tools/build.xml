@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+-->
+<project name="openmeap-serverside" basedir="." default="help">
+
+	<import file="ant_scripts/shared.xml"/>
+	
+	<target name="dist-all-web"
+			description="--> Build the openmeap-services-web and openmeap-admin-web war files"
+			depends="publish-local-shared,publish-local-shared-serverside,dist-admin-web,dist-services-web"/>
+	<target name="clean-all-web"
+			description="--> Clean-up everything related to the web build, including the war artifacts"
+			depends="clean-shared,clean-shared-serverside,clean-admin-web,clean-services-web">
+		<delete includeemptydirs="true" quiet="true">
+			<fileset dir="gen" includes="**/*"/>
+			<fileset dir="dist" includes="**/*"/>
+		</delete>
+	</target>
+	
+	<target name="dist-shared" depends="">
+		<ant dir="${openmeap.project.shared}" antfile="build.xml" target="dist" inheritall="false"/>
+	</target>
+	<target name="clean-shared">
+		<ant dir="${openmeap.project.shared}" antfile="build.xml" target="clean" inheritall="false"/>
+	</target>
+	<target name="publish-local-shared" depends="">
+		<ant dir="${openmeap.project.shared}" antfile="build.xml" target="publish-local" inheritall="false"/>
+	</target>
+	
+	<target name="dist-shared-serverside" depends="publish-local-shared">
+		<ant dir="${openmeap.project.shared-serverside}" antfile="build.xml" target="dist" inheritall="false"/>
+	</target>
+	<target name="clean-shared-serverside">
+		<ant dir="${openmeap.project.shared-serverside}" antfile="build.xml" target="clean" inheritall="false"/>
+	</target>
+	<target name="publish-local-shared-serverside" depends="publish-local-shared">
+		<ant dir="${openmeap.project.shared-serverside}" antfile="build.xml" target="publish-local" inheritall="false"/>
+	</target>
+	
+	<!-- Middleware -->
+	
+	<target name="dist-services-web" depends="publish-local-shared,publish-local-shared-serverside">
+		<ant dir="${openmeap.project.services-web}" antfile="build.xml" target="dist" inheritall="false"/>
+	</target>
+	<target name="clean-services-web">
+		<ant dir="${openmeap.project.services-web}" antfile="build.xml" target="clean" inheritall="false"/>
+	</target>
+		
+	<target name="dist-admin-web" depends="publish-local-shared,publish-local-shared-serverside">
+		<ant dir="${openmeap.project.admin-web}" antfile="build.xml" target="dist" inheritall="false"/>
+	</target>
+	<target name="clean-admin-web">
+		<ant dir="${openmeap.project.admin-web}" antfile="build.xml" target="clean" inheritall="false"/>
+	</target>
+	
+	<!-- Android SLIC -->
+	
+	<target name="dist-slic-android" depends="publish-local-shared,publish-local-slic-core">
+		<ant dir="${openmeap.project.slic.java.android}" antfile="build.xml" target="dist" inheritall="false"/>
+	</target>
+	<target name="clean-slic-android">
+		<ant dir="${openmeap.project.slic.java.android}" antfile="build.xml" target="clean" inheritall="false"/>
+	</target>
+	
+	<target name="dist-slic-core" depends="publish-local-shared">
+		<ant dir="${openmeap.project.slic.java.core}" antfile="build.xml" target="dist" inheritall="false"/>
+	</target>
+	<target name="clean-slic-core">
+		<ant dir="${openmeap.project.slic.java.core}" antfile="build.xml" target="clean" inheritall="false"/>
+	</target>
+	<target name="publish-local-slic-core">
+		<ant dir="${openmeap.project.slic.java.core}" antfile="build.xml" target="publish-local" inheritall="false"/>
+	</target>
+	
+</project>

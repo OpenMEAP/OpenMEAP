@@ -1,0 +1,1 @@
+Copyright &copy; ${currentTime?string("yyyy")!} OpenMEAP, Inc. All rights reserved

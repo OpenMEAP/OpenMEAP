@@ -1,0 +1,85 @@
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ############################################################################### 
+ -->
+ <beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:jee="http://www.springframework.org/schema/jee"
+  xmlns:aop="http://www.springframework.org/schema/aop"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+  http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services-2.0.xsd
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+  http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+	<bean id="openMeapJPAPropertiesConfigurer" 
+			class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations" value="classpath:/openmeap-jpa.properties"/>
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+		<property name="searchSystemEnvironment" value="true"/>
+		<property name="ignoreUnresolvablePlaceholders" value="true"/>
+	</bean>
+
+	<bean id="openMeapDataSourceBean" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${OPENMEAP_JDBC_DRIVERCLASS}" />
+		<property name="username" value="${OPENMEAP_JDBC_USERNAME}" />
+		<property name="password" value="${OPENMEAP_JDBC_PASSWORD}" />
+		<property name="url" value="${OPENMEAP_JDBC_URL}" />
+	</bean>
+
+    <bean id="www_persistenceVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+		<property name="showSql" value="${OPENMEAP_JPA_SHOWSQL}" />
+		<property name="generateDdl" value="${OPENMEAP_JPA_GENERATEDDL}" />
+		<property name="databasePlatform" value="${OPENMEAP_JPA_DIALECT}"/>
+	</bean>
+
+	<bean id="www_jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect"/>
+
+	<bean id="www_entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" >
+		<property name="persistenceUnitName" value="openmeap-jpa"/>
+		<property name="dataSource" ref="openMeapDataSourceBean"/>
+		<property name="loadTimeWeaver">
+			<bean class="org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver"/>
+		</property>
+		<property name="jpaVendorAdapter" ref="www_persistenceVendorAdapter"/>
+		<property name="jpaDialect" ref="www_jpaDialect"/>
+	</bean>
+	
+	<bean id="www_transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="www_entityManagerFactory"/>
+		<property name="dataSource" ref="openMeapDataSourceBean"/>
+		<property name="jpaDialect" ref="www_jpaDialect"/>
+	</bean>
+	
+	<bean id="entityManager" scope="request" factory-bean="www_entityManagerFactory" factory-method="createEntityManager">
+		<aop:scoped-proxy/>
+	</bean>
+	
+	<bean id="modelService" class="com.openmeap.model.ModelServiceImpl">
+		<property name="entityManager" ref="entityManager"/>
+	</bean>
+	
+	<bean id="modelManager" class="com.openmeap.model.ModelManagerImpl">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+    
+</beans>

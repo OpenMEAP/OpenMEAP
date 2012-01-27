@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="openmeap-services-web">
+        <wb-resource deploy-path="/" source-path="/WebContent"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/test"/>
+        <dependent-module archiveName="openmeap-shared.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/openmeap-shared/openmeap-shared">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="openmeap-shared-serverside.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/openmeap-shared-serverside/openmeap-shared-serverside">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="java-output-path" value="/openmeap-proxy-ws/build/classes"/>
+        <property name="context-root" value="openmeap-services-web"/>
+    </wb-module>
+</project-modules>

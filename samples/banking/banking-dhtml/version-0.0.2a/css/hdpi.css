@@ -1,0 +1,38 @@
+button {
+  position: relative;
+  height: 72px;
+  padding: 0 6px;
+  margin: 0;
+  box-sizing: border-box;
+
+  font-family: 'Droid Sans', helvetica, arial, sans-serif;
+  font-size: 21px;
+  line-height: 45px;
+
+  background: transparent;
+  border-width: 34px 17px 37px 18px;
+  border-image: url(../img/hdpi/btn_default_normal.png) 34 17 37 18 stretch stretch;
+
+  -webkit-box-sizing: border-box;
+  -webkit-border-image: url(../img/hdpi/btn_default_normal.png) 34 17 37 18 stretch stretch;
+  -webkit-tap-highlight-color: rgba(255, 0, 0, 0);
+  outline: 0;
+}
+
+button span {
+  position: relative;
+  left: 0;
+  top: -24px;
+}
+
+button:focus, button.focus {
+  border-image: url(../img/hdpi/btn_default_selected.png) 34 17 37 18 stretch stretch;
+
+  -webkit-border-image: url(../img/hdpi/btn_default_selected.png) 34 17 37 18 stretch stretch;
+}
+
+button:active, button.active {
+  border-image: url(../img/hdpi/btn_default_pressed.png) 34 17 37 18 stretch stretch;
+
+  -webkit-border-image: url(../img/hdpi/btn_default_pressed.png) 34 17 37 18 stretch stretch;
+}

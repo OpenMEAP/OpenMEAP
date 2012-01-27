@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011 OpenMEAP, Inc.                                        #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the GPLv3                                                 #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU General Public License as published by     #
+ #    the Free Software Foundation, either version 3 of the License, or        #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU General Public License for more details.                             #
+ #                                                                             #
+ #    You should have received a copy of the GNU General Public License        #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+-->
+<ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
+	<info revision="${openmeap.revision}"
+	    organisation="com.openmeap"
+	    module="middleware"
+	    status="integration">
+	</info>
+	
+	<configurations>
+		<conf name="core"/>
+	</configurations>
+	
+	<publications>
+		<artifact name="services-web" type="war" conf="core" ext="war"/>
+		<artifact name="admin-web" type="war" conf="core" ext="war"/>
+		<artifact name="shared" type="jar" conf="core" ext="jar"/>
+		<artifact name="shared-serverside" type="jar" conf="core" ext="jar"/>
+	</publications>
+	
+	<dependencies>
+	
+		<dependency org="javax.transaction" name="jta" rev="1.0.1B"/>
+	
+		<dependency org="org.apache.tomcat" name="servlet-api" rev="6.0.35"/>
+	
+		<dependency org="org.freemarker" name="freemarker" rev="2.3.18" conf="core->default"/>
+		  
+		<dependency org="org.xerial" name="sqlite-jdbc" rev="3.7.2" conf="core->default"/>
+		<dependency org="org.hibernate" name="hibernate-entitymanager" rev="3.3.2.GA" conf="core->default"/>
+		  
+		<dependency org="org.apache.httpcomponents" name="httpclient" rev="4.1.1" conf="core->default"/>
+		<dependency org="org.apache.httpcomponents" name="httpclient-cache" rev="4.1.1" conf="core->default"/>
+		<dependency org="org.apache.httpcomponents" name="httpmime" rev="4.1.1" conf="core->default"/>
+		  
+		<dependency org="log4j" name="log4j" rev="1.2.16" conf="core->default"/>
+		<dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.4" conf="core->default"/>
+		  
+		<dependency org="org.springframework" name="spring-web" rev="3.0.6.RELEASE" conf="core->default"/>
+		<dependency org="org.springframework" name="spring-tx" rev="3.0.6.RELEASE" conf="core->default"/>
+		<dependency org="org.springframework" name="spring-jdbc" rev="3.0.6.RELEASE" conf="core->default"/>
+		<dependency org="org.springframework" name="spring-orm" rev="3.0.6.RELEASE" conf="core->default"/>
+		<dependency org="org.springframework" name="spring-test" rev="3.0.6.RELEASE" conf="core->default"/>
+		  
+		<dependency org="commons-lang" name="commons-lang" rev="2.6" conf="core->default"/>
+		<dependency org="commons-io" name="commons-io" rev="2.1" conf="core->default"/>
+		<dependency org="commons-fileupload" name="commons-fileupload" rev="1.2.2" conf="core->default"/>
+	  
+	</dependencies>
+	
+</ivy-module>
