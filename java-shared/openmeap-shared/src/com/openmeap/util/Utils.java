@@ -24,15 +24,14 @@
 
 package com.openmeap.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
+
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
 import java.util.Formatter;
 import java.util.Scanner;
 import java.util.Map;
@@ -41,17 +40,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -149,53 +137,4 @@ abstract public class Utils {
         }
         return formatter.toString();
     }
-    
-    public static int sendFile(URL url, File file) {
-		HttpClient httpclient = new DefaultHttpClient();
-		try {
-			HttpPost httppost = new HttpPost(url.toURI());
-
-			FileBody bin = new FileBody(file);
-			// StringBody comment = new StringBody("A binary file of some kind");
-
-			MultipartEntity reqEntity = new MultipartEntity();
-			reqEntity.addPart("bin", bin);
-			//reqEntity.addPart("comment", comment);
-
-			httppost.setEntity(reqEntity);
-
-			//logger.debug("Executing request {}", httppost.getRequestLine());
-
-			HttpResponse response = httpclient.execute(httppost);
-			HttpEntity resEntity = response.getEntity();
-
-			//logger.debug("----------------------------------------");
-			//logger.debug(response.getStatusLine().toString());
-				
-			//if (resEntity != null) {
-				//logger.info("Response content length: {}",resEntity.getContentLength());
-			//}
-			EntityUtils.consume(resEntity);
-			
-			return response.getStatusLine().getStatusCode();
-		} catch( URISyntaxException use ) { 
-			// TODO: better exception reporting
-			//logger.error("An exception occurred converting the URL {} to a URI.",url);
-		} catch( ClientProtocolException cpo ) {
-			// TODO: better exception reporting
-			//logger.error("An exception occurred posting file {} to {} : {}",new Object[]{file,url,cpo});
-		} catch( IOException ioe ) {
-			// TODO: better exception reporting
-			//logger.error("An exception occurred consuming the response entity from {} : {}",new Object[]{url,ioe});
-		} finally {
-			try { 
-				httpclient.getConnectionManager().shutdown(); 
-			} catch (Exception e) {
-				// TODO: better exception reporting
-				//logger.error("An exception occurred shutting down the HttpClient ConnectionManager, posting to url {} the file {} : {}",new Object[]{url,file,e});
-				throw new RuntimeException(e);
-			}
-		}
-		return 0;
-	}
 }

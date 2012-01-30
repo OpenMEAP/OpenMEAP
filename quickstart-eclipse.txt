@@ -55,26 +55,43 @@ correct the Android sdk location, if this wasn't covered by the ADT install
 - Select "Apache 5.5"
 - Browse to where you downloaded and unzipped Apache Tomcat 5.5
 
-9) Import all the projects
-- Right-click on the "Package Explorer" pane,
-- Select Import, then "Import ..."
-- Expand General, then select "Import projects into workspace"
-- In "Select root directory" browse to the OpenMEAP source root
-- Seeing that all the projects are selected for import,
-- Click finish
+9) Import "build-tools" and configure the Ivy settings for workshop
 
-10) Build all the projects
-For the least pain, build the projects in this order
+	- Right-click on the "Package Explorer" pane,
+	- Select Import, then "Import ..."
+	- Expand General, then select "Import projects into workspace"
+	- In "Select root directory" browse to the OpenMEAP source root
+	- Seeing that only the "build-tools" project is selected for import,
+	- Click finish
+	
+	- Open Eclipse "Preferences", expand Ivy, then Settings
+	- For "Ivy settings path", Click "Workspace..." and select 
+		ivysettings.xml under build-tools
+	- For "Property files", Click "Workspace..." and select 
+		ant.properties under build-tools
 
+10) Import, resolve Ivy dependencies and build all the projects
+
+For the least pain, import and build the projects in groups in the order below
+	
 	openmeap-shared
 	openmeap-shared-serverside
+	
 	openmeap-admin-web
 	openmeap-services-web
 	
 	openmeap-slic-core
 	openmeap-slic-android
-		
 	openmeap-slic-android-test (not used yet)
 	
 	banking-web
-	
+
+For each grouping above, do the following:
+	- Right-click on the "Package Explorer" pane,
+	- Select Import, then "Import ..."
+	- Expand General, then select "Import projects into workspace"
+	- In "Select root directory" browse to the OpenMEAP source root
+	- Seeing that the group of projects desired are selected for import,
+	- Click finish
+	- Right click on each imported project and select "Ivy"->"resolve"
+	- Wait, then build each as the Ivy dependencies are resolved
