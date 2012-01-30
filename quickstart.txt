@@ -90,6 +90,17 @@ Create DHTML application
 List what you can do (illustrative, here, only)
 
 	om_client $ om_ios.sh -p
+	
+Publish the shared and slic-core projects to the local repository.
+The openmeap-shared and openmeap-slic-core project artifacts must be available
+within the local ivy repository, in order to perform command-line builds for 
+Android.  This step only needs to be performed when these projects have 
+changed.
+
+	$ . ./${OPENMEAP_HOME}/build-tools/scripts/setEnv.sh
+	$ cd ./${OPENMEAP_HOME}/build-tools
+	$ ant publish-local-shared
+	$ ant publish-local-slic-core
 
 Create and build your iOS project.  Opens and runs in xCode 4.2
 

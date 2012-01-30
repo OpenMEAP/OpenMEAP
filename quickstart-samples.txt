@@ -32,8 +32,19 @@ Correct the environment variables in this file to match your environment
 
 	$ . ./${OPENMEAP_HOME}/build-tools/scripts/setEnv.sh
 	
+#==================
+2) Publish the shared and slic-core projects to the local repository
+
+The openmeap-shared and openmeap-slic-core project artifacts must be available within the local
+ivy repository, in order to perform command-line builds for Android.
+
+ $ . ./${OPENMEAP_HOME}/build-tools/scripts/setEnv.sh
+ $ cd ./${OPENMEAP_HOME}/build-tools
+ $ ant publish-local-shared
+ $ ant publish-local-slic-core
+	
 +==================
-2) The Banking sample
+3) The Banking sample
 
 The Banking sample build script is setup to create an initial SLIC deployment
 build and 3 versions to upload into the OpenMEAP Admin interface.
@@ -45,18 +56,18 @@ in some update prior to the beta release of OpenMEAP.
 
 The following command will 
 
-	$ cd ${OPENMEAP_HOME}/samples/banking
+ $ cd ${OPENMEAP_HOME}/samples/banking
 	
 The following will create the Android and iOS Banking sample clients
 (only Android on non-Macs)
 	
-	$ ant create
+ $ ant create
 
 The following will build the Android and iOS Banking sample clients
 (only Android on non-Macs)	
 	
-	$ ant build
+ $ ant build
 	
 To create the 3 versions for uploading into /openmeap-admin-web/interface/
 	
-	$ ant package-versions
+ $ ant package-versions
