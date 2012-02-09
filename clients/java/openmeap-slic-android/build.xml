@@ -56,6 +56,6 @@
 	
 	<target name="release" depends="dist"/>
 	<target name="debug" depends="dist"/>
-	<target name="nodep"/>
+	<target name="nodeps"/>
 
 </project>
