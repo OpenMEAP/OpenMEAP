@@ -55,8 +55,9 @@
 	
 	<target name="compile" depends="resolve">
 		<mkdir dir="build/classes"/>
-		<javac debug="true" 
+		<javac debug="${openmeap.debug}" 
 				target="${openmeap.targetJdk}" 
+				source="${openmeap.sourceJdk}" 
 				debuglevel="${openmeap.debuglevel}" 
 				destdir="build/classes" 
 				classpathref="openmeap.classpath">

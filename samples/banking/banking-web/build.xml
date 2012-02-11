@@ -75,7 +75,7 @@
 	<!-- BEGIN COMPILE SECTION ++++++++++++++++++++++++++++++++++++ -->
 	
 	<target name="compile" depends="generate-sources,resolve">
-		<javac debug="true" debuglevel="${openmeap.debuglevel}" target="${openmeap.targetJdk}" destdir="build/classes" classpathref="openmeap.classpath">
+		<javac debug="${openmeap.debug}" debuglevel="${openmeap.debuglevel}" target="${openmeap.targetJdk}" source="${openmeap.sourceJdk}" destdir="build/classes" classpathref="openmeap.classpath">
 			<src path="src"/>
 			<src path="gen"/>
 		</javac>
