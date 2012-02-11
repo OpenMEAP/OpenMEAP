@@ -104,12 +104,14 @@ public abstract class ServletUtils {
 				throw new RuntimeException(fue);
 			}
 		} else {
-			for( Map.Entry<Object,Object> ent : ((Map<Object,Object>)request.getParameterMap()).entrySet() ) {
-				if( ent.getKey() instanceof String && ent.getValue() instanceof String[] ) {
-					String key = (String)ent.getKey();
-					String[] values = new String[((String[])ent.getValue()).length];
+			@SuppressWarnings(value={"unchecked"})
+			Map<String,String[]> params = (Map<String,String[]>)request.getParameterMap();
+			for( Map.Entry<String,String[]> ent : params.entrySet() ) {
+				if( ent.getValue() != null ) {
+					String key = ent.getKey();
+					String[] values = new String[ent.getValue().length];
 					int i = 0;
-					for( String val : (String[])ent.getValue() ) {
+					for( String val : ent.getValue() ) {
 						values[i++]=val;
 					}
 					map.put(key,values);
