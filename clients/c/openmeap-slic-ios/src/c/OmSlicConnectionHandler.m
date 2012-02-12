@@ -147,7 +147,7 @@
 	
 	NSString * authMethod = [protectionSpace authenticationMethod];
 	if( [authMethod compare:NSURLAuthenticationMethodDefault]==NSOrderedSame 
-	   || [authMethod compare:NSURLAuthenticationMethodServerTrust]==NSOrderedSame
+	   //|| [authMethod compare:NSURLAuthenticationMethodServerTrust]==NSOrderedSame
 	   || [authMethod compare:NSURLAuthenticationMethodHTTPBasic]==NSOrderedSame
 	   || [authMethod compare:NSURLAuthenticationMethodHTTPDigest]==NSOrderedSame ) {
 		return YES;
