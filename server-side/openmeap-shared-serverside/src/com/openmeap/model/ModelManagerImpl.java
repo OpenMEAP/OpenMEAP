@@ -143,26 +143,4 @@ public class ModelManagerImpl implements ModelManager {
 		}
 		return settings;
 	}
-	
-	public List<Application> findAllApplications() {
-		return modelService.findAll(Application.class);
-	}
-	public Application findApplication(Long id) {
-		return modelService.findByPrimaryKey(Application.class,id);
-	}
-	public Application findApplicationByName(String name) {
-		return modelService.findApplicationByName(name);
-	}
-	public ApplicationVersion findApplicationVersion(Long id) {
-		return modelService.findByPrimaryKey(ApplicationVersion.class,id);
-	}
-	public ApplicationInstallation findAppInstByUuid(String uuid) {
-		return modelService.findByPrimaryKey(ApplicationInstallation.class,uuid);
-	}
-	public ApplicationVersion findAppVersionByNameAndId(String appName, String versionId) {
-		return modelService.findAppVersionByNameAndId(appName,versionId);
-	}
-	public Deployment getLastDeployment(Application app) {
-		return modelService.getLastDeployment(app);
-	}
 }

@@ -42,7 +42,7 @@ public class ModelServiceRefreshNotifierTest {
 		lu.add( new URL("http://www.openmeap.com/openmeap-services-web") );
 		wsrn.getConfig().setServerUrls(lu);
 		
-		Application app = modelManager.findApplication(1L);
+		Application app = modelManager.getModelService().findByPrimaryKey(Application.class,1L);
 		app.setName(wsrn.getConfig().getAuthSalt());
 		wsrn.notify(new ModelEntityModifyEvent(app));
 		

@@ -25,22 +25,16 @@ Parameter Values / Outputs:
 		<dl>
 				<dt>Name:</dt>
 				<dd><input type="text" name="name" value="${(application.name?html)!}"/></dd>
-				<!--
-				<dt>Track Installs:</dt>
-				<dd><input type="checkbox" ${(trackInstalls.checked)!} name="${(trackInstalls.name?html)!}" value="${(trackInstalls.value?html)!}"/></dd>
-				<dt>Proxy Auth Salt:</dt>
-				<dd><input type="password" name="proxyAuthSalt" value=""/></dd>
-				<dt>Re-Enter Proxy Auth Salt:</dt>
-				<dd><input type="password" name="proxyAuthSaltConfirm" value=""/></dd>				
-				<dt>Proxed Base Url:</dt>
-				<dd><input type="text" name="proxiedBaseUrl" value="${(application.proxiedBaseUrl?html)!}"/></dd>
-				-->
 				<dt>Admins (may modify version admins as well):</dt>
 				<dd><textarea cols="60" rows="3" name="admins">${(application.admins?html)!}</textarea></dd>
 				<dt>Version Admins:</dt>
-				<dd><textarea cols="60" rows="3" name="version-admins">${(application.versionAdmins?html)!}</textarea></dd>
+				<dd><textarea cols="60" rows="3" name="versionAdmins">${(application.versionAdmins?html)!}</textarea></dd>
 				<dt>Description:</dt>
 				<dd><textarea cols="60" rows="5" name="description">${(application.description?html)!}</textarea></dd>
+				<dt>Initial Version Identifier:</dt>
+				<dd><input type="text" name="initialVersionIdentifier" value="${(application.initialVersionIdentifier?html)!}"/></dd>
+				<dt>Deployment History Length:</dt>
+				<dd><input type="text" name="deploymentHistoryLength" value="${(application.deploymentHistoryLength?string.computer)!}"/></dd>
 				[#if willProcess]
 				<dt>Submit:</dt>
 				<dd>

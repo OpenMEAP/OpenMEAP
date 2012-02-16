@@ -60,14 +60,14 @@ public class ApplicationListingsBacking extends AbstractTemplatedSectionBacking 
 			Map<Object, Object> templateVariables,
 			Map<Object, Object> parameterMap) {
 		
-		List<Application> applications = modelManager.findAllApplications();
+		List<Application> applications = modelManager.getModelService().findAll(Application.class);
 		
 		if( applications!=null && applications.size()>0 ) {
 			
 			Map<String,Anchor> deplUrls = new HashMap<String,Anchor>();
 			
 			for( Application app : applications ) {
-				Deployment d = modelManager.getLastDeployment(app);
+				Deployment d = modelManager.getModelService().getLastDeployment(app);
 				if( d!=null ) {
 					deplUrls.put( app.getName(),
 							new Anchor("?bean=addModifyAppVersionPage"

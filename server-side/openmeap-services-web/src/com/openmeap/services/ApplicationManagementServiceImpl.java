@@ -25,6 +25,7 @@
 package com.openmeap.services;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -72,24 +73,33 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 	
 	public ConnectionOpenResponse connectionOpen(ConnectionOpenRequest request) throws WebServiceException {
 		
+		String reqAppArchHashVal = StringUtils.trimToNull(request.getApplication().getHashValue());
+		String reqAppVerId = StringUtils.trimToNull(request.getApplication().getVersionId());
+		String reqAppName = StringUtils.trimToNull(request.getApplication().getName());
+		
 		ConnectionOpenResponse response = new ConnectionOpenResponse();
 		
-		ModelManager manager = getModelManager();
 		GlobalSettings settings = modelManager.getGlobalSettings();
-		if( StringUtils.isBlank(settings.getExternalServiceUrlPrefix()) ) {
-			logger.warn("The external service url prefix configured in the admin interface is blank.  This will probably cause issues downloading application archives.");
+		if( StringUtils.isBlank(settings.getExternalServiceUrlPrefix()) && logger.isWarnEnabled() ) {
+			logger.warn("The external service url prefix configured in the admin interface is blank.  "
+					+"This will probably cause issues downloading application archives.");
 		}
 		
-		// we will need to verify that they have the latest version
-		String appName = request.getApplication().getName();
-		String appVersionId = request.getApplication().getVersionId();
-		String appArchHashValue = request.getApplication().getHashValue();
-		com.openmeap.model.dto.ApplicationVersion appVer = manager.findAppVersionByNameAndId(appName,appVersionId);
-		if( appVer==null ) {
-			throw new WebServiceException(WebServiceException.TypeEnum.APPLICATION_VERSION_NOTFOUND,
-					"The application "+appName+"(version "+appVersionId+") was not found.");
-		}
-		Application application = appVer.getApplication();
+		Application application = getApplication(reqAppName,reqAppVerId);
+		List<Deployment> deployments = modelManager.getModelService().findDeploymentsByNameAndId(reqAppName,reqAppVerId);
+		if( deployments!=null ) {
+			Boolean found = false;
+			for( Deployment d : deployments ) {
+				if( d.getApplicationVersion().getIdentifier().equals(reqAppVerId) ) {
+					found = true;
+					break;
+				}
+			}
+			if( !found && (reqAppVerId==null || !reqAppVerId.equals(application.getInitialVersionIdentifier()) ) ) {
+				throw new WebServiceException(WebServiceException.TypeEnum.APPLICATION_VERSION_NOTFOUND,
+					"The application version "+reqAppVerId+" has not been deployed before.");
+			}
+		} 
 		
 		// TODO: run rules against the request
 		
@@ -97,16 +107,20 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 		String authToken = AuthTokenProvider.newAuthToken(application.getProxyAuthSalt());
 		response.setAuthToken(authToken);
 		
-		// The application must specify a current version, else is invalid
-		Deployment lastDeployment = modelManager.getLastDeployment(application);
-		if( modelManager.getLastDeployment(application)==null || lastDeployment.getApplicationVersion()==null ) {
-			throw new WebServiceException(WebServiceException.TypeEnum.MISSING_PARAMETER,
-					"The application "+appName+" has no deployment history");
-		}
+		// If there is a deployment, 
+		// and the version of that deployment differs in hash value or identifier
+		// then return an update in the response
+		Deployment lastDeployment = modelManager.getModelService().getLastDeployment(application);
+		Boolean reqAppVerDiffers = lastDeployment!=null && !lastDeployment.getApplicationVersion().getIdentifier().equals(reqAppVerId);
+		Boolean reqAppArchHashValDiffers = lastDeployment!=null && reqAppArchHashVal!=null && !lastDeployment.getHash().equals(reqAppArchHashVal);
 		
-		// If the version or hash value differ, then send an update
-		if( lastDeployment.getApplicationVersion().getIdentifier().compareTo( request.getApplication().getVersionId() )!=0 
-				|| (appArchHashValue!=null && lastDeployment.getHash().compareTo(appArchHashValue)!=0) ) {
+		// we only send an update if 
+		//   a deployment has been made
+		// and one of the following is true
+		//   the app version is different than reported
+		//   the app hash value is different than reported
+		if( reqAppVerDiffers || reqAppArchHashValDiffers ) {
+			
 			// TODO: I'm not happy with the discrepancies between the model and schema...besides, this update header should be encapsulated somewhere else
 			ApplicationVersion currentVersion = lastDeployment.getApplicationVersion();
 			ApplicationArchive currentVersionArchive = currentVersion.getArchive();
@@ -126,26 +140,6 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 			response.setUpdate(uh);
 		}
 		
-		// 1) the device isn't black listed or something
-		// 2) the application is tracking individual devices...
-		//    many customers may not care about authentication at this level
-		if( application.getTrackInstalls() ) {
-			
-			com.openmeap.model.dto.ApplicationInstallation appInst = manager.findAppInstByUuid(
-					request.getApplication().getInstallation().getUuid());
-			if( appInst==null ) {
-				appInst = new com.openmeap.model.dto.ApplicationInstallation();
-				appInst.setApplicationVersion(appVer);
-			}
-			appInst.setLastAuthentication(new Date());
-			
-			try {
-				modelManager.addModify(appInst);
-			} catch(Exception ipe) {
-				throw new WebServiceException(WebServiceException.TypeEnum.DATABASE_ERROR,ipe);
-			}
-		}
-		
 		return response;
 	}
 	
@@ -155,4 +149,34 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 		// and run rules
 	}
 	
+	/*
+	 * PRIVATE METHODS
+	 */
+	
+	private Application getApplication(String appName, String appVersionId) throws WebServiceException {
+		
+		if( appName==null || appVersionId==null ) {
+			throw new WebServiceException(WebServiceException.TypeEnum.APPLICATION_VERSION_NOTFOUND,
+					"Both application name and version id must be specified.");
+		}
+		
+		ModelManager manager = getModelManager();
+		
+		// we will need to verify that they have the latest version
+		com.openmeap.model.dto.ApplicationVersion appVer = manager.getModelService().findAppVersionByNameAndId(appName,appVersionId);
+		Application application;
+		if( appVer==null ) {
+			application = manager.getModelService().findApplicationByName(appName);
+			if( application==null 
+					|| application.getInitialVersionIdentifier()==null 
+					|| !(application.getInitialVersionIdentifier().equals(appVersionId)) ) {
+				throw new WebServiceException(WebServiceException.TypeEnum.APPLICATION_VERSION_NOTFOUND,
+						"The application "+appName+"(version "+appVersionId+") was not found.");
+			}
+		} else {
+			application = appVer.getApplication();
+		}
+		
+		return application;
+	}	
 }

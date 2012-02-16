@@ -77,5 +77,7 @@ public interface ModelService {
 	
 	public ApplicationVersion findAppVersionByNameAndId(String appName, String versionId);
 	
+	public List<Deployment> findDeploymentsByNameAndId(String appName, String versionId);
+	
 	public Deployment getLastDeployment(Application app);
 }

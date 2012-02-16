@@ -39,11 +39,11 @@ public class Application extends AbstractModelEntity {
 	private String name;
 	private String description;
 	private String proxyAuthSalt;
-	private String proxiedBaseUrl;
-	private Boolean trackInstalls;
 	private String versionAdmins;
 	private String admins;
+	private String initialVersionIdentifier;
 	private List<Deployment> deployments;
+	private Integer deploymentHistoryLength = 10;
 	
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	public Long getId() {
@@ -95,28 +95,6 @@ public class Application extends AbstractModelEntity {
 	}
 	
 	/**
-	 * @param trackInstalls True if the application should track application installation instances 
-	 */
-	public void setTrackInstalls(Boolean trackInstalls) {
-		this.trackInstalls = trackInstalls;
-	}
-	@Column(name="track_installs")
-	public Boolean getTrackInstalls() {
-		return trackInstalls;
-	}
-	
-	/**
-	 * @param url the url to proxy requests through to.  Applications do not have to use the proxy.
-	 */
-	public void setProxiedBaseUrl(String url) {
-		proxiedBaseUrl = url;
-	}
-	@Column(name="proxied_base_url")
-	public String getProxiedBaseUrl() {
-		return proxiedBaseUrl;
-	}
-	
-	/**
 	 * @param salt Salt to create HMAC SHA-1 authentication tokens with for validation in the proxy
 	 */
 	public void setProxyAuthSalt(String salt) {
@@ -165,7 +143,7 @@ public class Application extends AbstractModelEntity {
 	@OneToMany(mappedBy="application",fetch=FetchType.LAZY,cascade={CascadeType.ALL},targetEntity=Deployment.class)
 	public List<Deployment> getDeployments() {
 		return deployments;
-	}
+	}	
 	public void addDeployment(Deployment d) {
 		d.setApplication(this);
 		if( deployments == null ) {
@@ -182,6 +160,26 @@ public class Application extends AbstractModelEntity {
 		if( idx!=(-1) ) {
 			deployments.remove(idx);
 		}
+	}
+	
+	/**
+	 * The number of deployments to keep in history.
+	 * @return
+	 */
+	@Column(name="depl_hist_len")
+	public Integer getDeploymentHistoryLength() {
+		return deploymentHistoryLength;
+	}
+	public void setDeploymentHistoryLength(Integer deploymentHistoryLength) {
+		this.deploymentHistoryLength = deploymentHistoryLength;
+	}
+	
+	@Column(name="initial_version_id",length=255)
+	public String getInitialVersionIdentifier() {
+		return initialVersionIdentifier;
+	}
+	public void setInitialVersionIdentifier(String initialVersionIdentifier) {
+		this.initialVersionIdentifier = initialVersionIdentifier;
 	}
 	
 	public int hashCode() {

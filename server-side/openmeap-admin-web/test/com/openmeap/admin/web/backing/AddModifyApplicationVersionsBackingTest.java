@@ -168,7 +168,33 @@ public class AddModifyApplicationVersionsBackingTest {
 		amab = new AddModifyApplicationVersionBacking();
 		amab.setModelManager(modelManager);
 		events = amab.process(null, vars, parms);
-		version = modelManager.findApplicationVersion(ourVersionId);
+		version = modelManager.getModelService().findByPrimaryKey(ApplicationVersion.class,ourVersionId);
+		
+		Assert.assertTrue(version.getIdentifier().compareTo("ApplicationVersion.new_version.identifier")==0);
+		Assert.assertTrue(version.getArchive().getUrl().compareTo("AnotherNewDownloadUrl")==0);
+		Assert.assertTrue(version.getArchive().getHashAlgorithm().compareTo("SHA1")==0);
+		Assert.assertTrue(version.getArchive().getHash().compareTo("AnotherNewHashValue")==0);
+		Assert.assertTrue(version.getNotes().compareTo("New notes")==0);
+		Assert.assertTrue(version.getArchive().getBytesLength()==10000);
+		Assert.assertTrue(version.getArchive().getBytesLengthUncompressed()==10000);
+		
+		/////////////
+		// Verify that we cannot change an inactive version
+		ourVersionId = ((ApplicationVersion)vars.get("version")).getId();
+		((ApplicationVersion)vars.get("version")).setActiveFlag(false);
+		parms.put("versionId", new String[]{ourVersionId.toString()});
+		parms.put("identifier", new String[]{"ApplicationVersion.new_version_2.identifier"});
+		parms.put("url", new String[]{"AnotherNewDownloadUrl2"});
+		parms.put("hashType", new String[]{"MD5"});
+		parms.put("hash", new String[]{"AnotherNewHashValue2"});
+		parms.put("notes", new String[]{"New notes2"});
+		parms.put("deviceTypes", new String[]{"12"});
+		parms.put("bytesLength", new String[]{"100002"});
+		parms.put("bytesLengthUncompressed", new String[]{"100002"});
+		amab = new AddModifyApplicationVersionBacking();
+		amab.setModelManager(modelManager);
+		events = amab.process(null, vars, parms);
+		version = modelManager.getModelService().findByPrimaryKey(ApplicationVersion.class,ourVersionId);
 		
 		Assert.assertTrue(version.getIdentifier().compareTo("ApplicationVersion.new_version.identifier")==0);
 		Assert.assertTrue(version.getArchive().getUrl().compareTo("AnotherNewDownloadUrl")==0);

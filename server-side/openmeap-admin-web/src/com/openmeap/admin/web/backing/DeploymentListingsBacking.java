@@ -73,16 +73,17 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 
 		Application app = null;
 		try {
-			app = modelManager.findApplication(Long.valueOf(appId));
+			app = modelManager.getModelService().findByPrimaryKey(Application.class,Long.valueOf(appId));
 		} catch(NumberFormatException nfe) {
 			events.add( new MessagesEvent("A valid applicationId must be supplied to either view or create deployments.") );
 		}
 		
+		// TODO: I'm pretty sure I should create new deployments elsewhere and forward to here from there.
 		if( deploymentType!=null && PROCESS_TARGET.compareTo(processTarget)==0 && app!=null ) {
 			
 			ApplicationVersion version = null;
 			try {
-				version = modelManager.findApplicationVersion(Long.valueOf(appVerId));
+				version = modelManager.getModelService().findByPrimaryKey(ApplicationVersion.class,Long.valueOf(appVerId));
 			} catch(NumberFormatException nfe) {
 				events.add( new MessagesEvent("A valid versionId must be supplied to create a deployment.") );
 			}			
@@ -107,6 +108,9 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 					Throwable root = ExceptionUtils.getRootCause(pe);
 					events.add( new MessagesEvent("An exception was thrown creating the deployment: "+root.getMessage()));
 				}
+				
+				// TODO: clean up the deployment history per the app settings here.
+				//this.deploymentHistoryMaintainer
 			}
 		}
 		

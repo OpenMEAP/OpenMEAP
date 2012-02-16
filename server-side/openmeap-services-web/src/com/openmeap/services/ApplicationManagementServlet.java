@@ -152,7 +152,7 @@ public class ApplicationManagementServlet extends HttpServlet {
 			String appName = request.getParameter(UrlParamConstants.APP_NAME);
 			String versionId = request.getParameter(UrlParamConstants.APP_VERSION);
 			
-			ApplicationVersion appVersion = modelManager.findAppVersionByNameAndId(appName, versionId);
+			ApplicationVersion appVersion = modelManager.getModelService().findAppVersionByNameAndId(appName, versionId);
 			if( appVersion==null ) {
 				String mesg = "The application version "+versionId+" was not found for application "+appName;
 				err.setCode(ErrorCode.APPLICATION_VERSION_NOTFOUND);

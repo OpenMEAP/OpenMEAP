@@ -41,6 +41,7 @@ public class ApplicationVersion extends AbstractModelEntity {
 	private Application application;
 	private Long id;
 	private String notes;
+	private Boolean activeFlag = true;
 	
 	// TODO: the primary key for this class should really be a composite key
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
@@ -81,6 +82,14 @@ public class ApplicationVersion extends AbstractModelEntity {
 	}
 	public void setNotes(String notes) {
 		this.notes = notes;
+	}
+	
+	@Column(name="active_flag")
+	public Boolean getActiveFlag() {
+		return activeFlag;
+	}
+	public void setActiveFlag(Boolean active) {
+		this.activeFlag = active;
 	}
 	
 	/**

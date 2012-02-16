@@ -5,7 +5,7 @@ set ANT_HOME=C:\Users\schang\apps\apache-ant-1.8.2
 
 rem  OpenMEAP
 set ANDROID_SDK_HOME=C:\Users\schang\apps\android-sdk-windows
-set OPENMEAP_HOME=C:\Users\schang\openmeap
+set OPENMEAP_HOME=C:\Users\schang\openmeap.dev\openmeap
 
 rem  Database.  Only used by the war files.  Defaults to a sqlite db at /tmp
 rem  To change the default sqlite db location, just override the url

@@ -74,13 +74,13 @@ public class ServletManagementServletTest {
 		/////////////////
 		// validate that finding the application, modifying it, and then finding it again 
 		// will return an object with the same modifications.
-		Application app = modelManager.findApplication(1L);
+		Application app = modelManager.getModelService().findByPrimaryKey(Application.class,1L);
 		app.setName(randomUuid);
-		Assert.assertTrue(modelManager.findApplication(1L).getName().equals(randomUuid));
+		Assert.assertTrue(modelManager.getModelService().findByPrimaryKey(Application.class,1L).getName().equals(randomUuid));
 		
 		modelManager.getModelService().refresh(app);
-		app = modelManager.findApplication(1L);
-		Assert.assertTrue(!modelManager.findApplication(1L).getName().equals(randomUuid));
+		app = modelManager.getModelService().findByPrimaryKey(Application.class,1L);
+		Assert.assertTrue(!modelManager.getModelService().findByPrimaryKey(Application.class,1L).getName().equals(randomUuid));
 		
 		ServiceManagementServlet servlet = new ServiceManagementServlet();
 		servlet.setModelManager(modelManager);
@@ -99,11 +99,11 @@ public class ServletManagementServletTest {
 		String contentString = response.getContentAsString();
 		Document result = Utils.getDocument(new ByteArrayInputStream(contentString.getBytes()));
 		Assert.assertTrue( result.getFirstChild().getAttributes().getNamedItem("status").getNodeValue().equals("success"));
-		Assert.assertTrue( ! modelManager.findApplication(1L).getName().equals(randomUuid) );
+		Assert.assertTrue( ! modelManager.getModelService().findByPrimaryKey(Application.class,1L).getName().equals(randomUuid) );
 		
 		////////////////////
 		// validate that failing to provide auth token fails to refresh cache
-		app = modelManager.findApplication(1L);
+		app = modelManager.getModelService().findByPrimaryKey(Application.class,1L);
 		app.setName(randomUuid);
 		response = new MockHttpServletResponse();
 		request.removeParameter(UrlParamConstants.AUTH_TOKEN);
@@ -114,7 +114,7 @@ public class ServletManagementServletTest {
 		contentString = response.getContentAsString();
 		result = Utils.getDocument(new ByteArrayInputStream(response.getContentAsString().getBytes()));
 		Assert.assertTrue( result.getFirstChild().getAttributes().getNamedItem("status").getNodeValue().equals("failure"));
-		Assert.assertTrue( modelManager.findApplication(1L).getName().equals(randomUuid) );
+		Assert.assertTrue( modelManager.getModelService().findByPrimaryKey(Application.class,1L).getName().equals(randomUuid) );
 
 	}
 }

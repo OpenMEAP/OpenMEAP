@@ -68,13 +68,13 @@ public class ApplicationVersionListingsBacking extends AbstractTemplatedSectionB
 		
 		if( ParameterMapUtils.notEmpty("applicationId", parameterMap) ) {
 
-			Application app = modelManager.findApplication( Long.valueOf( ParameterMapUtils.firstValue("applicationId", parameterMap) ) );
+			Application app = modelManager.getModelService().findByPrimaryKey(Application.class, Long.valueOf( ParameterMapUtils.firstValue("applicationId", parameterMap) ) );
 			if( app!=null ) {
 				
 				Boolean mayUpdate = modelManager.getAuthorizer().may(Authorizer.Action.MODIFY, app);
 				templateVariables.put("mayUpdate", mayUpdate);
 				
-				Deployment lastDeployment = modelManager.getLastDeployment(app);
+				Deployment lastDeployment = modelManager.getModelService().getLastDeployment(app);
 				Long currentVersionId = null;
 				if( lastDeployment!=null && lastDeployment.getApplicationVersion()!=null ) 
 					currentVersionId = lastDeployment.getApplicationVersion().getId();

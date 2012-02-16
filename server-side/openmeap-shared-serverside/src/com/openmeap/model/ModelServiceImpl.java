@@ -170,6 +170,22 @@ public class ModelServiceImpl implements ModelService
 		}
 	}
 	
+	public List<Deployment> findDeploymentsByNameAndId(String appName, String versionId) {
+		Query q = entityManager.createQuery("select d "
+				+"from Deployment d inner join fetch d.applicationVersion av inner join fetch d.application a "
+				+"where av.identifier=:identifier "
+				+"and a.name=:name ");
+		q.setParameter("name", appName);
+		q.setParameter("identifier", versionId);
+		try {
+			@SuppressWarnings(value={"unchecked"})
+			List<Deployment> deployments = (List<Deployment>)q.getResultList();
+			return deployments;
+		} catch( NoResultException nre ) {
+			return null;
+		}
+	}
+	
 	// ACCESSORS
 	
 	public void setEventNotifiers(Collection<ModelServiceEventNotifier> handlers) {
