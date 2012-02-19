@@ -15,6 +15,9 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.function.StandardSQLFunction;
 import org.hibernate.dialect.function.SQLFunctionTemplate;
 import org.hibernate.dialect.function.VarArgsSQLFunction;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.NullableType;
+import org.hibernate.type.StringType;
 import org.hibernate.Hibernate;
 
 // TODO: determine if this would be better suited to live in it's own package on the class path
@@ -45,14 +48,12 @@ public class SQLite3Dialect extends Dialect {
 		registerColumnType(Types.CLOB, "clob");
 		registerColumnType(Types.BOOLEAN, "integer");
 
-		registerFunction("concat", new VarArgsSQLFunction(Hibernate.STRING, "",
-				"||", ""));
-		registerFunction("mod", new SQLFunctionTemplate(Hibernate.INTEGER,
-				"?1 % ?2"));
-		registerFunction("substr", new StandardSQLFunction("substr",
-				Hibernate.STRING));
-		registerFunction("substring", new StandardSQLFunction("substr",
-				Hibernate.STRING));
+		NullableType stringType = new StringType();
+		NullableType integerType = new IntegerType();
+		registerFunction("concat", new VarArgsSQLFunction(stringType, "", "||", ""));
+		registerFunction("mod", new SQLFunctionTemplate(integerType, "?1 % ?2"));
+		registerFunction("substr", new StandardSQLFunction("substr", stringType));
+		registerFunction("substring", new StandardSQLFunction("substr", stringType));
 	}
 
 	public boolean supportsIdentityColumns() {

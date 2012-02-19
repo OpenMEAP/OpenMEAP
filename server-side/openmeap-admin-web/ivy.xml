@@ -31,44 +31,73 @@
 	</info>
 	
 	<configurations>
+	
+		<conf name="none"/>
+	
+		<conf name="core"/>
+		
+		<conf name="openmeap"/>
+		
+		<conf name="javase" extends="core"/>
+		<conf name="javaee" extends="core"/>
+		
 		<conf name="ide"/>
-		<conf name="core" extends="ide"/>
-		<conf name="compile" extends="core"/>
+		<conf name="test"/>
+		
+		<conf name="compile" extends="javase"/>
+		
 	</configurations>
 	
 	<publications>
-		<artifact name="admin-web" type="war" conf="core" ext="war"/>
+		<artifact name="admin-web" type="war" conf="javase" ext="war"/>
+		<artifact name="admin-web-ee" type="war" conf="javaee" ext="war"/>
 	</publications>
 	
 	<dependencies>
-	
-		<dependency org="javax.transaction" name="jta" rev="1.0.1B" conf="ide->default"/>
-	
-		<dependency org="org.freemarker" name="freemarker" rev="2.3.18" conf="ide->default"/>
 		  
-		<dependency org="org.xerial" name="sqlite-jdbc" rev="3.7.2" conf="ide->default"/>
-		<dependency org="org.hibernate" name="hibernate-entitymanager" rev="3.3.2.GA" conf="ide->default"/>
-		  
-		<dependency org="org.apache.httpcomponents" name="httpclient" rev="4.1.1" conf="ide->default"/>
-		<dependency org="org.apache.httpcomponents" name="httpclient-cache" rev="4.1.1" conf="ide->default"/>
-		<dependency org="org.apache.httpcomponents" name="httpmime" rev="4.1.1" conf="ide->default"/>
-		  
-		<dependency org="log4j" name="log4j" rev="1.2.16" conf="ide->default"/>
-		<dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.4" conf="ide->default"/>
-		  
-		<dependency org="org.springframework" name="spring-web" rev="3.0.6.RELEASE" conf="ide->default"/>
-		<dependency org="org.springframework" name="spring-tx" rev="3.0.6.RELEASE" conf="ide->default"/>
-		<dependency org="org.springframework" name="spring-jdbc" rev="3.0.6.RELEASE" conf="ide->default"/>
-		<dependency org="org.springframework" name="spring-orm" rev="3.0.6.RELEASE" conf="ide->default"/>
-		  
-		<dependency org="commons-lang" name="commons-lang" rev="2.6" conf="ide->default"/>
-		<dependency org="commons-fileupload" name="commons-fileupload" rev="1.2.2" conf="ide->default"/>
-		<dependency org="commons-io" name="commons-io" rev="2.1" conf="ide->default"/>
+		<!-- core->default -->
+		<dependency org="org.apache.httpcomponents" name="httpclient" rev="4.1.1" conf="core->default"/>
+		<dependency org="org.apache.httpcomponents" name="httpclient-cache" rev="4.1.1" conf="core->default"/>
+		<dependency org="org.apache.httpcomponents" name="httpmime" rev="4.1.1" conf="core->default"/>
+		<dependency org="log4j" name="log4j" rev="1.2.16" conf="core->default"/>
+		<dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.4" conf="core->default"/>
+		<dependency org="org.springframework" name="spring-web" rev="3.0.6.RELEASE" conf="core->default"/>
+		<dependency org="org.springframework" name="spring-tx" rev="3.0.6.RELEASE" conf="core->default"/>
+		<dependency org="org.springframework" name="spring-jdbc" rev="3.0.6.RELEASE" conf="core->default"/>
+		<dependency org="org.springframework" name="spring-orm" rev="3.0.6.RELEASE" conf="core->default"/>
+		<dependency org="org.springframework" name="spring-beans" rev="3.0.6.RELEASE" conf="core->default"/>
+		<dependency org="org.springframework" name="spring-core" rev="3.0.6.RELEASE" conf="core->default"/> 
+		<dependency org="commons-lang" name="commons-lang" rev="2.6" conf="core->default"/>
+		<dependency org="commons-fileupload" name="commons-fileupload" rev="1.2.2" conf="core->default"/>
+		<dependency org="commons-io" name="commons-io" rev="2.1" conf="core->default"/>
+		<dependency org="org.xerial" name="sqlite-jdbc" rev="3.7.2" conf="core->default"/>
+		<dependency org="org.freemarker" name="freemarker" rev="2.3.18" conf="core->default"/>
+		<dependency org="org.hibernate" name="hibernate-entitymanager" rev="3.3.2.GA" conf="core->default"/>
+		
+		<!-- test->default -->
+		<dependency org="org.springframework" name="spring-mock" rev="2.0.8" conf="test->default"/>
+		
+		<!-- javase->default; javaee->default -->
+		<dependency org="com.openmeap" name="shared" rev="latest.integration" conf="openmeap->default; javase->default; javaee->default"/>
+		<dependency org="com.openmeap" name="shared-serverside" rev="latest.integration" conf="openmeap->default; javase->default; javaee->default"/>
+		
+		<!-- javaee->default -->
+		<dependency org="org.xerial" name="sqlite-jdbc" rev="3.7.2" conf="javaee->default" transitive="false"/>		
+		<dependency org="cglib" name="cglib" rev="2.2.2" conf="javaee->default"/>
+		<dependency org="org.freemarker" name="freemarker" rev="2.3.18" conf="javaee->default">
+			<exclude name='dom4j' />
+		</dependency>
+		<dependency org="org.hibernate" name="hibernate-entitymanager" rev="3.3.2.GA" conf="javaee->default" transitive="false">
+			<exclude name='dom4j' /> 
+		</dependency>
 	  
+	  	<!-- compile->default -->
 	  	<dependency org="org.apache.tomcat" name="servlet-api" rev="6.0.35" conf="compile->default"/>
+	  	<dependency org="javax.persistence" name="persistence-api" rev="1.0.2" conf="compile->default"/>
 	  	
-	  	<dependency org="com.openmeap" name="shared" rev="latest.integration" conf="core->default"/>
-	  	<dependency org="com.openmeap" name="shared-serverside" rev="latest.integration" conf="core->default"/>
+	  	<!-- ide->default -->
+		<dependency org="javax.persistence" name="persistence-api" rev="1.0.2" conf="ide->default"/>
+		<dependency org="javax.transaction" name="jta" rev="1.0.1B" conf="ide->default"/>
 	  
 	</dependencies>
 	

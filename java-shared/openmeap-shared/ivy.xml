@@ -32,7 +32,6 @@
 	
 	<configurations>
 		<conf name="core"/>
-		<conf name="test" extends="core"/>
 	</configurations>
 	
 	<publications>
