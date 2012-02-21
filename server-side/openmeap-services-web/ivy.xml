@@ -39,7 +39,7 @@
 		<conf name="openmeap"/>
 		
 		<conf name="javase" extends="core"/>
-		<conf name="javaee" extends="core"/>
+		<conf name="jboss_as7" extends="core"/>
 		
 		<conf name="ide"/>
 		<conf name="test"/>
@@ -50,7 +50,6 @@
 	
 	<publications>
 		<artifact name="services-web" type="war" conf="javase" ext="war"/>
-		<artifact name="services-web-ee" type="war" conf="javaee" ext="war"/>
 	</publications>
 	
 	<dependencies>
@@ -78,16 +77,16 @@
 		<dependency org="org.springframework" name="spring-mock" rev="2.0.8" conf="test->default"/>
 		
 		<!-- javase->default; javaee->default -->
-		<dependency org="com.openmeap" name="shared" rev="latest.integration" conf="openmeap->default; javase->default; javaee->default"/>
-		<dependency org="com.openmeap" name="shared-serverside" rev="latest.integration" conf="openmeap->default; javase->default; javaee->default"/>
+		<dependency org="com.openmeap" name="shared" rev="latest.integration" conf="openmeap->default; javase->default; jboss_as7->default"/>
+		<dependency org="com.openmeap" name="shared-serverside" rev="latest.integration" conf="openmeap->default; javase->default; jboss_as7->default"/>
 		
 		<!-- javaee->default -->
-		<dependency org="org.xerial" name="sqlite-jdbc" rev="3.7.2" conf="javaee->default" transitive="false"/>		
-		<dependency org="cglib" name="cglib" rev="2.2.2" conf="javaee->default"/>
-		<dependency org="org.freemarker" name="freemarker" rev="2.3.18" conf="javaee->default">
+		<dependency org="org.xerial" name="sqlite-jdbc" rev="3.7.2" conf="jboss_as7->default" transitive="false"/>		
+		<dependency org="cglib" name="cglib" rev="2.2.2" conf="jboss_as7->default"/>
+		<dependency org="org.freemarker" name="freemarker" rev="2.3.18" conf="jboss_as7->default">
 			<exclude name='dom4j' />
 		</dependency>
-		<dependency org="org.hibernate" name="hibernate-entitymanager" rev="3.3.2.GA" conf="javaee->default" transitive="false">
+		<dependency org="org.hibernate" name="hibernate-entitymanager" rev="3.3.2.GA" conf="jboss_as7->default" transitive="false">
 			<exclude name='dom4j' /> 
 		</dependency>
 	  

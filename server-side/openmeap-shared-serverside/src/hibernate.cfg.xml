@@ -34,7 +34,6 @@
         <property name="connection.url">jdbc:sqlite:/tmp/openmeap.db</property>
         <property name="connection.username">doesntmatter</property>
         <property name="connection.password">doesntmatter</property>
-        
 
         <!-- JDBC connection pool (use the built-in) -->
         <property name="connection.pool_size">1</property>
@@ -53,8 +52,6 @@
 
         <!-- Drop and re-create the database schema on startup --> 
         <property name="hbm2ddl.auto">update</property>
-        
-        <!-- <property name="query.factory_class">org.hibernate.hql.classic.ClassicQueryTranslatorFactory</property> -->
 
     </session-factory>
 
