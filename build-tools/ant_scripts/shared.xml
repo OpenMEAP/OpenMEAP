@@ -104,7 +104,9 @@
 			<ivy:resolve conf="*" file="${openmeap.project.current.file.ivy}" log="verbose"/>
 			<ivy:cachepath conf="${openmeap.ivy.cachepath.conf}" pathid="openmeap.classpath"/>
 			<ivy:cachefileset conf="${openmeap.ivy.cachefileset.conf}" setid="openmeap.fileset.lib"/>
-			<ivy:retrieve conf="${openmeap.ivy.retrieve.conf}" file="${openmeap.project.current.file.ivy}" sync="true"/>
+			<ivy:retrieve conf="${openmeap.ivy.retrieve.conf}" 
+					file="${openmeap.project.current.file.ivy}" 
+					sync="true"/>
 		</sequential>
 	</macrodef>
 	<target name="resolve">

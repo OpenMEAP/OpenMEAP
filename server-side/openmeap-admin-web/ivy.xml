@@ -69,12 +69,14 @@
 		<dependency org="commons-lang" name="commons-lang" rev="2.6" conf="core->default"/>
 		<dependency org="commons-fileupload" name="commons-fileupload" rev="1.2.2" conf="core->default"/>
 		<dependency org="commons-io" name="commons-io" rev="2.1" conf="core->default"/>
-		<dependency org="org.xerial" name="sqlite-jdbc" rev="3.7.2" conf="core->default"/>
-		<dependency org="org.freemarker" name="freemarker" rev="2.3.18" conf="core->default"/>
-		<dependency org="org.hibernate" name="hibernate-entitymanager" rev="3.3.2.GA" conf="core->default"/>
 		
 		<!-- test->default -->
 		<dependency org="org.springframework" name="spring-mock" rev="2.0.8" conf="test->default"/>
+		
+		<!-- javase->default -->
+		<dependency org="org.xerial" name="sqlite-jdbc" rev="3.7.2" conf="javase->default"/>
+		<dependency org="org.freemarker" name="freemarker" rev="2.3.18" conf="javase->default"/>
+		<dependency org="org.hibernate" name="hibernate-entitymanager" rev="3.3.2.GA" conf="javase->default"/>
 		
 		<!-- javase->default; javaee->default -->
 		<dependency org="com.openmeap" name="shared" rev="latest.integration" conf="openmeap->default; javase->default; jboss_as7->default"/>

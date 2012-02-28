@@ -32,18 +32,16 @@
 
 	<import file="../../build-tools/ant_scripts/shared.xml"/>
 	
-	<target name="-setup-properties">
-		<property name="openmeap.project.current.file.ivy" value="${openmeap.project.admin-web}/ivy.xml"/>
-		<property name="openmeap.project.current.dist" value="${openmeap.project.admin-web.dist.war}"/>
-		<property name="openmeap.project.current.dist.ext" value="war"/>
-		<property name="ivy.retrieve.pattern" value="${openmeap.project.admin-web.dist}/WEB-INF/lib/${openmeap.ivy.retrieve.pattern}"/>
-		<property name="openmeap.ivy.cachepath.conf" value="${openmeap.ivy.web.cachePathConf}"/>
-		<property name="openmeap.ivy.retrieve.conf" value="${openmeap.ivy.web.retrieveConf}"/>
-	</target>
+	<property name="openmeap.project.current.file.ivy" value="${openmeap.project.admin-web}/ivy.xml"/>
+	<property name="openmeap.project.current.dist" value="${openmeap.project.admin-web.dist.war}"/>
+	<property name="openmeap.project.current.dist.ext" value="war"/>
+	<property name="ivy.retrieve.pattern" value="${openmeap.project.admin-web.dist}/WEB-INF/lib/${openmeap.ivy.retrieve.pattern}"/>
+	<property name="openmeap.ivy.cachepath.conf" value="${openmeap.ivy.web.cachePathConf}"/>
+	<property name="openmeap.ivy.retrieve.conf" value="${openmeap.ivy.web.retrieveConf}"/>
 
 	<!-- BEGIN CLEAN SECTION +++++++++++++++++++++++++++++++++++++ -->
 	
-	<target name="-setup-properties,clean">
+	<target name="clean">
 		<delete file="${openmeap.project.admin-web.dist.war}"/>
 		<delete includeemptydirs="true" quiet="true">
 			<fileset dir="bin" includes="**/*"/>
@@ -56,7 +54,7 @@
 		
 	<!-- BEGIN COMPILE SECTION ++++++++++++++++++++++++++++++++++++ -->
 	
-	<target name="compile" depends="-setup-properties,resolve">
+	<target name="compile" depends="resolve">
 		<mkdir dir="build/classes"/>
 		<javac debug="${openmeap.debug}" 
 				target="${openmeap.targetJdk}" 
@@ -70,7 +68,7 @@
 	
 	<!-- END COMPILE SECTION +++++++++++++++++++++++++++++++++++++ -->
 	
-	<target name="export-war" depends="-setup-properties,dist-base,compile">
+	<target name="export-war" depends="dist-base,compile">
 		<copy todir="${openmeap.project.admin-web.dist}/">
 			<fileset dir="WebContent" includes="**/*"/>
 		</copy>
@@ -84,6 +82,6 @@
 		</war>
 	</target>
 	
-	<target name="dist" depends="-setup-properties,clean,export-war"/>
+	<target name="dist" depends="clean,export-war"/>
 	
 </project>
