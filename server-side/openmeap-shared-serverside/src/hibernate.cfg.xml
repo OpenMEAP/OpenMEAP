@@ -29,29 +29,21 @@
 
     <session-factory>
 
-        <!-- Database connection settings -->
+        <!-- Database connection settings 
         <property name="connection.driver_class">org.sqlite.JDBC</property>
         <property name="connection.url">jdbc:sqlite:/tmp/openmeap.db</property>
         <property name="connection.username">doesntmatter</property>
-        <property name="connection.password">doesntmatter</property>
-
-        <!-- JDBC connection pool (use the built-in) -->
-        <property name="connection.pool_size">1</property>
-
+        <property name="connection.password">doesntmatter</property> 
+        
         <property name="dialect">org.hibernate.dialect.SQLite3Dialect</property>
+        <property name="show_sql">false</property>
+        <property name="hbm2ddl.auto">update</property>
+        -->
 
-        <!-- Enable Hibernate's automatic session context management -->
+        <property name="connection.pool_size">1</property>
         <property name="current_session_context_class">thread</property>
-
-        <!-- Disable the second-level cache  -->
         <property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
         <property name="cache.use_query_cache">false</property>
-
-        <!-- Echo all executed SQL to stdout -->
-        <property name="show_sql">false</property>
-
-        <!-- Drop and re-create the database schema on startup --> 
-        <property name="hbm2ddl.auto">update</property>
 
     </session-factory>
 

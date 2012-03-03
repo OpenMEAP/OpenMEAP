@@ -39,9 +39,23 @@
 		<property name="ignoreUnresolvablePlaceholders" value="true"/>
 	</bean>
 	
+	<bean id="www_ejb3ConfigFactory" class="com.openmeap.util.Ejb3ConfigurationFactory">
+		<property name="properties">
+			<map>
+				<entry key="OPENMEAP_JPA_SHOWSQL" value="${OPENMEAP_JPA_SHOWSQL}"/>
+				<entry key="OPENMEAP_JPA_GENERATEDDL" value="${OPENMEAP_JPA_GENERATEDDL}"/>
+				<entry key="OPENMEAP_JPA_DIALECT" value="${OPENMEAP_JPA_DIALECT}"/>
+				<entry key="OPENMEAP_JDBC_DRIVERCLASS" value="${OPENMEAP_JPA_DIALECT}"/>
+				<entry key="OPENMEAP_JDBC_URL" value="${OPENMEAP_JDBC_URL}"/>
+				<entry key="OPENMEAP_JDBC_USERNAME" value="${OPENMEAP_JDBC_USERNAME}"/>
+				<entry key="OPENMEAP_JDBC_PASSWORD" value="${OPENMEAP_JDBC_PASSWORD}"/>
+			</map>
+		</property>
+	</bean>
+	
 	<bean id="www_ejb3Config" 
 			scope="prototype" 
-			class="com.openmeap.util.Ejb3ConfigurationFactory" 
+			factory-bean="www_ejb3ConfigFactory" 
 			factory-method="create">
 		<constructor-arg index="0" type="java.lang.String" value="openmeap-jpa-${OPENMEAP_JAVA_ENV}"/>
 	</bean>
