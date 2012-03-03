@@ -79,8 +79,8 @@
 		<dependency org="org.hibernate" name="hibernate-entitymanager" rev="3.3.2.GA" conf="javase->default"/>
 		
 		<!-- javase->default; javaee->default -->
-		<dependency org="com.openmeap" name="shared" rev="latest.integration" conf="openmeap->default; javase->default; jboss_as7->default"/>
-		<dependency org="com.openmeap" name="shared-serverside" rev="latest.integration" conf="openmeap->default; javase->default; jboss_as7->default"/>
+		<dependency org="com.openmeap" name="shared" rev="latest.integration" conf="openmeap->default;"/>
+		<dependency org="com.openmeap" name="shared-serverside" rev="latest.integration" conf="openmeap->default;"/>
 		
 		<!-- javaee->default -->
 		<dependency org="org.xerial" name="sqlite-jdbc" rev="3.7.2" conf="jboss_as7->default" transitive="false"/>		
