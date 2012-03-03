@@ -120,6 +120,11 @@ public class SLICConfig {
 		setProperty("com.openmeap.slic.lastUpdateResult",result);
 	}
 	
+	public Integer getUpdatePendingTimeout() {
+		String updatePTO = getProperty("com.openmeap.slic.updatePendingTimeout");
+		return updatePTO!=null?Integer.valueOf(updatePTO):null;
+	}
+	
 	/**
 	 * @return True if the application was just updated.  Flipped to false on the first reload.
 	 */

@@ -3,24 +3,26 @@
 <plist version="1.0">
 <dict>
 	<key>com.openmeap.slic.pullUpdates</key>
-	<string><![CDATA[@@openmeap.slic.pullUpdates@@]]></string>
+	<string>@@openmeap.slic.pullUpdates@@</string>
 	<key>com.openmeap.slic.developmentMode</key>
-	<string><![CDATA[@@openmeap.slic.developmentMode@@]]></string>
+	<string>@@openmeap.slic.developmentMode@@</string>
 	<key>com.openmeap.slic.updateFrequency</key>
-	<string><![CDATA[@@openmeap.slic.updateFrequency@@]]></string>
+	<string>@@openmeap.slic.updateFrequency@@</string>
 	<key>com.openmeap.slic.appName</key>
-	<string><![CDATA[@@openmeap.slic.appName@@]]></string>
+	<string>@@openmeap.slic.appName@@</string>
 	<key>com.openmeap.slic.appTitle</key>
-	<string><![CDATA[@@openmeap.slic.appTitle@@]]></string>
+	<string>@@openmeap.slic.appTitle@@</string>
 	<key>com.openmeap.slic.appVersion</key>
-	<string><![CDATA[@@openmeap.slic.appVersion@@]]></string>
+	<string>@@openmeap.slic.appVersion@@</string>
 	<key>com.openmeap.slic.appMgmtServiceUrl</key>
-	<string><![CDATA[@@openmeap.slic.appMgmtServiceUrl@@]]></string>
+	<string>@@openmeap.slic.appMgmtServiceUrl@@</string>
 	<key>com.openmeap.slic.deviceType</key>
-	<string><![CDATA[@@openmeap.slic.deviceType@@]]></string>
+	<string>@@openmeap.slic.deviceType@@</string>
 	<key>com.openmeap.slic.packagedAppRoot</key>
-	<string><![CDATA[@@openmeap.slic.packagedAppRoot@@]]></string>
+	<string>@@openmeap.slic.packagedAppRoot@@</string>
 	<key>com.openmeap.slic.version</key>
-	<string><![CDATA[@@openmeap.slic.version@@]]></string>
+	<string>@@openmeap.slic.version@@</string>
+	<key>com.openmeap.slic.updatePendingTimeout</key>
+	<string>@@openmeap.slic.updatePendingTimeout@@</string>
 </dict>
 </plist>

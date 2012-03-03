@@ -163,10 +163,11 @@ public class UpdateHandler {
 	private void _handleUpdate(UpdateStatus update, StatusChangeHandler eventHandler) throws UpdateException {
 		
 		String lastUpdateResult = config.getLastUpdateResult();
-		if( lastUpdateResult!=null && lastUpdateResult.compareTo(UpdateResult.PENDING.toString())==0 ) {
+		
+		Boolean hasTimedOut = hasUpdatePendingTimedOut();
+		if( !hasTimedOut && lastUpdateResult!=null && lastUpdateResult.compareTo(UpdateResult.PENDING.toString())==0 ) {
 			return;
 		} else {
-			// TODO: implement a pending timeout
 			config.setLastUpdateResult(UpdateResult.PENDING.toString());
 		}
 		
@@ -353,6 +354,16 @@ public class UpdateHandler {
 			if( zis!=null )
 				zis.close();
 		}
+	}
+	
+	private Boolean hasUpdatePendingTimedOut() {
+		Integer pendingTimeout = config.getUpdatePendingTimeout();
+		Long lastAttempt = config.getLastUpdateAttempt();
+		Long currentTime = new Date().getTime()/1000;
+		if( lastAttempt!=null ) {
+			return currentTime > lastAttempt+(pendingTimeout*1000);
+		}
+		return true;
 	}
 	
 	/* ACCESSORS BELOW HERE */

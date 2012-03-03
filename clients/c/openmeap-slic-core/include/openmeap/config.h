@@ -96,6 +96,11 @@ enum om_config_enum_type {
 	 * (uint32) The result code of the last update attempt.
 	 */
 	OM_CFG_UPDATE_LAST_RESULT,
+    
+    /**
+     * (uint32) The number of seconds to give up and allow another update attempt
+     */
+    OM_CFG_UPDATE_PENDING_TIMEOUT,
 	
 	/**
 	 * (boolean) True(1) if we should attempt to pull updates, else False(0)
