@@ -77,6 +77,8 @@ const char * om_config_map_to_str(int om_config_enum) {
 			return "com.openmeap.slic.lastUpdateAttempt";
 		case OM_CFG_UPDATE_LAST_RESULT:
 			return "com.openmeap.slic.lastUpdateResult";
+        case OM_CFG_UPDATE_PENDING_TIMEOUT:
+            return "com.openmeap.slic.updatePendingTimeout";
 		case OM_CFG_UPDATE_LAST_CHECK:
 			return "com.openmeap.slic.lastUpdateCheck";
 		case OM_CFG_UPDATE_FREQ:		
@@ -136,6 +138,7 @@ om_bool om_config_set(om_config_ptr cfg, int om_config_enum, void *val) {
         case OM_CFG_APP_UPDATED:
         case OM_CFG_DEV_MODE:
         case OM_CFG_NOT_FIRST_RUN:
+        case OM_CFG_UPDATE_PENDING_TIMEOUT:
             buffer = om_malloc(sizeof(char)*32);
 			a = *(om_uint32*)val;
 			sprintf( buffer, "%u", a );
@@ -165,6 +168,7 @@ void * __om_config_get_convert(int om_config_enum, void *passed_in) {
         case OM_CFG_APP_UPDATED:
         case OM_CFG_DEV_MODE:
         case OM_CFG_NOT_FIRST_RUN:
+        case OM_CFG_UPDATE_PENDING_TIMEOUT:
 			toret = om_malloc(sizeof(uint32)*1);
 			if( toret==OM_NULL ) {
 				om_error_set(OM_ERR_MALLOC,"could not allocate uint32");

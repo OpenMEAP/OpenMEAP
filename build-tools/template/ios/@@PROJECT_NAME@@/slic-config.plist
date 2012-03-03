@@ -22,5 +22,7 @@
 	<string><![CDATA[@@openmeap.slic.packagedAppRoot@@]]></string>
 	<key>com.openmeap.slic.version</key>
 	<string><![CDATA[@@openmeap.slic.version@@]]></string>
+	<key>com.openmeap.slic.updatePendingTimeout</key>
+	<string><![CDATA[@@openmeap.slic.updatePendingTimeout@@]]></string>
 </dict>
 </plist>
