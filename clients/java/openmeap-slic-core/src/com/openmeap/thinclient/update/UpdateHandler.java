@@ -359,7 +359,7 @@ public class UpdateHandler {
 	private Boolean hasUpdatePendingTimedOut() {
 		Integer pendingTimeout = config.getUpdatePendingTimeout();
 		Long lastAttempt = config.getLastUpdateAttempt();
-		Long currentTime = new Date().getTime()/1000;
+		Long currentTime = new Date().getTime();
 		if( lastAttempt!=null ) {
 			return currentTime > lastAttempt+(pendingTimeout*1000);
 		}
