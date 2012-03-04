@@ -40,6 +40,9 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.openmeap.Event;
+import com.openmeap.EventHandler;
+import com.openmeap.EventHandlingException;
 import com.openmeap.cluster.ClusterHandlingException;
 import com.openmeap.constants.UrlParamConstants;
 import com.openmeap.model.*;
@@ -67,8 +70,9 @@ public class ServiceManagementServlet extends HttpServlet {
 	private String authSalt = null;
 	private ModelServiceRefreshHandler modelServiceRefreshHandler = null;
 	private ArchiveUploadHandler archiveUploadHandler = null;
+	private ArchiveDeleteHandler archiveDeleteHandler = null;
 	
-	WebApplicationContext context = null;
+	private WebApplicationContext context = null;
 	
 	public void init() {
 		context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
@@ -76,6 +80,7 @@ public class ServiceManagementServlet extends HttpServlet {
 		authSalt = modelManager.getGlobalSettings().getServiceManagementAuthSalt();
 		modelServiceRefreshHandler = (ModelServiceRefreshHandler)context.getBean("modelServiceRefreshHandler");
 		archiveUploadHandler = (ArchiveUploadHandler)context.getBean("archiveUploadHandler");
+		archiveDeleteHandler = (ArchiveDeleteHandler)context.getBean("archiveDeleteHandler");
 	}
 	
 	@Override
@@ -89,23 +94,34 @@ public class ServiceManagementServlet extends HttpServlet {
 		PrintWriter os = new PrintWriter(response.getOutputStream());
 		
 		if( ! authenticates(request) ) {
+			
 			logger.error("Request failed to authenticate ",request);
 			os.print("<?xml version=\"1.0\"?>\n<result status=\"failure\" reason=\"Authentication failed\"/>");
+			
 		} else if( request.getParameter("clearPersistenceContext")!=null && context instanceof AbstractApplicationContext ) {
+			
 			clearPersistenceContext();
+			
 		} else if( action.equals(ArchiveUploadEvent.NAME) ) {
+			
 			GlobalSettings settings = modelManager.getGlobalSettings();
 			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings, request);
-			handleArchiveUploadEvent(os,paramMap);
+			handleArchiveEvent(archiveUploadHandler, new ArchiveUploadNotifiedEvent(paramMap), os, paramMap);
+			
+		} else if( action.equals(ArchiveDeleteEvent.NAME) ) {
+			
+			GlobalSettings settings = modelManager.getGlobalSettings();
+			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings, request);
+			handleArchiveEvent(archiveDeleteHandler, new ArchiveDeleteNotifiedEvent(paramMap), os, paramMap);
+			
 		} else if( action.equals(ModelEntityModifyEvent.NAME) ) {
+			
 			refresh(os,request,response);
+			
 		}
 		
 		os.flush();
 		os.close();
-	}
-	
-	private void handleClusterNodeAddModifyEvent(PrintWriter os, HttpServletRequest request, HttpServletResponse response) throws IOException {
 	}
 	
 	private void clearPersistenceContext() {
@@ -116,12 +132,9 @@ public class ServiceManagementServlet extends HttpServlet {
 		ms.clearPersistenceContext();
 	}
 	
-	private void handleArchiveUploadEvent(PrintWriter os, Map<Object,Object> paramMap) throws IOException {
+	@SuppressWarnings(value={ "rawtypes", "unchecked" })
+	private void handleArchiveEvent(EventHandler eventHandler, Event event, PrintWriter os, Map<Object,Object> paramMap) throws IOException {
 		
-		/* TODO: determine if this is more app or service management.
-		 * I want to consider the service-management interface internal
-		 * and the application-management interface external.
-		 */
 		String hash = firstValue(UrlParamConstants.APPARCH_HASH,paramMap);
 		String hashType = firstValue(UrlParamConstants.APPARCH_HASH_ALG,paramMap);
 		String clusterNodeKey = firstValue(UrlParamConstants.CLUSTERNODE_KEY,paramMap);
@@ -135,17 +148,27 @@ public class ServiceManagementServlet extends HttpServlet {
 			arch.setHashAlgorithm(hashType);
 			// TODO: i shouldn't do this each time...there should be a global configuration somewhere
 			archiveUploadHandler.setClusterNodeServiceUrl(clusterNodeKey);
+			
 			try {
+				
 				// TODO: still not happy with the ArchiveUploadNotifiedEvent argument...maybe a Message type class??
 				paramMap.put("archive",arch);
-				archiveUploadHandler.handle(new ArchiveUploadNotifiedEvent(paramMap));
-			} catch(ClusterHandlingException che) {
+				eventHandler.handle(event);
+			} catch(EventHandlingException che) {
 				logger.error("Exception thrown handling ArchiveUploadEvent",che);
 				os.print("<?xml version=\"1.0\"?>\n<result status=\"failure\" reason=\"Exception occurred handing the ArchiveUploadEvent\"/>\n");
 			}
-		}		
+		}
 	}
 	
+	/**
+	 * Handles the notification that this node should refresh some object from the database.
+	 * 
+	 * @param os
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 */
 	private void refresh(PrintWriter os, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
 		response.setContentType("text/xml");

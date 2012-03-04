@@ -26,28 +26,14 @@ package com.openmeap.model;
 
 import java.util.Map;
 
-import com.openmeap.Event;
-
-public class ArchiveUploadNotifiedEvent implements Event<Map> {
-	
-	// TODO: I'm not happy with this, from a purist pov...maybe the Event warrants a Message payload?
+@SuppressWarnings("rawtypes")
+public class ArchiveUploadNotifiedEvent extends AbstractEvent<Map> {
 	
 	final static public String NAME = "archiveUploadNotifiedEvent";
-	
 	private static final long serialVersionUID = -8871542806763550102L;
-	private Map parms = null;
-
-	public ArchiveUploadNotifiedEvent(Map parms) {
-		this.parms=parms;
+	
+	public ArchiveUploadNotifiedEvent(Map payload) {
+		super(payload);
 	}
 	
-	@Override
-	public void setPayload(Map object) {
-		parms = object;
-	}
-
-	@Override
-	public Map getPayload() {
-		return parms;
-	}
 }

@@ -1,3 +1,4 @@
+/*
  ###############################################################################
  #                                                                             #
  #    Copyright (C) 2011-2012 OpenMEAP, Inc.                                   #
@@ -19,6 +20,20 @@
  #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
  #                                                                             #
  ###############################################################################
+ */
 
-# Should correspond to the key this cluster node is referenced by in the database
-OPENMEAP_CLUSTER_NODE_URL_PREFIX=http://localhost:8080/openmeap-services-web
+package com.openmeap.model;
+
+import com.openmeap.model.dto.ApplicationArchive;
+
+public class ArchiveDeleteEvent extends AbstractEvent<ApplicationArchive> {
+
+	final static public String NAME = "archiveDeleteEvent";
+	
+	private static final long serialVersionUID = -9033272977442892920L;
+	
+	public ArchiveDeleteEvent(ApplicationArchive payload) {
+		super(payload);
+	}
+	
+}

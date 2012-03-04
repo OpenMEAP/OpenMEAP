@@ -24,12 +24,7 @@
 
 package com.openmeap.model.service;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -39,14 +34,12 @@ import org.slf4j.LoggerFactory;
 
 import com.openmeap.Event;
 import com.openmeap.EventHandler;
-import com.openmeap.EventHandlingException;
 import com.openmeap.cluster.ClusterHandlingException;
 import com.openmeap.model.InvalidPropertiesException;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.GlobalSettings;
-import com.openmeap.util.Utils;
 
 public class ArchiveUploadHandler implements EventHandler<Map> {
 

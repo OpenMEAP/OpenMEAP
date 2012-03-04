@@ -24,28 +24,15 @@
 
 package com.openmeap.model;
 
-import com.openmeap.Event;
 import com.openmeap.model.dto.ApplicationArchive;
 
-public class ArchiveUploadEvent implements Event<ApplicationArchive> {
+public class ArchiveUploadEvent extends AbstractEvent<ApplicationArchive> {
 
 	final static public String NAME = "archiveUploadEvent";
 	
 	private static final long serialVersionUID = -4389253160307376753L;
 	
-	private ApplicationArchive archive = null;
-
-	public ArchiveUploadEvent(ApplicationArchive archive) {
-		this.archive=archive;
-	}
-	
-	@Override
-	public void setPayload(ApplicationArchive object) {
-		archive = object;
-	}
-
-	@Override
-	public ApplicationArchive getPayload() {
-		return archive;
+	public ArchiveUploadEvent(ApplicationArchive payload) {
+		super(payload);
 	}
 }

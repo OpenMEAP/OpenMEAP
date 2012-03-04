@@ -1,3 +1,4 @@
+/*
  ###############################################################################
  #                                                                             #
  #    Copyright (C) 2011-2012 OpenMEAP, Inc.                                   #
@@ -19,6 +20,28 @@
  #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
  #                                                                             #
  ###############################################################################
+ */
 
-# Should correspond to the key this cluster node is referenced by in the database
-OPENMEAP_CLUSTER_NODE_URL_PREFIX=http://localhost:8080/openmeap-services-web
+package com.openmeap.model;
+
+import com.openmeap.Event;
+
+@SuppressWarnings("serial")
+abstract public class AbstractEvent<T> implements Event<T> {
+		
+	private T payload = null;
+	
+	public AbstractEvent(T payload) {
+		setPayload(payload);
+	}
+	
+	@Override
+	public void setPayload(T object) {
+		payload = object;
+	}
+
+	@Override
+	public T getPayload() {
+		return payload;
+	}
+}

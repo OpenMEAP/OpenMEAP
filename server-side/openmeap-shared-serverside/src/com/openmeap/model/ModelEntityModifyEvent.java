@@ -24,29 +24,13 @@
 
 package com.openmeap.model;
 
-import com.openmeap.Event;
+public class ModelEntityModifyEvent extends AbstractEvent<ModelEntity> {
 
-public class ModelEntityModifyEvent implements Event<ModelEntity> {
-	
-	// TODO: there should be a NAME constant here which is used everywhere else
 	final static public String NAME = "refresh";
 	
 	private static final long serialVersionUID = 5825309477564008214L;
 	
-	private ModelEntity payload = null;
-	
 	public ModelEntityModifyEvent(ModelEntity payload) {
-		setPayload(payload);
+		super(payload);
 	}
-	
-	@Override
-	public void setPayload(ModelEntity object) {
-		payload = object;
-	}
-
-	@Override
-	public ModelEntity getPayload() {
-		return payload;
-	}
-
 }

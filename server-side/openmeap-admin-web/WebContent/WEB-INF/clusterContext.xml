@@ -51,4 +51,12 @@
 		</property>
 	</bean>
 	
+	<bean id="archiveDeleteNotifier" class="com.openmeap.model.service.ArchiveDeleteNotifier">
+		<property name="modelManager" ref="modelManager"/>
+		<property name="config" ref="clusterServiceNotifierConfig"/>
+		<property name="httpRequestExecuter">
+			<bean class="com.openmeap.util.HttpRequestExecuterFactory" factory-method="newDefault"/>
+		</property>
+	</bean>
+	
 </beans>
