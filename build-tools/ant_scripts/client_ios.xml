@@ -137,12 +137,13 @@
 			<replacefilter token="@@openmeap.slic.updateFrequency@@" value="${openmeap.slic.updateFrequency}"/>
 			<replacefilter token="@@openmeap.slic.appTitle@@" value="${openmeap.slic.appTitle}"/>
 			<replacefilter token="@@openmeap.slic.packagedAppRoot@@" value="${openmeap.slic.packagedAppRoot}"/>
-			<replacefilter token="@@openmeap.slic.developmentMode@@" value="${openmeap.slic.developmentMode}"/>
+			<replacefilter token="@@openmeap.slic.developmentMode@@" value="${openmeap.slic.ios.developmentMode}"/>
 			<replacefilter token="@@openmeap.slic.deviceType@@" value="${openmeap.slic.deviceType}"/>
 			<replacefilter token="@@openmeap.slic.appMgmtServiceUrl@@" value="${openmeap.slic.appMgmtServiceUrl}"/>
 			<replacefilter token="@@openmeap.slic.appName@@" value="${openmeap.slic.appName}"/>
 			<replacefilter token="@@openmeap.slic.appVersion@@" value="${openmeap.slic.appVersion}"/>
 			<replacefilter token="@@openmeap.slic.version@@" value="${openmeap.revision}"/>
+			<replacefilter token="@@openmeap.slic.updatePendingTimeout@@" value="${openmeap.slic.updatePendingTimeout}"/>
 		</replace>
 	</target>
 	

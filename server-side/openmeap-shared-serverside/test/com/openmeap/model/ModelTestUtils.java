@@ -32,13 +32,13 @@ public class ModelTestUtils {
 		//getPersistenceBean("modelManager");
 		if( persistenceBeans==null ) {
 			
-			System.setProperty("OPENMEAP_JPA_SHOWSQL","true");
-			System.setProperty("OPENMEAP_JPA_GENERATEDDL","true");
-			System.setProperty("OPENMEAP_JPA_DIALECT","org.hibernate.dialect.MySQLDialect");
-			System.setProperty("OPENMEAP_JDBC_DRIVERCLASS","com.mysql.jdbc.Driver");
-			System.setProperty("OPENMEAP_JDBC_URL","jdbc:mysql://localhost:3306/openmeap");
-			System.setProperty("OPENMEAP_JDBC_USERNAME","openmeap");
-			System.setProperty("OPENMEAP_JDBC_PASSWORD","password");
+			System.setProperty("hibernate.show_sql","true");
+			System.setProperty("hibernate.hbm2ddl.auto","update");
+			System.setProperty("hibernate.dialect","org.hibernate.dialect.MySQLDialect");
+			System.setProperty("hibernate.connection.driver_class","com.mysql.jdbc.Driver");
+			System.setProperty("hibernate.connection.url","jdbc:mysql://localhost:3306/openmeap");
+			System.setProperty("hibernate.connection.username","openmeap");
+			System.setProperty("hibernate.connection.password","password");
 			
 			persistenceBeans=new ClassPathXmlApplicationContext(
 				new String[]{"/META-INF/persistenceContext.xml",
@@ -51,11 +51,11 @@ public class ModelTestUtils {
 	static public synchronized Object getPersistenceBean(String name) {
 		if( persistenceBeans==null ) {
 			
-			System.setProperty("OPENMEAP_JPA_SHOWSQL","false");
-			System.setProperty("OPENMEAP_JPA_GENERATEDDL","true");
-			System.setProperty("OPENMEAP_JPA_DIALECT","org.hibernate.dialect.SQLite3Dialect");
-			System.setProperty("OPENMEAP_JDBC_DRIVERCLASS","org.sqlite.JDBC");
-			System.setProperty("OPENMEAP_JDBC_URL","jdbc:sqlite:"+OPENMEAP_TEST_DB);
+			System.setProperty("hibernate.show_sql","true");
+			System.setProperty("hibernate.hbm2ddl.auto","update");
+			System.setProperty("hibernate.dialect","org.hibernate.dialect.SQLite3Dialect");
+			System.setProperty("hibernate.connection.driver_class","org.sqlite.JDBC");
+			System.setProperty("hibernate.connection.url","jdbc:sqlite:"+OPENMEAP_TEST_DB);
 			
 			persistenceBeans=new ClassPathXmlApplicationContext(
 				new String[]{"/META-INF/persistenceContext.xml",

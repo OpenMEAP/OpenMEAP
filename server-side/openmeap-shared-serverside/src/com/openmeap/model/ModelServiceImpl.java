@@ -208,7 +208,7 @@ public class ModelServiceImpl implements ModelService
 			+"from Deployment d join d.application "
 			+"where d.application.id=:id "
 			+"order by d.createDate desc");
-		q.setParameter("id", app.getId().toString());
+		q.setParameter("id", app.getId());
 		q.setMaxResults(1);
 		try {
 			Object o = q.getSingleResult();

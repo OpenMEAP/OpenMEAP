@@ -26,9 +26,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
 	
-	<persistence-unit name="openmeap-jpa" transaction-type="RESOURCE_LOCAL">
+	<persistence-unit name="openmeap-jpa-javaee">
 	
-		<!-- <provider>org.hibernate.ejb.HibernatePersistence</provider> -->
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+	
+		<jta-data-source>java:/openmeap/datasource</jta-data-source>
 		
 		<class>com.openmeap.model.dto.Application</class>
 		<class>com.openmeap.model.dto.Deployment</class>
@@ -39,13 +41,26 @@
 		<class>com.openmeap.model.dto.ClusterNode</class>
 		
 		<properties>
-			<!-- <property name="hibernate.hbm2ddl.auto" value="true" /> -->
-			<!-- <property name="hibernate.show_sql" value="true" /> -->
-			<!-- <property name="org.hibernate.ejb.event.EJB3AutoFlushEventListener" value="auto-flush/." /> -->
-			<property name="hibernate.query.factory_class" value="org.hibernate.hql.classic.ClassicQueryTranslatorFactory"/>
-			<!-- <property name="hibernate.ejb.cfgfile" value="/META-INF/hibernate.cfg.xml"/> -->
+			<property name="hibernate.ejb.cfgfile" value="hibernate.cfg.xml"/>
 		</properties>
 		
+	</persistence-unit>
+	
+	<persistence-unit name="openmeap-jpa-javase" transaction-type="RESOURCE_LOCAL">
+	
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		
+		<class>com.openmeap.model.dto.Application</class>
+		<class>com.openmeap.model.dto.Deployment</class>
+		<class>com.openmeap.model.dto.ApplicationArchive</class>
+		<class>com.openmeap.model.dto.ApplicationVersion</class>
+		<class>com.openmeap.model.dto.ApplicationInstallation</class>
+		<class>com.openmeap.model.dto.GlobalSettings</class>
+		<class>com.openmeap.model.dto.ClusterNode</class>
+		
+		<properties>
+			<property name="hibernate.ejb.cfgfile" value="hibernate.cfg.xml"/>
+		</properties>
 		
 	</persistence-unit>
 	

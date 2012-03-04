@@ -7,16 +7,17 @@ rem  OpenMEAP
 set ANDROID_SDK_HOME=C:\Users\schang\apps\android-sdk-windows
 set OPENMEAP_HOME=C:\Users\schang\openmeap.dev\openmeap
 
-rem  Database.  Only used by the war files.  Defaults to a sqlite db at /tmp
-rem  To change the default sqlite db location, just override the url
-rem  and call this from within your apache tomcat startup file
-rem  or use any other means to get the property/env var to the vm running tomcat
-rem set OPENMEAP_JPA_SHOWSQL=true
-rem set OPENMEAP_JPA_GENERATEDDL=true
+rem Required on services nodes.  Is used as an identity for a cluster node
+rem set OPENMEAP_CLUSTER_NODE_URL_PREFIX=http://localhost:8080/openmeap-services-web
+
+rem Database settings.  Can also be passed as system properties.
+rem set OPENMEAP_JAVA_ENV=javase
+rem set OPENMEAP_JPA_SHOWSQL=false
+rem set OPENMEAP_JPA_GENERATEDDL=update
 rem set OPENMEAP_JPA_DIALECT=org.hibernate.dialect.SQLite3Dialect
-rem set OPENMEAP_JDBC_DRIVERCLASS=com.mysql.jdbc.Driver
 rem set OPENMEAP_JDBC_DRIVERCLASS=org.sqlite.JDBC
-rem set OPENMEAP_JDBC_URL=jdbc:sqlite:/tmp/test.db
+rem set OPENMEAP_JDBC_URL=jdbc:mysql://192.168.1.2:3306/openmeap
+rem set OPENMEAP_JDBC_URL=jdbc:sqlite:/tmp/openmeap.db
 rem set OPENMEAP_JDBC_USERNAME=openmeap
 rem set OPENMEAP_JDBC_PASSWORD=openmeap
 

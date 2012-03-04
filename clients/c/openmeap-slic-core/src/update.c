@@ -24,6 +24,7 @@
 
 #include <openmeap-slic-core.h>
 #include <stdio.h>
+#include <time.h>
 #include "cJSON.h"
 
 const char * OmUpdateResultPending = "PENDING";
@@ -600,19 +601,31 @@ const char * om_update_perform_with_callback(om_config_ptr cfg,
                                              om_update_callback_func_ptr callback,
                                              om_update_callback_info_ptr callback_info)
 {
+    om_uint32 * lastTime = om_config_get(cfg,OM_CFG_UPDATE_LAST_ATTEMPT);
+    om_uint32 * pendingTimeout = om_config_get(cfg,OM_CFG_UPDATE_PENDING_TIMEOUT);
+    om_uint32 tim = time(0);
     char * lastUpdateResult = om_config_get(cfg,OM_CFG_UPDATE_LAST_RESULT);
+    om_uint32 timeoutTime = 0;    
     
-	if( lastUpdateResult!=OM_NULL && strcmp(lastUpdateResult,OmUpdateResultPending)==0 ) {
-        // TODO: implement a ResultPendng timeout
+	if( lastUpdateResult!=OM_NULL 
+            && strcmp(lastUpdateResult,OmUpdateResultPending)==0        
+            && lastTime!=OM_NULL 
+            && (timeoutTime = *lastTime + *pendingTimeout)
+            && tim < timeoutTime
+       ) {
         om_free(lastUpdateResult);
+        om_free(lastTime);
+        om_free(pendingTimeout);
 		return OmUpdateResultPending;
 	} else {
+        om_free(lastUpdateResult);
+        om_free(lastTime);
+        om_free(pendingTimeout);
         om_config_set(cfg,OM_CFG_UPDATE_LAST_RESULT,OmUpdateResultPending);
     }
 	
 	const char * retVal = OmUpdateResultSuccess;
 	const char * r;
-	om_uint32 tim = time(0);
 	
 	if( om_config_set(cfg,OM_CFG_UPDATE_LAST_ATTEMPT,&tim) ) {
 		if( 

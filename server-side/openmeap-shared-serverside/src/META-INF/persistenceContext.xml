@@ -38,37 +38,33 @@
 		<property name="searchSystemEnvironment" value="true"/>
 		<property name="ignoreUnresolvablePlaceholders" value="true"/>
 	</bean>
-
-	<bean id="openMeapDataSourceBean" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="${OPENMEAP_JDBC_DRIVERCLASS}" />
-		<property name="username" value="${OPENMEAP_JDBC_USERNAME}" />
-		<property name="password" value="${OPENMEAP_JDBC_PASSWORD}" />
-		<property name="url" value="${OPENMEAP_JDBC_URL}" />
-	</bean>
-
-    <bean id="www_persistenceVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-		<property name="showSql" value="${OPENMEAP_JPA_SHOWSQL}" />
-		<property name="generateDdl" value="${OPENMEAP_JPA_GENERATEDDL}" />
-		<property name="databasePlatform" value="${OPENMEAP_JPA_DIALECT}"/>
-	</bean>
-
-	<bean id="www_jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect"/>
-
-	<bean id="www_entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" >
-		<property name="persistenceUnitName" value="openmeap-jpa"/>
-		<property name="dataSource" ref="openMeapDataSourceBean"/>
-		<property name="loadTimeWeaver">
-			<bean class="org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver"/>
+	
+	<bean id="www_ejb3ConfigFactory" class="com.openmeap.util.Ejb3ConfigurationFactory">
+		<property name="properties">
+			<map>
+				<entry key="OPENMEAP_JPA_SHOWSQL" value="${OPENMEAP_JPA_SHOWSQL}"/>
+				<entry key="OPENMEAP_JPA_GENERATEDDL" value="${OPENMEAP_JPA_GENERATEDDL}"/>
+				<entry key="OPENMEAP_JPA_DIALECT" value="${OPENMEAP_JPA_DIALECT}"/>
+				
+				<entry key="OPENMEAP_JDBC_DRIVERCLASS" value="${OPENMEAP_JDBC_DRIVERCLASS}"/>
+				<entry key="OPENMEAP_JDBC_URL" value="${OPENMEAP_JDBC_URL}"/>
+				<entry key="OPENMEAP_JDBC_USERNAME" value="${OPENMEAP_JDBC_USERNAME}"/>
+				<entry key="OPENMEAP_JDBC_PASSWORD" value="${OPENMEAP_JDBC_PASSWORD}"/>
+			</map>
 		</property>
-		<property name="jpaVendorAdapter" ref="www_persistenceVendorAdapter"/>
-		<property name="jpaDialect" ref="www_jpaDialect"/>
 	</bean>
 	
-	<bean id="www_transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-		<property name="entityManagerFactory" ref="www_entityManagerFactory"/>
-		<property name="dataSource" ref="openMeapDataSourceBean"/>
-		<property name="jpaDialect" ref="www_jpaDialect"/>
+	<bean id="www_ejb3Config" 
+			scope="prototype" 
+			factory-bean="www_ejb3ConfigFactory" 
+			factory-method="create">
+		<constructor-arg index="0" type="java.lang.String" value="openmeap-jpa-${OPENMEAP_JAVA_ENV}"/>
 	</bean>
+	
+	<bean id="www_entityManagerFactory" 
+			class="javax.persistence.EntityManagerFactory" 
+			factory-bean="www_ejb3Config" 
+			factory-method="buildEntityManagerFactory"/>
 	
 	<bean id="entityManager" scope="request" factory-bean="www_entityManagerFactory" factory-method="createEntityManager">
 		<aop:scoped-proxy/>

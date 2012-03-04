@@ -28,7 +28,7 @@
 	<property name="openmeap.project.current.file.ivy" value="${openmeap.project.shared-serverside}/ivy.xml"/>
 	<property name="openmeap.project.current.dist" value="${openmeap.project.shared-serverside.dist.jar}"/>
 	<property name="openmeap.project.current.dist.ext" value="jar"/>
-	<property name="openmeap.ivy.cachepath.conf" value="core"/>
+	<property name="openmeap.ivy.cachepath.conf" value="compile"/>
 	<property name="openmeap.ivy.retrieve.conf" value="core"/>
 
 	<!-- BEGIN CLEAN SECTION +++++++++++++++++++++++++++++++++++++ -->
@@ -52,7 +52,7 @@
 			
 	<!-- //TODO: figure out how to get the XJCTask functional. -->
 	<!-- <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask" classpathref="openmeap.classpath"/> -->
-	<target name="generate-sources" depends="clean-generated-sources"> 
+	<target name="generate-sources"> 
 		<description>
 			Create and populate the ./gen/ directory with the source resulting 
 			from running XJC against the schemas in schema.
@@ -91,6 +91,7 @@
 		</copy>
 		<copy todir="bin">
 			<fileset dir="src" includes="openmeap-jpa.properties"/>
+			<fileset dir="src" includes="hibernate.cfg.xml"/>
 		</copy>
 		<copy todir="bin/com/openmeap/cluster/node/config">
 			<fileset dir="src/com/openmeap/cluster/node/config" includes="**/*.xsd"/>

@@ -31,12 +31,13 @@
 	</description>
 
 	<import file="../../build-tools/ant_scripts/shared.xml"/>
+	
 	<property name="openmeap.project.current.file.ivy" value="${openmeap.project.admin-web}/ivy.xml"/>
 	<property name="openmeap.project.current.dist" value="${openmeap.project.admin-web.dist.war}"/>
 	<property name="openmeap.project.current.dist.ext" value="war"/>
 	<property name="ivy.retrieve.pattern" value="${openmeap.project.admin-web.dist}/WEB-INF/lib/${openmeap.ivy.retrieve.pattern}"/>
-	<property name="openmeap.ivy.cachepath.conf" value="compile"/>
-	<property name="openmeap.ivy.retrieve.conf" value="core"/>
+	<property name="openmeap.ivy.cachepath.conf" value="${openmeap.ivy.web.cachePathConf}"/>
+	<property name="openmeap.ivy.retrieve.conf" value="${openmeap.ivy.web.retrieveConf}"/>
 
 	<!-- BEGIN CLEAN SECTION +++++++++++++++++++++++++++++++++++++ -->
 	

@@ -42,9 +42,9 @@
 	
 	<dependencies>
 	
-		<dependency org="javax.transaction" name="jta" rev="1.0.1B"/>
+		<dependency org="javax.transaction" name="jta" rev="1.0.1B" conf="compile->default"/>
 	
-		<dependency org="org.apache.tomcat" name="servlet-api" rev="6.0.35"/>
+		<dependency org="org.apache.tomcat" name="servlet-api" rev="6.0.35" conf="compile->default"/>
 	
 		<dependency org="org.freemarker" name="freemarker" rev="2.3.18" conf="ide->default"/>
 		  

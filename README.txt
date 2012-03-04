@@ -1,4 +1,4 @@
-OpenMEAP 1.0.0a
+OpenMEAP 1.0.x alpha
 
 Herein is the very first alpha release of OpenMEAP.  We
 understand well that the code is far from perfect and 
@@ -16,5 +16,5 @@ first-round feedback on the direction of the project.
 
 So, in the spirit of friendship, we give to you, 
 
-OpenMEAP 1.0.0a, 
+OpenMEAP 1.0.x alpha, 
 please see COPYING for license information.  =)

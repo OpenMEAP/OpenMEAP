@@ -9,6 +9,8 @@
   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
 
-	<bean id="entityManager" scope="prototype" factory-bean="www_entityManagerFactory" factory-method="createEntityManager">
-	</bean>
+	<bean id="entityManager" 
+			scope="prototype" 
+			factory-bean="www_entityManagerFactory" 
+			factory-method="createEntityManager"/>
 </beans>
