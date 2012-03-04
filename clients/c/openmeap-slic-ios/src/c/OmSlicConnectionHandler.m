@@ -146,8 +146,13 @@
 	}
 	
 	NSString * authMethod = [protectionSpace authenticationMethod];
+    
+    if( [authMethod compare:NSURLAuthenticationMethodServerTrust]==NSOrderedSame 
+            && [OmSlicAppDelegate isDevelopmentMode] ) {
+        return YES;
+    }
+    
 	if( [authMethod compare:NSURLAuthenticationMethodDefault]==NSOrderedSame 
-	   //|| [authMethod compare:NSURLAuthenticationMethodServerTrust]==NSOrderedSame
 	   || [authMethod compare:NSURLAuthenticationMethodHTTPBasic]==NSOrderedSame
 	   || [authMethod compare:NSURLAuthenticationMethodHTTPDigest]==NSOrderedSame ) {
 		return YES;
@@ -159,7 +164,16 @@
 - (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
 	NSLog(@"in OmSlicConnectionHandler connection: didReceiveAuthenticationChallenge:");
 	
-	NSURLProtectionSpace * protectionSpace = lastProtectionSpace;
+	NSURLProtectionSpace * protectionSpace = challenge.protectionSpace;
+    
+    NSString * authMethod = [protectionSpace authenticationMethod];
+    if( [authMethod compare:NSURLAuthenticationMethodServerTrust]==NSOrderedSame 
+            && [OmSlicAppDelegate isDevelopmentMode]) {
+        [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] 
+             forAuthenticationChallenge:challenge];
+        return;
+    }
+    
 	NSThread * thread = [NSThread currentThread];
 	[[OmSlicAppDelegate globalInstance] doLoginFormForDelegate:self 
 			withAuthenticationChallenge:challenge 

@@ -201,6 +201,17 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 #pragma mark - 
 #pragma mark Various Utility Methods
 
++ (BOOL) isDevelopmentMode {
+    OmSlicAppDelegate *del = [OmSlicAppDelegate globalInstance];
+    uint32 *d = om_config_get(del.config, OM_CFG_DEV_MODE);
+    uint32 dMode = 0;
+    if( d!=OM_NULL && *d==1 ) {
+        dMode=*d;
+    }
+    om_free(d);
+    return dMode==1 ? YES : NO;
+}
+
 - (void) reload {
     NSLog(@"in OmSlicAppDelegate::reload");
 
