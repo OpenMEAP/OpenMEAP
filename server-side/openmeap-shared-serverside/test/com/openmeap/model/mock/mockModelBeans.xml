@@ -55,9 +55,8 @@
 		<property name="id" value="1"/>
 		<property name="name" value="Application.name"/>
 		<property name="description" value="Application.description"/>
-		<property name="trackInstalls" value="false"/>
 		<property name="proxyAuthSalt" value="Application.authSalt.1"/>
-		<property name="proxiedBaseUrl" value="Application.proxiedBaseUrl"/>
+		<property name="initialVersionIdentifier" value="ApplicationVersion.identifier.bundled"/>
 		<property name="deployments">
 			<list>
 				<ref bean="Application1_Deployment1"/>
@@ -79,6 +78,8 @@
 		<property name="application" ref="Application_1"/>
 		<property name="applicationVersion" ref="ApplicationVersion_1"/>
 		<property name="createDate" value="2011/JAN/01"/>
+		<property name="hash" value="123"/>
+		<property name="hashAlgorithm" value="MD5"/>
 	</bean>
 	<bean id="Application1_Deployment2" class="com.openmeap.model.dto.Deployment">
 		<property name="id" value="2"/>
@@ -86,6 +87,8 @@
 		<property name="application" ref="Application_1"/>
 		<property name="applicationVersion" ref="ApplicationVersion_1"/>
 		<property name="createDate" value="2011/JAN/02"/>
+		<property name="hash" value="234"/>
+		<property name="hashAlgorithm" value="MD5"/>
 	</bean>
 	<bean id="Application1_Deployment3" class="com.openmeap.model.dto.Deployment">
 		<property name="id" value="3"/>
@@ -93,6 +96,8 @@
 		<property name="application" ref="Application_1"/>
 		<property name="applicationVersion" ref="ApplicationVersion_2"/>
 		<property name="createDate" value="2011/JAN/03"/>
+		<property name="hash" value="345"/>
+		<property name="hashAlgorithm" value="MD5"/>
 	</bean>
 	
 	<bean id="ApplicationVersion_1" class="com.openmeap.model.dto.ApplicationVersion">

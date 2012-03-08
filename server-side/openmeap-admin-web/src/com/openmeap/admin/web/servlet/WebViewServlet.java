@@ -90,7 +90,7 @@ public class WebViewServlet extends HttpServlet {
 		String applicationNameString = URLDecoder.decode(pathParts[APP_NAME_INDEX],"utf-8");
 		String applicationVersionString = URLDecoder.decode(pathParts[APP_VER_INDEX],"utf-8");
 		
-		ApplicationVersion ver = mgr.findAppVersionByNameAndId(applicationNameString, applicationVersionString);
+		ApplicationVersion ver = mgr.getModelService().findAppVersionByNameAndId(applicationNameString, applicationVersionString);
 	
 		String authSalt = ver.getApplication().getProxyAuthSalt();
 		String authToken = URLDecoder.decode(pathParts[AUTH_TOKEN_INDEX],"utf-8");

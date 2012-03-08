@@ -129,7 +129,7 @@ public class AddModifyApplicationBackingTest {
 		Assert.assertTrue(vars.get("processTarget")!=null && ((String)vars.get("processTarget")).compareTo(ProcessingTargets.ADDMODIFY_APP)==0);
 		Assert.assertTrue(vars.get("application")!=null && ((Application)vars.get("application")).getDescription().compareTo("Application.description.1_modified")==0);
 		// verify that the applicaiton we modified is otherwise uncorrupted.
-		Application app = mm.findApplication(1L);
+		Application app = mm.getModelService().findByPrimaryKey(Application.class,1L);
 		Assert.assertTrue(app.getName()!=null && app.getName().compareTo("Application.name.1")==0 );
 	}
 	
@@ -160,7 +160,7 @@ public class AddModifyApplicationBackingTest {
 		amab.setModelManager( mm );
 		Collection<ProcessingEvent> events = amab.process(null, vars, parms);
 		Assert.assertTrue(ProcessingUtils.containsTarget(events, ProcessingTargets.MESSAGES));
-		Assert.assertTrue(mm.findApplication(1L)!=null);
+		Assert.assertTrue(mm.getModelService().findByPrimaryKey(Application.class,1L)!=null);
 		
 		//////////////////////////
 		// Verify that we can use the backing to delete an application
@@ -176,7 +176,7 @@ public class AddModifyApplicationBackingTest {
 		amab = new AddModifyApplicationBacking();
 		amab.setModelManager( mm );
 		amab.process(null, vars, parms);
-		Assert.assertTrue(mm.findApplication(1L)==null);
+		Assert.assertTrue(mm.getModelService().findByPrimaryKey(Application.class,1L)==null);
 		Assert.assertTrue(parms.get("applicationId")==null);
 		Assert.assertTrue(ProcessingUtils.containsTarget(events, ProcessingTargets.MESSAGES));
 	}

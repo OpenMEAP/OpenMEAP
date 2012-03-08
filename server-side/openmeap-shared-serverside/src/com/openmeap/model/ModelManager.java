@@ -24,7 +24,7 @@
 
 package com.openmeap.model;
 
-import java.util.*;
+import java.util.List;
 
 import javax.persistence.PersistenceException;
 
@@ -73,25 +73,4 @@ public interface ModelManager {
 	GlobalSettings addModify(GlobalSettings settings) throws InvalidPropertiesException, PersistenceException;
 	
 	GlobalSettings getGlobalSettings();
-	
-	List<Application> findAllApplications();
-	
-	Application findApplication(Long id);
-	
-	Application findApplicationByName(String name);
-	
-	ApplicationVersion findApplicationVersion(Long id);
-	
-	ApplicationInstallation findAppInstByUuid(String uuid);
-	
-	/**
-	 * Find an ApplicationVersion by Application name and ApplicationVersion identifier
-	 * 
-	 * @param appName The parent Application of the ApplicationVersion desired
-	 * @param versionId The version identifier of the ApplicationVersion desired
-	 * @return either the ApplicationVersion associated to version id and application name, else null
-	 */
-	ApplicationVersion findAppVersionByNameAndId(String appName, String versionId);
-	
-	Deployment getLastDeployment(Application app);
 }

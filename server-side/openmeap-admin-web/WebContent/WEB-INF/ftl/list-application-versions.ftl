@@ -31,7 +31,7 @@ Input params:
 			<th>Url</th>
 		</tr>
 		[#list versions?values as version]
-		[#if version.identifier??]
+		[#if version.identifier?? && version.activeFlag]
 			<tr>
 				<td>[#if mayUpdate]
 				<input type="radio" [#if currentVersionId==version.id]checked[/#if] name="versionId" value="${version.id}"/>

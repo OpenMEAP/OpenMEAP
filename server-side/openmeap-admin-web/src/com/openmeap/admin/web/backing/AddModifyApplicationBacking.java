@@ -81,9 +81,9 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 		
 		templateVariables.put("processTarget",PROCESS_TARGET);
 		
-		Application app = null;
+		Application app = new Application();
 		if( ParameterMapUtils.notEmpty("applicationId",parameterMap) ) {
-			app = modelManager.findApplication( Long.valueOf( ParameterMapUtils.firstValue("applicationId", parameterMap) ) );
+			app = modelManager.getModelService().findByPrimaryKey(Application.class, Long.valueOf( ParameterMapUtils.firstValue("applicationId", parameterMap) ) );
 		}
 		
 		Boolean mayCreate = modelManager.getAuthorizer().may(Authorizer.Action.CREATE, new Application());
@@ -114,7 +114,7 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 			}
 			
 			if( app==null && ParameterMapUtils.notEmpty("applicationId",parameterMap) )
-				app = modelManager.findApplication( 
+				app = modelManager.getModelService().findByPrimaryKey(Application.class, 
 						Long.valueOf( 
 								ParameterMapUtils.firstValue("applicationId", parameterMap) ) );
 			
@@ -133,7 +133,7 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 		
 		// the user is visiting the page to view or modify an application
 		else if( ParameterMapUtils.notEmpty("applicationId",parameterMap) ) {
-			app = modelManager.findApplication( Long.valueOf( ParameterMapUtils.firstValue("applicationId", parameterMap) ) );
+			app = modelManager.getModelService().findByPrimaryKey(Application.class, Long.valueOf( ParameterMapUtils.firstValue("applicationId", parameterMap) ) );
 		}
 		
 		if( app == null && ParameterMapUtils.notEmpty("applicationId",parameterMap) )
@@ -160,7 +160,6 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 		}
 		
 		fillInVariablesFromApplication(templateVariables,app);
-		createTrackInstalls(templateVariables,app);
 	
 		return events;
 	}
@@ -176,13 +175,15 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 			app = new Application();
 		}
 		app.setName(ParameterMapUtils.firstValue("name",parameterMap));
-		app.setProxiedBaseUrl(ParameterMapUtils.firstValue("proxiedBaseUrl",parameterMap));
 		app.setAdmins(ParameterMapUtils.firstValue("admins",parameterMap));
-		app.setVersionAdmins(ParameterMapUtils.firstValue("version-admins",parameterMap));
+		app.setVersionAdmins(ParameterMapUtils.firstValue("versionAdmins",parameterMap));
 		app.setDescription(ParameterMapUtils.firstValue("description",parameterMap));
-		if( parameterMap.get("trackInstalls")!=null )
-			app.setTrackInstalls(true);
-		else app.setTrackInstalls(false);
+		app.setInitialVersionIdentifier(ParameterMapUtils.firstValue("initialVersionIdentifier",parameterMap));
+		
+		String deploymentHistoryLength = ParameterMapUtils.firstValue("deploymentHistoryLength",parameterMap);
+		if( deploymentHistoryLength!=null && deploymentHistoryLength.trim().matches("[\\d]+") ) {
+			app.setDeploymentHistoryLength(Integer.valueOf(deploymentHistoryLength.trim()));
+		}
 		
 		// update the salt used for generating authentication tokens
 		String salt = ParameterMapUtils.firstValue("proxyAuthSalt",parameterMap);
@@ -206,12 +207,5 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 	 */
 	private void fillInVariablesFromApplication(Map<Object,Object> vars, Application app) {
 		vars.put("application", app);
-	}
-	
-	private void createTrackInstalls(Map<Object,Object> vars, Application app) {
-		Checkbox ti = new Checkbox();
-		ti.setName("trackInstalls");
-		ti.setIsChecked(app!=null&&app.getTrackInstalls()!=null?app.getTrackInstalls():false);
-		vars.put("trackInstalls", ti);
 	}
 }

@@ -111,7 +111,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 			return ProcessingUtils.newList(new GenericProcessingEvent<String>(ProcessingTargets.MESSAGES,"An application must be specified in order to add a version"));
 		}
 		Long appId = Long.valueOf( firstValue("applicationId", parameterMap) );
-		app = modelManager.findApplication( appId );
+		app = modelManager.getModelService().findByPrimaryKey(Application.class, appId );
 		if( app==null ) {
 			return ProcessingUtils.newList(new GenericProcessingEvent<String>(ProcessingTargets.MESSAGES,"The application with id "+appId+" could not be found."));
 		}
@@ -126,9 +126,13 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 			version = new ApplicationVersion();
 		}
 		
-		Boolean willProcess = determineWillProcessPost(app,version);
+		Boolean willProcess = canUserModifyOrCreate(app,version);
 		if( !willProcess ) {
-			events.add( new MessagesEvent("Current user does not have permissions to make changes here") );
+			events.add( new MessagesEvent("Current user does not have permissions to make changes here.") );
+		}
+		if( !version.getActiveFlag() ) {
+			events.add( new MessagesEvent("This version is not currently active.") );
+			willProcess=false;
 		}
 		templateVariables.put("willProcess",willProcess);
 		
@@ -146,7 +150,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		return events;
 	}
 	
-	private Boolean determineWillProcessPost(Application app, ApplicationVersion version) {
+	private Boolean canUserModifyOrCreate(Application app, ApplicationVersion version) {
 		
 		// we don't want to pass it back, but the
 		// Authorizer needs the Application object
@@ -195,10 +199,10 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		if( StringUtils.isNotBlank(versionId) || StringUtils.isNotBlank(identifier) ) {
 
 			if( StringUtils.isNotBlank(versionId) ) {
-				version = modelManager.findApplicationVersion(Long.valueOf(versionId));
+				version = modelManager.getModelService().findByPrimaryKey(ApplicationVersion.class,Long.valueOf(versionId));
 			}
 			if( version==null && StringUtils.isNotBlank(identifier) ) {
-				version = modelManager.findAppVersionByNameAndId(app.getName(), identifier);
+				version = modelManager.getModelService().findAppVersionByNameAndId(app.getName(), identifier);
 			}
 			
 			if( version==null ) {

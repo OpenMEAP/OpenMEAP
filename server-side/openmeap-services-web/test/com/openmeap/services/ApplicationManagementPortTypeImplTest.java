@@ -27,17 +27,23 @@ package com.openmeap.services;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.openmeap.model.*;
+import com.openmeap.model.ModelManager;
+import com.openmeap.model.ModelTestUtils;
+import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.protocol.WebServiceException;
-import com.openmeap.protocol.dto.*;
+import com.openmeap.protocol.dto.ConnectionOpenRequest;
+import com.openmeap.protocol.dto.ConnectionOpenResponse;
+import com.openmeap.protocol.dto.SLIC;
 import com.openmeap.util.AuthTokenProvider;
 
 public class ApplicationManagementPortTypeImplTest {
@@ -46,84 +52,188 @@ public class ApplicationManagementPortTypeImplTest {
 	
 	static ModelManager modelManager = null;
 	
-	@BeforeClass static public void beforeClass() {
-		if( modelManager==null ) {
+	private ConnectionOpenResponse response = null;
+	private Boolean thrown = false;
+	private ApplicationManagementServiceImpl appMgmtSvc = null;
+	private ConnectionOpenRequest request;
+	
+	@Before public void before() {
+		
+		//if( modelManager==null ) {
 			ModelTestUtils.resetTestDb();
 			ModelTestUtils.createModel(null);
 			modelManager = ModelTestUtils.createModelManager();
-		}
+		//}
+		
+		response = null;
+		thrown = false;
+		appMgmtSvc = new ApplicationManagementServiceImpl();
+		appMgmtSvc.setModelManager(modelManager);
+		
+		request = new ConnectionOpenRequest();
+		request.setApplication(new com.openmeap.protocol.dto.Application());
+		request.getApplication().setInstallation(new com.openmeap.protocol.dto.ApplicationInstallation());
+		request.getApplication().getInstallation().setUuid("Device.uuid.1");
+		request.getApplication().setName("Application.name");
+		request.getApplication().setVersionId("ApplicationVersion.identifier.bundled");
+		request.setSlic(new SLIC());
+		request.getSlic().setVersionId("CURRENT_VERSION_UNUSED");
 	}
 	
-	@AfterClass static public void afterClass() {
+	@After public void after() {
 		ModelTestUtils.resetTestDb();
 	}
 	
-	@Test public void testConnectionOpen() throws Exception {
-		
-		ConnectionOpenResponse response = null;
-		Boolean thrown = false;
-		
-		ApplicationManagementServiceImpl ams = new ApplicationManagementServiceImpl();
-		ams.setModelManager(modelManager);
-		
-		ConnectionOpenRequest req = new ConnectionOpenRequest();
-		req.setApplication(new com.openmeap.protocol.dto.Application());
-		req.getApplication().setInstallation(new com.openmeap.protocol.dto.ApplicationInstallation());
-		req.getApplication().getInstallation().setUuid("Device.uuid.1");
-		req.getApplication().setName("Application.name");
-		req.setSlic(new SLIC());
-		req.getSlic().setVersionId("CURRENT_VERSION_UNUSED");
-		
-		////////////////
-		// Verify that an exception will get thrown if the version claimed does not exist
-		req.getApplication().setVersionId("VERSION_DOES_NOT_EXIST");
+	/**
+	 * Verify that an exception is thrown if a version that does not exist is reported by SLIC
+	 * @throws Exception
+	 */
+	@Test public void testConnectionOpen_verifyExceptionOnNonExistingVerison() throws Exception {
+		request.getApplication().setVersionId("VERSION_DOES_NOT_EXIST");
 		try {
-			response = ams.connectionOpen(req);
+			response = appMgmtSvc.connectionOpen(request);
 		} catch( WebServiceException wse ) {
 			thrown = true;
 		}
 		Assert.assertTrue("A non-existent application version should trigger an exception",thrown);
+	}
+	
+	/**
+	 * Verify that no exceptions are thrown and no update returned
+	 * when the version SLIC reports is the same as the initial version.
+	 */
+	@Test public void testConnectionOpen_verifyInitialVersionIdentifierRecognized() throws Exception {
+		thrown = false;
+		request.getApplication().setVersionId("ApplicationVersion.identifier.bundled");
 		
-		////////////////
-		// Verify that, when the current version is specified,
-		// an authentication token is generated and no UpdateHeader is returned
-		req.getApplication().setVersionId("ApplicationVersion.identifier.2");
-		response = ams.connectionOpen(req);
+		com.openmeap.model.dto.Application app = modelManager.getModelService().findByPrimaryKey(Application.class, 1L);
+		Iterator<Deployment> i = new ArrayList<Deployment>(app.getDeployments()).iterator();
+		while(i.hasNext()) {
+			Deployment d = i.next();
+			modelManager.getModelService().delete(d);
+		}
+		
+		try {
+			response = appMgmtSvc.connectionOpen(request);
+		} catch( WebServiceException wse ) {
+			thrown = true;
+		}
+		Assert.assertTrue("No update should be returned here",response.getUpdate()==null);
+		Assert.assertTrue("The originally bundled application version id should not trigger an exception",thrown==false);
+	}
+	
+	/**
+	 * Verify that SLIC reporting the currently deployed version triggers no update
+	 * @throws Exception
+	 */
+	@Test public void testConnectionOpen_verifyCurrentVersionTriggersNoUpdateNotify() throws Exception  {
+		request.getApplication().setVersionId("ApplicationVersion.identifier.2");
+		response = appMgmtSvc.connectionOpen(request);
 		Assert.assertTrue(response.getUpdate()==null);
 		Assert.assertTrue(response.getAuthToken()!=null && response.getAuthToken().length()>0);
-		
+	}
+	
+	/**
+	 * Verify that SLIC reporting the currently deployed version triggers an update
+	 * when the hash does not match the hash associated to the currently deployed version
+	 * @throws Exception
+	 */
+	@Test public void testConnectionOpen_verifyCurrentVersionTriggersUpdateWhenHashDiffers() throws Exception  {
+		request.getApplication().setVersionId("ApplicationVersion.identifier.2");
+		request.getApplication().setHashValue("Differing Hash Value");
+		response = appMgmtSvc.connectionOpen(request);
+		Assert.assertTrue(response.getUpdate()!=null);
+		Assert.assertTrue(response.getAuthToken()!=null && response.getAuthToken().length()>0);
+	}
+	
+	/**
+	 * Verify that an update header is returned if the version reported by SLIC
+	 * does not match the version of the most recent deployment and
+	 * verify that the authentication token is generated using the proxy salt
+	 * associated to the application.
+	 * @throws Exception
+	 */
+	@Test public void testConnectionOpen_verifyUpdateHeaderOnUpdateRequired() throws Exception {
 		////////////////
 		// Verify that, when version that exists, but is not the current version, is specified,
 		// an authentication token is generated AS WELL AS an UpdateHeader
-		req.getApplication().setVersionId("ApplicationVersion.identifier.1");
-		com.openmeap.model.dto.ApplicationVersion appVer = modelManager.findAppVersionByNameAndId(req.getApplication().getName(), "ApplicationVersion.identifier.2");
+		request.getApplication().setVersionId("ApplicationVersion.identifier.1");
+		com.openmeap.model.dto.ApplicationVersion appVer = modelManager.getModelService().findAppVersionByNameAndId(request.getApplication().getName(), "ApplicationVersion.identifier.2");
 		com.openmeap.model.dto.Application app = appVer.getApplication();
-		response = ams.connectionOpen(req);
+		response = appMgmtSvc.connectionOpen(request);
 		Assert.assertTrue(response.getAuthToken()!=null && response.getAuthToken().length()>0);
 		Assert.assertTrue(response.getUpdate()!=null);
 		Assert.assertTrue(response.getUpdate().getInstallNeeds().intValue()==appVer.getArchive().getBytesLength()+appVer.getArchive().getBytesLengthUncompressed());
 		Assert.assertTrue(response.getUpdate().getStorageNeeds().intValue()==appVer.getArchive().getBytesLengthUncompressed());
 		Assert.assertTrue(response.getUpdate().getHash().getValue().compareTo(appVer.getArchive().getHash())==0);
 		Assert.assertTrue(AuthTokenProvider.validateAuthToken(app.getProxyAuthSalt(), response.getAuthToken()));
+	}
+	
+	/**
+	 * Verify an exception occurs,
+	 * when the SLIC current version is not communicated.
+	 * @throws Exception
+	 */
+	@Test public void testConnectionOpen_verifyExceptionWhenCurrentVersionNotCommunicated() throws Exception {
 		
-		
-		////////////////
-		// Verify that, if a current version has not been established for an application,
-		// an exception is thrown
-		app = modelManager.findApplication(1L);
+		request.getApplication().setVersionId(null);
+		thrown = false;
+		try {
+			response = appMgmtSvc.connectionOpen(request);
+		} catch( WebServiceException wse ) {
+			thrown = true;
+		}
+		Assert.assertTrue("An application that has not set a current version should trigger an exception",thrown);
+	}
+	
+	/**
+	 * Verify that no update is set,
+	 * if there are no deployments
+	 * and the initial version is reported
+	 */ 
+	@Test public void testConnectionOpen_verifyNoUpdateIfOnlyInitialVersion() throws Exception {
+		com.openmeap.model.dto.Application app = modelManager.getModelService().findByPrimaryKey(Application.class,1L);
 		Iterator<Deployment> i = new ArrayList<Deployment>(app.getDeployments()).iterator();
 		while(i.hasNext()) {
 			Deployment d = i.next();
 			modelManager.getModelService().delete(d);
 		}
+		app = modelManager.getModelService().findByPrimaryKey(Application.class,1L);
 		Assert.assertTrue(app.getDeployments().size()==0);
+		Assert.assertTrue(app.getVersions().size()==2);
 		thrown = false;
 		try {
-			response = ams.connectionOpen(req);
+			response = appMgmtSvc.connectionOpen(request);
 		} catch( WebServiceException wse ) {
 			thrown = true;
 		}
-		Assert.assertTrue("An application that has not set a current version should trigger an exception",thrown);
+		Assert.assertTrue("If no deployments have been made, it should be ok, providing the initial version is reported by SLIC.",!thrown);
+		app=modelManager.addModify(app);
+	}
+	
+	/**
+	 * Verify an exception occurs,
+	 * if no deployments have been made
+	 * and a version is reported
+	 */ 
+	@Test public void testConnectionOpen_verifyExceptionOnUndeployedVersion() throws Exception {
+		com.openmeap.model.dto.Application app = modelManager.getModelService().findByPrimaryKey(Application.class,1L);
+		Iterator<Deployment> i = new ArrayList<Deployment>(app.getDeployments()).iterator();
+		while(i.hasNext()) {
+			Deployment d = i.next();
+			modelManager.getModelService().delete(d);
+		}
+		app = modelManager.getModelService().findByPrimaryKey(Application.class,1L);
+		Assert.assertTrue(app.getDeployments().size()==0);
+		Assert.assertTrue(app.getVersions().size()==2);
+		request.getApplication().setVersionId("ApplicationVersion.identifier.1");
+		thrown = false;
+		try {
+			response = appMgmtSvc.connectionOpen(request);
+		} catch( WebServiceException wse ) {
+			thrown = true;
+		}
+		Assert.assertTrue("SLIC reporting an undeployed version should throw an exception",thrown);
 		app=modelManager.addModify(app);
 	}
 }

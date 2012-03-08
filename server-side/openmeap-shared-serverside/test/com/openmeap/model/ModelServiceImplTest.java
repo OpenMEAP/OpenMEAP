@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import com.openmeap.Event;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationVersion;
+import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.service.*;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -87,6 +88,12 @@ public class ModelServiceImplTest {
 	@Test public void testFindAppVersionByNameAndId() {
 		ApplicationVersion app = modelService.findAppVersionByNameAndId("Application.name","ApplicationVersion.identifier.2");
 		Assert.assertTrue(app!=null);
+	}
+	
+	@Test public void testFindDeploymentsByNameAndId() {
+		List<Deployment> deployments = modelService.findDeploymentsByNameAndId("Application.name","ApplicationVersion.identifier.1");
+		Assert.assertTrue(deployments!=null);
+		Assert.assertTrue(deployments.size()==2);
 	}
 	
 	@Test public void testFireEventHandlers() {

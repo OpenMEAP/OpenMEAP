@@ -33,8 +33,8 @@ public class ModelManagerImplTest {
 	}
 	
 	@Test public void testGetLastDeployment() throws Exception {
-		Application app = modelManager.findApplication(1L);
-		Deployment d = modelManager.getLastDeployment(app);
+		Application app = modelManager.getModelService().findByPrimaryKey(Application.class, 1L);
+		Deployment d = modelManager.getModelService().getLastDeployment(app);
 		Assert.assertTrue(d!=null && d.getApplicationVersion().getIdentifier().equals("ApplicationVersion.identifier.2"));
 	}
 	@Test public void testAddModifyApplication() throws Exception {
@@ -72,7 +72,7 @@ public class ModelManagerImplTest {
 		Long id = app.getId();
 		app.setName("Application.2.name_modified");
 		app = modelManager.addModify(app);
-		Application appFound = modelManager.findApplication(id);
+		Application appFound = modelManager.getModelService().findByPrimaryKey(Application.class,id);
 		Assert.assertTrue(appFound.getName().compareTo("Application.2.name_modified")==0);
 	}
 	
@@ -104,7 +104,7 @@ public class ModelManagerImplTest {
 	@Test public void testAddModifyApplicationVersion() throws Exception {
 		
 		Boolean thrown = false;
-		Application app = modelManager.findApplication(1L);
+		Application app = modelManager.getModelService().findByPrimaryKey(Application.class,1L);
 		InvalidPropertiesException e = null;
 		
 		////////////////////////////
@@ -153,41 +153,13 @@ public class ModelManagerImplTest {
 		Assert.assertTrue(e.getMethodMap().get(ApplicationArchive.class.getMethod("getHashAlgorithm"))!=null);
 		Assert.assertTrue(e.getMethodMap().get(ApplicationArchive.class.getMethod("getBytesLength"))!=null);
 	}
-	@Test public void testFindAllApplications() {
-		List<Application> dtl = modelManager.findAllApplications();
-		Assert.assertTrue(dtl.size()==2);
-		for( String toFind : new String[] {"Application.name","Application.2.name_modified"} ) {
-			Boolean found=false;
-			for( Application dt : dtl ) {
-				found = dt.getName().compareTo(toFind)==0;
-				if( found ) break;
-			}
-			Assert.assertTrue("expecting a Application with name "+toFind,found);
-		}		
-	}
 	
-	@Test public void testFindApplicationVersion() {
-		ApplicationVersion version = modelManager.findApplicationVersion(1L);
-		Assert.assertTrue( version.getIdentifier().compareTo("ApplicationVersion.identifier.1")==0 );
-		Assert.assertTrue( modelManager.findApplicationVersion(417L)==null );
-	}
-	@Test public void testFindDeviceByUuid() {
-		ApplicationInstallation dev = modelManager.findAppInstByUuid("Device.uuid.1");
-		Assert.assertTrue(dev!=null);
-		Assert.assertTrue(dev.getApplicationVersion()!=null);
-		Assert.assertTrue(dev.getApplicationVersion().getIdentifier().compareTo("ApplicationVersion.identifier.2")==0);
-		Assert.assertTrue(modelManager.findAppInstByUuid("NOTFOUND")==null);
-	}
-	@Test public void testFindAppVersionByNameAndId() {
-		ApplicationVersion av = modelManager.findAppVersionByNameAndId("Application.name","ApplicationVersion.identifier.1");
-		Assert.assertTrue(av!=null);
-	}
 	@Test public void testAddModifyApplicationInstallation() throws Exception {
 		ApplicationInstallation ai = new ApplicationInstallation();
-		ai.setApplicationVersion( modelManager.findAppVersionByNameAndId("Application.name","ApplicationVersion.identifier.1") );
+		ai.setApplicationVersion( modelManager.getModelService().findAppVersionByNameAndId("Application.name","ApplicationVersion.identifier.1") );
 		ai.setUuid("AppInst.name.1");
 		modelManager.addModify(ai);
-		ai = modelManager.findAppInstByUuid("AppInst.name.1");
+		ai = modelManager.getModelService().findByPrimaryKey(ApplicationInstallation.class,"AppInst.name.1");
 		Assert.assertTrue(ai!=null);
 	}
 	
