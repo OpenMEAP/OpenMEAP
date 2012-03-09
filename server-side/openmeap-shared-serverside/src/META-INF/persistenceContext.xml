@@ -42,6 +42,8 @@
 	<bean id="www_ejb3ConfigFactory" class="com.openmeap.util.Ejb3ConfigurationFactory">
 		<property name="properties">
 			<map>
+				<entry key="OPENMEAP_HIBERNATE_CFG" value="${OPENMEAP_HIBERNATE_CFG}"/>
+			
 				<entry key="OPENMEAP_JPA_SHOWSQL" value="${OPENMEAP_JPA_SHOWSQL}"/>
 				<entry key="OPENMEAP_JPA_GENERATEDDL" value="${OPENMEAP_JPA_GENERATEDDL}"/>
 				<entry key="OPENMEAP_JPA_DIALECT" value="${OPENMEAP_JPA_DIALECT}"/>
@@ -52,6 +54,8 @@
 				<entry key="OPENMEAP_JDBC_PASSWORD" value="${OPENMEAP_JDBC_PASSWORD}"/>
 			</map>
 		</property>
+		<property name="configuration" value="${OPENMEAP_JPA_CONFIGURATION}"/>
+		<property name="targetEnvironment" value="${OPENMEAP_JAVA_ENV}"/>
 	</bean>
 	
 	<bean id="www_ejb3Config" 
