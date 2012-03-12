@@ -36,6 +36,7 @@ import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationInstallation;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.GlobalSettings;
+import com.openmeap.model.event.ModelEntityEventAction;
 import com.openmeap.model.event.ModelEntityModifyEvent;
 
 import java.util.*;
@@ -51,7 +52,7 @@ import com.openmeap.util.*;
 
 public class ModelServiceRefreshNotifier 
 		extends AbstractClusterServiceMgmtNotifier<ModelEntity>
-		implements ModelServiceEventNotifier, ApplicationContextAware {
+		implements ModelServiceEventNotifier<ModelEntity>, ApplicationContextAware {
 
 	private Logger logger = LoggerFactory.getLogger(ModelServiceRefreshNotifier.class);
 	private String configBeanName;
@@ -59,7 +60,7 @@ public class ModelServiceRefreshNotifier
 	
 	@Override
 	public Boolean notifiesFor(ModelServiceOperation operation, ModelEntity payload) {
-		if(operation==ModelServiceOperation.REFRESH) {
+		if(operation==ModelServiceOperation.SAVE_OR_UPDATE) {
 			return true;
 		}
 		return false;
@@ -104,7 +105,7 @@ public class ModelServiceRefreshNotifier
 		else return;
 		
 		Map<String,Object> parms = new HashMap<String,Object>();
-		parms.put(UrlParamConstants.ACTION, ModelEntityModifyEvent.NAME);
+		parms.put(UrlParamConstants.ACTION, ModelEntityEventAction.MODEL_REFRESH.getActionName());
 		parms.put(UrlParamConstants.AUTH_TOKEN, newAuthToken());
 		parms.put(UrlParamConstants.REFRESH_TYPE, simpleName);
 		parms.put(UrlParamConstants.REFRESH_OBJ_PKID, obj.getPk());

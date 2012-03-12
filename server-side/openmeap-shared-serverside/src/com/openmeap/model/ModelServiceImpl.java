@@ -65,42 +65,33 @@ public class ModelServiceImpl implements ModelService
 		T obj2Persist = obj;
 		try {
 			entityManager.getTransaction().begin();
-			
 			// if we haven't loaded this object yet,
 			// then attempt to do so
 			if( ! entityManager.contains(obj2Persist) ) {
 				obj2Persist = entityManager.merge(obj);
 			}
-			
 			entityManager.persist(obj2Persist);
 			entityManager.getTransaction().commit();
-			this.refresh(obj2Persist);
-			
+			this._refresh(obj2Persist);
 		} catch( PersistenceException pe ) {
 			if( entityManager.isOpen() && entityManager.getTransaction().isActive() ) {
 				entityManager.getTransaction().rollback();
 			}
 			throw new PersistenceException(pe);
 		}
+		callEventNotifiers(ModelServiceOperation.SAVE_OR_UPDATE,obj2Persist);
 		return obj2Persist;
 	}
 
 	public <T extends ModelEntity> void refresh(T obj2Refresh) throws PersistenceException {
-		if( !entityManager.contains(obj2Refresh) )
-			entityManager.merge(obj2Refresh);
-		entityManager.refresh(obj2Refresh);
-		
+		this._refresh(obj2Refresh);
 		callEventNotifiers(ModelServiceOperation.REFRESH,obj2Refresh);
 	}
 	
-	public <T extends ModelEntity> void delete(T obj2Delete) throws PersistenceException {
-		
-		// give the event notifiers an opportunity to act, prior to deletion
-		callEventNotifiers(ModelServiceOperation.DELETE,obj2Delete);
-		
+	public <T extends ModelEntity> void delete(T obj2Delete) throws PersistenceException {		
 		try {
 			entityManager.getTransaction().begin();
-			this.refresh(obj2Delete);
+			this._refresh(obj2Delete);
 			obj2Delete.remove();
 			entityManager.remove(obj2Delete);
 			entityManager.getTransaction().commit();
@@ -110,6 +101,8 @@ public class ModelServiceImpl implements ModelService
 			}
 			throw new PersistenceException(pe);
 		}			
+		// give the event notifiers an opportunity to act, prior to deletion
+		callEventNotifiers(ModelServiceOperation.DELETE,obj2Delete);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -205,6 +198,13 @@ public class ModelServiceImpl implements ModelService
 		} catch( NoResultException nre ) {
 			return null;
 		}
+	}
+	
+	private void _refresh(ModelEntity obj2Refresh) {
+		if( !entityManager.contains(obj2Refresh) ) {
+			entityManager.merge(obj2Refresh);
+		}
+		entityManager.refresh(obj2Refresh);
 	}
 	
 	private void callEventNotifiers(ModelServiceOperation op, ModelEntity obj2ActOn) {

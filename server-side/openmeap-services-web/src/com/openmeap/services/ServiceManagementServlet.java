@@ -120,7 +120,7 @@ public class ServiceManagementServlet extends HttpServlet {
 			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings, request);
 			handleArchiveEvent(archiveDeleteHandler, new ArchiveDeleteNotifiedEvent(paramMap), os, paramMap);
 			
-		} else if( action.equals(ModelEntityModifyEvent.NAME) ) {
+		} else if( action.equals(ModelEntityEventAction.MODEL_REFRESH.getActionName()) ) {
 			
 			refresh(os,request,response);
 			

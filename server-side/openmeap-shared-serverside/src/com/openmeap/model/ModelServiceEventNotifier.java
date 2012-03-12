@@ -30,7 +30,7 @@ import com.openmeap.EventNotifier;
  * 
  * @author schang
  */
-public interface ModelServiceEventNotifier extends EventNotifier<ModelEntity> {
+public interface ModelServiceEventNotifier<T extends ModelEntity> extends EventNotifier<T> {
 	/**
 	 * @param operation
 	 * @return true if the event notifier should be executed on a specific operation and payload, else false

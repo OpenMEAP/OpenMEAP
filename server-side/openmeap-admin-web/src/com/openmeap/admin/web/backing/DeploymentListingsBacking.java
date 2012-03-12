@@ -141,12 +141,18 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 		Integer lengthToMaintain = app.getDeploymentHistoryLength();
 		List<Deployment> deployments = app.getDeployments();
 		if( deployments!=null && deployments.size()>lengthToMaintain ) {
+			
 			Integer currentSize = deployments.size();
+			
 			List<Deployment> newDeployments = new ArrayList<Deployment>(deployments.subList(currentSize-lengthToMaintain,currentSize));
 			List<Deployment> oldDeployments = deployments.subList(0,currentSize-lengthToMaintain);
-			app.setDeployments(newDeployments);
+			
 			for( Deployment deployment : oldDeployments ) {
 				modelManager.getModelService().delete(deployment);
+			}
+			
+			for( Deployment deployment : newDeployments ) {
+				app.getDeployments().add(deployment);
 			}
 		}
 	}

@@ -55,7 +55,8 @@ public class ApplicationArchive extends AbstractModelEntity {
 	private ApplicationVersion version;
 	private Integer bytesLength;
 	private Integer bytesLengthUncompressed;
-	
+	private Boolean newFileUploaded = Boolean.FALSE;
+
 	final static public String URL_TEMPLATE = "${globalSettings.externalServiceUrlPrefix}/"+ServletNameConstants.APPLICATION_MANAGEMENT
 		+"/?"+UrlParamConstants.ACTION+"=archiveDownload"
 		+"&"+UrlParamConstants.APP_NAME+"=${appName}"
@@ -123,6 +124,7 @@ public class ApplicationArchive extends AbstractModelEntity {
 	}
 	
 	@Transient private String substituteArchiveVariables(GlobalSettings settings,String url) {
+		
 		String externalServiceUrlPrefix = settings.getExternalServiceUrlPrefix();
 		String authSalt = this.getVersion().getApplication().getProxyAuthSalt();
 		String newAuthToken = AuthTokenProvider.newAuthToken(authSalt!=null?authSalt:"");
@@ -208,6 +210,14 @@ public class ApplicationArchive extends AbstractModelEntity {
 	}
 	public void setBytesLengthUncompressed(Integer bytesLength) {
 		bytesLengthUncompressed = bytesLength;
+	}
+	
+	@Transient
+	public Boolean getNewFileUploaded() {
+		return newFileUploaded;
+	}
+	public void setNewFileUploaded(Boolean newFileUploaded) {
+		this.newFileUploaded = newFileUploaded;
 	}
 	
 	public Map<Method,String> validate() {

@@ -114,10 +114,14 @@ public class ApplicationVersionListingsBacking extends AbstractTemplatedSectionB
 		Map<String,String> downloadUrls = new HashMap<String,String>();
 		Map<String,String> viewUrls = new HashMap<String,String>();
 		for( ApplicationVersion version : app.getVersions().values() ) {
-			downloadUrls.put(version.getIdentifier(), version.getArchive().getDownloadUrl(settings));
-			File exploded = version.getArchive().getExplodedPath(settings.getTemporaryStoragePath());
-			if( exploded!=null && exploded.exists() ) {
-				viewUrls.put(version.getIdentifier(), version.getArchive().getViewUrl(settings));
+			if( version.getArchive()==null ) {
+				viewUrls.put(version.getIdentifier(), "");
+			} else {
+				downloadUrls.put(version.getIdentifier(), version.getArchive().getDownloadUrl(settings));
+				File exploded = version.getArchive().getExplodedPath(settings.getTemporaryStoragePath());
+				if( exploded!=null && exploded.exists() ) {
+					viewUrls.put(version.getIdentifier(), version.getArchive().getViewUrl(settings));
+				}
 			}
 		}
 		templateVariables.put("downloadUrls",downloadUrls);

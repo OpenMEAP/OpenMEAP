@@ -25,6 +25,7 @@
 package com.openmeap.model.event;
 
 public enum ModelEntityEventAction {
+	DEPLOYMENT_DELETE("deploymentDeleteEvent"),
 	ARCHIVE_DELETE("archiveDeleteEvent"),
 	ARCHIVE_UPLOAD("archiveUploadEvent"),
 	MODEL_REFRESH("refresh");

@@ -34,6 +34,7 @@
 		<property name="eventNotifiers">
 			<list>
 				<ref bean="modelServiceRefreshNotifier"/>
+				<ref bean="deploymentDeleteNotifier"/>
 			</list>
 		</property>
 	</bean>

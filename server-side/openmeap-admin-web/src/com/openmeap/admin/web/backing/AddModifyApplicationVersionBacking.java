@@ -61,6 +61,7 @@ import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.model.event.ArchiveUploadEvent;
+import com.openmeap.model.event.ModelEntityEvent;
 import com.openmeap.model.event.notifier.ArchiveUploadNotifier;
 import com.openmeap.web.*;
 
@@ -250,9 +251,6 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		}
 		
 		version.setApplication(app);
-		/*if( app.getVersions()==null )
-			app.setVersions(new HashMap<String,ApplicationVersion>());
-		app.getVersions().put(version.getIdentifier(), version);*/
 		
 		version.setNotes(firstValue("notes",parameterMap));
 		
@@ -291,6 +289,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	private ApplicationArchive createApplicationArchiveFromFileItem(ApplicationArchive archive, FileItem item, List<ProcessingEvent> events) {
 		
 		GlobalSettings settings = modelManager.getGlobalSettings();
@@ -341,6 +340,18 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 			}
 			
 			File newFile = archive.getFile(settings.getTemporaryStoragePath());
+			if( newFile.exists() && !newFile.delete() ) {
+				String mesg = String.format("Failed to delete old file %s",newFile.getName());
+				logger.error(mesg);
+				events.add(new MessagesEvent(mesg));
+				if( ! tempFile.delete() ) {
+					mesg = String.format("Failed to delete temporary file %s",tempFile.getName());
+					logger.error(mesg);
+					events.add(new MessagesEvent(mesg));	
+				}
+				return null;
+			}
+			
 			if( tempFile.renameTo(newFile) ) {
 				
 				String mesg = String.format("Uploaded temporary file %s successfully renamed to %s",tempFile.getName(),newFile.getName());
@@ -386,8 +397,10 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		// TODO: make all parameters of this url into a template and have that default template specified in the Application
 		archive.setUrl(ApplicationArchive.URL_TEMPLATE);
 		
+		archive.setNewFileUploaded(true);
+		
 		try {
-			archiveUploadNotifier.notify(new ArchiveUploadEvent(archive));
+			archiveUploadNotifier.notify( new ModelEntityEvent(ModelServiceOperation.SAVE_OR_UPDATE,archive) );
 		} catch (Exception e) {
 			logger.error("An exception occurred pushing the new archive to cluster nodes: {}",e);
 			events.add(new MessagesEvent(String.format("An exception occurred while calculating the uncompressed size of the archive: %s",e.getMessage())));

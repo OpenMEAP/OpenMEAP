@@ -28,12 +28,12 @@ import com.openmeap.AbstractEvent;
 import com.openmeap.model.ModelEntity;
 import com.openmeap.model.ModelServiceOperation;
 
-public class ModelEntityEvent extends AbstractEvent<ModelEntity> {
+public class ModelEntityEvent<T extends ModelEntity> extends AbstractEvent<T> {
 	
 	private static final long serialVersionUID = 7401170880417711172L;
 	private ModelServiceOperation operation;
 	
-	public ModelEntityEvent(ModelServiceOperation operation, ModelEntity payload) {
+	public ModelEntityEvent(ModelServiceOperation operation, T payload) {
 		super(payload);
 		this.operation = operation;
 	}

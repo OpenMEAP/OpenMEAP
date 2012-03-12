@@ -26,26 +26,40 @@ package com.openmeap.model.event.notifier;
 
 import java.util.Map;
 
+import com.openmeap.Event;
+import com.openmeap.cluster.ClusterNotificationException;
 import com.openmeap.constants.UrlParamConstants;
 import com.openmeap.model.ModelEntity;
 import com.openmeap.model.ModelServiceOperation;
 import com.openmeap.model.dto.ApplicationArchive;
-import com.openmeap.model.event.ArchiveUploadEvent;
 import com.openmeap.model.event.ModelEntityEventAction;
 
 public class ArchiveUploadNotifier extends AbstractArchiveEventNotifier {	
-	protected String getArchiveEventActionName() {
+	
+	@Override
+	protected String getEventActionName() {
 		return ModelEntityEventAction.ARCHIVE_UPLOAD.getActionName();
 	}
-	protected void addRequestParameters(ApplicationArchive archive, Map<String,Object> parms) {
+	
+	@Override
+	protected void addRequestParameters(ModelEntity modelEntity, Map<String,Object> parms) {
+		ApplicationArchive archive = (ApplicationArchive)modelEntity;
 		parms.put(UrlParamConstants.APPARCH_FILE, archive.getFile(getModelManager().getGlobalSettings().getTemporaryStoragePath()));
 	}
+	
 	@Override
-	public Boolean notifiesFor(ModelServiceOperation operation,
-			ModelEntity payload) {
+	public Boolean notifiesFor(ModelServiceOperation operation, ModelEntity payload) {
 		if(operation==ModelServiceOperation.SAVE_OR_UPDATE && ApplicationArchive.class.isAssignableFrom(payload.getClass()) ) {
 			return true;
 		}
 		return false;
+	}
+	
+	@Override
+	public <E extends Event<ApplicationArchive>> void notify(final E event) throws ClusterNotificationException {
+		ApplicationArchive archive = (ApplicationArchive)event.getPayload();
+		if( archive.getNewFileUploaded() ) {
+			super.notify(event);
+		}
 	}
 }

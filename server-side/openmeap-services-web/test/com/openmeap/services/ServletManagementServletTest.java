@@ -37,6 +37,7 @@ import org.w3c.dom.*;
 import com.openmeap.services.ServiceManagementServlet;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.GlobalSettings;
+import com.openmeap.model.event.ModelEntityEventAction;
 import com.openmeap.model.event.ModelEntityModifyEvent;
 import com.openmeap.model.event.handler.ModelServiceRefreshHandler;
 import com.openmeap.util.AuthTokenProvider;
@@ -95,7 +96,7 @@ public class ServletManagementServletTest {
 		request.setParameter(UrlParamConstants.REFRESH_TYPE, "Application");
 		request.setParameter(UrlParamConstants.REFRESH_OBJ_PKID, "1");
 		request.setParameter(UrlParamConstants.AUTH_TOKEN, authToken);
-		request.setParameter(UrlParamConstants.ACTION, ModelEntityModifyEvent.NAME);
+		request.setParameter(UrlParamConstants.ACTION, ModelEntityEventAction.MODEL_REFRESH.getActionName());
 		servlet.service(request,response);
 		String contentString = response.getContentAsString();
 		Document result = Utils.getDocument(new ByteArrayInputStream(contentString.getBytes()));
@@ -108,7 +109,7 @@ public class ServletManagementServletTest {
 		app.setName(randomUuid);
 		response = new MockHttpServletResponse();
 		request.removeParameter(UrlParamConstants.AUTH_TOKEN);
-		request.setParameter(UrlParamConstants.ACTION,ModelEntityModifyEvent.NAME);
+		request.setParameter(UrlParamConstants.ACTION,ModelEntityEventAction.MODEL_REFRESH.getActionName());
 		request.setParameter(UrlParamConstants.REFRESH_TYPE, "Application");
 		request.setParameter(UrlParamConstants.REFRESH_OBJ_PKID, "1");
 		servlet.service(request,response);

@@ -32,13 +32,12 @@ import com.openmeap.model.event.ModelEntityEventAction;
 public class ArchiveDeleteNotifier extends AbstractArchiveEventNotifier {
 	
 	@Override 
-	protected String getArchiveEventActionName() {
+	protected String getEventActionName() {
 		return ModelEntityEventAction.ARCHIVE_DELETE.getActionName();
 	}
 
 	@Override
-	public Boolean notifiesFor(ModelServiceOperation operation,
-			ModelEntity payload) {
+	public Boolean notifiesFor(ModelServiceOperation operation, ModelEntity payload) {
 		if(operation==ModelServiceOperation.DELETE && ApplicationArchive.class.isAssignableFrom(payload.getClass()) ) {
 			return true;
 		}

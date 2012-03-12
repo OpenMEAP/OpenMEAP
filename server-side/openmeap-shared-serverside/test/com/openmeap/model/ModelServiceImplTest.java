@@ -99,7 +99,7 @@ public class ModelServiceImplTest {
 	
 	@Test public void testFireEventHandlers() {
 		List<ModelServiceEventNotifier> handlers = new ArrayList<ModelServiceEventNotifier>();
-		class MockUpdateNotifier implements ModelServiceEventNotifier {
+		class MockUpdateNotifier implements ModelServiceEventNotifier<ModelEntity> {
 			public Boolean eventFired = false;
 			public Boolean getEventFired() {
 				return eventFired;

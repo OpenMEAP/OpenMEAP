@@ -52,9 +52,9 @@ abstract public class ZipUtils {
 		BufferedOutputStream dest = null;
 		BufferedInputStream is = null;
 
-		if( ! destinationDir.exists() ) {
+		if( !destinationDir.exists() ) {
 			destinationDir.mkdir();
-		}
+		} 
 		
 		ZipEntry entry;
 		@SuppressWarnings("rawtypes")
