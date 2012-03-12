@@ -22,14 +22,23 @@
  ###############################################################################
  */
 
-package com.openmeap.model;
+package com.openmeap.model.event;
 
-import com.openmeap.EventHandler;
+import com.openmeap.AbstractEvent;
+import com.openmeap.model.ModelEntity;
+import com.openmeap.model.ModelServiceOperation;
 
-/**
- * Serves as a base for ModelService event handling classes
- * @author schang
- */
-public interface ModelServiceEventHandler extends EventHandler<ModelEntity> {
-	// TODO: i'm not sure that i can really justify this interface
+public class ModelEntityEvent extends AbstractEvent<ModelEntity> {
+	
+	private static final long serialVersionUID = 7401170880417711172L;
+	private ModelServiceOperation operation;
+	
+	public ModelEntityEvent(ModelServiceOperation operation, ModelEntity payload) {
+		super(payload);
+		this.operation = operation;
+	}
+	
+	public ModelServiceOperation getOperation() {
+		return this.operation;
+	}
 }

@@ -48,7 +48,13 @@ import com.openmeap.constants.UrlParamConstants;
 import com.openmeap.model.*;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.GlobalSettings;
-import com.openmeap.model.service.*;
+import com.openmeap.model.event.ArchiveDeleteEvent;
+import com.openmeap.model.event.ArchiveDeleteNotifiedEvent;
+import com.openmeap.model.event.ArchiveUploadEvent;
+import com.openmeap.model.event.ArchiveUploadNotifiedEvent;
+import com.openmeap.model.event.ModelEntityEventAction;
+import com.openmeap.model.event.ModelEntityModifyEvent;
+import com.openmeap.model.event.handler.*;
 import com.openmeap.util.AuthTokenProvider;
 import static com.openmeap.util.ParameterMapUtils.*;
 import com.openmeap.util.ServletUtils;
@@ -102,13 +108,13 @@ public class ServiceManagementServlet extends HttpServlet {
 			
 			clearPersistenceContext();
 			
-		} else if( action.equals(ArchiveUploadEvent.NAME) ) {
+		} else if( action.equals(ModelEntityEventAction.ARCHIVE_UPLOAD.getActionName()) ) {
 			
 			GlobalSettings settings = modelManager.getGlobalSettings();
 			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings, request);
 			handleArchiveEvent(archiveUploadHandler, new ArchiveUploadNotifiedEvent(paramMap), os, paramMap);
 			
-		} else if( action.equals(ArchiveDeleteEvent.NAME) ) {
+		} else if( action.equals(ModelEntityEventAction.ARCHIVE_DELETE.getActionName()) ) {
 			
 			GlobalSettings settings = modelManager.getGlobalSettings();
 			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings, request);

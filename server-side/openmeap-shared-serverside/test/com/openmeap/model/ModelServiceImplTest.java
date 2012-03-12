@@ -8,7 +8,8 @@ import com.openmeap.Event;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.Deployment;
-import com.openmeap.model.service.*;
+import com.openmeap.model.event.handler.*;
+
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -106,6 +107,11 @@ public class ModelServiceImplTest {
 			@Override
 			public <E extends Event<ModelEntity>> void notify(E event) {
 				eventFired = true;
+			}
+			@Override
+			public Boolean notifiesFor(ModelServiceOperation operation,
+					ModelEntity payload) {
+				return true;
 			}
 		};	
 		handlers.add(new MockUpdateNotifier());

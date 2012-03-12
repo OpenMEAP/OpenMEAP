@@ -60,7 +60,8 @@ import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.GlobalSettings;
-import com.openmeap.model.service.ArchiveUploadNotifier;
+import com.openmeap.model.event.ArchiveUploadEvent;
+import com.openmeap.model.event.notifier.ArchiveUploadNotifier;
 import com.openmeap.web.*;
 
 // TODO: there are way to many things going on in this class

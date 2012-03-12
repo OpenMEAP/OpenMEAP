@@ -22,19 +22,56 @@
  ###############################################################################
  */
 
-package com.openmeap.model.service;
+package com.openmeap.model.event.handler;
 
 import java.util.Map;
 
-import com.openmeap.constants.UrlParamConstants;
-import com.openmeap.model.ArchiveUploadEvent;
-import com.openmeap.model.dto.ApplicationArchive;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class ArchiveUploadNotifier extends AbstractArchiveEventNotifier {	
-	protected String getArchiveEventActionName() {
-		return ArchiveUploadEvent.NAME;
+import com.openmeap.Event;
+import com.openmeap.model.ModelEntity;
+import com.openmeap.model.ModelManager;
+import com.openmeap.model.ModelServiceEventHandler;
+
+public class ModelServiceRefreshHandler implements ModelServiceEventHandler {
+	
+	private Logger logger = LoggerFactory.getLogger(ModelServiceRefreshHandler.class);
+	
+	private ModelManager modelManager = null;
+	
+	public void setModelManager(ModelManager manager) {
+		modelManager = manager;
 	}
-	protected void addRequestParameters(ApplicationArchive archive, Map<String,Object> parms) {
-		parms.put(UrlParamConstants.APPARCH_FILE, archive.getFile(getModelManager().getGlobalSettings().getTemporaryStoragePath()));
+	public ModelManager getModelManager() {
+		return modelManager;
 	}
+	
+	@Override
+	public <E extends Event<ModelEntity>> void handle(E event) {
+		if( event.getPayload()!=null ) {
+			ModelEntity payload = event.getPayload(); 
+			try {
+				handleRefresh(event.getPayload().getClass().getSimpleName(), event.getPayload().getPk().toString());
+			} catch (ClassNotFoundException e) {
+				logger.error("{}",e);
+			}
+		}
+	}
+	
+	public Boolean handleRefresh(String refreshType, String objectId) throws ClassNotFoundException {
+			
+		Object id=null;
+		if( refreshType.equals("ApplicationInstallation") )
+			id = objectId;
+		else id = Long.valueOf(objectId);
+
+		@SuppressWarnings("unchecked")
+		Class<ModelEntity> clazz = (Class<ModelEntity>)Class.forName("com.openmeap.model.dto."+refreshType);
+		ModelEntity app = (ModelEntity)modelManager.getModelService().findByPrimaryKey(clazz, id);
+		
+		modelManager.getModelService().refresh(app);
+		return true;	
+	}
+
 }

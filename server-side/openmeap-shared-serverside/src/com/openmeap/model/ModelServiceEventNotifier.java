@@ -26,6 +26,14 @@ package com.openmeap.model;
 
 import com.openmeap.EventNotifier;
 
+/**
+ * 
+ * @author schang
+ */
 public interface ModelServiceEventNotifier extends EventNotifier<ModelEntity> {
-	// TODO: i'm not sure that i can really justify this interface
+	/**
+	 * @param operation
+	 * @return true if the event notifier should be executed on a specific operation and payload, else false
+	 */
+	Boolean notifiesFor(ModelServiceOperation operation, ModelEntity payload);
 }

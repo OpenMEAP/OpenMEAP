@@ -22,7 +22,7 @@
  ###############################################################################
  */
 
-package com.openmeap.model.service;
+package com.openmeap.model.event.handler;
 
 import java.io.File;
 import java.lang.reflect.Method;

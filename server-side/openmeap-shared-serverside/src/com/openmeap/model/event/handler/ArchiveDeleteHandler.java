@@ -1,4 +1,4 @@
-package com.openmeap.model.service;
+package com.openmeap.model.event.handler;
 
 import java.util.Map;
 

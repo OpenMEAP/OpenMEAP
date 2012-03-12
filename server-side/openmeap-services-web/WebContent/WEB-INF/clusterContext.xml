@@ -33,15 +33,15 @@
 		<constructor-arg ref="modelManager"/>
 	</bean>
 	
-	<bean id="modelServiceRefreshHandler" class="com.openmeap.model.service.ModelServiceRefreshHandler">
+	<bean id="modelServiceRefreshHandler" class="com.openmeap.model.event.handler.ModelServiceRefreshHandler">
 		<property name="modelManager" ref="modelManager"/>
 	</bean>
 	
-	<bean id="archiveUploadHandler" class="com.openmeap.model.service.ArchiveUploadHandler">
+	<bean id="archiveUploadHandler" class="com.openmeap.model.event.handler.ArchiveUploadHandler">
 		<property name="modelManager" ref="modelManager"/>
 	</bean>
 	
-	<bean id="archiveDeleteHandler" class="com.openmeap.model.service.ArchiveDeleteHandler">
+	<bean id="archiveDeleteHandler" class="com.openmeap.model.event.handler.ArchiveDeleteHandler">
 		<property name="modelManager" ref="modelManager"/>
 	</bean>
 	

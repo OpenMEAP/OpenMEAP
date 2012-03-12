@@ -22,26 +22,14 @@
  ###############################################################################
  */
 
-package com.openmeap.model;
+package com.openmeap.model.event;
 
-import com.openmeap.Event;
+import com.openmeap.model.ModelServiceOperation;
+import com.openmeap.model.dto.ApplicationArchive;
 
-@SuppressWarnings("serial")
-abstract public class AbstractEvent<T> implements Event<T> {
-		
-	private T payload = null;
-	
-	public AbstractEvent(T payload) {
-		setPayload(payload);
-	}
-	
-	@Override
-	public void setPayload(T object) {
-		payload = object;
-	}
-
-	@Override
-	public T getPayload() {
-		return payload;
+public class ArchiveUploadEvent extends ModelEntityEvent {
+	private static final long serialVersionUID = -4389253160307376753L;
+	public ArchiveUploadEvent(ApplicationArchive payload) {
+		super(ModelServiceOperation.SAVE_OR_UPDATE,payload);
 	}
 }

@@ -22,14 +22,19 @@
  ###############################################################################
  */
 
-package com.openmeap.model;
+package com.openmeap.model.event;
 
-import com.openmeap.EventHandler;
-
-/**
- * Serves as a base for ModelService event handling classes
- * @author schang
- */
-public interface ModelServiceEventHandler extends EventHandler<ModelEntity> {
-	// TODO: i'm not sure that i can really justify this interface
+public enum ModelEntityEventAction {
+	ARCHIVE_DELETE("archiveDeleteEvent"),
+	ARCHIVE_UPLOAD("archiveUploadEvent"),
+	MODEL_REFRESH("refresh");
+	
+	private String actionName=null;
+	
+	private ModelEntityEventAction(String urlActionName) {
+		this.actionName = urlActionName;
+	}
+	public String getActionName() {
+		return this.actionName;
+	}
 }

@@ -22,7 +22,7 @@
  ###############################################################################
  */
 
-package com.openmeap.model.service;
+package com.openmeap.model.event.notifier;
 
 import com.openmeap.Event;
 import com.openmeap.cluster.AbstractClusterServiceMgmtNotifier;
@@ -36,6 +36,7 @@ import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationInstallation;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.GlobalSettings;
+import com.openmeap.model.event.ModelEntityModifyEvent;
 
 import java.util.*;
 import java.net.*;
@@ -55,6 +56,14 @@ public class ModelServiceRefreshNotifier
 	private Logger logger = LoggerFactory.getLogger(ModelServiceRefreshNotifier.class);
 	private String configBeanName;
 	private ApplicationContext applicationContext;
+	
+	@Override
+	public Boolean notifiesFor(ModelServiceOperation operation, ModelEntity payload) {
+		if(operation==ModelServiceOperation.REFRESH) {
+			return true;
+		}
+		return false;
+	}
 	
 	@Override
 	protected void onBeforeNotify(final Event<ModelEntity> event) {
@@ -130,5 +139,4 @@ public class ModelServiceRefreshNotifier
 	public void setConfigBeanName(String configBeanName) {
 		this.configBeanName = configBeanName;
 	}
-
 }

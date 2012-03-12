@@ -22,15 +22,30 @@
  ###############################################################################
  */
 
-package com.openmeap.model;
+package com.openmeap.model.event.notifier;
 
-public class ModelEntityModifyEvent extends AbstractEvent<ModelEntity> {
+import java.util.Map;
 
-	final static public String NAME = "refresh";
-	
-	private static final long serialVersionUID = 5825309477564008214L;
-	
-	public ModelEntityModifyEvent(ModelEntity payload) {
-		super(payload);
+import com.openmeap.constants.UrlParamConstants;
+import com.openmeap.model.ModelEntity;
+import com.openmeap.model.ModelServiceOperation;
+import com.openmeap.model.dto.ApplicationArchive;
+import com.openmeap.model.event.ArchiveUploadEvent;
+import com.openmeap.model.event.ModelEntityEventAction;
+
+public class ArchiveUploadNotifier extends AbstractArchiveEventNotifier {	
+	protected String getArchiveEventActionName() {
+		return ModelEntityEventAction.ARCHIVE_UPLOAD.getActionName();
+	}
+	protected void addRequestParameters(ApplicationArchive archive, Map<String,Object> parms) {
+		parms.put(UrlParamConstants.APPARCH_FILE, archive.getFile(getModelManager().getGlobalSettings().getTemporaryStoragePath()));
+	}
+	@Override
+	public Boolean notifiesFor(ModelServiceOperation operation,
+			ModelEntity payload) {
+		if(operation==ModelServiceOperation.SAVE_OR_UPDATE && ApplicationArchive.class.isAssignableFrom(payload.getClass()) ) {
+			return true;
+		}
+		return false;
 	}
 }

@@ -31,7 +31,9 @@ import com.openmeap.cluster.ClusterNotificationException;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.Deployment;
-import com.openmeap.model.service.*;
+import com.openmeap.model.event.ModelEntityEvent;
+import com.openmeap.model.event.ModelEntityModifyEvent;
+import com.openmeap.model.event.handler.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,27 +90,14 @@ public class ModelServiceImpl implements ModelService
 			entityManager.merge(obj2Refresh);
 		entityManager.refresh(obj2Refresh);
 		
-		// if there are any web-servers out there to notify of the update,
-		// then do so
-		if( eventNotifiers!=null ) {
-			for( ModelServiceEventNotifier handler : eventNotifiers ) {
-				try {
-					handler.notify(new ModelEntityModifyEvent(obj2Refresh));
-				} catch( EventNotificationException e ) {
-					/* TODO: in order to handle this elegantly, i need to convert this whole interface
-					 * to accept request objects and return response objects,
-					 * as I do not want to simply throw these exceptions, but rather
-					 * alert the user.
-					 * 
-					 * Perhaps I should have a more global event system?
-					 */
-					logger.error(String.format("EventNotificationException occurred: %s",e.getMessage()));
-				}
-			}
-		}
+		callEventNotifiers(ModelServiceOperation.REFRESH,obj2Refresh);
 	}
 	
 	public <T extends ModelEntity> void delete(T obj2Delete) throws PersistenceException {
+		
+		// give the event notifiers an opportunity to act, prior to deletion
+		callEventNotifiers(ModelServiceOperation.DELETE,obj2Delete);
+		
 		try {
 			entityManager.getTransaction().begin();
 			this.refresh(obj2Delete);
@@ -215,6 +204,29 @@ public class ModelServiceImpl implements ModelService
 			return (Deployment)o;
 		} catch( NoResultException nre ) {
 			return null;
+		}
+	}
+	
+	private void callEventNotifiers(ModelServiceOperation op, ModelEntity obj2ActOn) {
+		// if there are any web-servers out there to notify of the update,
+		// then do so
+		if( eventNotifiers!=null ) {
+			for( ModelServiceEventNotifier handler : eventNotifiers ) {
+				try {
+					if( handler.notifiesFor(op,obj2ActOn) ) {
+						handler.notify( new ModelEntityEvent(op,obj2ActOn) );
+					}
+				} catch( EventNotificationException e ) {
+					/* TODO: in order to handle this elegantly, i need to convert this whole interface
+					 * to accept request objects and return response objects,
+					 * as I do not want to simply throw these exceptions, but rather
+					 * alert the user.
+					 * 
+					 * Perhaps I should have a more global event system?
+					 */
+					logger.error(String.format("EventNotificationException occurred: %s",e.getMessage()));
+				}
+			}
 		}
 	}
 }

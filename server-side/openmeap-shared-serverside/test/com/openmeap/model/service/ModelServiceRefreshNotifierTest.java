@@ -8,6 +8,8 @@ import java.net.*;
 import com.openmeap.cluster.ClusterServiceNotifierConfig;
 import com.openmeap.model.*;
 import com.openmeap.model.dto.Application;
+import com.openmeap.model.event.ModelEntityModifyEvent;
+import com.openmeap.model.event.notifier.ModelServiceRefreshNotifier;
 import com.openmeap.util.*;
 
 public class ModelServiceRefreshNotifierTest {

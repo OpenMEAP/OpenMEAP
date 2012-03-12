@@ -33,14 +33,14 @@
 		<constructor-arg ref="modelManager"/>
 	</bean>
 	
-	<bean id="modelServiceRefreshNotifier" class="com.openmeap.model.service.ModelServiceRefreshNotifier">
+	<bean id="modelServiceRefreshNotifier" class="com.openmeap.model.event.notifier.ModelServiceRefreshNotifier">
 		<property name="configBeanName" value="clusterServiceNotifierConfig"/>
 		<property name="httpRequestExecuter">
 			<bean class="com.openmeap.util.HttpRequestExecuterFactory" factory-method="newDefault"/>
 		</property>
 	</bean>
 	
-	<bean id="archiveUploadNotifier" class="com.openmeap.model.service.ArchiveUploadNotifier">
+	<bean id="archiveUploadNotifier" class="com.openmeap.model.event.notifier.ArchiveUploadNotifier">
 		<property name="modelManager" ref="modelManager"/>
 		<property name="config" ref="clusterServiceNotifierConfig"/>
 		<property name="httpRequestExecuter">
@@ -48,7 +48,7 @@
 		</property>
 	</bean>
 	
-	<bean id="archiveDeleteNotifier" class="com.openmeap.model.service.ArchiveDeleteNotifier">
+	<bean id="archiveDeleteNotifier" class="com.openmeap.model.event.notifier.ArchiveDeleteNotifier">
 		<property name="modelManager" ref="modelManager"/>
 		<property name="config" ref="clusterServiceNotifierConfig"/>
 		<property name="httpRequestExecuter">

@@ -22,17 +22,20 @@
  ###############################################################################
  */
 
-package com.openmeap.model;
+package com.openmeap.model.event;
 
-import com.openmeap.model.dto.ApplicationArchive;
+import java.util.Map;
 
-public class ArchiveUploadEvent extends AbstractEvent<ApplicationArchive> {
+import com.openmeap.AbstractEvent;
 
-	final static public String NAME = "archiveUploadEvent";
+@SuppressWarnings("rawtypes")
+public class ArchiveDeleteNotifiedEvent extends AbstractEvent<Map> {
+		
+	final static public String NAME = "archiveDeleteNotifiedEvent";
+
+	private static final long serialVersionUID = -8871542806763550102L;
 	
-	private static final long serialVersionUID = -4389253160307376753L;
-	
-	public ArchiveUploadEvent(ApplicationArchive payload) {
+	public ArchiveDeleteNotifiedEvent(Map payload) {
 		super(payload);
 	}
 }

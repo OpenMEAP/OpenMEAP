@@ -31,6 +31,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -113,16 +114,18 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 			}
 		}
 		
+		// making sure to order the deployments by date
 		if( app!=null && app.getDeployments()!=null ) {
-			((ModelServiceImpl)modelManager.getModelService()).getEntityManager().getTransaction().begin();
-			((ModelServiceImpl)modelManager.getModelService()).getEntityManager().merge(app);
+			EntityManager entityManager = ((ModelServiceImpl)modelManager.getModelService()).getEntityManager(); 
+			entityManager.getTransaction().begin();
+			entityManager.merge(app);
 			List<Deployment> depls = app.getDeployments();
 			Collections.sort( depls, new Comparator<Deployment>() {
 				public int compare(Deployment arg0, Deployment arg1) {
 					return arg0.getCreateDate().compareTo(arg1.getCreateDate()) > 0 ? -1 : 1;
 				}
 			});
-			((ModelServiceImpl)modelManager.getModelService()).getEntityManager().getTransaction().commit();
+			entityManager.getTransaction().commit();
 			templateVariables.put("deployments", depls);
 		}
 		
@@ -136,8 +139,15 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 	private void maintainDeploymentHistoryLength(Application app) {
 		
 		Integer lengthToMaintain = app.getDeploymentHistoryLength();
-		if( app.getDeployments()!=null && app.getDeployments().size()>lengthToMaintain ) {
-			
+		List<Deployment> deployments = app.getDeployments();
+		if( deployments!=null && deployments.size()>lengthToMaintain ) {
+			Integer currentSize = deployments.size();
+			List<Deployment> newDeployments = new ArrayList<Deployment>(deployments.subList(currentSize-lengthToMaintain,currentSize));
+			List<Deployment> oldDeployments = deployments.subList(0,currentSize-lengthToMaintain);
+			app.setDeployments(newDeployments);
+			for( Deployment deployment : oldDeployments ) {
+				modelManager.getModelService().delete(deployment);
+			}
 		}
 	}
 }

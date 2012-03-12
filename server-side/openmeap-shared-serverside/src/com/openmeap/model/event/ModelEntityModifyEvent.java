@@ -22,18 +22,15 @@
  ###############################################################################
  */
 
-package com.openmeap.model;
+package com.openmeap.model.event;
 
-import com.openmeap.model.dto.ApplicationArchive;
+import com.openmeap.model.ModelEntity;
+import com.openmeap.model.ModelServiceOperation;
 
-public class ArchiveDeleteEvent extends AbstractEvent<ApplicationArchive> {
-
-	final static public String NAME = "archiveDeleteEvent";
-	
-	private static final long serialVersionUID = -9033272977442892920L;
-	
-	public ArchiveDeleteEvent(ApplicationArchive payload) {
-		super(payload);
+public class ModelEntityModifyEvent extends ModelEntityEvent {
+	final static public String NAME = "refresh";
+	private static final long serialVersionUID = 5825309477564008214L;
+	public ModelEntityModifyEvent(ModelEntity payload) {
+		super(ModelServiceOperation.SAVE_OR_UPDATE,payload);
 	}
-	
 }

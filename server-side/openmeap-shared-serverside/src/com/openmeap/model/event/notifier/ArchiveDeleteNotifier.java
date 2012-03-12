@@ -22,18 +22,26 @@
  ###############################################################################
  */
 
-package com.openmeap.model;
+package com.openmeap.model.event.notifier;
 
-import java.util.Map;
+import com.openmeap.model.ModelEntity;
+import com.openmeap.model.ModelServiceOperation;
+import com.openmeap.model.dto.ApplicationArchive;
+import com.openmeap.model.event.ModelEntityEventAction;
 
-@SuppressWarnings("rawtypes")
-public class ArchiveUploadNotifiedEvent extends AbstractEvent<Map> {
+public class ArchiveDeleteNotifier extends AbstractArchiveEventNotifier {
 	
-	final static public String NAME = "archiveUploadNotifiedEvent";
-	private static final long serialVersionUID = -8871542806763550102L;
-	
-	public ArchiveUploadNotifiedEvent(Map payload) {
-		super(payload);
+	@Override 
+	protected String getArchiveEventActionName() {
+		return ModelEntityEventAction.ARCHIVE_DELETE.getActionName();
 	}
-	
+
+	@Override
+	public Boolean notifiesFor(ModelServiceOperation operation,
+			ModelEntity payload) {
+		if(operation==ModelServiceOperation.DELETE && ApplicationArchive.class.isAssignableFrom(payload.getClass()) ) {
+			return true;
+		}
+		return false;
+	}
 }

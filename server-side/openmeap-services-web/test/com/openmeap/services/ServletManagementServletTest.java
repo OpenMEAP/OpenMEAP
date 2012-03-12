@@ -37,7 +37,8 @@ import org.w3c.dom.*;
 import com.openmeap.services.ServiceManagementServlet;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.GlobalSettings;
-import com.openmeap.model.service.ModelServiceRefreshHandler;
+import com.openmeap.model.event.ModelEntityModifyEvent;
+import com.openmeap.model.event.handler.ModelServiceRefreshHandler;
 import com.openmeap.util.AuthTokenProvider;
 import com.openmeap.util.Utils;
 
