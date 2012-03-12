@@ -39,9 +39,6 @@
 			<bean class="com.openmeap.util.HttpRequestExecuterFactory" factory-method="newDefault"/>
 		</property>
 	</bean>
-	<bean id="modelServiceRefreshHandler" class="com.openmeap.model.service.ModelServiceRefreshHandler">
-		<property name="modelManager" ref="modelManager"/>
-	</bean>
 	
 	<bean id="archiveUploadNotifier" class="com.openmeap.model.service.ArchiveUploadNotifier">
 		<property name="modelManager" ref="modelManager"/>

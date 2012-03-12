@@ -99,6 +99,8 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 				depl.setCreateDate(new java.util.Date());
 				app.addDeployment(depl);
 				try {
+					maintainDeploymentHistoryLength(app);
+					
 					app = modelManager.addModify(app);
 					events.add( new MessagesEvent("Deployment successfully create!") );
 				} catch (PersistenceException pe) {
@@ -108,9 +110,6 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 					Throwable root = ExceptionUtils.getRootCause(pe);
 					events.add( new MessagesEvent("An exception was thrown creating the deployment: "+root.getMessage()));
 				}
-				
-				// TODO: clean up the deployment history per the app settings here.
-				//this.deploymentHistoryMaintainer
 			}
 		}
 		
@@ -128,5 +127,17 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 		}
 		
 		return events;
+	}
+	
+	/**
+	 * Trim the deployment history table.  Deleting old archives as we go.
+	 * @param app
+	 */
+	private void maintainDeploymentHistoryLength(Application app) {
+		
+		Integer lengthToMaintain = app.getDeploymentHistoryLength();
+		if( app.getDeployments()!=null && app.getDeployments().size()>lengthToMaintain ) {
+			
+		}
 	}
 }

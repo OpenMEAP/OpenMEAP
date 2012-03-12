@@ -31,5 +31,6 @@
         <property name="current_session_context_class">thread</property>
         <property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
         <property name="cache.use_query_cache">false</property>
+        <mapping package="com.openmeap.model.dto"/>
     </session-factory>
 </hibernate-configuration>

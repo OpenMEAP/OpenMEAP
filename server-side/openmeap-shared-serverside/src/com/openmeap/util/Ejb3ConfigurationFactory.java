@@ -9,7 +9,7 @@ import org.hibernate.ejb.Ejb3Configuration;
 public class Ejb3ConfigurationFactory {
 	
 	private Map<String,String> properties;
-	private String configuration = "hibernate.cfg.xml";
+	private String configuration = "openmeap-jpa-javase";
 	private String targetEnvironment = "javase";
 
 	public Ejb3Configuration create(String persistenceUnit) {
@@ -25,11 +25,11 @@ public class Ejb3ConfigurationFactory {
 			}
 		}
 		
-		if(targetEnvironment.equals("javase")) {
-			conf.addProperties(jpaProperties).configure(configuration);
-		} else if(targetEnvironment.equals("javaee")) {
+		//if(targetEnvironment.equals("javase")) {
+			//conf.addProperties(jpaProperties).configure(configuration);
+		//} else if(targetEnvironment.equals("javaee")) {
 			conf.configure(configuration,jpaProperties);
-		}
+		//}
 		
 		return conf;
 	}

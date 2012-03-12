@@ -27,12 +27,5 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
 	<persistence-unit name="openmeap-jpa-javase" transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<class>com.openmeap.model.dto.Application</class>
-		<class>com.openmeap.model.dto.Deployment</class>
-		<class>com.openmeap.model.dto.ApplicationArchive</class>
-		<class>com.openmeap.model.dto.ApplicationVersion</class>
-		<class>com.openmeap.model.dto.ApplicationInstallation</class>
-		<class>com.openmeap.model.dto.GlobalSettings</class>
-		<class>com.openmeap.model.dto.ClusterNode</class>
 	</persistence-unit>
 </persistence>

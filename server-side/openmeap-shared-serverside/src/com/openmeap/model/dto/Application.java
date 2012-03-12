@@ -194,16 +194,23 @@ public class Application extends AbstractModelEntity {
 		try {
 			Map<Method,String> errors = new HashMap<Method,String>();
 			
-			if( this.getName()==null )
+			if( this.getName()==null ) {
 				errors.put( this.getClass().getMethod("getName"), "must contain a name");
+			}
 			
-			if( this.getProxyAuthSalt()==null || this.getProxyAuthSalt().length()==0 )
+			if( this.getProxyAuthSalt()==null || this.getProxyAuthSalt().length()==0 ) {
 				this.setProxyAuthSalt(UUID.randomUUID().toString());
+			}
 			
-			if( errors.size()>0 )
+			if( this.getDeploymentHistoryLength()==null || this.getDeploymentHistoryLength()<1 ) {
+				errors.put( this.getClass().getMethod("getDeploymentHistoryLength"), "must be a number greater than 0");
+			}
+			
+			if( errors.size()>0 ) {
 				return errors;
-			
-			else return null;
+			} else {
+				return null;
+			}
 		} catch( NoSuchMethodException nsme ) {
 			throw new RuntimeException(nsme);
 		}

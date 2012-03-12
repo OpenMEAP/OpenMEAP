@@ -33,12 +33,6 @@
 		<constructor-arg ref="modelManager"/>
 	</bean>
 	
-	<bean id="modelServiceRefreshNotifier" class="com.openmeap.model.service.ModelServiceRefreshNotifier">
-		<property name="configBeanName" value="clusterServiceNotifierConfig"/>
-		<property name="httpRequestExecuter">
-			<bean class="com.openmeap.util.FileHandlingHttpRequestExecuterImpl"/>
-		</property>
-	</bean>	
 	<bean id="modelServiceRefreshHandler" class="com.openmeap.model.service.ModelServiceRefreshHandler">
 		<property name="modelManager" ref="modelManager"/>
 	</bean>

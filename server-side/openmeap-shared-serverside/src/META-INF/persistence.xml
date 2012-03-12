@@ -29,16 +29,10 @@
 	<persistence-unit name="openmeap-jpa-javaee">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<jta-data-source>java:/openmeap/datasource</jta-data-source>
-		<class>com.openmeap.model.dto.Application</class>
-		<class>com.openmeap.model.dto.Deployment</class>
-		<class>com.openmeap.model.dto.ApplicationArchive</class>
-		<class>com.openmeap.model.dto.ApplicationVersion</class>
-		<class>com.openmeap.model.dto.ApplicationInstallation</class>
-		<class>com.openmeap.model.dto.GlobalSettings</class>
-		<class>com.openmeap.model.dto.ClusterNode</class>
-		<properties>
-			<property name="hibernate.ejb.cfgfile" value="hibernate.cfg.xml"/>
-		</properties>
+	</persistence-unit>
+	
+	<persistence-unit name="openmeap-jpa-javase" transaction-type="RESOURCE_LOCAL">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 	</persistence-unit>
 		
 </persistence>
