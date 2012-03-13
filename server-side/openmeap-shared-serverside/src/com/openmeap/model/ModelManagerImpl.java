@@ -33,12 +33,16 @@ import javax.persistence.PersistenceException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import com.openmeap.AuthorizationException;
 import com.openmeap.Authorizer;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationInstallation;
 import com.openmeap.model.dto.ApplicationVersion;
+import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
 
@@ -46,10 +50,11 @@ import com.openmeap.model.dto.GlobalSettings;
  * Handles all business logic related to the model Entity objects. 
  * @author schang
  */
-public class ModelManagerImpl implements ModelManager {
+public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 
 	private ModelService modelService;
 	private Logger logger = LoggerFactory.getLogger(ModelManagerImpl.class);
+	private ApplicationContext context = null;
 	private Authorizer authorizer = new Authorizer() {
 			@Override public Boolean may(Action action, Object object) {
 				return Boolean.TRUE;
@@ -73,6 +78,10 @@ public class ModelManagerImpl implements ModelManager {
 	}
 	public ModelService getModelService() {
 		return modelService;
+	}
+	
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		context = applicationContext;
 	}
 	
 	public void delete(Application app) {
@@ -142,5 +151,15 @@ public class ModelManagerImpl implements ModelManager {
 			modelService.refresh(settings);
 		}
 		return settings;
+	}
+	
+	public ClusterNode getClusterNode() {
+		if( context!=null ) {
+			Map<String,String> servicesWebProperties = (Map<String,String>)context.getBean("openmeapServicesWebPropertiesMap");
+			String serviceUrl = (String)servicesWebProperties.get("clusterNodeUrlPrefix");
+			return this.getGlobalSettings().getClusterNodes().get(serviceUrl);
+		} else {
+			return null;
+		}
 	}
 }

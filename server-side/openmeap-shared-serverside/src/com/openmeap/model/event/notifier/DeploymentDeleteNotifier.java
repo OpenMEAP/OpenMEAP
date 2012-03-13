@@ -27,20 +27,19 @@ package com.openmeap.model.event.notifier;
 import com.openmeap.Event;
 import com.openmeap.cluster.ClusterNotificationException;
 import com.openmeap.model.ModelEntity;
+import com.openmeap.model.ModelServiceEventNotifier;
 import com.openmeap.model.ModelServiceOperation;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.Deployment;
+import com.openmeap.model.event.ModelEntityEvent;
 import com.openmeap.model.event.ModelEntityEventAction;
 
-public class DeploymentDeleteNotifier extends AbstractEventNotifier<Deployment> {
+public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deployment> {
 	
-	@Override
-	protected String getEventActionName() {
-		return ModelEntityEventAction.DEPLOYMENT_DELETE.getActionName();
-	}
-
+	ArchiveDeleteNotifier archiveDeleteNotifier = null;
+	
 	@Override
 	public Boolean notifiesFor(ModelServiceOperation operation,
 			ModelEntity payload) {
@@ -54,12 +53,13 @@ public class DeploymentDeleteNotifier extends AbstractEventNotifier<Deployment> 
 	public <E extends Event<Deployment>> void notify(final E event) throws ClusterNotificationException {
 		
 		Deployment deployment2Delete = (Deployment)event.getPayload();
-		Application app = deployment2Delete.getApplication();
+		Application app = deployment2Delete.getApplicationVersion().getApplication();
+		app = archiveDeleteNotifier.getModelManager().getModelService().findByPrimaryKey(app.getClass(),app.getPk());
 		
 		// if there are any other deployments with this hash,
 		// then we cannot yet delete it.
 		for( Deployment deployment : app.getDeployments() ) {
-			if( ! deployment.getId().equals(deployment2Delete.getId()) ) {
+			if( deployment.getId()==null || !deployment.getId().equals(deployment2Delete.getId()) ) {
 				if( deployment.getHash().equals(deployment2Delete.getHash()) 
 						&& deployment.getHashAlgorithm().equals(deployment2Delete.getHashAlgorithm()) ) {
 					return;
@@ -75,9 +75,20 @@ public class DeploymentDeleteNotifier extends AbstractEventNotifier<Deployment> 
 			if( archive.getHash().equals(deployment2Delete.getHash()) 
 					&& archive.getHashAlgorithm().equals(deployment2Delete.getHashAlgorithm()) ) {
 				return;
-			}
+			} 
 		}
 		
-		super.notify(event);
+		ApplicationArchive archive = new ApplicationArchive();
+		archive.setHash(deployment2Delete.getHash());
+		archive.setHashAlgorithm(deployment2Delete.getHashAlgorithm());
+		archiveDeleteNotifier.notify(new ModelEntityEvent(ModelServiceOperation.DELETE,archive));
+	}
+
+	public ArchiveDeleteNotifier getArchiveDeleteNotifier() {
+		return archiveDeleteNotifier;
+	}
+
+	public void setArchiveDeleteNotifier(ArchiveDeleteNotifier archiveDeleteNotifier) {
+		this.archiveDeleteNotifier = archiveDeleteNotifier;
 	}
 }

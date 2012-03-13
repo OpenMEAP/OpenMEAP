@@ -57,11 +57,7 @@
 	</bean>
 	
 	<bean id="deploymentDeleteNotifier" class="com.openmeap.model.event.notifier.DeploymentDeleteNotifier">
-		<property name="modelManager" ref="modelManager"/>
-		<property name="config" ref="clusterServiceNotifierConfig"/>
-		<property name="httpRequestExecuter">
-			<bean class="com.openmeap.util.HttpRequestExecuterFactory" factory-method="newDefault"/>
-		</property>
+		<property name="archiveDeleteNotifier" ref="archiveDeleteNotifier"/>
 	</bean>
 	
 </beans>

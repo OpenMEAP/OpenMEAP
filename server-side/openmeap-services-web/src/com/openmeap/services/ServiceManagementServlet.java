@@ -25,15 +25,12 @@
 package com.openmeap.services;
 
 import java.io.*;
-import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileUploadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -43,17 +40,13 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import com.openmeap.Event;
 import com.openmeap.EventHandler;
 import com.openmeap.EventHandlingException;
-import com.openmeap.cluster.ClusterHandlingException;
 import com.openmeap.constants.UrlParamConstants;
 import com.openmeap.model.*;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.GlobalSettings;
-import com.openmeap.model.event.ArchiveDeleteEvent;
 import com.openmeap.model.event.ArchiveDeleteNotifiedEvent;
-import com.openmeap.model.event.ArchiveUploadEvent;
 import com.openmeap.model.event.ArchiveUploadNotifiedEvent;
 import com.openmeap.model.event.ModelEntityEventAction;
-import com.openmeap.model.event.ModelEntityModifyEvent;
 import com.openmeap.model.event.handler.*;
 import com.openmeap.util.AuthTokenProvider;
 import static com.openmeap.util.ParameterMapUtils.*;
@@ -98,6 +91,7 @@ public class ServiceManagementServlet extends HttpServlet {
 			action="";
 		
 		PrintWriter os = new PrintWriter(response.getOutputStream());
+		GlobalSettings settings = modelManager.getGlobalSettings();
 		
 		if( ! authenticates(request) ) {
 			
@@ -110,13 +104,11 @@ public class ServiceManagementServlet extends HttpServlet {
 			
 		} else if( action.equals(ModelEntityEventAction.ARCHIVE_UPLOAD.getActionName()) ) {
 			
-			GlobalSettings settings = modelManager.getGlobalSettings();
 			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings, request);
 			handleArchiveEvent(archiveUploadHandler, new ArchiveUploadNotifiedEvent(paramMap), os, paramMap);
 			
 		} else if( action.equals(ModelEntityEventAction.ARCHIVE_DELETE.getActionName()) ) {
 			
-			GlobalSettings settings = modelManager.getGlobalSettings();
 			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings, request);
 			handleArchiveEvent(archiveDeleteHandler, new ArchiveDeleteNotifiedEvent(paramMap), os, paramMap);
 			
@@ -143,17 +135,14 @@ public class ServiceManagementServlet extends HttpServlet {
 		
 		String hash = firstValue(UrlParamConstants.APPARCH_HASH,paramMap);
 		String hashType = firstValue(UrlParamConstants.APPARCH_HASH_ALG,paramMap);
-		String clusterNodeKey = firstValue(UrlParamConstants.CLUSTERNODE_KEY,paramMap);
 		if( logger.isInfoEnabled() ) {
 			logger.info("Received request archive upload notification "+hashType+":"+hash);
 		}
 		
-		if( hash!=null && hashType!=null && clusterNodeKey!=null ) {
+		if( hash!=null && hashType!=null ) {
 			ApplicationArchive arch = new ApplicationArchive();
 			arch.setHash(hash);
 			arch.setHashAlgorithm(hashType);
-			// TODO: i shouldn't do this each time...there should be a global configuration somewhere
-			archiveUploadHandler.setClusterNodeServiceUrl(clusterNodeKey);
 			
 			try {
 				

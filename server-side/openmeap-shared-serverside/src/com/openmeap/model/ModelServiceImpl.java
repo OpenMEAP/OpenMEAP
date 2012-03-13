@@ -89,6 +89,8 @@ public class ModelServiceImpl implements ModelService
 	}
 	
 	public <T extends ModelEntity> void delete(T obj2Delete) throws PersistenceException {		
+		// give the event notifiers an opportunity to act, prior to deletion
+		callEventNotifiers(ModelServiceOperation.DELETE,obj2Delete);
 		try {
 			entityManager.getTransaction().begin();
 			this._refresh(obj2Delete);
@@ -101,8 +103,6 @@ public class ModelServiceImpl implements ModelService
 			}
 			throw new PersistenceException(pe);
 		}			
-		// give the event notifiers an opportunity to act, prior to deletion
-		callEventNotifiers(ModelServiceOperation.DELETE,obj2Delete);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -168,22 +168,6 @@ public class ModelServiceImpl implements ModelService
 		}
 	}
 	
-	// ACCESSORS
-	
-	public void setEventNotifiers(Collection<ModelServiceEventNotifier> handlers) {
-		eventNotifiers = handlers;
-	}
-	public Collection<ModelServiceEventNotifier> getEventNotifiers() {
-		return eventNotifiers;
-	}
-	
-	public void setEntityManager(EntityManager manager) {
-		entityManager = manager;
-	}
-	public EntityManager getEntityManager() {
-		return entityManager;
-	}
-
 	@Override
 	public Deployment getLastDeployment(Application app) {
 		Query q = entityManager.createQuery("select distinct d "
@@ -199,6 +183,24 @@ public class ModelServiceImpl implements ModelService
 			return null;
 		}
 	}
+	
+	// ACCESSORS
+	
+	public void setEventNotifiers(Collection<ModelServiceEventNotifier> handlers) {
+		eventNotifiers = handlers;
+	}
+	public Collection<ModelServiceEventNotifier> getEventNotifiers() {
+		return eventNotifiers;
+	}
+	
+	public void setEntityManager(EntityManager manager) {
+		entityManager = manager;
+	}
+	public EntityManager getEntityManager() {
+		return entityManager;
+	}
+	
+	// PRIVATE METHODS
 	
 	private void _refresh(ModelEntity obj2Refresh) {
 		if( !entityManager.contains(obj2Refresh) ) {

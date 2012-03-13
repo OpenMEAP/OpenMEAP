@@ -46,7 +46,6 @@ public class ArchiveUploadHandler implements EventHandler<Map> {
 	private Logger logger = LoggerFactory.getLogger(ArchiveUploadHandler.class);
 	
 	private ModelManager modelManager;
-	private String serviceUrl;
 	
 	@Override
 	public <E extends Event<Map>> void handle(E event) throws ClusterHandlingException {
@@ -58,8 +57,7 @@ public class ArchiveUploadHandler implements EventHandler<Map> {
 		
 		logger.debug("ArchiveUploadEvent for file {}",hashId);
 		
-		GlobalSettings settings = modelManager.getGlobalSettings();
-		ClusterNode node = settings.getClusterNodes().get(serviceUrl);
+		ClusterNode node = modelManager.getClusterNode();
 		Map<Method,String> validationErrors = node.validate();
 		if( validationErrors != null ) {
 			throw new ClusterHandlingException( new InvalidPropertiesException(arch,validationErrors) );
@@ -88,13 +86,6 @@ public class ArchiveUploadHandler implements EventHandler<Map> {
 	}
 
 	// ACCESSORS
-	
-	public void setClusterNodeServiceUrl(String serviceUrl) {
-		this.serviceUrl = serviceUrl;
-	}
-	public String setClusterNodeServiceUrl() {
-		return this.serviceUrl;
-	}
 	
 	public void setModelManager(ModelManager modelManager) {
 		this.modelManager = modelManager;

@@ -32,6 +32,7 @@ import com.openmeap.Authorizer;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationInstallation;
 import com.openmeap.model.dto.ApplicationVersion;
+import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
 
@@ -73,4 +74,6 @@ public interface ModelManager {
 	GlobalSettings addModify(GlobalSettings settings) throws InvalidPropertiesException, PersistenceException;
 	
 	GlobalSettings getGlobalSettings();
+	
+	ClusterNode getClusterNode();
 }

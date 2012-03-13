@@ -90,18 +90,11 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 			}			
 			
 			if( version!=null ) {
-				GlobalSettings settings = modelManager.getGlobalSettings();
-				Deployment depl = new Deployment();
-				depl.setType( Deployment.Type.valueOf(deploymentType) );
-				depl.setApplicationVersion(version);
-				depl.setHash(version.getArchive().getHash());
-				depl.setHashAlgorithm(version.getArchive().getHashAlgorithm());
-				depl.setDownloadUrl(version.getArchive().getDirectDownloadUrl(settings));
-				depl.setCreateDate(new java.util.Date());
+				Deployment depl = createDeployment(version,deploymentType);
 				app.addDeployment(depl);
+				
 				try {
 					maintainDeploymentHistoryLength(app);
-					
 					app = modelManager.addModify(app);
 					events.add( new MessagesEvent("Deployment successfully create!") );
 				} catch (PersistenceException pe) {
@@ -116,20 +109,36 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 		
 		// making sure to order the deployments by date
 		if( app!=null && app.getDeployments()!=null ) {
-			EntityManager entityManager = ((ModelServiceImpl)modelManager.getModelService()).getEntityManager(); 
-			entityManager.getTransaction().begin();
-			entityManager.merge(app);
-			List<Deployment> depls = app.getDeployments();
-			Collections.sort( depls, new Comparator<Deployment>() {
-				public int compare(Deployment arg0, Deployment arg1) {
-					return arg0.getCreateDate().compareTo(arg1.getCreateDate()) > 0 ? -1 : 1;
-				}
-			});
-			entityManager.getTransaction().commit();
-			templateVariables.put("deployments", depls);
+			templateVariables.put("deployments", getOrderedDeployments(app));
 		}
 		
 		return events;
+	}
+	
+	private List<Deployment> getOrderedDeployments(Application app) {
+		EntityManager entityManager = ((ModelServiceImpl)modelManager.getModelService()).getEntityManager(); 
+		entityManager.getTransaction().begin();
+		entityManager.merge(app);
+		List<Deployment> depls = app.getDeployments();
+		Collections.sort( depls, new Comparator<Deployment>() {
+			public int compare(Deployment arg0, Deployment arg1) {
+				return arg0.getCreateDate().compareTo(arg1.getCreateDate()) > 0 ? -1 : 1;
+			}
+		});
+		entityManager.getTransaction().commit();
+		return depls;
+	}
+	
+	private Deployment createDeployment(ApplicationVersion version, String deploymentType) {
+		GlobalSettings settings = modelManager.getGlobalSettings();
+		Deployment depl = new Deployment();
+		depl.setType( Deployment.Type.valueOf(deploymentType) );
+		depl.setApplicationVersion(version);
+		depl.setHash(version.getArchive().getHash());
+		depl.setHashAlgorithm(version.getArchive().getHashAlgorithm());
+		depl.setDownloadUrl(version.getArchive().getDirectDownloadUrl(settings));
+		depl.setCreateDate(new java.util.Date());
+		return depl;
 	}
 	
 	/**
@@ -145,7 +154,7 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 			Integer currentSize = deployments.size();
 			
 			List<Deployment> newDeployments = new ArrayList<Deployment>(deployments.subList(currentSize-lengthToMaintain,currentSize));
-			List<Deployment> oldDeployments = deployments.subList(0,currentSize-lengthToMaintain);
+			List<Deployment> oldDeployments = new ArrayList<Deployment>(deployments.subList(0,currentSize-lengthToMaintain));
 			
 			for( Deployment deployment : oldDeployments ) {
 				modelManager.getModelService().delete(deployment);
