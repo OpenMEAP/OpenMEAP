@@ -46,6 +46,7 @@ public class ArchiveUploadHandler implements EventHandler<Map> {
 	private Logger logger = LoggerFactory.getLogger(ArchiveUploadHandler.class);
 	
 	private ModelManager modelManager;
+	private String fileSystemStoragePathPrefix;
 	
 	@Override
 	public <E extends Event<Map>> void handle(E event) throws ClusterHandlingException {
@@ -57,13 +58,7 @@ public class ArchiveUploadHandler implements EventHandler<Map> {
 		
 		logger.debug("ArchiveUploadEvent for file {}",hashId);
 		
-		ClusterNode node = modelManager.getClusterNode();
-		Map<Method,String> validationErrors = node.validate();
-		if( validationErrors != null ) {
-			throw new ClusterHandlingException( new InvalidPropertiesException(arch,validationErrors) );
-		}
-		
-		File file = arch.getFile(node.getFileSystemStoragePathPrefix());
+		File file = arch.getFile(getFileSystemStoragePathPrefix());
 		
 		if( file.exists() ) {
 			logger.warn("ApplicationArchive with %s already exists, ignoring ArchiveUploadEvent.",hashId);
@@ -93,6 +88,13 @@ public class ArchiveUploadHandler implements EventHandler<Map> {
 
 	public ModelManager getModelManager() {
 		return modelManager;
+	}
+
+	public String getFileSystemStoragePathPrefix() {
+		return fileSystemStoragePathPrefix;
+	}
+	public void setFileSystemStoragePathPrefix(String fileSystemStoragePathPrefix) {
+		this.fileSystemStoragePathPrefix = fileSystemStoragePathPrefix;
 	}
 	
 }

@@ -48,6 +48,11 @@
 		</property>
 	</bean>
 	
+	<bean id="deploymentDeleteNotifier" class="com.openmeap.model.event.notifier.DeploymentDeleteNotifier">
+		<property name="archiveDeleteNotifier" ref="archiveDeleteNotifier"/>
+		<property name="archiveDeleteHandler" ref="archiveDeleteHandler"/>
+	</bean>
+	
 	<bean id="archiveDeleteNotifier" class="com.openmeap.model.event.notifier.ArchiveDeleteNotifier">
 		<property name="modelManager" ref="modelManager"/>
 		<property name="config" ref="clusterServiceNotifierConfig"/>
@@ -56,8 +61,8 @@
 		</property>
 	</bean>
 	
-	<bean id="deploymentDeleteNotifier" class="com.openmeap.model.event.notifier.DeploymentDeleteNotifier">
-		<property name="archiveDeleteNotifier" ref="archiveDeleteNotifier"/>
+	<bean id="archiveDeleteHandler" class="com.openmeap.model.event.handler.ArchiveDeleteHandler">
+		<property name="modelManager" ref="modelManager"/>
 	</bean>
 	
 </beans>

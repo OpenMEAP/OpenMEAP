@@ -97,7 +97,8 @@ public class AdminServlet extends HttpServlet {
 			
 			// TODO: I'm not really happy with this hacky work-around for the login form not being in actual request scope
 			if( td.getProcessesFormData() ) {
-				map = ServletUtils.cloneParameterMap(mgr.getGlobalSettings(),request);
+				GlobalSettings settings = mgr.getGlobalSettings();
+				map = ServletUtils.cloneParameterMap(settings.getMaxFileUploadSize(),settings.getTemporaryStoragePath(),request);
 				
 				AuthorizerImpl auth = (AuthorizerImpl)context.getBean("authorizer");
 				auth.setRequest(request);

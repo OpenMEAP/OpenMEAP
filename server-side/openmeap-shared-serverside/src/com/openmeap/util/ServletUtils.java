@@ -51,14 +51,14 @@ public abstract class ServletUtils {
 	 * @return
 	 * @throws FileUploadException
 	 */
-	static final public Boolean handleFileUploads(GlobalSettings settings, HttpServletRequest request, Map<Object,Object> map) throws FileUploadException {
+	static final public Boolean handleFileUploads(Integer maxFileUploadSize, String fileStoragePrefix, HttpServletRequest request, Map<Object,Object> map) throws FileUploadException {
 		
 		DiskFileItemFactory factory = new DiskFileItemFactory();
         factory.setSizeThreshold(4096);
-        factory.setRepository(new File(settings.getTemporaryStoragePath()));
+        factory.setRepository(new File(fileStoragePrefix));
         
         ServletFileUpload upload = new ServletFileUpload(factory);
-        upload.setSizeMax(settings.getMaxFileUploadSize());
+        upload.setSizeMax(maxFileUploadSize);
         
         List fileItems = upload.parseRequest(request);
         for(FileItem item : (List<FileItem>)fileItems) {
@@ -87,7 +87,7 @@ public abstract class ServletUtils {
 	 * @param request
 	 * @return
 	 */
-	static final public Map<Object,Object> cloneParameterMap(GlobalSettings settings, HttpServletRequest request) {
+	static final public Map<Object,Object> cloneParameterMap(Integer maxFileUploadSize, String fileStoragePrefix, HttpServletRequest request) {
 		
 		// make a tidy package of parameters for the DocumentProcessor
 		Map<Object,Object> map = new HashMap<Object,Object>();
@@ -95,10 +95,9 @@ public abstract class ServletUtils {
 		// check for file uploads
 		String contentType = request.getContentType();
 		if( contentType!=null 
-				&& contentType.startsWith(FormConstants.ENCTYPE_MULTIPART_FORMDATA)
-				&& settings.validateTemporaryStoragePath()==null ) {
+				&& contentType.startsWith(FormConstants.ENCTYPE_MULTIPART_FORMDATA) ) {
 			try {
-	        	ServletUtils.handleFileUploads(settings,request,map);
+	        	ServletUtils.handleFileUploads(maxFileUploadSize,fileStoragePrefix,request,map);
 			} catch( FileUploadException fue ) {
 				// TODO: switch over to an error page and pass an event such that the exception is intelligently communicated
 				throw new RuntimeException(fue);

@@ -24,7 +24,11 @@
 
 package com.openmeap.model.event.notifier;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.openmeap.Event;
+import com.openmeap.EventHandlingException;
 import com.openmeap.cluster.ClusterNotificationException;
 import com.openmeap.model.ModelEntity;
 import com.openmeap.model.ModelServiceEventNotifier;
@@ -33,12 +37,16 @@ import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.Deployment;
+import com.openmeap.model.dto.GlobalSettings;
+import com.openmeap.model.event.MapPayloadEvent;
 import com.openmeap.model.event.ModelEntityEvent;
 import com.openmeap.model.event.ModelEntityEventAction;
+import com.openmeap.model.event.handler.ArchiveDeleteHandler;
 
 public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deployment> {
 	
 	ArchiveDeleteNotifier archiveDeleteNotifier = null;
+	ArchiveDeleteHandler archiveDeleteHandler = null;
 	
 	@Override
 	public Boolean notifiesFor(ModelServiceOperation operation,
@@ -82,6 +90,16 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 		archive.setHash(deployment2Delete.getHash());
 		archive.setHashAlgorithm(deployment2Delete.getHashAlgorithm());
 		archiveDeleteNotifier.notify(new ModelEntityEvent(ModelServiceOperation.DELETE,archive));
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("archive", archive);
+		try {
+			GlobalSettings settings = archiveDeleteNotifier.getModelManager().getGlobalSettings();
+			archiveDeleteHandler.setFileSystemStoragePathPrefix(settings.getTemporaryStoragePath());
+			archiveDeleteHandler.handle(new MapPayloadEvent(map));
+		} catch (EventHandlingException e) {
+			throw new ClusterNotificationException(e);
+		}
 	}
 
 	public ArchiveDeleteNotifier getArchiveDeleteNotifier() {
@@ -90,5 +108,12 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 
 	public void setArchiveDeleteNotifier(ArchiveDeleteNotifier archiveDeleteNotifier) {
 		this.archiveDeleteNotifier = archiveDeleteNotifier;
+	}
+
+	public ArchiveDeleteHandler getArchiveDeleteHandler() {
+		return archiveDeleteHandler;
+	}
+	public void setArchiveDeleteHandler(ArchiveDeleteHandler archiveDeleteHandler) {
+		this.archiveDeleteHandler = archiveDeleteHandler;
 	}
 }

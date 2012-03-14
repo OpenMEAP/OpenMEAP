@@ -25,6 +25,7 @@
 package com.openmeap.services;
 
 import java.io.*;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import javax.servlet.http.HttpServlet;
@@ -43,9 +44,9 @@ import com.openmeap.EventHandlingException;
 import com.openmeap.constants.UrlParamConstants;
 import com.openmeap.model.*;
 import com.openmeap.model.dto.ApplicationArchive;
+import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.GlobalSettings;
-import com.openmeap.model.event.ArchiveDeleteNotifiedEvent;
-import com.openmeap.model.event.ArchiveUploadNotifiedEvent;
+import com.openmeap.model.event.MapPayloadEvent;
 import com.openmeap.model.event.ModelEntityEventAction;
 import com.openmeap.model.event.handler.*;
 import com.openmeap.util.AuthTokenProvider;
@@ -92,6 +93,14 @@ public class ServiceManagementServlet extends HttpServlet {
 		
 		PrintWriter os = new PrintWriter(response.getOutputStream());
 		GlobalSettings settings = modelManager.getGlobalSettings();
+		ClusterNode node = modelManager.getClusterNode();
+		if( node==null ) {
+			throw new RuntimeException("openmeap-services-web needs to be configured as a cluster node in the settings of the admin interface.");
+		}
+		Map<Method,String> validationErrors = node.validate();
+		if( validationErrors != null ) {
+			throw new RuntimeException(new InvalidPropertiesException(node,validationErrors));
+		}
 		
 		if( ! authenticates(request) ) {
 			
@@ -104,13 +113,13 @@ public class ServiceManagementServlet extends HttpServlet {
 			
 		} else if( action.equals(ModelEntityEventAction.ARCHIVE_UPLOAD.getActionName()) ) {
 			
-			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings, request);
-			handleArchiveEvent(archiveUploadHandler, new ArchiveUploadNotifiedEvent(paramMap), os, paramMap);
+			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings.getMaxFileUploadSize(),node.getFileSystemStoragePathPrefix(),request);
+			handleArchiveEvent(archiveUploadHandler, new MapPayloadEvent(paramMap), os, paramMap);
 			
 		} else if( action.equals(ModelEntityEventAction.ARCHIVE_DELETE.getActionName()) ) {
 			
-			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings, request);
-			handleArchiveEvent(archiveDeleteHandler, new ArchiveDeleteNotifiedEvent(paramMap), os, paramMap);
+			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings.getMaxFileUploadSize(),node.getFileSystemStoragePathPrefix(), request);
+			handleArchiveEvent(archiveDeleteHandler, new MapPayloadEvent(paramMap), os, paramMap);
 			
 		} else if( action.equals(ModelEntityEventAction.MODEL_REFRESH.getActionName()) ) {
 			

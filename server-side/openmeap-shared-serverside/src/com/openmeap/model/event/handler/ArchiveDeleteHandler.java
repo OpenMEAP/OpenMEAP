@@ -18,6 +18,7 @@ public class ArchiveDeleteHandler implements EventHandler<Map> {
 	private Logger logger = LoggerFactory.getLogger(ArchiveDeleteHandler.class);
 	
 	private ModelManager modelManager;
+	private String fileSystemStoragePathPrefix;
 	
 	@Override
 	public <E extends Event<Map>> void handle(E event)
@@ -28,12 +29,14 @@ public class ArchiveDeleteHandler implements EventHandler<Map> {
 		}
 		
 		ApplicationArchive archive = (ApplicationArchive)event.getPayload().get("archive");
-		
-		ClusterNode node = modelManager.getClusterNode();
-		File file = archive.getFile(node.getFileSystemStoragePathPrefix());
+		File file = archive.getFile(getFileSystemStoragePathPrefix());
 		
 		if( file.exists() ) {
-			file.delete();
+			if( !file.delete() ) {
+				logger.error("Failed to delete archive "+archive.getFile(getFileSystemStoragePathPrefix()));
+			}
+		} else {
+			logger.error("Failed to find archive "+archive.getFile(getFileSystemStoragePathPrefix()));
 		}
 		
 		if( logger.isTraceEnabled() ) {
@@ -46,6 +49,13 @@ public class ArchiveDeleteHandler implements EventHandler<Map> {
 	}
 	public ModelManager getModelManager() {
 		return modelManager;
+	}
+
+	public String getFileSystemStoragePathPrefix() {
+		return fileSystemStoragePathPrefix;
+	}
+	public void setFileSystemStoragePathPrefix(String fileSystemStoragePathPrefix) {
+		this.fileSystemStoragePathPrefix = fileSystemStoragePathPrefix;
 	}
 
 }

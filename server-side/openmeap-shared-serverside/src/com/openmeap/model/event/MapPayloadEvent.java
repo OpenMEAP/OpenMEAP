@@ -29,12 +29,11 @@ import java.util.Map;
 import com.openmeap.AbstractEvent;
 
 @SuppressWarnings("rawtypes")
-public class ArchiveUploadNotifiedEvent extends AbstractEvent<Map> {
+public class MapPayloadEvent extends AbstractEvent<Map> {
 	
-	final static public String NAME = "archiveUploadNotifiedEvent";
 	private static final long serialVersionUID = -8871542806763550102L;
 	
-	public ArchiveUploadNotifiedEvent(Map payload) {
+	public MapPayloadEvent(Map payload) {
 		super(payload);
 	}
 	

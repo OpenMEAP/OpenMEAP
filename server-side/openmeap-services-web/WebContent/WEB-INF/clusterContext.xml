@@ -38,10 +38,12 @@
 	</bean>
 	
 	<bean id="archiveUploadHandler" class="com.openmeap.model.event.handler.ArchiveUploadHandler">
+		<property name="fileSystemStoragePathPrefix" value="${OPENMEAP_CLUSTER_NODE_URL_PREFIX}"/>
 		<property name="modelManager" ref="modelManager"/>
 	</bean>
 	
 	<bean id="archiveDeleteHandler" class="com.openmeap.model.event.handler.ArchiveDeleteHandler">
+		<property name="fileSystemStoragePathPrefix" value="${OPENMEAP_CLUSTER_NODE_URL_PREFIX}"/>
 		<property name="modelManager" ref="modelManager"/>
 	</bean>
 	

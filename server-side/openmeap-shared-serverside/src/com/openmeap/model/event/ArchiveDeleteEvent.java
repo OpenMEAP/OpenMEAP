@@ -28,7 +28,6 @@ import com.openmeap.model.ModelServiceOperation;
 import com.openmeap.model.dto.ApplicationArchive;
 
 public class ArchiveDeleteEvent extends ModelEntityEvent {
-	final static public String NAME = "archiveDeleteEvent";
 	private static final long serialVersionUID = -9033272977442892920L;
 	public ArchiveDeleteEvent(ApplicationArchive payload) {
 		super(ModelServiceOperation.DELETE,payload);
