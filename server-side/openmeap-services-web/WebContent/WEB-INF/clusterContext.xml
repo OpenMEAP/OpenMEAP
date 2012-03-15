@@ -28,23 +28,21 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
   http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services-2.0.xsd
   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
-  
-	<bean id="clusterServiceNotifierConfig" class="com.openmeap.cluster.ClusterServiceNotifierConfig">
-		<constructor-arg ref="modelManager"/>
-	</bean>
 	
 	<bean id="modelServiceRefreshHandler" class="com.openmeap.model.event.handler.ModelServiceRefreshHandler">
 		<property name="modelManager" ref="modelManager"/>
 	</bean>
 	
 	<bean id="archiveUploadHandler" class="com.openmeap.model.event.handler.ArchiveUploadHandler">
-		<property name="fileSystemStoragePathPrefix" value="${OPENMEAP_CLUSTER_NODE_URL_PREFIX}"/>
 		<property name="modelManager" ref="modelManager"/>
+		<!-- this will be overridden in service-management -->
+		<property name="fileSystemStoragePathPrefix" value="${OPENMEAP_CLUSTER_NODE_PATH_PREFIX}"/>
 	</bean>
 	
 	<bean id="archiveDeleteHandler" class="com.openmeap.model.event.handler.ArchiveDeleteHandler">
-		<property name="fileSystemStoragePathPrefix" value="${OPENMEAP_CLUSTER_NODE_URL_PREFIX}"/>
 		<property name="modelManager" ref="modelManager"/>
+		<!-- this will be overridden in service-management -->
+		<property name="fileSystemStoragePathPrefix" value="${OPENMEAP_CLUSTER_NODE_PATH_PREFIX}"/>
 	</bean>
 	
 </beans>

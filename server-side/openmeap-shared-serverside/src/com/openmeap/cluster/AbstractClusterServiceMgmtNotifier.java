@@ -24,27 +24,24 @@
 
 package com.openmeap.cluster;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executor;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import com.openmeap.Event;
 import com.openmeap.EventNotifier;
 import com.openmeap.model.ModelManager;
+import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.util.AuthTokenProvider;
 import com.openmeap.util.ThrowableList;
@@ -60,7 +57,7 @@ public abstract class AbstractClusterServiceMgmtNotifier<T> implements EventNoti
 	 */
 	private ExecutorService executorService = null;
 	private HttpRequestExecuter httpRequestExecuter = null;
-	private ClusterServiceNotifierConfig config = null;
+	private ModelManager modelManager = null;
 	private Long executorTimeout = null;
 	
 	protected void onBeforeNotify(final Event<T> event) {}
@@ -75,16 +72,29 @@ public abstract class AbstractClusterServiceMgmtNotifier<T> implements EventNoti
 		onBeforeNotify(event);
 		
 		final Map<String,Boolean> urlRequestCompleteStatus = new HashMap<String,Boolean>();
-		for( final URL thisUrl : config.getWebServiceUrls() ) {
+		GlobalSettings globalSettings = modelManager.getGlobalSettings();
+		Map<String,ClusterNode> clusterNodes = globalSettings.getClusterNodes();
+		for( final String thisUrlString : clusterNodes.keySet() ) {
+			
+			URL thisUrl = null;
+			try {
+				thisUrl = new URL(thisUrlString);
+			} catch (MalformedURLException e) {
+				logger.error("Could not create URL object from "+thisUrlString+": {}",e);
+				continue;
+			}
 			if( executorService!=null ) {
 				
 				logger.debug("Making request to {} using the executor.",thisUrl);
 				
 				executorService.execute(new Runnable() {
-							public void run() {
-								notifyMakeRequest(exceptions,thisUrl,urlRequestCompleteStatus,event);
+							URL url;
+							public void run() { notifyMakeRequest(exceptions,url,urlRequestCompleteStatus,event); }
+							Runnable setUrl(URL url) {
+								this.url = url;
+								return this;
 							}
-						}
+						}.setUrl(thisUrl)
 					);
 				
 			} else {
@@ -134,7 +144,7 @@ public abstract class AbstractClusterServiceMgmtNotifier<T> implements EventNoti
 	}
 	
 	protected String newAuthToken() {
-		return AuthTokenProvider.newAuthToken(config.getAuthSalt());
+		return AuthTokenProvider.newAuthToken(modelManager.getGlobalSettings().getServiceManagementAuthSalt());
 	}
 	
 	/**
@@ -159,11 +169,11 @@ public abstract class AbstractClusterServiceMgmtNotifier<T> implements EventNoti
 		return executorService;
 	}
 	
-	public void setConfig(ClusterServiceNotifierConfig config) {
-		this.config = config;
+	public void setModelManager(ModelManager config) {
+		this.modelManager = config;
 	}
-	public ClusterServiceNotifierConfig getConfig() {
-		return config;
+	public ModelManager getModelManager() {
+		return modelManager;
 	}
 	
 	public void setExecutorTimeout(Long executorTimeout) {

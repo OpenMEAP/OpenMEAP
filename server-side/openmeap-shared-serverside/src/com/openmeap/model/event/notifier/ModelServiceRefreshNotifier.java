@@ -24,39 +24,35 @@
 
 package com.openmeap.model.event.notifier;
 
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.http.HttpResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.openmeap.Event;
 import com.openmeap.cluster.AbstractClusterServiceMgmtNotifier;
 import com.openmeap.cluster.ClusterNotificationException;
-import com.openmeap.cluster.ClusterServiceNotifierConfig;
 import com.openmeap.constants.ServletNameConstants;
 import com.openmeap.constants.UrlParamConstants;
-import com.openmeap.model.*;
+import com.openmeap.model.ModelEntity;
+import com.openmeap.model.ModelServiceEventNotifier;
+import com.openmeap.model.ModelServiceOperation;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationInstallation;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.model.event.ModelEntityEventAction;
-import com.openmeap.model.event.ModelEntityModifyEvent;
-
-import java.util.*;
-import java.net.*;
-
-import org.apache.http.*;
-import org.slf4j.*;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-
-import com.openmeap.util.*;
+import com.openmeap.util.Utils;
 
 public class ModelServiceRefreshNotifier 
 		extends AbstractClusterServiceMgmtNotifier<ModelEntity>
-		implements ModelServiceEventNotifier<ModelEntity>, ApplicationContextAware {
+		implements ModelServiceEventNotifier<ModelEntity> {
 
 	private Logger logger = LoggerFactory.getLogger(ModelServiceRefreshNotifier.class);
-	private String configBeanName;
-	private ApplicationContext applicationContext;
 	
 	@Override
 	public Boolean notifiesFor(ModelServiceOperation operation, ModelEntity payload) {
@@ -64,13 +60,6 @@ public class ModelServiceRefreshNotifier
 			return true;
 		}
 		return false;
-	}
-	
-	@Override
-	protected void onBeforeNotify(final Event<ModelEntity> event) {
-		if( getConfig() == null ) {
-			setConfig( (ClusterServiceNotifierConfig)applicationContext.getBean(configBeanName) );
-		}
 	}
 	
 	/**
@@ -124,20 +113,5 @@ public class ModelServiceRefreshNotifier
 			logger.error(exMesg,e);
 			throw new ClusterNotificationException(exMesg,e);
 		}
-	}
-
-	// ACCESSORS
-	
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext)
-			throws BeansException {
-		this.applicationContext = applicationContext;
-	}
-	
-	public String getConfigBeanName() {
-		return configBeanName;
-	}
-	public void setConfigBeanName(String configBeanName) {
-		this.configBeanName = configBeanName;
 	}
 }

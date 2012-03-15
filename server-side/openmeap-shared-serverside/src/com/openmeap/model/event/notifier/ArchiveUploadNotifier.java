@@ -45,6 +45,7 @@ public class ArchiveUploadNotifier extends AbstractArchiveEventNotifier {
 	protected void addRequestParameters(ModelEntity modelEntity, Map<String,Object> parms) {
 		ApplicationArchive archive = (ApplicationArchive)modelEntity;
 		parms.put(UrlParamConstants.APPARCH_FILE, archive.getFile(getModelManager().getGlobalSettings().getTemporaryStoragePath()));
+		super.addRequestParameters(modelEntity, parms);
 	}
 	
 	@Override

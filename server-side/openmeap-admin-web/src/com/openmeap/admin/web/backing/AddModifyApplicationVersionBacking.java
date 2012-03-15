@@ -304,6 +304,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		
 		// create a temp file
 		File tempFile = null;
+		File newFile = null;
 		try {
 			tempFile = File.createTempFile("uploadArchive","",new File(settings.getTemporaryStoragePath()));
 			item.write(tempFile);
@@ -317,31 +318,59 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		// determine the md5 hash of the uploaded file
 		// and rename the temp file by the hash
 		FileInputStream is = null;
-		try {
-			is = new FileInputStream(tempFile);
+		
+		try {	
+			String hashValue = null;
 			try {
-				String hashValue = Utils.hashInputStream("MD5", is);
-				
-				try {
-					File oldExplodedPath = archive.getExplodedPath(settings.getTemporaryStoragePath());
-					if( oldExplodedPath!=null && oldExplodedPath.exists() ) {
-						FileUtils.deleteDirectory(oldExplodedPath);
-					}
-				} catch( IOException ioe ) {
-					logger.error("There was an exception deleting the old web-view directory: {}",ioe);
-					events.add(new MessagesEvent(String.format("Upload process will continue.  There was an exception deleting the old web-view directory: %s",ioe.getMessage())));
-				}
-				
-				// TODO: using MD5 or SHA1 should be a configured global setting...maybe
-				archive.setHashAlgorithm("MD5");
-				archive.setHash(hashValue);
+				is = new FileInputStream(tempFile);
+				hashValue = Utils.hashInputStream("MD5", is);
 			} finally {
 				is.close();
 			}
 			
-			File newFile = archive.getFile(settings.getTemporaryStoragePath());
+			// if the archive is pre-existing and not the same,
+			// determine if the web-view and zip should be deleted
+			// that is, they are not used by any other versions
+			if( archive.getId()!=null && !archive.getHash().equals(hashValue) ) {
+
+				// check to see if any other archives have this hash and md5
+				List<ApplicationArchive> archives = modelManager
+						.getModelService()
+						.findApplicationArchivesByHashAndAlgorithm(archive.getHash(), archive.getHashAlgorithm());
+				Boolean archiveIsInUseElsewhere = archives!=null && archives.size()>1;
+				
+				if( !archiveIsInUseElsewhere ) {
+					
+					// delete the web-view
+					try {
+						File oldExplodedPath = archive.getExplodedPath(settings.getTemporaryStoragePath());
+						if( oldExplodedPath!=null && oldExplodedPath.exists() ) {
+							FileUtils.deleteDirectory(oldExplodedPath);
+						}
+					} catch( IOException ioe ) {
+						logger.error("There was an exception deleting the old web-view directory: {}",ioe);
+						events.add(new MessagesEvent(String.format("Upload process will continue.  There was an exception deleting the old web-view directory: %s",ioe.getMessage())));
+					}
+					
+					// delete the zip file
+					File originalFile = archive.getFile(settings.getTemporaryStoragePath());
+					if( originalFile.exists() && !originalFile.delete() ) {
+						String mesg = String.format("Failed to delete old file %s, was different so proceeding anyhow.",originalFile.getName());
+						logger.error(mesg);
+						events.add(new MessagesEvent(mesg));
+					}
+				}
+			}
+			
+			archive.setHashAlgorithm("MD5");
+			archive.setHash(hashValue);
+			
+			newFile = archive.getFile(settings.getTemporaryStoragePath());
+			
+			// if the upload destination exists, then try to delete and overwrite
+			// even though they are theoretically the same.
 			if( newFile.exists() && !newFile.delete() ) {
-				String mesg = String.format("Failed to delete old file %s",newFile.getName());
+				String mesg = String.format("Failed to delete old file (theoretically the same anyways, so proceeding) %s",newFile.getName());
 				logger.error(mesg);
 				events.add(new MessagesEvent(mesg));
 				if( ! tempFile.delete() ) {
@@ -349,21 +378,16 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 					logger.error(mesg);
 					events.add(new MessagesEvent(mesg));	
 				}
-				return null;
 			}
-			
-			if( tempFile.renameTo(newFile) ) {
+			// if it didn't exist or it was successfully deleted,
+			// then rename the upload to our destination and unzip it
+			// into the web-view directory
+			else if( tempFile.renameTo(newFile) ) {
 				
 				String mesg = String.format("Uploaded temporary file %s successfully renamed to %s",tempFile.getName(),newFile.getName());
 				logger.debug(mesg);
 				events.add(new MessagesEvent(mesg));
-				
-				if( ! unzipFile(archive,newFile,events) ) {
-					return null;
-				}
-				
-				tempFile = newFile;
-				
+				unzipFile(archive,newFile,events);
 			} else {
 				String mesg = String.format("Failed to renamed file %s to %s",tempFile.getName(),newFile.getName());
 				logger.error(mesg);
@@ -381,29 +405,30 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		// determine the compressed and uncompressed size of the zip archive
 		try {
 			archive.setBytesLength(size.intValue());
-			ZipFile zipFile = new ZipFile(tempFile);
+			ZipFile zipFile = null;
 			try {
+				zipFile = new ZipFile(newFile);
 				Integer uncompressedSize = ZipUtils.getUncompressedSize(zipFile).intValue();
 				archive.setBytesLengthUncompressed(new Long(uncompressedSize).intValue());
 			} finally {
-				zipFile.close();
+				if(zipFile!=null) {
+					zipFile.close();
+				}
 			}
 		} catch( IOException ioe ) {
 			logger.error("An exception occurred while calculating the uncompressed size of the archive: {}",ioe);
-			events.add(new MessagesEvent(String.format("An exception occurred while calculating the uncompressed size of the archive: %s"+ioe.getMessage())));
+			events.add(new MessagesEvent(String.format("An exception occurred while calculating the uncompressed size of the archive: %s",ioe.getMessage())));
 			return null;
 		}
 		
-		// TODO: make all parameters of this url into a template and have that default template specified in the Application
 		archive.setUrl(ApplicationArchive.URL_TEMPLATE);
-		
 		archive.setNewFileUploaded(true);
 		
 		try {
 			archiveUploadNotifier.notify( new ModelEntityEvent(ModelServiceOperation.SAVE_OR_UPDATE,archive) );
 		} catch (Exception e) {
 			logger.error("An exception occurred pushing the new archive to cluster nodes: {}",e);
-			events.add(new MessagesEvent(String.format("An exception occurred while calculating the uncompressed size of the archive: %s",e.getMessage())));
+			events.add(new MessagesEvent(String.format("An exception occurred pushing the new archive to cluster nodes: %s",e.getMessage())));
 		}
 		
 		return archive;
@@ -423,7 +448,13 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 			if( dest.exists() ) {
 				FileUtils.deleteDirectory(dest);
 			}
-			ZipUtils.unzipFile(new ZipFile(zipFile), dest);
+			ZipFile file = null;
+			try {
+				file = new ZipFile(zipFile);
+				ZipUtils.unzipFile(file, dest);
+			} finally {
+				file.close();
+			}
 			return Boolean.TRUE;
 		} catch( Exception e ) {
 			logger.error("An exception occurred unzipping the archive to the viewing location: {}",e);

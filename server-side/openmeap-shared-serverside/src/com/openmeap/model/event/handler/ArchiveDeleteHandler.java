@@ -13,6 +13,10 @@ import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ClusterNode;
 
+/**
+ * Handles the actual deletion of an application archive.
+ * @author schang
+ */
 public class ArchiveDeleteHandler implements EventHandler<Map> {
 
 	private Logger logger = LoggerFactory.getLogger(ArchiveDeleteHandler.class);

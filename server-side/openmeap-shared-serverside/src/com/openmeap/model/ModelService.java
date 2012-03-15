@@ -30,6 +30,7 @@ import java.util.List;
 import javax.persistence.PersistenceException;
 
 import com.openmeap.model.dto.Application;
+import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.Deployment;
 
@@ -78,6 +79,8 @@ public interface ModelService {
 	public ApplicationVersion findAppVersionByNameAndId(String appName, String versionId);
 	
 	public List<Deployment> findDeploymentsByNameAndId(String appName, String versionId);
+	
+	public List<ApplicationArchive> findApplicationArchivesByHashAndAlgorithm(String hash, String hashAlgorithm);
 	
 	public Deployment getLastDeployment(Application app);
 }

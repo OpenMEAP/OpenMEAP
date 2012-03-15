@@ -46,5 +46,4 @@ public class Result {
     public void setConnectionOpenResponse(ConnectionOpenResponse value) {
         this.connectionOpenResponse = value;
     }
-
 }

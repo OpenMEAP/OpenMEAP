@@ -29,6 +29,7 @@ import java.util.*;
 import com.openmeap.EventNotificationException;
 import com.openmeap.cluster.ClusterNotificationException;
 import com.openmeap.model.dto.Application;
+import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.event.ModelEntityEvent;
@@ -179,6 +180,23 @@ public class ModelServiceImpl implements ModelService
 		try {
 			Object o = q.getSingleResult();
 			return (Deployment)o;
+		} catch( NoResultException nre ) {
+			return null;
+		}
+	}
+	
+	@Override
+	public List<ApplicationArchive> findApplicationArchivesByHashAndAlgorithm(String hash, String hashAlgorithm) {
+		Query q = entityManager.createQuery("select distinct ar "
+				+"from ApplicationArchive ar join fetch ar.version "
+				+"where ar.hash=:hash "
+				+"and ar.hashAlgorithm=:hashAlgorithm");
+		q.setParameter("hash", hash);
+		q.setParameter("hashAlgorithm", hashAlgorithm);
+		q.setMaxResults(1);
+		try {
+			List<ApplicationArchive> o = (List<ApplicationArchive>)q.getResultList();
+			return (List<ApplicationArchive>)o;
 		} catch( NoResultException nre ) {
 			return null;
 		}

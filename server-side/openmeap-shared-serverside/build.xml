@@ -61,14 +61,14 @@
 		<mkdir dir="gen"/>
 		<mkdir dir="bin"/>
 		
-		<!-- Start Schema-compile template. -->
+		<!-- Start Schema-compile template. 
 		<exec executable="xjc">
 			<arg value="src/com/openmeap/cluster/node/config/cluster-node-configuration.xsd"/>
 			<arg value="-xmlschema"/>
 			<arg value="-d"/><arg value="gen"/>
 			<arg value="-p"/><arg value="com.openmeap.cluster.node.config"/>
 		</exec>
-		<!-- End Schema-compile template. -->
+		<!- - End Schema-compile template. -->
 		
 	</target>
 		

@@ -24,7 +24,10 @@
 
 package com.openmeap.services;
 
-import java.io.*;
+import static com.openmeap.util.ParameterMapUtils.firstValue;
+
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -32,6 +35,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpStatus;
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -42,15 +47,20 @@ import com.openmeap.Event;
 import com.openmeap.EventHandler;
 import com.openmeap.EventHandlingException;
 import com.openmeap.constants.UrlParamConstants;
-import com.openmeap.model.*;
+import com.openmeap.json.JSONObjectBuilder;
+import com.openmeap.model.InvalidPropertiesException;
+import com.openmeap.model.ModelManager;
+import com.openmeap.model.ModelServiceImpl;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.model.event.MapPayloadEvent;
 import com.openmeap.model.event.ModelEntityEventAction;
-import com.openmeap.model.event.handler.*;
+import com.openmeap.model.event.handler.ArchiveDeleteHandler;
+import com.openmeap.model.event.handler.ArchiveUploadHandler;
+import com.openmeap.model.event.handler.ModelServiceRefreshHandler;
+import com.openmeap.services.dto.Result;
 import com.openmeap.util.AuthTokenProvider;
-import static com.openmeap.util.ParameterMapUtils.*;
 import com.openmeap.util.ServletUtils;
 
 /**
@@ -64,10 +74,14 @@ import com.openmeap.util.ServletUtils;
  */
 public class ServiceManagementServlet extends HttpServlet {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private Logger logger = LoggerFactory.getLogger(ServiceManagementServlet.class);
 	
 	private ModelManager modelManager = null;
-	private String authSalt = null;
 	private ModelServiceRefreshHandler modelServiceRefreshHandler = null;
 	private ArchiveUploadHandler archiveUploadHandler = null;
 	private ArchiveDeleteHandler archiveDeleteHandler = null;
@@ -75,16 +89,24 @@ public class ServiceManagementServlet extends HttpServlet {
 	private WebApplicationContext context = null;
 	
 	public void init() {
+		
 		context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+		
 		modelManager = (ModelManager)context.getBean("modelManager");
-		authSalt = modelManager.getGlobalSettings().getServiceManagementAuthSalt();
+		
 		modelServiceRefreshHandler = (ModelServiceRefreshHandler)context.getBean("modelServiceRefreshHandler");
+		
 		archiveUploadHandler = (ArchiveUploadHandler)context.getBean("archiveUploadHandler");
+		archiveUploadHandler.setFileSystemStoragePathPrefix(modelManager.getClusterNode().getFileSystemStoragePathPrefix());
+		
 		archiveDeleteHandler = (ArchiveDeleteHandler)context.getBean("archiveDeleteHandler");
+		archiveDeleteHandler.setFileSystemStoragePathPrefix(modelManager.getClusterNode().getFileSystemStoragePathPrefix());
 	}
 	
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		
+		Result result = null;
 		
 		String action = request.getParameter("action");
 		
@@ -105,28 +127,36 @@ public class ServiceManagementServlet extends HttpServlet {
 		if( ! authenticates(request) ) {
 			
 			logger.error("Request failed to authenticate ",request);
-			os.print("<?xml version=\"1.0\"?>\n<result status=\"failure\" reason=\"Authentication failed\"/>");
+			result = new Result(Result.Status.FAILURE,"Authentication failed");
 			
 		} else if( request.getParameter("clearPersistenceContext")!=null && context instanceof AbstractApplicationContext ) {
 			
 			clearPersistenceContext();
 			
 		} else if( action.equals(ModelEntityEventAction.ARCHIVE_UPLOAD.getActionName()) ) {
-			
+
 			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings.getMaxFileUploadSize(),node.getFileSystemStoragePathPrefix(),request);
-			handleArchiveEvent(archiveUploadHandler, new MapPayloadEvent(paramMap), os, paramMap);
+			result = handleArchiveEvent(archiveUploadHandler, new MapPayloadEvent(paramMap), paramMap);
 			
 		} else if( action.equals(ModelEntityEventAction.ARCHIVE_DELETE.getActionName()) ) {
 			
 			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings.getMaxFileUploadSize(),node.getFileSystemStoragePathPrefix(), request);
-			handleArchiveEvent(archiveDeleteHandler, new MapPayloadEvent(paramMap), os, paramMap);
+			result = handleArchiveEvent(archiveDeleteHandler, new MapPayloadEvent(paramMap), paramMap);
 			
 		} else if( action.equals(ModelEntityEventAction.MODEL_REFRESH.getActionName()) ) {
 			
-			refresh(os,request,response);
+			result = refresh(request,response);
 			
 		}
 		
+		try {
+			if( result.getStatus()!=Result.Status.SUCCESS ) {
+				response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+			}
+			os.print( new JSONObjectBuilder().toJSON(result).toString(3) );
+		} catch( JSONException jse ) {
+			throw new IOException(jse);
+		}
 		os.flush();
 		os.close();
 	}
@@ -140,7 +170,7 @@ public class ServiceManagementServlet extends HttpServlet {
 	}
 	
 	@SuppressWarnings(value={ "rawtypes", "unchecked" })
-	private void handleArchiveEvent(EventHandler eventHandler, Event event, PrintWriter os, Map<Object,Object> paramMap) throws IOException {
+	private Result handleArchiveEvent(EventHandler eventHandler, Event event, Map<Object,Object> paramMap) throws IOException {
 		
 		String hash = firstValue(UrlParamConstants.APPARCH_HASH,paramMap);
 		String hashType = firstValue(UrlParamConstants.APPARCH_HASH_ALG,paramMap);
@@ -148,21 +178,26 @@ public class ServiceManagementServlet extends HttpServlet {
 			logger.info("Received request archive upload notification "+hashType+":"+hash);
 		}
 		
+		Result result = null;
 		if( hash!=null && hashType!=null ) {
 			ApplicationArchive arch = new ApplicationArchive();
 			arch.setHash(hash);
 			arch.setHashAlgorithm(hashType);
-			
 			try {
-				
-				// TODO: still not happy with the ArchiveUploadNotifiedEvent argument...maybe a Message type class??
 				paramMap.put("archive",arch);
 				eventHandler.handle(event);
+				result = new Result(Result.Status.SUCCESS);
 			} catch(EventHandlingException che) {
-				logger.error("Exception thrown handling ArchiveUploadEvent",che);
-				os.print("<?xml version=\"1.0\"?>\n<result status=\"failure\" reason=\"Exception occurred handing the ArchiveUploadEvent\"/>\n");
+				String msg = "Exception occurred handing the ArchiveUploadEvent";
+				logger.error(msg,che);
+				result = new Result(Result.Status.FAILURE,msg);
 			}
+		} else {
+			String msg = "Either the hash("+hash+") or the hashType("+hashType+") was null.  Both are needed to process an archive event";
+			logger.error(msg);
+			result = new Result(Result.Status.FAILURE,msg);
 		}
+		return result;
 	}
 	
 	/**
@@ -173,12 +208,13 @@ public class ServiceManagementServlet extends HttpServlet {
 	 * @param response
 	 * @throws IOException
 	 */
-	private void refresh(PrintWriter os, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private Result refresh(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
-		response.setContentType("text/xml");
+		response.setContentType("text/javascript");
 		
 		String refreshType = (String)request.getParameter("type");
 		String objectId = (String)request.getParameter("id");
+		Result result = null;
 		
 		if( refreshType!=null && objectId!=null ) {
 		
@@ -191,18 +227,26 @@ public class ServiceManagementServlet extends HttpServlet {
 				if( logger.isInfoEnabled() ) { 
 					logger.info("Refresh for "+refreshType+" with id "+objectId+" was successful");
 				}
-				os.print("<?xml version=\"1.0\"?>\n<result status=\"success\"/>\n");	
+				result = new Result(Result.Status.SUCCESS);
 			} catch( Exception e ) {
-				logger.error("Exception occurred refreshing "+refreshType+" with object id "+objectId,e);
-				os.print("<?xml version=\"1.0\"?>\n<result status=\"failure\" reason=\"Exception occurred refreshing "+refreshType+" with object id "+objectId+"\"/>\n");
+				String msg = "Exception occurred refreshing "+refreshType+" with object id "+objectId;
+				logger.error(msg,e);
+				result = new Result(Result.Status.FAILURE,msg);
 			}	
 			
 		} else {
-			logger.error("A request failed to specify all required parameters",request);
-			os.print("<?xml version=\"1.0\"?>\n<result status=\"failure\" reason=\"Must specify refresh target class, object primary key, and authentication token.\"/>\n"); 
+			String msg = "Must specify refresh target class, object primary key, and authentication token.";
+			logger.error(msg,request);
+			result = new Result(Result.Status.FAILURE,msg);
 		}
+		return result;
 	}
 	
+	/**
+	 * Validates that the auth in a request passes validation
+	 * @param arg0
+	 * @return
+	 */
 	private Boolean authenticates(HttpServletRequest arg0) {
 		String authSalt = getAuthSalt();
 		String auth = (String)arg0.getParameter(UrlParamConstants.AUTH_TOKEN);
@@ -212,15 +256,15 @@ public class ServiceManagementServlet extends HttpServlet {
 	
 	// ACCESSORS
 	
+	public String getAuthSalt() {
+		return modelManager.getGlobalSettings().getServiceManagementAuthSalt();
+	}
+	
 	public void setModelManager(ModelManager manager) {
 		modelManager = manager;
 	}
 	public ModelManager getModelManager() {
 		return modelManager;
-	}
-	
-	public String getAuthSalt() {
-		return modelManager.getGlobalSettings().getServiceManagementAuthSalt();
 	}
 	
 	public void setModelServiceRefreshHandler(ModelServiceRefreshHandler refreshHandler) {
@@ -229,6 +273,7 @@ public class ServiceManagementServlet extends HttpServlet {
 	public ModelServiceRefreshHandler getModelServiceRefreshHandler() {
 		return modelServiceRefreshHandler;
 	}
+
 }
 
 

@@ -39,9 +39,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 import org.apache.commons.codec.net.URLCodec;
 import org.json.JSONException;
@@ -73,6 +70,10 @@ import com.openmeap.util.Utils;
 
 public class ApplicationManagementServlet extends HttpServlet {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Logger logger = LoggerFactory.getLogger(ApplicationManagementServlet.class);
 	private ModelManager modelManager = null;
 	private WebApplicationContext context = null;

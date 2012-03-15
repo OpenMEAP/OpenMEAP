@@ -22,19 +22,44 @@
  ###############################################################################
  */
 
-package com.openmeap.model;
+package com.openmeap.services.dto;
 
-import com.openmeap.EventHandler;
+import com.openmeap.json.JSONProperty;
 
 /**
- * Serves as a base for ModelService event handling classes
+ * Generic result to return from the service-management servlet
  * @author schang
  */
-public interface ModelServiceEventHandler extends EventHandler<ModelEntity> {
-	/**
-	 * @param operation
-	 * @return true if the event notifier should be executed on a specific operation and payload, else false
-	 
-	Boolean handlesFor(ModelServiceOperation operation, ModelEntity payload);
-	 */
+public class Result {
+	
+	public enum Status {
+		SUCCESS,
+		FAILURE;
+	};
+	
+	private Status resultStatus;
+	private String message;
+	
+	public Result(Status status, String message) {
+		setStatus(status);
+		setMessage(message);
+	}
+	public Result(Status status) {
+		setStatus(status);
+		setMessage(status.toString());
+	}
+	
+	@JSONProperty public Status getStatus() {
+		return resultStatus;
+	}
+	public void setStatus(Status result) {
+		this.resultStatus = result;
+	}
+	
+	@JSONProperty public String getMessage() {
+		return message;
+	}
+	public void setMessage(String message) {
+		this.message = message;
+	}
 }

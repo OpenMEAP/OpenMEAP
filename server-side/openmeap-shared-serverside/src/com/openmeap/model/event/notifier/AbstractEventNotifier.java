@@ -48,7 +48,6 @@ abstract public class AbstractEventNotifier<T extends ModelEntity> extends
 		AbstractClusterServiceMgmtNotifier<T> 
 		implements ModelServiceEventNotifier<T> {
 	
-	private ModelManager modelManager;
 	private Logger logger = LoggerFactory.getLogger(AbstractEventNotifier.class);
 	
 	/**
@@ -99,16 +98,5 @@ abstract public class AbstractEventNotifier<T extends ModelEntity> extends
 		} catch( Exception e ) {
 			throw new ClusterNotificationException(e.getMessage(),e);
 		}
-	}
-
-	/*
-	 * ACCESSORS
-	 */
-	
-	public ModelManager getModelManager() {
-		return modelManager;
-	}
-	public void setModelManager(ModelManager modelManager) {
-		this.modelManager = modelManager;
 	}
 }

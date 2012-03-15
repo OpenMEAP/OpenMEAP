@@ -43,6 +43,11 @@ import com.openmeap.model.event.ModelEntityEvent;
 import com.openmeap.model.event.ModelEntityEventAction;
 import com.openmeap.model.event.handler.ArchiveDeleteHandler;
 
+/**
+ * Fired off when a deployment is deleted.  Determines whether or not to delete
+ * the application archive from the file-system. 
+ * @author schang
+ */
 public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deployment> {
 	
 	ArchiveDeleteNotifier archiveDeleteNotifier = null;
