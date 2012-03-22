@@ -34,7 +34,7 @@ import com.openmeap.model.ModelServiceOperation;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.event.ModelEntityEventAction;
 
-public class ArchiveUploadNotifier extends AbstractArchiveEventNotifier {	
+public class ArchiveFileUploadNotifier extends AbstractArchiveEventNotifier {	
 	
 	@Override
 	protected String getEventActionName() {

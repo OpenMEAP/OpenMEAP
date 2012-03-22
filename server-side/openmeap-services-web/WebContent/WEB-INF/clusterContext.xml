@@ -33,13 +33,13 @@
 		<property name="modelManager" ref="modelManager"/>
 	</bean>
 	
-	<bean id="archiveUploadHandler" class="com.openmeap.model.event.handler.ArchiveUploadHandler">
+	<bean id="archiveUploadHandler" class="com.openmeap.model.event.handler.ArchiveFileUploadHandler">
 		<property name="modelManager" ref="modelManager"/>
 		<!-- this will be overridden in service-management -->
 		<property name="fileSystemStoragePathPrefix" value="${OPENMEAP_CLUSTER_NODE_PATH_PREFIX}"/>
 	</bean>
 	
-	<bean id="archiveDeleteHandler" class="com.openmeap.model.event.handler.ArchiveDeleteHandler">
+	<bean id="archiveDeleteHandler" class="com.openmeap.model.event.handler.ArchiveFileDeleteHandler">
 		<property name="modelManager" ref="modelManager"/>
 		<!-- this will be overridden in service-management -->
 		<property name="fileSystemStoragePathPrefix" value="${OPENMEAP_CLUSTER_NODE_PATH_PREFIX}"/>

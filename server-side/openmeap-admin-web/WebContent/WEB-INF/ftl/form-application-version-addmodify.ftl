@@ -48,6 +48,24 @@ Parameter Values / Outputs:
 				[/#if]
 			</select></dd>
 			<dt>Hash Value:</dt><dd><input type="text" name="hash" value="${(version.archive.hash?html)!}"/></dd>
+			[#if willProcess && (version.id)??]
+				<dt>
+					Delete Confirm:<br/>
+					<span class="copy">Type "delete the version" here.</span>
+				</dt>
+				<dd><input type="text" name="deleteConfirm" value=""/></dd>
+				<dt>
+					Delete:<br/>
+					<span class="copy">After filling in the "Delete Confirm" field, click here.
+					This will delete the application archive from the server, so you'll need to
+					re-upload the zip file if you want to re-create the version.
+					</span>
+				</dt>
+				<dd>
+					<input type="hidden" name="delete" value="Delete!">	
+					<input type="image" src="/openmeap-admin-web/img/btn/action_delete.gif" value="Delete!"/>
+				</dd>
+			[/#if]
 		</dl>
 	</fieldset>
 </form>

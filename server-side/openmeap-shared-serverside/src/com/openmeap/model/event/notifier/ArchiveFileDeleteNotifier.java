@@ -33,7 +33,7 @@ import com.openmeap.model.event.ModelEntityEventAction;
  * Notifies the cluster of the need to delete an application archive file.
  * @author schang
  */
-public class ArchiveDeleteNotifier extends AbstractArchiveEventNotifier {
+public class ArchiveFileDeleteNotifier extends AbstractArchiveEventNotifier {
 	
 	@Override 
 	protected String getEventActionName() {

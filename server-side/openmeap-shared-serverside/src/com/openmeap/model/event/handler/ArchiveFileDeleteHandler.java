@@ -18,9 +18,9 @@ import com.openmeap.model.dto.ApplicationArchive;
  * Handles the actual deletion of an application archive.
  * @author schang
  */
-public class ArchiveDeleteHandler implements EventHandler<Map> {
+public class ArchiveFileDeleteHandler implements EventHandler<Map> {
 
-	private Logger logger = LoggerFactory.getLogger(ArchiveDeleteHandler.class);
+	private Logger logger = LoggerFactory.getLogger(ArchiveFileDeleteHandler.class);
 	
 	private ModelManager modelManager;
 	private String fileSystemStoragePathPrefix;

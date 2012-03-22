@@ -41,7 +41,7 @@ import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.model.event.MapPayloadEvent;
 import com.openmeap.model.event.ModelEntityEvent;
 import com.openmeap.model.event.ModelEntityEventAction;
-import com.openmeap.model.event.handler.ArchiveDeleteHandler;
+import com.openmeap.model.event.handler.ArchiveFileDeleteHandler;
 
 /**
  * Fired off when a deployment is deleted.  Determines whether or not to delete
@@ -50,8 +50,8 @@ import com.openmeap.model.event.handler.ArchiveDeleteHandler;
  */
 public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deployment> {
 	
-	ArchiveDeleteNotifier archiveDeleteNotifier = null;
-	ArchiveDeleteHandler archiveDeleteHandler = null;
+	ArchiveFileDeleteNotifier archiveDeleteNotifier = null;
+	ArchiveFileDeleteHandler archiveDeleteHandler = null;
 	
 	@Override
 	public Boolean notifiesFor(ModelServiceOperation operation,
@@ -111,17 +111,17 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 		}
 	}
 
-	public ArchiveDeleteNotifier getArchiveDeleteNotifier() {
+	public ArchiveFileDeleteNotifier getArchiveDeleteNotifier() {
 		return archiveDeleteNotifier;
 	}
-	public void setArchiveDeleteNotifier(ArchiveDeleteNotifier archiveDeleteNotifier) {
+	public void setArchiveDeleteNotifier(ArchiveFileDeleteNotifier archiveDeleteNotifier) {
 		this.archiveDeleteNotifier = archiveDeleteNotifier;
 	}
 
-	public ArchiveDeleteHandler getArchiveDeleteHandler() {
+	public ArchiveFileDeleteHandler getArchiveDeleteHandler() {
 		return archiveDeleteHandler;
 	}
-	public void setArchiveDeleteHandler(ArchiveDeleteHandler archiveDeleteHandler) {
+	public void setArchiveDeleteHandler(ArchiveFileDeleteHandler archiveDeleteHandler) {
 		this.archiveDeleteHandler = archiveDeleteHandler;
 	}
 }

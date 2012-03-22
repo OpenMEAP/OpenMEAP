@@ -41,9 +41,9 @@ import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.GlobalSettings;
 
-public class ArchiveUploadHandler implements EventHandler<Map> {
+public class ArchiveFileUploadHandler implements EventHandler<Map> {
 
-	private Logger logger = LoggerFactory.getLogger(ArchiveUploadHandler.class);
+	private Logger logger = LoggerFactory.getLogger(ArchiveFileUploadHandler.class);
 	
 	private ModelManager modelManager;
 	private String fileSystemStoragePathPrefix;

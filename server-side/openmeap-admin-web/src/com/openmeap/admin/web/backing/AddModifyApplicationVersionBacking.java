@@ -59,8 +59,9 @@ import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.model.event.ModelEntityEvent;
-import com.openmeap.model.event.notifier.ArchiveUploadNotifier;
+import com.openmeap.model.event.notifier.ArchiveFileUploadNotifier;
 import com.openmeap.protocol.dto.HashAlgorithm;
+import com.openmeap.util.ParameterMapUtils;
 import com.openmeap.util.Utils;
 import com.openmeap.util.ZipUtils;
 import com.openmeap.web.AbstractTemplatedSectionBacking;
@@ -79,7 +80,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 	private static String PROCESS_TARGET = ProcessingTargets.ADDMODIFY_APPVER;
 	
 	private ModelManager modelManager = null;
-	private ArchiveUploadNotifier archiveUploadNotifier = null;
+	private ArchiveFileUploadNotifier archiveUploadNotifier = null;
 	
 	public AddModifyApplicationVersionBacking() {
 		setProcessingTargetIds(Arrays.asList(new String[]{PROCESS_TARGET}));
@@ -147,10 +148,39 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		if( notEmpty("processTarget", parameterMap) 
 				&& PROCESS_TARGET.compareTo(firstValue("processTarget",parameterMap ))==0 
 				&& willProcess ) {
-			processApplicationVersionFromParameters(app,version,events,parameterMap);
+			
+			if( ParameterMapUtils.notEmpty("delete",parameterMap) && ParameterMapUtils.notEmpty("deleteConfirm",parameterMap) ) {
+				
+				if( ParameterMapUtils.firstValue("deleteConfirm", parameterMap).equals("delete the version") ) {
+					
+					ApplicationArchive archive2Delete = null;
+					if( version.getArchive()!=null ) {
+						archive2Delete = new ApplicationArchive();
+						archive2Delete.setHash(version.getArchive().getHash());
+						archive2Delete.setHashAlgorithm(version.getArchive().getHashAlgorithm());
+					}
+					
+					modelManager.getModelService().delete(version);
+					if( archive2Delete!=null ) {
+						deleteOldArchiveFromFileSystem(archive2Delete, events);
+					}
+					events.add( new MessagesEvent("Application version successfully deleted!") );
+					version=null;
+					
+				} else {
+					
+					events.add( new MessagesEvent("You must confirm your desire to delete by typing in the delete confirmation message.") );
+				}
+			} else {
+			
+				processApplicationVersionFromParameters(app,version,events,parameterMap);
+			}
+			
 		}
 		
-		templateVariables.put("version", version);
+		if( version!=null ) {
+			templateVariables.put("version", version);
+		}
 		templateVariables.put("application", app);
 		
 		createHashTypes(templateVariables,version!=null?version.getArchive():null);
@@ -339,33 +369,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 			// that is, they are not used by any other versions
 			if( archive.getId()!=null && !archive.getHash().equals(hashValue) ) {
 
-				// check to see if any other archives have this hash and md5
-				List<ApplicationArchive> archives = modelManager
-						.getModelService()
-						.findApplicationArchivesByHashAndAlgorithm(archive.getHash(), archive.getHashAlgorithm());
-				Boolean archiveIsInUseElsewhere = archives!=null && archives.size()>1;
-				
-				if( !archiveIsInUseElsewhere ) {
-					
-					// delete the web-view
-					try {
-						File oldExplodedPath = archive.getExplodedPath(settings.getTemporaryStoragePath());
-						if( oldExplodedPath!=null && oldExplodedPath.exists() ) {
-							FileUtils.deleteDirectory(oldExplodedPath);
-						}
-					} catch( IOException ioe ) {
-						logger.error("There was an exception deleting the old web-view directory: {}",ioe);
-						events.add(new MessagesEvent(String.format("Upload process will continue.  There was an exception deleting the old web-view directory: %s",ioe.getMessage())));
-					}
-					
-					// delete the zip file
-					File originalFile = archive.getFile(settings.getTemporaryStoragePath());
-					if( originalFile.exists() && !originalFile.delete() ) {
-						String mesg = String.format("Failed to delete old file %s, was different so proceeding anyhow.",originalFile.getName());
-						logger.error(mesg);
-						events.add(new MessagesEvent(mesg));
-					}
-				}
+				deleteOldArchiveFromFileSystem(archive,events);
 			}
 			
 			archive.setHashAlgorithm("MD5");
@@ -440,6 +444,39 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		return archive;
 	}
 	
+	private void deleteOldArchiveFromFileSystem(ApplicationArchive archive, List<ProcessingEvent> events) {
+		
+		GlobalSettings settings = modelManager.getGlobalSettings();
+		
+		// check to see if any other archives have this hash and md5
+		List<ApplicationArchive> archives = modelManager
+				.getModelService()
+				.findApplicationArchivesByHashAndAlgorithm(archive.getHash(), archive.getHashAlgorithm());
+		Boolean archiveIsInUseElsewhere = archives!=null && archives.size()>1;
+		
+		if( !archiveIsInUseElsewhere ) {
+			
+			// delete the web-view
+			try {
+				File oldExplodedPath = archive.getExplodedPath(settings.getTemporaryStoragePath());
+				if( oldExplodedPath!=null && oldExplodedPath.exists() ) {
+					FileUtils.deleteDirectory(oldExplodedPath);
+				}
+			} catch( IOException ioe ) {
+				logger.error("There was an exception deleting the old web-view directory: {}",ioe);
+				events.add(new MessagesEvent(String.format("Upload process will continue.  There was an exception deleting the old web-view directory: %s",ioe.getMessage())));
+			}
+			
+			// delete the zip file
+			File originalFile = archive.getFile(settings.getTemporaryStoragePath());
+			if( originalFile.exists() && !originalFile.delete() ) {
+				String mesg = String.format("Failed to delete old file %s, was different so proceeding anyhow.",originalFile.getName());
+				logger.error(mesg);
+				events.add(new MessagesEvent(mesg));
+			}
+		}
+	}
+	
 	/**
 	 * 
 	 * @param archive
@@ -478,10 +515,10 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		return modelManager;
 	}
 
-	public void setArchiveUploadNotifier(ArchiveUploadNotifier archiveUploadNotifier) {
+	public void setArchiveUploadNotifier(ArchiveFileUploadNotifier archiveUploadNotifier) {
 		this.archiveUploadNotifier = archiveUploadNotifier;
 	}
-	public ArchiveUploadNotifier getArchiveUploadNotifier() {
+	public ArchiveFileUploadNotifier getArchiveUploadNotifier() {
 		return archiveUploadNotifier;
 	}
 }

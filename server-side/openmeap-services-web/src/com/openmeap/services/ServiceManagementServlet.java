@@ -56,8 +56,8 @@ import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.model.event.MapPayloadEvent;
 import com.openmeap.model.event.ModelEntityEventAction;
-import com.openmeap.model.event.handler.ArchiveDeleteHandler;
-import com.openmeap.model.event.handler.ArchiveUploadHandler;
+import com.openmeap.model.event.handler.ArchiveFileDeleteHandler;
+import com.openmeap.model.event.handler.ArchiveFileUploadHandler;
 import com.openmeap.model.event.handler.ModelServiceRefreshHandler;
 import com.openmeap.services.dto.Result;
 import com.openmeap.util.AuthTokenProvider;
@@ -83,8 +83,8 @@ public class ServiceManagementServlet extends HttpServlet {
 	
 	private ModelManager modelManager = null;
 	private ModelServiceRefreshHandler modelServiceRefreshHandler = null;
-	private ArchiveUploadHandler archiveUploadHandler = null;
-	private ArchiveDeleteHandler archiveDeleteHandler = null;
+	private ArchiveFileUploadHandler archiveUploadHandler = null;
+	private ArchiveFileDeleteHandler archiveDeleteHandler = null;
 	
 	private WebApplicationContext context = null;
 	
@@ -96,10 +96,10 @@ public class ServiceManagementServlet extends HttpServlet {
 		
 		modelServiceRefreshHandler = (ModelServiceRefreshHandler)context.getBean("modelServiceRefreshHandler");
 		
-		archiveUploadHandler = (ArchiveUploadHandler)context.getBean("archiveUploadHandler");
+		archiveUploadHandler = (ArchiveFileUploadHandler)context.getBean("archiveUploadHandler");
 		archiveUploadHandler.setFileSystemStoragePathPrefix(modelManager.getClusterNode().getFileSystemStoragePathPrefix());
 		
-		archiveDeleteHandler = (ArchiveDeleteHandler)context.getBean("archiveDeleteHandler");
+		archiveDeleteHandler = (ArchiveFileDeleteHandler)context.getBean("archiveDeleteHandler");
 		archiveDeleteHandler.setFileSystemStoragePathPrefix(modelManager.getClusterNode().getFileSystemStoragePathPrefix());
 	}
 	
