@@ -41,7 +41,10 @@ public class HttpRequestExecuterFactory {
 		}
 	};
 	
-	public void setDefaultType(Class<? extends HttpRequestExecuter> defaultNew) {
+	public void setStaticDefaultType(Class<? extends HttpRequestExecuter> defaultNew) {
+		defaultExecuter = defaultNew;
+	}
+	static public void setDefaultType(Class<? extends HttpRequestExecuter> defaultNew) {
 		defaultExecuter = defaultNew;
 	}
 	static public Class<? extends HttpRequestExecuter> getDefaultType() {
