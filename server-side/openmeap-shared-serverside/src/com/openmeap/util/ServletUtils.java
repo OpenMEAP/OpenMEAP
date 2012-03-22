@@ -107,6 +107,7 @@ public abstract class ServletUtils {
 			Map<String,String[]> params = (Map<String,String[]>)request.getParameterMap();
 			for( Map.Entry<String,String[]> ent : params.entrySet() ) {
 				if( ent.getValue() != null ) {
+					
 					String key = ent.getKey();
 					String[] values = new String[ent.getValue().length];
 					int i = 0;

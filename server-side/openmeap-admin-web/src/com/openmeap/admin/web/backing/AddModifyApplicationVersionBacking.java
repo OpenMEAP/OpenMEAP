@@ -24,14 +24,18 @@
 
 package com.openmeap.admin.web.backing;
 
+import static com.openmeap.util.ParameterMapUtils.firstValue;
+import static com.openmeap.util.ParameterMapUtils.notEmpty;
+
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipFile;
 
 import javax.persistence.PersistenceException;
@@ -42,28 +46,30 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.openmeap.util.ParameterMapUtils.*;
-
-import com.openmeap.protocol.dto.HashAlgorithm;
-import com.openmeap.util.Utils;
-import com.openmeap.util.ZipUtils;
-import com.openmeap.web.html.*;
+import com.openmeap.Authorizer;
 import com.openmeap.admin.web.ProcessingTargets;
 import com.openmeap.admin.web.backing.event.AddSubNavAnchorEvent;
 import com.openmeap.admin.web.backing.event.MessagesEvent;
 import com.openmeap.constants.FormConstants;
-import com.openmeap.constants.ServletNameConstants;
-import com.openmeap.constants.UrlParamConstants;
-import com.openmeap.model.*;
-import com.openmeap.Authorizer;
+import com.openmeap.model.InvalidPropertiesException;
+import com.openmeap.model.ModelManager;
+import com.openmeap.model.ModelServiceOperation;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.GlobalSettings;
-import com.openmeap.model.event.ArchiveUploadEvent;
 import com.openmeap.model.event.ModelEntityEvent;
 import com.openmeap.model.event.notifier.ArchiveUploadNotifier;
-import com.openmeap.web.*;
+import com.openmeap.protocol.dto.HashAlgorithm;
+import com.openmeap.util.Utils;
+import com.openmeap.util.ZipUtils;
+import com.openmeap.web.AbstractTemplatedSectionBacking;
+import com.openmeap.web.GenericProcessingEvent;
+import com.openmeap.web.ProcessingContext;
+import com.openmeap.web.ProcessingEvent;
+import com.openmeap.web.ProcessingUtils;
+import com.openmeap.web.html.Anchor;
+import com.openmeap.web.html.Option;
 
 // TODO: there are way to many things going on in this class
 public class AddModifyApplicationVersionBacking extends AbstractTemplatedSectionBacking {

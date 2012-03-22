@@ -66,6 +66,14 @@ public interface ModelService {
 	public <T extends ModelEntity> void delete(T obj2Delete) throws PersistenceException;
 	
 	/**
+	 * Handles application deletion.
+	 * 
+	 * @param app
+	 * @throws PersistenceException
+	 */
+	public void delete(Application app) throws PersistenceException;
+	
+	/**
 	 * Pulls back every instance of a particular ModelEntity.
 	 * Implemented to pull back DeviceTypes, but could be used for any of them 
 	 * @param <T>

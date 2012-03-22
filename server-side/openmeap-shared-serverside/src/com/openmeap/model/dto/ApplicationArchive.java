@@ -88,7 +88,6 @@ public class ApplicationArchive extends AbstractModelEntity {
 			return new File(pathPrefix, hash+".zip"); 
 		} else return null;
 	}
-	
 	@Transient public File getExplodedPath(String pathPrefix) {
 		if( pathPrefix!=null && getHash()!=null && getHashAlgorithm()!=null ) {
 			return new File(pathPrefix, getHash()); 

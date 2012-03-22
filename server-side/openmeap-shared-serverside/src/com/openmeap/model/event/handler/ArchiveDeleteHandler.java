@@ -1,8 +1,10 @@
 package com.openmeap.model.event.handler;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +13,6 @@ import com.openmeap.EventHandler;
 import com.openmeap.EventHandlingException;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.ApplicationArchive;
-import com.openmeap.model.dto.ClusterNode;
 
 /**
  * Handles the actual deletion of an application archive.
@@ -42,6 +43,17 @@ public class ArchiveDeleteHandler implements EventHandler<Map> {
 		} else {
 			logger.error("Failed to find archive "+archive.getFile(getFileSystemStoragePathPrefix()));
 		}
+		
+		File directory = archive.getExplodedPath(getFileSystemStoragePathPrefix());
+		if( directory.exists() ) {
+			try {
+				FileUtils.deleteDirectory(directory);
+			} catch(IOException ioe) {
+				String msg = "Unable to delete directory "+directory;
+				logger.error(msg);
+				throw new EventHandlingException(msg,ioe);
+			}
+		}		
 		
 		if( logger.isTraceEnabled() ) {
 			logger.trace("exiting handle()");

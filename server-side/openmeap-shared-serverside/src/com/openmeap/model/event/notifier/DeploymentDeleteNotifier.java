@@ -67,10 +67,9 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 		
 		Deployment deployment2Delete = (Deployment)event.getPayload();
 		Application app = deployment2Delete.getApplicationVersion().getApplication();
-		app = archiveDeleteNotifier.getModelManager().getModelService().findByPrimaryKey(app.getClass(),app.getPk());
 		
 		// if there are any other deployments with this hash,
-		// then we cannot yet delete it.
+		//   then we cannot yet delete it's archive.
 		for( Deployment deployment : app.getDeployments() ) {
 			if( deployment.getId()==null || !deployment.getId().equals(deployment2Delete.getId()) ) {
 				if( deployment.getHash().equals(deployment2Delete.getHash()) 
@@ -81,21 +80,26 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 		}
 		
 		// if there are any application versions with this archive, 
-		// then we cannot delete it.
+		//   then we cannot delete it's archive.
 		for( String versionId : app.getVersions().keySet() ) {
 			ApplicationVersion version = app.getVersions().get(versionId);
 			ApplicationArchive archive = version.getArchive();
-			if( archive.getHash().equals(deployment2Delete.getHash()) 
+			if( version.getActiveFlag().equals(Boolean.TRUE)
+					&& archive.getHash().equals(deployment2Delete.getHash()) 
 					&& archive.getHashAlgorithm().equals(deployment2Delete.getHashAlgorithm()) ) {
 				return;
 			} 
 		}
 		
+		// our checks have passed, so we can remove the archive from the local and cluster file-systems
+		
+		// use the archive delete notifier to cleanup to cluster nodes
 		ApplicationArchive archive = new ApplicationArchive();
 		archive.setHash(deployment2Delete.getHash());
 		archive.setHashAlgorithm(deployment2Delete.getHashAlgorithm());
 		archiveDeleteNotifier.notify(new ModelEntityEvent(ModelServiceOperation.DELETE,archive));
 		
+		// use the archive delete handler to cleanup localhost
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("archive", archive);
 		try {
@@ -110,7 +114,6 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 	public ArchiveDeleteNotifier getArchiveDeleteNotifier() {
 		return archiveDeleteNotifier;
 	}
-
 	public void setArchiveDeleteNotifier(ArchiveDeleteNotifier archiveDeleteNotifier) {
 		this.archiveDeleteNotifier = archiveDeleteNotifier;
 	}

@@ -119,13 +119,16 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 								ParameterMapUtils.firstValue("applicationId", parameterMap) ) );
 			
 			if( ParameterMapUtils.notEmpty("delete",parameterMap) && ParameterMapUtils.notEmpty("deleteConfirm",parameterMap) ) {
+				
 					if( ParameterMapUtils.firstValue("deleteConfirm", parameterMap).equals("delete the application") ) {
+						
 						modelManager.delete(app);
 						events.add( new MessagesEvent("Application successfully deleted!") );
 						app = null;
 						// we remove the applicationId parameter, so that the form can populate empty
 						parameterMap.remove("applicationId");
 					} else {
+						
 						events.add( new MessagesEvent("You must confirm your desire to delete by typing in the delete confirmation message.") );
 				}
 			} 
@@ -136,9 +139,9 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 			app = modelManager.getModelService().findByPrimaryKey(Application.class, Long.valueOf( ParameterMapUtils.firstValue("applicationId", parameterMap) ) );
 		}
 		
-		if( app == null && ParameterMapUtils.notEmpty("applicationId",parameterMap) )
+		if( app == null && ParameterMapUtils.notEmpty("applicationId",parameterMap) ) {
 			events.add( new MessagesEvent("Application with id "+ParameterMapUtils.firstValue("applicationId", parameterMap)+" not found") );
-		else if( app!=null && app.getId()!=null ) { 
+		} else if( app!=null && app.getId()!=null ) { 
 			if( app.getVersions()!=null && app.getVersions().size()>0 )
 				events.add( 
 						new AddSubNavAnchorEvent(

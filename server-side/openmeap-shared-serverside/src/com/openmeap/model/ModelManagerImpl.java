@@ -24,6 +24,8 @@
 
 package com.openmeap.model;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -66,25 +68,8 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 		setModelService(service);
 	}
 	
-	public void setAuthorizer(Authorizer auth) {
-		this.authorizer=auth;
-	}
-	public Authorizer getAuthorizer() {
-		return authorizer;
-	}
-	
-	public void setModelService(ModelService service) {
-		modelService = service;
-	}
-	public ModelService getModelService() {
-		return modelService;
-	}
-	
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		context = applicationContext;
-	}
-	
 	public void delete(Application app) {
+		
 		if( ! getAuthorizer().may(Authorizer.Action.DELETE, app) ) {
 			throw new PersistenceException(new AuthorizationException("The user logged in does not have permissions to DELETE Application objects."));
 		}
@@ -161,5 +146,27 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 		} else {
 			return null;
 		}
+	}
+	
+	/*
+	 * GETTERS/SETTERS
+	 */
+	
+	public void setAuthorizer(Authorizer auth) {
+		this.authorizer=auth;
+	}
+	public Authorizer getAuthorizer() {
+		return authorizer;
+	}
+	
+	public void setModelService(ModelService service) {
+		modelService = service;
+	}
+	public ModelService getModelService() {
+		return modelService;
+	}
+	
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		context = applicationContext;
 	}
 }

@@ -68,7 +68,7 @@
 		<dependency org="org.springframework" name="spring-core" rev="3.0.6.RELEASE" conf="ide->default"/>
 		  
 		<dependency org="commons-lang" name="commons-lang" rev="2.6" conf="ide->default"/>
-		
+		<dependency org="commons-io" name="commons-io" rev="2.1" conf="ide->default"/>
 		<dependency org="commons-fileupload" name="commons-fileupload" rev="1.2.2" conf="ide->default"/>
 		
 		<dependency org="org.apache.tomcat" name="servlet-api" rev="6.0.35" conf="compile->default"/>

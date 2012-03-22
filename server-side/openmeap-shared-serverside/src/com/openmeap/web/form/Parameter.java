@@ -22,46 +22,17 @@
  ###############################################################################
  */
 
-package com.openmeap.util;
+package com.openmeap.web.form;
 
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
+import java.lang.annotation.Target;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-public class HttpRequestExecuterFactory {
-	
-	static public interface CredentialsProviderFactory {
-		CredentialsProvider newCredentialsProvider();
-	}
-	
-	static private Class<? extends HttpRequestExecuter> defaultExecuter = HttpRequestExecuterImpl.class;
-	
-	static private CredentialsProviderFactory credentialsProviderFactory = new CredentialsProviderFactory() {
-		public CredentialsProvider newCredentialsProvider() {
-			return new BasicCredentialsProvider();
-		}
-	};
-	
-	public void setDefaultType(Class<? extends HttpRequestExecuter> defaultNew) {
-		defaultExecuter = defaultNew;
-	}
-	static public Class<? extends HttpRequestExecuter> getDefaultType() {
-		return defaultExecuter;
-	}
-	static public HttpRequestExecuter newDefault() {
-		try {
-			return defaultExecuter.newInstance();
-		} catch( Exception ie ) {
-			throw new RuntimeException(ie);
-		}
-	}
-	
-	static public void setDefaultCredentialsProviderFactory(CredentialsProviderFactory factory) {
-		credentialsProviderFactory = factory;
-	}
-	static public CredentialsProviderFactory getDefaultCredentialsProviderFactory() {
-		return credentialsProviderFactory;
-	}
-	static public CredentialsProvider newDefaultCredentialsProvider() {
-		return credentialsProviderFactory.newCredentialsProvider();
-	}
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Parameter {
+	String value() default "";
+	boolean password() default false;
+	Validation validation() default @Validation;
 }

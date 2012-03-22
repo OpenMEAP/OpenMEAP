@@ -62,6 +62,7 @@ public class ModelServiceImpl implements ModelService
 		entityManager.clear();
 	}
 	
+	@Override
 	public <T extends ModelEntity> T saveOrUpdate(T obj) throws PersistenceException {
 		T obj2Persist = obj;
 		try {
@@ -83,27 +84,38 @@ public class ModelServiceImpl implements ModelService
 		callEventNotifiers(ModelServiceOperation.SAVE_OR_UPDATE,obj2Persist);
 		return obj2Persist;
 	}
+	
+	@Override
+	public <T extends ModelEntity> void delete(T obj2Delete) throws PersistenceException {		
+		_delete(obj2Delete);		
+	}
 
+	@Override
+	public void delete(Application app) throws PersistenceException {
+		
+		Iterator iterator = app.getDeployments().iterator();
+		List<Deployment> deplList = new ArrayList<Deployment>();
+		while(iterator.hasNext()) {
+			Deployment depl = (Deployment)iterator.next();
+			deplList.add(depl);
+		}	
+		
+		_delete(app);
+			
+		app.setDeployments(deplList);
+		app.getVersions().clear();
+		iterator = app.getDeployments().iterator();
+		while(iterator.hasNext()) {
+			Deployment depl = (Deployment)iterator.next();
+			callEventNotifiers(ModelServiceOperation.DELETE,depl);
+			iterator.remove();
+		}
+	}
+	
+	@Override
 	public <T extends ModelEntity> void refresh(T obj2Refresh) throws PersistenceException {
 		this._refresh(obj2Refresh);
 		callEventNotifiers(ModelServiceOperation.REFRESH,obj2Refresh);
-	}
-	
-	public <T extends ModelEntity> void delete(T obj2Delete) throws PersistenceException {		
-		// give the event notifiers an opportunity to act, prior to deletion
-		callEventNotifiers(ModelServiceOperation.DELETE,obj2Delete);
-		try {
-			entityManager.getTransaction().begin();
-			this._refresh(obj2Delete);
-			obj2Delete.remove();
-			entityManager.remove(obj2Delete);
-			entityManager.getTransaction().commit();
-		} catch( PersistenceException pe ) {
-			if( entityManager.isOpen() && entityManager.getTransaction().isActive() ) {
-				entityManager.getTransaction().rollback();
-			}
-			throw new PersistenceException(pe);
-		}			
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -126,6 +138,7 @@ public class ModelServiceImpl implements ModelService
 		}
 	}
 	
+	@Override
 	public Application findApplicationByName(String name) {
 		Query q = entityManager.createQuery("select distinct a "
 				+"from Application a "
@@ -138,6 +151,7 @@ public class ModelServiceImpl implements ModelService
 		}
 	}
 	
+	@Override
 	public ApplicationVersion findAppVersionByNameAndId(String appName, String versionId) {
 		Query q = entityManager.createQuery("select distinct av "
 				+"from ApplicationVersion av inner join fetch av.application a "
@@ -153,6 +167,7 @@ public class ModelServiceImpl implements ModelService
 		}
 	}
 	
+	@Override
 	public List<Deployment> findDeploymentsByNameAndId(String appName, String versionId) {
 		Query q = entityManager.createQuery("select d "
 				+"from Deployment d inner join fetch d.applicationVersion av inner join fetch d.application a "
@@ -219,6 +234,23 @@ public class ModelServiceImpl implements ModelService
 	}
 	
 	// PRIVATE METHODS
+	
+	private <T extends ModelEntity> void _delete(T obj2Delete) throws PersistenceException {		
+		// give the event notifiers an opportunity to act, prior to deletion
+		callEventNotifiers(ModelServiceOperation.DELETE,obj2Delete);
+		try {
+			entityManager.getTransaction().begin();
+			this._refresh(obj2Delete);
+			obj2Delete.remove();
+			entityManager.remove(obj2Delete);
+			entityManager.getTransaction().commit();
+		} catch( PersistenceException pe ) {
+			if( entityManager.isOpen() && entityManager.getTransaction().isActive() ) {
+				entityManager.getTransaction().rollback();
+			}
+			throw new PersistenceException(pe);
+		}			
+	}
 	
 	private void _refresh(ModelEntity obj2Refresh) {
 		if( !entityManager.contains(obj2Refresh) ) {

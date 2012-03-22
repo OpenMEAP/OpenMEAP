@@ -1,3 +1,12 @@
+OpenMEAP 1.1.0a
+  - Bug fixes and refactoring
+  - Automated deployment history maintenance
+  - The ability to delete versions
+  - Archive distribution to the cluster is deferred to deployment.
+
+OpenMEAP 1.0.4a
+  - Fixed JavaSE settings.  Still not quite where we want it to be JavaEE
+
 OpenMEAP 1.0.3a
   - Added com.openmeap.slic.updatePendingTimeout
   - Cleaned up the JPA configuration some, making it more flexible.

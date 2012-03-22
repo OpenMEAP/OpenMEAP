@@ -9,6 +9,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.openmeap.util.PropertyUtils;
+
 /**
  * Converts an object hierarchy into a JSON representation.
  * Only looks at the JSONProperty annotated getter-methods.
@@ -32,8 +34,8 @@ public class JSONObjectBuilder {
 				continue;
 			}
 			Class<?> returnType = getterMethod.getReturnType();
-			Method setterMethod = setterForGetterMethod(getterMethod);
-			String propertyName = propertyForMethodName(getterMethod.getName());
+			Method setterMethod = PropertyUtils.setterForGetterMethod(getterMethod);
+			String propertyName = PropertyUtils.propertyForGetterMethodName(getterMethod.getName());
 			try {
 				if( setterMethod!=null ) {
 					
@@ -72,9 +74,9 @@ public class JSONObjectBuilder {
 						// instantiate a new object, of the type correct for the
 						Object obj = (Object)returnType.newInstance();
 						setterMethod.invoke(rootObject, fromJSON((JSONObject)value,obj));
-					} else if( isSimpleType(returnType) ) {
+					} else if( PropertyUtils.isSimpleType(returnType) ) {
 						
-						setterMethod.invoke(rootObject, correctCasting(returnType,value));
+						setterMethod.invoke(rootObject, PropertyUtils.correctCasting(returnType,value));
 					} 
 				}
 			} catch( InstantiationException e ) {
@@ -117,13 +119,13 @@ public class JSONObjectBuilder {
 			}
 			
 			// strip "get" off the front
-			String propertyName = propertyForMethodName(method.getName());
+			String propertyName = PropertyUtils.propertyForGetterMethodName(method.getName());
 			
 			try {
 				if( returnType.isEnum() ) {
 					Enum ret = (Enum)method.invoke(obj);
 					jsonObj.put(propertyName, ret.toString());
-				} else if( isSimpleType(returnType) ) {
+				} else if( PropertyUtils.isSimpleType(returnType) ) {
 					if( returnType.isArray() ) {
 						Object[] returnValues = (Object[])method.invoke(obj);
 						JSONArray jsonArray = new JSONArray();
@@ -156,53 +158,6 @@ public class JSONObjectBuilder {
 			
 		}
 		return jsonObj;
-	}
-	
-	private Object correctCasting(Class<?> type, Object obj) {
-		if( type.equals(Long.class) ) {
-			return Long.valueOf(obj.toString());
-		} else if( type.equals(Double.class) ) {
-			return Double.valueOf(obj.toString());
-		} else if( type.equals(Integer.class) ) {
-			return Integer.valueOf(obj.toString());
-		} else return obj;
-	}
-	
-	private Boolean isSimpleType(Class<?> returnType) {
-		Class<?> testAgainst = returnType.isArray() ? returnType.getComponentType() : returnType;
-		return Boolean.class.isAssignableFrom(testAgainst) 
-			|| Long.class.isAssignableFrom(testAgainst) 
-			|| Double.class.isAssignableFrom(testAgainst)
-			|| Integer.class.isAssignableFrom(testAgainst)
-			|| String.class.isAssignableFrom(testAgainst);
-	}
-	
-	private Method setterForGetterMethod(Method getterMethod) {
-		String setterName = getterMethod.getName();
-		if( setterName.startsWith("g") ) {
-			setterName = setterName.replaceFirst("g", "s");
-		}
-		Method setterMethod = null;
-		try {
-			Class clazz = getterMethod.getDeclaringClass();
-			Class returnType = getterMethod.getReturnType();
-			setterMethod = clazz.getMethod(setterName,returnType);
-		} catch( NoSuchMethodException ite ) {
-			// we don't care, here
-		}
-		return setterMethod;
-	}
-	
-	private String propertyForMethodName(String methodName) {
-		String propertyName = methodName;
-		if( propertyName.startsWith("get") ) {
-			propertyName = propertyName.substring(3);
-		}
-		String firstLetter = propertyName.substring(0,1);
-		if( firstLetter.matches("[A-Z]") ) {
-			propertyName = firstLetter.toLowerCase()+propertyName.substring(1);
-		}
-		return propertyName;
 	}
 	
 	private Object[] toTypedArray(List<?> list) {

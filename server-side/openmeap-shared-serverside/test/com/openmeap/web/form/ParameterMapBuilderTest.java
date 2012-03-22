@@ -22,46 +22,71 @@
  ###############################################################################
  */
 
-package com.openmeap.util;
+package com.openmeap.web.form;
 
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
+import java.util.HashMap;
+import java.util.Map;
 
-public class HttpRequestExecuterFactory {
+import org.junit.Assert;
+import org.junit.Test;
+
+public class ParameterMapBuilderTest {
 	
-	static public interface CredentialsProviderFactory {
-		CredentialsProvider newCredentialsProvider();
+	@Test public void testParameterMapBuilder() throws Exception {
+		
+		TestObject obj = new TestObject();
+		obj.setDoubleValue(3.141597);
+		obj.setIntegerValue(123456);
+		obj.setStringValue("AStringValue");
+		
+		ParameterMapBuilder builder = new ParameterMapBuilder();
+		builder.setUseParameterMapUtilsFirstValue(false);
+		builder.setMapValuesAsStrings(true);
+		
+		Map<String,Object> map = new HashMap<String,Object>();
+		builder.toParameters(map,obj);
+		TestObject roundTrip = new TestObject();
+		builder.fromParameters(roundTrip, map);
+
+		Assert.assertEquals("expected to be equal", obj, roundTrip);
 	}
 	
-	static private Class<? extends HttpRequestExecuter> defaultExecuter = HttpRequestExecuterImpl.class;
-	
-	static private CredentialsProviderFactory credentialsProviderFactory = new CredentialsProviderFactory() {
-		public CredentialsProvider newCredentialsProvider() {
-			return new BasicCredentialsProvider();
+	static public class TestObject {
+		
+		String stringValue;
+		Integer integerValue;
+		Double doubleValue;
+		
+		@Parameter("string_value")
+		public String getStringValue() {
+			return stringValue;
 		}
-	};
-	
-	public void setDefaultType(Class<? extends HttpRequestExecuter> defaultNew) {
-		defaultExecuter = defaultNew;
-	}
-	static public Class<? extends HttpRequestExecuter> getDefaultType() {
-		return defaultExecuter;
-	}
-	static public HttpRequestExecuter newDefault() {
-		try {
-			return defaultExecuter.newInstance();
-		} catch( Exception ie ) {
-			throw new RuntimeException(ie);
+		public void setStringValue(String stringValue) {
+			this.stringValue = stringValue;
 		}
-	}
-	
-	static public void setDefaultCredentialsProviderFactory(CredentialsProviderFactory factory) {
-		credentialsProviderFactory = factory;
-	}
-	static public CredentialsProviderFactory getDefaultCredentialsProviderFactory() {
-		return credentialsProviderFactory;
-	}
-	static public CredentialsProvider newDefaultCredentialsProvider() {
-		return credentialsProviderFactory.newCredentialsProvider();
+		
+		@Parameter("integer_value")
+		public Integer getIntegerValue() {
+			return integerValue;
+		}
+		public void setIntegerValue(Integer integerValue) {
+			this.integerValue = integerValue;
+		}
+		
+		@Parameter("double_value")
+		public Double getDoubleValue() {
+			return doubleValue;
+		}
+		public void setDoubleValue(Double doubleValue) {
+			this.doubleValue = doubleValue;
+		}
+		
+		public int hashCode() {
+			return (stringValue+"."+doubleValue+"."+integerValue).hashCode();
+		}
+		public boolean equals(Object obj) {
+			TestObject to = (TestObject)obj;
+			return this.hashCode()==obj.hashCode();
+		}
 	}
 }

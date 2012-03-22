@@ -22,46 +22,27 @@
  ###############################################################################
  */
 
-package com.openmeap.util;
+package com.openmeap.web.form;
 
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
+public class ParameterMapBuilderException extends Exception {
 
-public class HttpRequestExecuterFactory {
-	
-	static public interface CredentialsProviderFactory {
-		CredentialsProvider newCredentialsProvider();
+	public ParameterMapBuilderException() {
+		// TODO Auto-generated constructor stub
 	}
-	
-	static private Class<? extends HttpRequestExecuter> defaultExecuter = HttpRequestExecuterImpl.class;
-	
-	static private CredentialsProviderFactory credentialsProviderFactory = new CredentialsProviderFactory() {
-		public CredentialsProvider newCredentialsProvider() {
-			return new BasicCredentialsProvider();
-		}
-	};
-	
-	public void setDefaultType(Class<? extends HttpRequestExecuter> defaultNew) {
-		defaultExecuter = defaultNew;
+
+	public ParameterMapBuilderException(String message) {
+		super(message);
+		// TODO Auto-generated constructor stub
 	}
-	static public Class<? extends HttpRequestExecuter> getDefaultType() {
-		return defaultExecuter;
+
+	public ParameterMapBuilderException(Throwable cause) {
+		super(cause);
+		// TODO Auto-generated constructor stub
 	}
-	static public HttpRequestExecuter newDefault() {
-		try {
-			return defaultExecuter.newInstance();
-		} catch( Exception ie ) {
-			throw new RuntimeException(ie);
-		}
+
+	public ParameterMapBuilderException(String message, Throwable cause) {
+		super(message, cause);
+		// TODO Auto-generated constructor stub
 	}
-	
-	static public void setDefaultCredentialsProviderFactory(CredentialsProviderFactory factory) {
-		credentialsProviderFactory = factory;
-	}
-	static public CredentialsProviderFactory getDefaultCredentialsProviderFactory() {
-		return credentialsProviderFactory;
-	}
-	static public CredentialsProvider newDefaultCredentialsProvider() {
-		return credentialsProviderFactory.newCredentialsProvider();
-	}
+
 }

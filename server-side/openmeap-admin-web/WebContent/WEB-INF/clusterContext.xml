@@ -30,6 +30,10 @@
   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
 	
+	<bean id="httpRequestExecuterFactory" class="com.openmeap.util.HttpRequestExecuterFactory">
+		<property name="defaultType" value="com.openmeap.util.FileHandlingHttpRequestExecuterImpl"/>
+	</bean>
+	
 	<bean id="modelServiceRefreshNotifier" class="com.openmeap.model.event.notifier.ModelServiceRefreshNotifier">
 		<property name="modelManager" ref="modelManager"/>
 		<property name="httpRequestExecuter">
