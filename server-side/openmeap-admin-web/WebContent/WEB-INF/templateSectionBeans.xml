@@ -135,7 +135,6 @@
 		<property name="sectionBacking">
 			<bean class="com.openmeap.admin.web.backing.AddModifyApplicationVersionBacking">
 				<property name="modelManager" ref="modelManager"/>
-				<property name="archiveUploadNotifier" ref="archiveUploadNotifier"/>
 			</bean>
 		</property>
 	</bean>
@@ -161,6 +160,7 @@
 		<property name="sectionBacking">
 			<bean class="com.openmeap.admin.web.backing.DeploymentListingsBacking">
 				<property name="modelManager" ref="modelManager"/>
+				<property name="archiveFileUploadNotifier" ref="archiveUploadNotifier"/>
 			</bean>
 		</property>
 	</bean>

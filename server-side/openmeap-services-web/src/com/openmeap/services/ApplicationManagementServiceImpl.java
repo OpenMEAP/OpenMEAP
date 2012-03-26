@@ -86,22 +86,6 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 		}
 		
 		Application application = getApplication(reqAppName,reqAppVerId);
-		List<Deployment> deployments = modelManager.getModelService().findDeploymentsByNameAndId(reqAppName,reqAppVerId);
-		if( deployments!=null ) {
-			Boolean found = false;
-			for( Deployment d : deployments ) {
-				if( d.getApplicationVersion().getIdentifier().equals(reqAppVerId) ) {
-					found = true;
-					break;
-				}
-			}
-			if( !found && (reqAppVerId==null || !reqAppVerId.equals(application.getInitialVersionIdentifier()) ) ) {
-				throw new WebServiceException(WebServiceException.TypeEnum.APPLICATION_VERSION_NOTFOUND,
-					"The application version "+reqAppVerId+" has not been deployed before.");
-			}
-		} 
-		
-		// TODO: run rules against the request
 		
 		// Generate a new auth token for the device to present to the proxy
 		String authToken = AuthTokenProvider.newAuthToken(application.getProxyAuthSalt());
@@ -121,7 +105,8 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 		//   the app hash value is different than reported
 		if( reqAppVerDiffers || reqAppArchHashValDiffers ) {
 			
-			// TODO: I'm not happy with the discrepancies between the model and schema...besides, this update header should be encapsulated somewhere else
+			// TODO: I'm not happy with the discrepancies between the model and schema
+			// ...besides, this update header should be encapsulated somewhere else
 			ApplicationVersion currentVersion = lastDeployment.getApplicationVersion();
 			ApplicationArchive currentVersionArchive = currentVersion.getArchive();
 			UpdateHeader uh = new UpdateHeader();

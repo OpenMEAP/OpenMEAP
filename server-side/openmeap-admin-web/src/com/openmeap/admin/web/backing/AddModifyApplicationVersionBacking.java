@@ -57,6 +57,7 @@ import com.openmeap.model.ModelServiceOperation;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
+import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.model.event.ModelEntityEvent;
 import com.openmeap.model.event.notifier.ArchiveFileUploadNotifier;
@@ -107,13 +108,8 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		Application app = null;
 		ApplicationVersion version = null;
 		
-		String storagePathErrors = modelManager.getGlobalSettings().validateTemporaryStoragePath();
-		if( storagePathErrors!=null ) {
-			events.add( new MessagesEvent("WARNING: The archive storage path is not set and file uploads will not be processed.  The archive storage path can be set on the settings page.") );
-			templateVariables.put("encodingType", "");
-		} else {
-			templateVariables.put("encodingType","enctype=\""+FormConstants.ENCTYPE_MULTIPART_FORMDATA+"\"");
-		}
+		// make sure we're configured to accept uploads, warn otherwise
+		validateStorageConfiguration(templateVariables,events);
 		
 		// we must have an application in order to add a version
 		if( ! notEmpty("applicationId", parameterMap) ) {
@@ -135,6 +131,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 			version = new ApplicationVersion();
 		}
 		
+		// determine if the user is allowed to modify application versions
 		Boolean willProcess = canUserModifyOrCreate(app,version);
 		if( !willProcess ) {
 			events.add( new MessagesEvent("Current user does not have permissions to make changes here.") );
@@ -145,27 +142,17 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		}
 		templateVariables.put("willProcess",willProcess);
 		
+		
 		if( notEmpty("processTarget", parameterMap) 
 				&& PROCESS_TARGET.compareTo(firstValue("processTarget",parameterMap ))==0 
 				&& willProcess ) {
 			
+			// TODO: check to see if the user can delete versions
 			if( ParameterMapUtils.notEmpty("delete",parameterMap) && ParameterMapUtils.notEmpty("deleteConfirm",parameterMap) ) {
 				
 				if( ParameterMapUtils.firstValue("deleteConfirm", parameterMap).equals("delete the version") ) {
 					
-					ApplicationArchive archive2Delete = null;
-					if( version.getArchive()!=null ) {
-						archive2Delete = new ApplicationArchive();
-						archive2Delete.setHash(version.getArchive().getHash());
-						archive2Delete.setHashAlgorithm(version.getArchive().getHashAlgorithm());
-					}
-					
-					modelManager.getModelService().delete(version);
-					if( archive2Delete!=null ) {
-						deleteOldArchiveFromFileSystem(archive2Delete, events);
-					}
-					events.add( new MessagesEvent("Application version successfully deleted!") );
-					version=null;
+					processApplicationVersionDeletion(version, events);
 					
 				} else {
 					
@@ -181,11 +168,58 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		if( version!=null ) {
 			templateVariables.put("version", version);
 		}
+		
 		templateVariables.put("application", app);
 		
 		createHashTypes(templateVariables,version!=null?version.getArchive():null);
 		
 		return events;
+	}
+	
+	private void validateStorageConfiguration(Map<Object,Object> templateVariables, List<ProcessingEvent> events) {
+		String storagePathErrors = modelManager.getGlobalSettings().validateTemporaryStoragePath();
+		if( storagePathErrors!=null ) {
+			events.add( new MessagesEvent("WARNING: The archive storage path is not set and file uploads will not be processed.  The archive storage path can be set on the settings page.") );
+			templateVariables.put("encodingType", "");
+		} else {
+			templateVariables.put("encodingType","enctype=\""+FormConstants.ENCTYPE_MULTIPART_FORMDATA+"\"");
+		}
+	}
+	
+	private void processApplicationVersionDeletion(ApplicationVersion version, List<ProcessingEvent> events) {
+		ApplicationArchive archive2Delete = null;
+		if( version.getArchive()!=null ) {
+			archive2Delete = new ApplicationArchive();
+			archive2Delete.setHash(version.getArchive().getHash());
+			archive2Delete.setHashAlgorithm(version.getArchive().getHashAlgorithm());
+		}
+		
+		Boolean versionInUse = false;
+		for( Deployment depl : version.getApplication().getDeployments() ) {
+			if( depl.getApplicationVersion().getPk().equals(version.getPk()) ) {
+				versionInUse = true;
+			}
+		}
+		if( versionInUse ) {
+		
+			version.setActiveFlag(false);
+			try {
+				version = modelManager.addModify(version);
+				modelManager.getModelService().refresh(version.getApplication());
+				events.add( new MessagesEvent("Application version successfully set to inactive.  It will be deleted when the last deployment made with it is removed.") );
+			} catch( InvalidPropertiesException ipe ) {
+				events.add( new MessagesEvent(ipe.getMessage()) );
+			} catch( PersistenceException pe ) {
+				events.add( new MessagesEvent(pe.getMessage()) );								
+			}
+		} else {
+			modelManager.getModelService().delete(version);
+			if( archive2Delete!=null ) {
+				maintainFileSystemCleanliness(archive2Delete, events);
+			}
+			events.add( new MessagesEvent("Application version successfully deleted!") );
+		}
+		version=null;
 	}
 	
 	private Boolean canUserModifyOrCreate(Application app, ApplicationVersion version) {
@@ -254,14 +288,17 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 	}
 	
 	private void processApplicationVersionFromParameters(Application app, ApplicationVersion version, List<ProcessingEvent> events, Map<Object,Object> parameterMap) {
-		// a version is not being modified
+		
+		// a version is not being modified,
+		// then create a new archive for it.
 		if( version.getPk()==null ) {
 			version.setArchive(new ApplicationArchive());
 			version.getArchive().setVersion(version);
 			version.setApplication(app);
-			//app.getVersions().put(version.getIdentifier(), version);
 		}
+		
 		fillInApplicationVersionFromParameters(app,version,events,parameterMap);
+		
 		if( version!=null && version.getArchive()==null ) {
 			events.add( new MessagesEvent("Application archive could not be created.  Not creating empty version.") );
 		} else {
@@ -294,15 +331,23 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		
 		// if there was an uploadArchive, then attempt to auto-assemble the rest of parameters
 		if( parameterMap.get("uploadArchive")!=null ) {
+			
 			if( ! (parameterMap.get("uploadArchive") instanceof FileItem) ) {
+				
 				events.add( new MessagesEvent("Uploaded file not processed!  Is the archive storage path set in settings?") );
 			} else {
+				
 				FileItem item = (FileItem)parameterMap.get("uploadArchive");
 				Long size = item.getSize();
+				
 				if( size>0 ) {
-					ApplicationArchive archive = createApplicationArchiveFromFileItem(version.getArchive(),item,events);
+					
+					ApplicationArchive archive = processApplicationArchiveFileUpload(version.getArchive(),item,events);
 					version.setArchive(archive);
-					archiveUncreated = false;
+					archiveUncreated = archive==null;
+				} else {
+					
+					events.add( new MessagesEvent("Uploaded file not processed!  Is the archive storage path set in settings?") );
 				}
 			}
 		}
@@ -326,7 +371,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 	}
 	
 	@SuppressWarnings("unchecked")
-	private ApplicationArchive createApplicationArchiveFromFileItem(ApplicationArchive archive, FileItem item, List<ProcessingEvent> events) {
+	private ApplicationArchive processApplicationArchiveFileUpload(ApplicationArchive archive, FileItem item, List<ProcessingEvent> events) {
 		
 		GlobalSettings settings = modelManager.getGlobalSettings();
 		Long size = item.getSize();
@@ -340,7 +385,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		
 		// create a temp file
 		File tempFile = null;
-		File newFile = null;
+		File destinationFile = null;
 		try {
 			tempFile = File.createTempFile("uploadArchive","",new File(settings.getTemporaryStoragePath()));
 			item.write(tempFile);
@@ -365,22 +410,22 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 			}
 			
 			// if the archive is pre-existing and not the same,
-			// determine if the web-view and zip should be deleted
+			// then determine if the web-view and zip should be deleted
 			// that is, they are not used by any other versions
 			if( archive.getId()!=null && !archive.getHash().equals(hashValue) ) {
 
-				deleteOldArchiveFromFileSystem(archive,events);
+				maintainFileSystemCleanliness(archive,events);
 			}
 			
 			archive.setHashAlgorithm("MD5");
 			archive.setHash(hashValue);
 			
-			newFile = archive.getFile(settings.getTemporaryStoragePath());
+			destinationFile = archive.getFile(settings.getTemporaryStoragePath());
 			
 			// if the upload destination exists, then try to delete and overwrite
 			// even though they are theoretically the same.
-			if( newFile.exists() && !newFile.delete() ) {
-				String mesg = String.format("Failed to delete old file (theoretically the same anyways, so proceeding) %s",newFile.getName());
+			if( destinationFile.exists() && !destinationFile.delete() ) {
+				String mesg = String.format("Failed to delete old file (theoretically the same anyways, so proceeding) %s",destinationFile.getName());
 				logger.error(mesg);
 				events.add(new MessagesEvent(mesg));
 				if( ! tempFile.delete() ) {
@@ -389,17 +434,18 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 					events.add(new MessagesEvent(mesg));	
 				}
 			}
+			
 			// if it didn't exist or it was successfully deleted,
 			// then rename the upload to our destination and unzip it
 			// into the web-view directory
-			else if( tempFile.renameTo(newFile) ) {
+			else if( tempFile.renameTo(destinationFile) ) {
 				
-				String mesg = String.format("Uploaded temporary file %s successfully renamed to %s",tempFile.getName(),newFile.getName());
+				String mesg = String.format("Uploaded temporary file %s successfully renamed to %s",tempFile.getName(),destinationFile.getName());
 				logger.debug(mesg);
 				events.add(new MessagesEvent(mesg));
-				unzipFile(archive,newFile,events);
+				unzipFile(archive,destinationFile,events);
 			} else {
-				String mesg = String.format("Failed to renamed file %s to %s",tempFile.getName(),newFile.getName());
+				String mesg = String.format("Failed to renamed file %s to %s",tempFile.getName(),destinationFile.getName());
 				logger.error(mesg);
 				events.add(new MessagesEvent(mesg));
 				return null;
@@ -417,7 +463,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 			archive.setBytesLength(size.intValue());
 			ZipFile zipFile = null;
 			try {
-				zipFile = new ZipFile(newFile);
+				zipFile = new ZipFile(destinationFile);
 				Integer uncompressedSize = ZipUtils.getUncompressedSize(zipFile).intValue();
 				archive.setBytesLengthUncompressed(new Long(uncompressedSize).intValue());
 			} finally {
@@ -434,17 +480,10 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		archive.setUrl(ApplicationArchive.URL_TEMPLATE);
 		archive.setNewFileUploaded(true);
 		
-		try {
-			archiveUploadNotifier.notify( new ModelEntityEvent(ModelServiceOperation.SAVE_OR_UPDATE,archive) );
-		} catch (Exception e) {
-			logger.error("An exception occurred pushing the new archive to cluster nodes: {}",e);
-			events.add(new MessagesEvent(String.format("An exception occurred pushing the new archive to cluster nodes: %s",e.getMessage())));
-		}
-		
 		return archive;
 	}
 	
-	private void deleteOldArchiveFromFileSystem(ApplicationArchive archive, List<ProcessingEvent> events) {
+	private void maintainFileSystemCleanliness(ApplicationArchive archive, List<ProcessingEvent> events) {
 		
 		GlobalSettings settings = modelManager.getGlobalSettings();
 		
@@ -452,7 +491,17 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		List<ApplicationArchive> archives = modelManager
 				.getModelService()
 				.findApplicationArchivesByHashAndAlgorithm(archive.getHash(), archive.getHashAlgorithm());
-		Boolean archiveIsInUseElsewhere = archives!=null && archives.size()>1;
+		
+		// either more than one archive has this file
+		Boolean archiveIsInUseElsewhere = 
+				archives!=null 
+				&& (
+						archives.size()>1
+						|| (
+								archives.size()==1 
+								&& !archives.get(0).getPk().equals(archive.getPk())
+						)
+				);
 		
 		if( !archiveIsInUseElsewhere ) {
 			
@@ -513,12 +562,5 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 	}
 	public ModelManager getModelManager() {
 		return modelManager;
-	}
-
-	public void setArchiveUploadNotifier(ArchiveFileUploadNotifier archiveUploadNotifier) {
-		this.archiveUploadNotifier = archiveUploadNotifier;
-	}
-	public ArchiveFileUploadNotifier getArchiveUploadNotifier() {
-		return archiveUploadNotifier;
 	}
 }

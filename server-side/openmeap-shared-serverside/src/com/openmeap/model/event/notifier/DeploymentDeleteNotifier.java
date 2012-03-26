@@ -40,7 +40,6 @@ import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.model.event.MapPayloadEvent;
 import com.openmeap.model.event.ModelEntityEvent;
-import com.openmeap.model.event.ModelEntityEventAction;
 import com.openmeap.model.event.handler.ArchiveFileDeleteHandler;
 
 /**
@@ -66,10 +65,12 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 	public <E extends Event<Deployment>> void notify(final E event) throws ClusterNotificationException {
 		
 		Deployment deployment2Delete = (Deployment)event.getPayload();
-		Application app = deployment2Delete.getApplicationVersion().getApplication();
+		ApplicationVersion version = deployment2Delete.getApplicationVersion();
+		Application app = version.getApplication();
 		
 		// if there are any other deployments with this hash,
 		//   then we cannot yet delete it's archive.
+		int versionCount = 0;
 		for( Deployment deployment : app.getDeployments() ) {
 			if( deployment.getId()==null || !deployment.getId().equals(deployment2Delete.getId()) ) {
 				if( deployment.getHash().equals(deployment2Delete.getHash()) 
@@ -77,12 +78,15 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 					return;
 				}
 			}
+			if( deployment.getApplicationVersion().getPk().equals(version.getPk()) ) {
+				versionCount++;
+			}
 		}
 		
 		// if there are any application versions with this archive, 
 		//   then we cannot delete it's archive.
 		for( String versionId : app.getVersions().keySet() ) {
-			ApplicationVersion version = app.getVersions().get(versionId);
+			version = app.getVersions().get(versionId);
 			ApplicationArchive archive = version.getArchive();
 			if( version.getActiveFlag().equals(Boolean.TRUE)
 					&& archive.getHash().equals(deployment2Delete.getHash()) 
@@ -109,6 +113,12 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 		} catch (EventHandlingException e) {
 			throw new ClusterNotificationException(e);
 		}
+		
+		// if all other deployments using the version of this deployment have been deleted,
+		// and this version is inactive...then delete this version.
+		if( versionCount==1 ) {
+			archiveDeleteHandler.getModelManager().getModelService().delete(version);
+		}		
 	}
 
 	public ArchiveFileDeleteNotifier getArchiveDeleteNotifier() {

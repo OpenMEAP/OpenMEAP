@@ -1,31 +1,32 @@
 OpenMEAP 1.1.0a
-  - Bug fixes and refactoring
-  - Automated deployment history maintenance
-  - The ability to delete versions
+  - Bug fixes and refactoring.
+  - Automated deployment history maintenance.
+  - The ability to delete versions.
   - Archive distribution to the cluster is deferred to deployment.
+  - Relaxed requirement that current SLIC version be known by app mgmt.
 
 OpenMEAP 1.0.4a
-  - Fixed JavaSE settings.  Still not quite where we want it to be JavaEE
+  - Fixed JavaSE settings.  Still not quite where we want it to be JavaEE.
 
 OpenMEAP 1.0.3a
-  - Added com.openmeap.slic.updatePendingTimeout
+  - Added com.openmeap.slic.updatePendingTimeout.
   - Cleaned up the JPA configuration some, making it more flexible.
-  - Fixed the https development mode for iOS
-  - Correct licensing, so that everything is, in fact, LGPLv3
+  - Fixed the https development mode for iOS.
+  - Correct licensing, so that everything is, in fact, LGPLv3.
 
 OpenMEAP 1.0.2a
-  - Corrected openmeap.debuglevel for JDK7 (a little pickier, apparently)
-  - Removed iOS OmSlicConnectionHandler's NSURLAuthenticationMethodServerTrust
+  - Corrected openmeap.debuglevel for JDK7 (a little pickier, apparently).
+  - Removed iOS OmSlicConnectionHandler's NSURLAuthenticationMethodServerTrust.
   - fixed android-slic build.xml "nodeps" target name.
-  - More documentation updates
-  - More dependency resolution fixes to ivy.xml
-  - Corrected a casting issue in ServletUtils of shared-serverside
+  - More documentation updates.
+  - More dependency resolution fixes to ivy.xml.
+  - Corrected a casting issue in ServletUtils of shared-serverside.
 
 OpenMEAP 1.0.1a
   - Removed com.openmeap.util.Utils::sendFile(), as was causing an issue
     in Android and was unused code.
   - Corrected instructions in the quickstart-eclipse.txt file.
-  - Added spring-beans and spring-core to the serverside ivy.xml
+  - Added spring-beans and spring-core to the serverside ivy.xml.
   
 OpenMEAP 1.0.0a
-  - Initial implementation
+  - Initial implementation.

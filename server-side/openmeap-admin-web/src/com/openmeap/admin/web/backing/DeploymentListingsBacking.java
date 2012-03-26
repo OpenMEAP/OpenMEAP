@@ -35,33 +35,36 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.openmeap.admin.web.ProcessingTargets;
 import com.openmeap.admin.web.backing.event.MessagesEvent;
 import com.openmeap.model.InvalidPropertiesException;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.ModelServiceImpl;
+import com.openmeap.model.ModelServiceOperation;
 import com.openmeap.model.dto.Application;
+import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
+import com.openmeap.model.event.ModelEntityEvent;
+import com.openmeap.model.event.notifier.ArchiveFileUploadNotifier;
 import com.openmeap.web.AbstractTemplatedSectionBacking;
 import com.openmeap.web.ProcessingContext;
 import com.openmeap.web.ProcessingEvent;
 import static com.openmeap.util.ParameterMapUtils.*;
 
 public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
+	
 	private static String PROCESS_TARGET = ProcessingTargets.DEPLOYMENTS;
 	
+	private Logger logger = LoggerFactory.getLogger(DeploymentListingsBacking.class);
+	
 	private ModelManager modelManager = null;
-	
-	public void setModelManager(ModelManager modelManager) {
-		this.modelManager = modelManager;
-	}
-	public ModelManager getModelManager() {
-		return modelManager;
-	}
-	
+	private ArchiveFileUploadNotifier archiveFileUploadNotifier = null;
+
 	public Collection<ProcessingEvent> process(ProcessingContext context, Map<Object,Object> templateVariables, Map<Object, Object> parameterMap) {
 		
 		List<ProcessingEvent> events = new ArrayList<ProcessingEvent>();
@@ -91,6 +94,7 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 			
 			if( version!=null ) {
 				Deployment depl = createDeployment(version,deploymentType);
+				pushArchiveToClusterForDeployment(depl,events);
 				app.addDeployment(depl);
 				
 				try {
@@ -141,6 +145,19 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 		return depl;
 	}
 	
+	private void pushArchiveToClusterForDeployment(Deployment depl, List<ProcessingEvent> events) {
+		try {
+			ApplicationArchive archive = new ApplicationArchive();
+			archive.setHash(depl.getHash());
+			archive.setHashAlgorithm(depl.getHashAlgorithm());
+			archive.setNewFileUploaded(true);
+			archiveFileUploadNotifier.notify( new ModelEntityEvent(ModelServiceOperation.SAVE_OR_UPDATE,archive) );
+		} catch (Exception e) {
+			logger.error("An exception occurred pushing the new archive to cluster nodes: {}",e);
+			events.add(new MessagesEvent(String.format("An exception occurred pushing the new archive to cluster nodes: %s",e.getMessage())));
+		}
+	}
+	
 	/**
 	 * Trim the deployment history table.  Deleting old archives as we go.
 	 * @param app
@@ -164,5 +181,24 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 				app.getDeployments().add(deployment);
 			}
 		}
+	}
+	
+	/*
+	 * ACCESSORS	
+	 */
+	
+	public void setModelManager(ModelManager modelManager) {
+		this.modelManager = modelManager;
+	}
+	public ModelManager getModelManager() {
+		return modelManager;
+	}
+	
+	public ArchiveFileUploadNotifier getArchiveFileUploadNotifier() {
+		return archiveFileUploadNotifier;
+	}
+	public void setArchiveFileUploadNotifier(
+			ArchiveFileUploadNotifier archiveFileUploadNotifier) {
+		this.archiveFileUploadNotifier = archiveFileUploadNotifier;
 	}
 }
