@@ -3,6 +3,7 @@ import java.io.File;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
@@ -67,10 +68,15 @@ public class ModelTestUtils {
 	
 	static public void resetTestDb() {
 		if( persistenceBeans!=null ) {
+			EntityManagerFactory emf = getEntityManagerFactory();
+			emf.close();
 			persistenceBeans.close();
 		}
 		persistenceBeans=null;
-		new File(OPENMEAP_TEST_DB).delete();
+		File testDbFile = new File(OPENMEAP_TEST_DB);
+		if( testDbFile.exists() && !testDbFile.delete() ) {
+			throw new RuntimeException("Could not delete "+OPENMEAP_TEST_DB);
+		}
 	}
 
 	static public ModelManager createModelManager() {
@@ -79,6 +85,10 @@ public class ModelTestUtils {
 
 	static public ModelService createModelService() {
 		return (ModelServiceImpl)getPersistenceBean("modelService");
+	}
+	
+	static public EntityManagerFactory getEntityManagerFactory() {
+		return (EntityManagerFactory)getPersistenceBean("www_entityManagerFactory");
 	}
 	
 	static public EntityManager createEntityManager() {
