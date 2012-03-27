@@ -34,6 +34,7 @@ import com.openmeap.web.html.*;
 import com.openmeap.admin.web.ProcessingTargets;
 import com.openmeap.admin.web.backing.event.MessagesEvent;
 import com.openmeap.admin.web.backing.event.AddSubNavAnchorEvent;
+import com.openmeap.constants.FormConstants;
 import com.openmeap.model.*;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationVersion;
@@ -79,11 +80,11 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 		
 		List<ProcessingEvent> events = new ArrayList<ProcessingEvent>();
 		
-		templateVariables.put("processTarget",PROCESS_TARGET);
+		templateVariables.put(FormConstants.PROCESS_TARGET,PROCESS_TARGET);
 		
 		Application app = new Application();
-		if( ParameterMapUtils.notEmpty("applicationId",parameterMap) ) {
-			app = modelManager.getModelService().findByPrimaryKey(Application.class, Long.valueOf( ParameterMapUtils.firstValue("applicationId", parameterMap) ) );
+		if( ParameterMapUtils.notEmpty(FormConstants.APP_ID,parameterMap) ) {
+			app = modelManager.getModelService().findByPrimaryKey(Application.class, Long.valueOf( ParameterMapUtils.firstValue(FormConstants.APP_ID, parameterMap) ) );
 		}
 		
 		Boolean mayCreate = modelManager.getAuthorizer().may(Authorizer.Action.CREATE, new Application());
@@ -96,8 +97,8 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 		
 		// if the request is targeting this section or the primary page of this section
 		// the user is submitting the form for either an add or modify
-		if( ParameterMapUtils.notEmpty("processTarget",parameterMap) 
-				&& PROCESS_TARGET.equals(((String[])parameterMap.get("processTarget"))[0]) 
+		if( ParameterMapUtils.notEmpty(FormConstants.PROCESS_TARGET,parameterMap) 
+				&& PROCESS_TARGET.equals(((String[])parameterMap.get(FormConstants.PROCESS_TARGET))[0]) 
 				&& willProcess ) {
 			
 			app = createApplicationFromParameters(app,parameterMap, events);
@@ -113,20 +114,19 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 				}
 			}
 			
-			if( app==null && ParameterMapUtils.notEmpty("applicationId",parameterMap) )
+			if( app==null && ParameterMapUtils.notEmpty(FormConstants.APP_ID,parameterMap) )
 				app = modelManager.getModelService().findByPrimaryKey(Application.class, 
-						Long.valueOf( 
-								ParameterMapUtils.firstValue("applicationId", parameterMap) ) );
+						Long.valueOf(ParameterMapUtils.firstValue(FormConstants.APP_ID, parameterMap)));
 			
-			if( ParameterMapUtils.notEmpty("delete",parameterMap) && ParameterMapUtils.notEmpty("deleteConfirm",parameterMap) ) {
+			if( ParameterMapUtils.notEmpty(FormConstants.DELETE,parameterMap) && ParameterMapUtils.notEmpty("deleteConfirm",parameterMap) ) {
 				
-					if( ParameterMapUtils.firstValue("deleteConfirm", parameterMap).equals("delete the application") ) {
+					if( ParameterMapUtils.firstValue("deleteConfirm", parameterMap).equals(FormConstants.APP_DELETE_CONFIRM_TEXT) ) {
 						
 						modelManager.delete(app);
 						events.add( new MessagesEvent("Application successfully deleted!") );
 						app = null;
 						// we remove the applicationId parameter, so that the form can populate empty
-						parameterMap.remove("applicationId");
+						parameterMap.remove(FormConstants.APP_ID);
 					} else {
 						
 						events.add( new MessagesEvent("You must confirm your desire to delete by typing in the delete confirmation message.") );
@@ -135,12 +135,12 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 		}
 		
 		// the user is visiting the page to view or modify an application
-		else if( ParameterMapUtils.notEmpty("applicationId",parameterMap) ) {
-			app = modelManager.getModelService().findByPrimaryKey(Application.class, Long.valueOf( ParameterMapUtils.firstValue("applicationId", parameterMap) ) );
+		else if( ParameterMapUtils.notEmpty(FormConstants.APP_ID,parameterMap) ) {
+			app = modelManager.getModelService().findByPrimaryKey(Application.class, Long.valueOf( ParameterMapUtils.firstValue(FormConstants.APP_ID, parameterMap) ) );
 		}
 		
-		if( app == null && ParameterMapUtils.notEmpty("applicationId",parameterMap) ) {
-			events.add( new MessagesEvent("Application with id "+ParameterMapUtils.firstValue("applicationId", parameterMap)+" not found") );
+		if( app == null && ParameterMapUtils.notEmpty(FormConstants.APP_ID,parameterMap) ) {
+			events.add( new MessagesEvent("Application with id "+ParameterMapUtils.firstValue(FormConstants.APP_ID, parameterMap)+" not found") );
 		} else if( app!=null && app.getId()!=null ) { 
 			if( app.getVersions()!=null && app.getVersions().size()>0 )
 				events.add( 
@@ -178,12 +178,12 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 			app = new Application();
 		}
 		app.setName(ParameterMapUtils.firstValue("name",parameterMap));
-		app.setAdmins(ParameterMapUtils.firstValue("admins",parameterMap));
-		app.setVersionAdmins(ParameterMapUtils.firstValue("versionAdmins",parameterMap));
-		app.setDescription(ParameterMapUtils.firstValue("description",parameterMap));
+		app.setAdmins(ParameterMapUtils.firstValue(FormConstants.APP_ADMINS,parameterMap));
+		app.setVersionAdmins(ParameterMapUtils.firstValue(FormConstants.APP_VERSIONADMINS,parameterMap));
+		app.setDescription(ParameterMapUtils.firstValue(FormConstants.APP_DESCRIPTION,parameterMap));
 		app.setInitialVersionIdentifier(ParameterMapUtils.firstValue("initialVersionIdentifier",parameterMap));
 		
-		String deploymentHistoryLength = ParameterMapUtils.firstValue("deploymentHistoryLength",parameterMap);
+		String deploymentHistoryLength = ParameterMapUtils.firstValue(FormConstants.APP_DEPL_HIST_LEN,parameterMap);
 		if( deploymentHistoryLength!=null && deploymentHistoryLength.trim().matches("[\\d]+") ) {
 			app.setDeploymentHistoryLength(Integer.valueOf(deploymentHistoryLength.trim()));
 		}

@@ -24,33 +24,36 @@
 
 package com.openmeap.admin.web.backing;
 
+import static com.openmeap.util.ParameterMapUtils.empty;
+import static com.openmeap.util.ParameterMapUtils.equalsEachOther;
+import static com.openmeap.util.ParameterMapUtils.firstValue;
+
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.persistence.PersistenceException;
 
-import static com.openmeap.util.ParameterMapUtils.*;
-
-import com.openmeap.web.AbstractTemplatedSectionBacking;
-import com.openmeap.web.ProcessingContext;
-import com.openmeap.web.ProcessingEvent;
+import com.openmeap.Authorizer.Action;
+import com.openmeap.admin.web.ProcessingTargets;
+import com.openmeap.admin.web.backing.event.MessagesEvent;
+import com.openmeap.constants.FormConstants;
 import com.openmeap.model.InvalidPropertiesException;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.GlobalSettings;
-import com.openmeap.Authorizer.Action;
-import com.openmeap.admin.web.ProcessingTargets;
-import com.openmeap.admin.web.backing.event.MessagesEvent;
+import com.openmeap.web.AbstractTemplatedSectionBacking;
+import com.openmeap.web.ProcessingContext;
+import com.openmeap.web.ProcessingEvent;
 
 public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 	private ModelManager modelManager;
 	
-	private final static String PROCESS_TARGET_PARAM     = "processTarget";
+	private final static String PROCESS_TARGET_PARAM     = FormConstants.PROCESS_TARGET;
 	private final static String AUTH_SALT_PARAM          = "authSalt";
 	private final static String AUTH_SALT_VERIFY_PARAM   = "authSaltVerify";
 	private final static String STORAGE_PATH_PARAM       = "tempStoragePathPrefix";

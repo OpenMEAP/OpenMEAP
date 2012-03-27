@@ -24,14 +24,22 @@
 
 package com.openmeap.admin.web.backing;
 
-import java.util.*;
-import org.junit.*;
-import com.openmeap.web.*;
-import com.openmeap.web.html.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import com.openmeap.admin.web.ProcessingTargets;
-import com.openmeap.admin.web.backing.AddModifyApplicationBacking;
-import com.openmeap.model.*;
+import com.openmeap.constants.FormConstants;
+import com.openmeap.model.ModelManager;
+import com.openmeap.model.ModelTestUtils;
 import com.openmeap.model.dto.Application;
+import com.openmeap.web.ProcessingEvent;
+import com.openmeap.web.ProcessingUtils;
 
 public class AddModifyApplicationBackingTest {
 	
@@ -55,17 +63,17 @@ public class AddModifyApplicationBackingTest {
 		AddModifyApplicationBacking amab = new AddModifyApplicationBacking();
 		amab.setModelManager( mm );
 		amab.process(null, vars, parms);
-		Assert.assertTrue(vars.get("processTarget")!=null && ((String)vars.get("processTarget")).compareTo(ProcessingTargets.ADDMODIFY_APP)==0);
+		Assert.assertTrue(vars.get(FormConstants.PROCESS_TARGET)!=null && ((String)vars.get(FormConstants.PROCESS_TARGET)).compareTo(ProcessingTargets.ADDMODIFY_APP)==0);
 		
 		//////////////////////////
 		// Verify that passing in an applicationId will return the app in the model 
 		vars = new HashMap<Object,Object>();
 		parms = new HashMap<Object,Object>();
-		parms.put("applicationId", new String[] {"1"} );
+		parms.put(FormConstants.APP_ID, new String[] {"1"} );
 		amab = new AddModifyApplicationBacking();
 		amab.setModelManager( mm );
 		amab.process(null, vars, parms);
-		Assert.assertTrue(vars.get("processTarget")!=null && ((String)vars.get("processTarget")).compareTo(ProcessingTargets.ADDMODIFY_APP)==0);
+		Assert.assertTrue(vars.get(FormConstants.PROCESS_TARGET)!=null && ((String)vars.get(FormConstants.PROCESS_TARGET)).compareTo(ProcessingTargets.ADDMODIFY_APP)==0);
 		Assert.assertTrue(vars.get("application")!=null && ((Application)vars.get("application")).getId()==1L);
 	}
 	
@@ -80,15 +88,15 @@ public class AddModifyApplicationBackingTest {
 		Map<Object,Object> vars = new HashMap<Object,Object>();
 		Map<Object,Object> parms = new HashMap<Object,Object>();
 		AddModifyApplicationBacking amab = null;
-		parms.put("processTarget", new String[] {ProcessingTargets.ADDMODIFY_APP} );
-		parms.put("applicationId", new String[] {} );
+		parms.put(FormConstants.PROCESS_TARGET, new String[] {ProcessingTargets.ADDMODIFY_APP} );
+		parms.put(FormConstants.APP_ID, new String[] {} );
 		parms.put("name", new String[] {"Application.name.3"} );
-		parms.put("description", new String[] {"Application.description.3"} );
+		parms.put(FormConstants.APP_DESCRIPTION, new String[] {"Application.description.3"} );
 		parms.put("deviceTypes", new String[] {"1"} );
 		amab = new AddModifyApplicationBacking();
 		amab.setModelManager( mm );
 		amab.process(null, vars, parms);
-		Assert.assertTrue(vars.get("processTarget")!=null && ((String)vars.get("processTarget")).compareTo(ProcessingTargets.ADDMODIFY_APP)==0);
+		Assert.assertTrue(vars.get(FormConstants.PROCESS_TARGET)!=null && ((String)vars.get(FormConstants.PROCESS_TARGET)).compareTo(ProcessingTargets.ADDMODIFY_APP)==0);
 		Assert.assertTrue(vars.get("application")!=null && ((Application)vars.get("application")).getName().compareTo("Application.name.3")==0);
 		
 		//////////////////////////
@@ -97,9 +105,9 @@ public class AddModifyApplicationBackingTest {
 		// that targets the message backing.
 		vars = new HashMap<Object,Object>();
 		parms = new HashMap<Object,Object>();
-		parms.put("processTarget", new String[] {ProcessingTargets.ADDMODIFY_APP} );
-		parms.put("applicationId", new String[] {} );
-		parms.put("description", new String[] {"Application.description.4"} );
+		parms.put(FormConstants.PROCESS_TARGET, new String[] {ProcessingTargets.ADDMODIFY_APP} );
+		parms.put(FormConstants.APP_ID, new String[] {} );
+		parms.put(FormConstants.APP_DESCRIPTION, new String[] {"Application.description.4"} );
 		parms.put("deviceTypes", new String[] {"1"} );
 		amab = new AddModifyApplicationBacking();
 		amab.setModelManager( mm );
@@ -117,16 +125,16 @@ public class AddModifyApplicationBackingTest {
 		// Verify that we can use the backing to modify an application
 		vars = new HashMap<Object,Object>();
 		parms = new HashMap<Object,Object>();
-		parms.put("processTarget", new String[] {ProcessingTargets.ADDMODIFY_APP} );
+		parms.put(FormConstants.PROCESS_TARGET, new String[] {ProcessingTargets.ADDMODIFY_APP} );
 		// we happen to know that the model creates an application with id 1 that is not named Application.name.3
-		parms.put("applicationId", new String[] {"1"} );
+		parms.put(FormConstants.APP_ID, new String[] {"1"} );
 		parms.put("name", new String[] {"Application.name.1"} );
-		parms.put("description", new String[] {"Application.description.1_modified"} );
+		parms.put(FormConstants.APP_DESCRIPTION, new String[] {"Application.description.1_modified"} );
 		parms.put("deviceTypes", new String[] {"1","2"} );
 		amab = new AddModifyApplicationBacking();
 		amab.setModelManager( mm );
 		amab.process(null, vars, parms);
-		Assert.assertTrue(vars.get("processTarget")!=null && ((String)vars.get("processTarget")).compareTo(ProcessingTargets.ADDMODIFY_APP)==0);
+		Assert.assertTrue(vars.get(FormConstants.PROCESS_TARGET)!=null && ((String)vars.get(FormConstants.PROCESS_TARGET)).compareTo(ProcessingTargets.ADDMODIFY_APP)==0);
 		Assert.assertTrue(vars.get("application")!=null && ((Application)vars.get("application")).getDescription().compareTo("Application.description.1_modified")==0);
 		// verify that the applicaiton we modified is otherwise uncorrupted.
 		Application app = mm.getModelService().findByPrimaryKey(Application.class,1L);
@@ -149,12 +157,12 @@ public class AddModifyApplicationBackingTest {
 		// results in no action, except message
 		vars = new HashMap<Object,Object>();
 		parms = new HashMap<Object,Object>();
-		parms.put("processTarget", new String[] {ProcessingTargets.ADDMODIFY_APP} );
-		parms.put("delete", new String[] {"Delete!"} );
+		parms.put(FormConstants.PROCESS_TARGET, new String[] {ProcessingTargets.ADDMODIFY_APP} );
+		parms.put(FormConstants.DELETE, new String[] {"Delete!"} );
 		parms.put("deleteConfirm", new String[] {"this is squirreled up"} );
-		parms.put("applicationId", new String[] {"1"} );
+		parms.put(FormConstants.APP_ID, new String[] {"1"} );
 		parms.put("name", new String[] {"Application.name.1"} );
-		parms.put("description", new String[] {"Application.description.1_modified"} );
+		parms.put(FormConstants.APP_DESCRIPTION, new String[] {"Application.description.1_modified"} );
 		parms.put("deviceTypes", new String[] {"1","2"} );
 		amab = new AddModifyApplicationBacking();
 		amab.setModelManager( mm );
@@ -166,18 +174,18 @@ public class AddModifyApplicationBackingTest {
 		// Verify that we can use the backing to delete an application
 		vars = new HashMap<Object,Object>();
 		parms = new HashMap<Object,Object>();
-		parms.put("processTarget", new String[] {ProcessingTargets.ADDMODIFY_APP} );
-		parms.put("delete", new String[] {"Delete!"} );
+		parms.put(FormConstants.PROCESS_TARGET, new String[] {ProcessingTargets.ADDMODIFY_APP} );
+		parms.put(FormConstants.DELETE, new String[] {"Delete!"} );
 		parms.put("deleteConfirm", new String[] {"delete the application"} );
-		parms.put("applicationId", new String[] {"1"} );
+		parms.put(FormConstants.APP_ID, new String[] {"1"} );
 		parms.put("name", new String[] {"Application.name.1"} );
-		parms.put("description", new String[] {"Application.description.1_modified"} );
+		parms.put(FormConstants.APP_DESCRIPTION, new String[] {"Application.description.1_modified"} );
 		parms.put("deviceTypes", new String[] {"1","2"} );
 		amab = new AddModifyApplicationBacking();
 		amab.setModelManager( mm );
 		amab.process(null, vars, parms);
 		Assert.assertTrue(mm.getModelService().findByPrimaryKey(Application.class,1L)==null);
-		Assert.assertTrue(parms.get("applicationId")==null);
+		Assert.assertTrue(parms.get(FormConstants.APP_ID)==null);
 		Assert.assertTrue(ProcessingUtils.containsTarget(events, ProcessingTargets.MESSAGES));
 	}
 }

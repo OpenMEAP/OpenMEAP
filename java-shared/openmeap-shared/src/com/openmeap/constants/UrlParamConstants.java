@@ -24,6 +24,12 @@
 
 package com.openmeap.constants;
 
+/**
+ * These are in communication between the SLIC and the application-management servlet, as well as
+ * for communication between the admin and service nodes.
+ * 
+ * @author Schang
+ */
 public class UrlParamConstants {
 	
 	/**

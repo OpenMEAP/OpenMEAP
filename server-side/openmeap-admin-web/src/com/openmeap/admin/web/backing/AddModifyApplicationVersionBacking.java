@@ -112,10 +112,10 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		validateStorageConfiguration(templateVariables,events);
 		
 		// we must have an application in order to add a version
-		if( ! notEmpty("applicationId", parameterMap) ) {
+		if( ! notEmpty(FormConstants.APP_ID, parameterMap) ) {
 			return ProcessingUtils.newList(new GenericProcessingEvent<String>(ProcessingTargets.MESSAGES,"An application must be specified in order to add a version"));
 		}
-		Long appId = Long.valueOf( firstValue("applicationId", parameterMap) );
+		Long appId = Long.valueOf( firstValue(FormConstants.APP_ID, parameterMap) );
 		app = modelManager.getModelService().findByPrimaryKey(Application.class, appId );
 		if( app==null ) {
 			return ProcessingUtils.newList(new GenericProcessingEvent<String>(ProcessingTargets.MESSAGES,"The application with id "+appId+" could not be found."));
@@ -124,7 +124,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		events.add( new AddSubNavAnchorEvent(new Anchor("?bean=appVersionListingsPage&applicationId="+app.getId(),"Version Listings","Version Listings")) );
 		
 		// at this point, we're committed to form setup at least
-		templateVariables.put("processTarget",PROCESS_TARGET);
+		templateVariables.put(FormConstants.PROCESS_TARGET,PROCESS_TARGET);
 		
 		version = obtainExistingApplicationVersionFromParameters(app,appId,events,parameterMap);
 		if( version==null ) {
@@ -143,12 +143,12 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		templateVariables.put("willProcess",willProcess);
 		
 		
-		if( notEmpty("processTarget", parameterMap) 
-				&& PROCESS_TARGET.compareTo(firstValue("processTarget",parameterMap ))==0 
+		if( notEmpty(FormConstants.PROCESS_TARGET, parameterMap) 
+				&& PROCESS_TARGET.compareTo(firstValue(FormConstants.PROCESS_TARGET,parameterMap ))==0 
 				&& willProcess ) {
 			
 			// TODO: check to see if the user can delete versions
-			if( ParameterMapUtils.notEmpty("delete",parameterMap) && ParameterMapUtils.notEmpty("deleteConfirm",parameterMap) ) {
+			if( ParameterMapUtils.notEmpty(FormConstants.DELETE,parameterMap) && ParameterMapUtils.notEmpty("deleteConfirm",parameterMap) ) {
 				
 				if( ParameterMapUtils.firstValue("deleteConfirm", parameterMap).equals("delete the version") ) {
 					

@@ -25,11 +25,27 @@
 package com.openmeap.model.dto;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MapKey;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import com.openmeap.constants.FormConstants;
 import com.openmeap.model.AbstractModelEntity;
+import com.openmeap.web.form.Parameter;
 
 @Entity @Table(name="application")
 public class Application extends AbstractModelEntity {
@@ -46,6 +62,7 @@ public class Application extends AbstractModelEntity {
 	private Integer deploymentHistoryLength = 10;
 	
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
+	@Parameter(FormConstants.APP_ID)
 	public Long getId() {
 		return id;
 	}
@@ -57,6 +74,7 @@ public class Application extends AbstractModelEntity {
 	@Override public void setPk( Object pkValue ) { setId((Long)pkValue); }
 	
 	@Column(name="name",unique=true,nullable=false)
+	@Parameter("name")
 	public String getName() {
 		return this.name;
 	}
@@ -65,6 +83,7 @@ public class Application extends AbstractModelEntity {
 	}
 	
 	@Column(name="description",length=4000)
+	@Parameter(FormConstants.APP_DESCRIPTION)
 	public String getDescription() {
 		return description;
 	}
@@ -72,15 +91,16 @@ public class Application extends AbstractModelEntity {
 		this.description = description;
 	}
 	
+	@Column(name="admins",length=4000)
+	@Parameter(FormConstants.APP_ADMINS)
+	public String getAdmins() {
+		return admins;
+	}
 	/**
 	 * @param admins A space-delimited list of users/roles that may modify the application (except name)
 	 */
 	public void setAdmins(String admins) {
 		this.admins = admins;
-	}
-	@Column(name="admins",length=4000)
-	public String getAdmins() {
-		return admins;
 	}
 	
 	/**
@@ -90,6 +110,7 @@ public class Application extends AbstractModelEntity {
 		versionAdmins = admins;
 	}
 	@Column(name="version_admins",length=4000)
+	@Parameter(FormConstants.APP_VERSIONADMINS)
 	public String getVersionAdmins() {
 		return versionAdmins;
 	}
@@ -103,6 +124,32 @@ public class Application extends AbstractModelEntity {
 	@Column(name="proxy_auth_salt")
 	public String getProxyAuthSalt() {
 		return proxyAuthSalt;
+	}
+	
+	/**
+	 * The number of deployments to keep in history.
+	 * @return
+	 */
+	@Column(name="depl_hist_len")
+	@Parameter(FormConstants.APP_DEPL_HIST_LEN)
+	public Integer getDeploymentHistoryLength() {
+		return deploymentHistoryLength;
+	}
+	public void setDeploymentHistoryLength(Integer deploymentHistoryLength) {
+		this.deploymentHistoryLength = deploymentHistoryLength;
+	}
+	
+	@Column(name="initial_version_id",length=255)
+	@Parameter("initialVersionIdentifier")
+	public String getInitialVersionIdentifier() {
+		return initialVersionIdentifier;
+	}
+	public void setInitialVersionIdentifier(String initialVersionIdentifier) {
+		this.initialVersionIdentifier = initialVersionIdentifier;
+	}
+	
+	public int hashCode() {
+		return getName()!=null?getName().hashCode():(-1);
 	}
 	
 	/**
@@ -160,30 +207,6 @@ public class Application extends AbstractModelEntity {
 		if( idx!=(-1) ) {
 			deployments.remove(idx);
 		}
-	}
-	
-	/**
-	 * The number of deployments to keep in history.
-	 * @return
-	 */
-	@Column(name="depl_hist_len")
-	public Integer getDeploymentHistoryLength() {
-		return deploymentHistoryLength;
-	}
-	public void setDeploymentHistoryLength(Integer deploymentHistoryLength) {
-		this.deploymentHistoryLength = deploymentHistoryLength;
-	}
-	
-	@Column(name="initial_version_id",length=255)
-	public String getInitialVersionIdentifier() {
-		return initialVersionIdentifier;
-	}
-	public void setInitialVersionIdentifier(String initialVersionIdentifier) {
-		this.initialVersionIdentifier = initialVersionIdentifier;
-	}
-	
-	public int hashCode() {
-		return getName()!=null?getName().hashCode():(-1);
 	}
 	
 	public boolean equals(Application app) {

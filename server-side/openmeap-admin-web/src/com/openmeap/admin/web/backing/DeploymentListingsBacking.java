@@ -24,6 +24,8 @@
 
 package com.openmeap.admin.web.backing;
 
+import static com.openmeap.util.ParameterMapUtils.firstValue;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import com.openmeap.admin.web.ProcessingTargets;
 import com.openmeap.admin.web.backing.event.MessagesEvent;
+import com.openmeap.constants.FormConstants;
 import com.openmeap.model.InvalidPropertiesException;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.ModelServiceImpl;
@@ -54,7 +57,6 @@ import com.openmeap.model.event.notifier.ArchiveFileUploadNotifier;
 import com.openmeap.web.AbstractTemplatedSectionBacking;
 import com.openmeap.web.ProcessingContext;
 import com.openmeap.web.ProcessingEvent;
-import static com.openmeap.util.ParameterMapUtils.*;
 
 public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 	
@@ -69,11 +71,11 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 		
 		List<ProcessingEvent> events = new ArrayList<ProcessingEvent>();
 		
-		templateVariables.put("processTarget",PROCESS_TARGET);
-		String appId          = firstValue("applicationId",parameterMap);
+		templateVariables.put(FormConstants.PROCESS_TARGET,PROCESS_TARGET);
+		String appId          = firstValue(FormConstants.APP_ID,parameterMap);
 		String appVerId       = firstValue("versionId",parameterMap);
 		String deploymentType = firstValue("deploymentType",parameterMap);
-		String processTarget  = firstValue("processTarget",parameterMap);
+		String processTarget  = firstValue(FormConstants.PROCESS_TARGET,parameterMap);
 
 		Application app = null;
 		try {

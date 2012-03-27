@@ -40,6 +40,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.openmeap.AuthorizerImpl;
+import com.openmeap.constants.FormConstants;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.ModelServiceImpl;
 import com.openmeap.model.dto.GlobalSettings;
@@ -88,9 +89,9 @@ public class AdminServlet extends HttpServlet {
 			}
 			
 			// default to the mainOptionPage, unless otherwise specified
-			if( request.getParameter("bean")!=null )
-				td = (DocumentProcessor)context.getBean(request.getParameter("bean"));
-			else td = (DocumentProcessor)context.getBean("mainOptionsPage");
+			if( request.getParameter(FormConstants.PAGE_BEAN)!=null )
+				td = (DocumentProcessor)context.getBean(request.getParameter(FormConstants.PAGE_BEAN));
+			else td = (DocumentProcessor)context.getBean(FormConstants.PAGE_BEAN_MAIN);
 			
 			ModelManager mgr = getModelManager();
 			Map<Object,Object> map = new HashMap<Object,Object>();

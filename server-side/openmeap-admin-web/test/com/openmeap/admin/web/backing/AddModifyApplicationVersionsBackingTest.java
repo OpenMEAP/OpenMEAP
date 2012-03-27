@@ -77,7 +77,7 @@ public class AddModifyApplicationVersionsBackingTest {
 		// verify the correct templateVariables are produced with an invalid applcationId is passed
 		vars = new HashMap<Object,Object>();
 		parms = new HashMap<Object,Object>();
-		parms.put("applicationId", new String[]{"666"});
+		parms.put(FormConstants.APP_ID, new String[]{"666"});
 		amab = new AddModifyApplicationVersionBacking();
 		amab.setModelManager( mm );
 		events = amab.process(null, vars, parms);
@@ -89,7 +89,7 @@ public class AddModifyApplicationVersionsBackingTest {
 		// but invalid versionId is passed
 		vars = new HashMap<Object,Object>();
 		parms = new HashMap<Object,Object>();
-		parms.put("applicationId", new String[]{"1"});
+		parms.put(FormConstants.APP_ID, new String[]{"1"});
 		parms.put("versionId", new String[]{"666"});
 		amab = new AddModifyApplicationVersionBacking();
 		amab.setModelManager( mm );
@@ -100,14 +100,14 @@ public class AddModifyApplicationVersionsBackingTest {
 		Assert.assertTrue(vars.get("application")!=null && ((Application)vars.get("application")).getName().compareTo("Application.name")==0 );
 		Assert.assertTrue(vars.get("version")!=null && ((ApplicationVersion)vars.get("version")).getIdentifier()==null);
 		Assert.assertTrue(vars.get("hashTypes")!=null && ((List)vars.get("hashTypes")).size()==HashAlgorithm.values().length);
-		Assert.assertTrue(((String)vars.get("processTarget")).compareTo(ProcessingTargets.ADDMODIFY_APPVER)==0);
+		Assert.assertTrue(((String)vars.get(FormConstants.PROCESS_TARGET)).compareTo(ProcessingTargets.ADDMODIFY_APPVER)==0);
 		
 		//////////////////////
 		// verify the correct templateVariables are produced when 
 		// both a valid app id and version id are passed in
 		vars = new HashMap<Object,Object>();
 		parms = new HashMap<Object,Object>();
-		parms.put("applicationId", new String[]{"1"});
+		parms.put(FormConstants.APP_ID, new String[]{"1"});
 		parms.put("versionId", new String[]{"1"});
 		amab = new AddModifyApplicationVersionBacking();
 		amab.setModelManager( mm );
@@ -118,7 +118,7 @@ public class AddModifyApplicationVersionsBackingTest {
 		Assert.assertTrue(vars.get("application")!=null && ((Application)vars.get("application")).getName().compareTo("Application.name")==0 );
 		Assert.assertTrue(vars.get("version")!=null && ((ApplicationVersion)vars.get("version")).getIdentifier().compareTo("ApplicationVersion.identifier.1")==0 );
 		Assert.assertTrue(vars.get("hashTypes")!=null && ((List)vars.get("hashTypes")).size()==HashAlgorithm.values().length);
-		Assert.assertTrue(((String)vars.get("processTarget")).compareTo(ProcessingTargets.ADDMODIFY_APPVER)==0);
+		Assert.assertTrue(((String)vars.get(FormConstants.PROCESS_TARGET)).compareTo(ProcessingTargets.ADDMODIFY_APPVER)==0);
 	}
 	
 	@Test public void testFormPost() {
@@ -131,8 +131,8 @@ public class AddModifyApplicationVersionsBackingTest {
 		// Verify that we can create a new ApplicationVersion
 		vars = new HashMap<Object,Object>();
 		parms = new HashMap<Object,Object>();
-		parms.put("processTarget", new String[]{ProcessingTargets.ADDMODIFY_APPVER});
-		parms.put("applicationId", new String[]{"1"});
+		parms.put(FormConstants.PROCESS_TARGET, new String[]{ProcessingTargets.ADDMODIFY_APPVER});
+		parms.put(FormConstants.APP_ID, new String[]{"1"});
 		parms.put("versionId", new String[]{""});
 		parms.put("identifier", new String[]{"ApplicationVersion.identifier.1"});
 		parms.put("url", new String[]{"ANewDownloadUrl"});
@@ -147,7 +147,7 @@ public class AddModifyApplicationVersionsBackingTest {
 		Collection<ProcessingEvent> events = amab.process(null, vars, parms);
 		Assert.assertTrue(events.size()==3 && ProcessingUtils.containsTarget(events, ProcessingTargets.MESSAGES));
 		Assert.assertTrue(vars.get("hashTypes")!=null);
-		Assert.assertTrue(vars.get("processTarget")!=null && ((String)vars.get("processTarget")).compareTo(ProcessingTargets.ADDMODIFY_APPVER)==0);
+		Assert.assertTrue(vars.get(FormConstants.PROCESS_TARGET)!=null && ((String)vars.get(FormConstants.PROCESS_TARGET)).compareTo(ProcessingTargets.ADDMODIFY_APPVER)==0);
 		Assert.assertTrue(vars.get("version")!=null);
 		version = ((ApplicationVersion)vars.get("version"));
 		Assert.assertTrue(version.getIdentifier().compareTo("ApplicationVersion.identifier.1")==0);

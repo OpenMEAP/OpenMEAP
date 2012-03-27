@@ -24,15 +24,16 @@
 
 package com.openmeap.admin.web.backing;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Test;
 
 import com.openmeap.admin.web.ProcessingTargets;
+import com.openmeap.constants.FormConstants;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.ModelTestUtils;
 import com.openmeap.util.ParameterMapUtils;
-
-import org.junit.Test;
 
 public class GlobalSettingsBackingTest {
 
@@ -47,7 +48,7 @@ public class GlobalSettingsBackingTest {
 		
 		Map<Object,Object> templateVariables = new HashMap<Object,Object>();
 		Map<Object,Object> parameterMap = new HashMap<Object,Object>();
-		ParameterMapUtils.setValue("processTarget", ProcessingTargets.GLOBAL_SETTINGS, parameterMap);
+		ParameterMapUtils.setValue(FormConstants.PROCESS_TARGET, ProcessingTargets.GLOBAL_SETTINGS, parameterMap);
 		backing.process(null, templateVariables, parameterMap);
 		ModelTestUtils.resetTestDb();
 	}

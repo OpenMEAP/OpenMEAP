@@ -24,16 +24,23 @@
 
 package com.openmeap.admin.web.backing;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-import com.openmeap.web.*;
-import com.openmeap.web.html.*;
 import com.openmeap.admin.web.ProcessingTargets;
-import com.openmeap.admin.web.backing.ApplicationVersionListingsBacking;
-import com.openmeap.model.*;
+import com.openmeap.constants.FormConstants;
+import com.openmeap.model.ModelManager;
+import com.openmeap.model.ModelTestUtils;
 import com.openmeap.model.dto.ApplicationVersion;
+import com.openmeap.web.ProcessingEvent;
+import com.openmeap.web.ProcessingUtils;
+import com.openmeap.web.html.Anchor;
 
 public class ApplicationVersionListingsBackingTest {
 	
@@ -68,7 +75,7 @@ public class ApplicationVersionListingsBackingTest {
 		// Verify that a valid application id returns 
 		//   - a "Create Application Version" anchor
 		//   - a list of versions
-		parms.put("applicationId", new String[]{"1"});
+		parms.put(FormConstants.APP_ID, new String[]{"1"});
 		events = avlb.process(null,vars,parms);
 		Assert.assertTrue(events!=null && events.size()==2 && ProcessingUtils.containsTarget(events,ProcessingTargets.NAV_SUB));
 		for( ProcessingEvent event : events ) {

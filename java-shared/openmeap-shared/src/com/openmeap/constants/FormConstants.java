@@ -25,7 +25,36 @@
 package com.openmeap.constants;
 
 public class FormConstants {
-	// TODO: this should really be an enum somewhere...prolly already is and I should use that instead.
+	
 	final static public String ENCTYPE_MULTIPART_FORMDATA = "multipart/form-data";
 	final static public String CHAR_ENC_DEFAULT = "UTF-8";
+	
+	/*
+	 * Page bean names
+	 */
+	
+	final static public String PAGE_BEAN_APP_ADDMODIFY = "addModifyAppPage";
+	final static public String PAGE_BEAN_MAIN = "mainOptionsPage";
+	
+	/*
+	 * Shared form parameter names
+	 */
+	final static public String PROCESS_TARGET = "processTarget";
+	final static public String PAGE_BEAN = "bean";
+	final static public String DELETE = "delete";
+	final static public String APP_ID = "applicationId";
+	
+	/*
+	 * App Add/Modify unique parameter constants
+	 */
+	final static public String APP_DESCRIPTION = "description";
+	final static public String APP_ADMINS = "admins";
+	final static public String APP_VERSIONADMINS = "admins";
+	final static public String APP_DEPL_HIST_LEN = "deploymentHistoryLength";
+	
+	/*
+	 * App Add/Modify unique parameter string values
+	 */
+	final static public String APP_DELETE_CONFIRM_TEXT = "delete the application";
+	
 }

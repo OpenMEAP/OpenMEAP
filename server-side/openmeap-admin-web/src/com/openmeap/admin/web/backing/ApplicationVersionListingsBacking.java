@@ -25,23 +25,28 @@
 package com.openmeap.admin.web.backing;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
-
-import com.openmeap.admin.web.ProcessingTargets;
 import com.openmeap.Authorizer;
-import com.openmeap.model.*;
+import com.openmeap.admin.web.ProcessingTargets;
+import com.openmeap.admin.web.backing.event.AddSubNavAnchorEvent;
+import com.openmeap.admin.web.backing.event.MessagesEvent;
+import com.openmeap.constants.FormConstants;
+import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.util.ParameterMapUtils;
-import com.openmeap.web.*;
-import com.openmeap.admin.web.backing.event.MessagesEvent;
-import com.openmeap.admin.web.backing.event.AddSubNavAnchorEvent;
-import com.openmeap.web.html.*;
-import javax.persistence.PersistenceException;
+import com.openmeap.web.AbstractTemplatedSectionBacking;
+import com.openmeap.web.ProcessingContext;
+import com.openmeap.web.ProcessingEvent;
+import com.openmeap.web.html.Anchor;
 
 public class ApplicationVersionListingsBacking extends AbstractTemplatedSectionBacking {
 
@@ -66,9 +71,9 @@ public class ApplicationVersionListingsBacking extends AbstractTemplatedSectionB
 		
 		List<ProcessingEvent> events = new ArrayList<ProcessingEvent>();
 		
-		if( ParameterMapUtils.notEmpty("applicationId", parameterMap) ) {
+		if( ParameterMapUtils.notEmpty(FormConstants.APP_ID, parameterMap) ) {
 
-			Application app = modelManager.getModelService().findByPrimaryKey(Application.class, Long.valueOf( ParameterMapUtils.firstValue("applicationId", parameterMap) ) );
+			Application app = modelManager.getModelService().findByPrimaryKey(Application.class, Long.valueOf( ParameterMapUtils.firstValue(FormConstants.APP_ID, parameterMap) ) );
 			if( app!=null ) {
 				
 				Boolean mayUpdate = modelManager.getAuthorizer().may(Authorizer.Action.MODIFY, app);
@@ -81,13 +86,13 @@ public class ApplicationVersionListingsBacking extends AbstractTemplatedSectionB
 				currentVersionId = currentVersionId!=null ? currentVersionId:(-1);
 				
 				templateVariables.put("application", app);
-				templateVariables.put("processTarget", ProcessingTargets.DEPLOYMENTS);
+				templateVariables.put(FormConstants.PROCESS_TARGET, ProcessingTargets.DEPLOYMENTS);
 				templateVariables.put("currentVersionId", currentVersionId);
 				
 				if( app.getVersions()!=null && app.getVersions().size()>0 ) {
 					createVersionsDisplayLists(app,templateVariables);
 				} else {
-					events.add( new MessagesEvent( "Application with id "+ParameterMapUtils.firstValue("applicationId", parameterMap)+" has no versions associated to it") );
+					events.add( new MessagesEvent( "Application with id "+ParameterMapUtils.firstValue(FormConstants.APP_ID, parameterMap)+" has no versions associated to it") );
 				}
 				if( modelManager.getAuthorizer().may(Authorizer.Action.CREATE, new Application()) ) {
 					events.add( new AddSubNavAnchorEvent( new Anchor("?bean=addModifyAppVersionPage&applicationId="+app.getId(),"Add an Application Version","Create Application Version")) );
@@ -98,7 +103,7 @@ public class ApplicationVersionListingsBacking extends AbstractTemplatedSectionB
 				events.add( new AddSubNavAnchorEvent(deploymentHistoryAnchor));
 				
 			} else {
-				events.add( new MessagesEvent( "Application with id "+ParameterMapUtils.firstValue("applicationId", parameterMap)+" not found") );
+				events.add( new MessagesEvent( "Application with id "+ParameterMapUtils.firstValue(FormConstants.APP_ID, parameterMap)+" not found") );
 			}
 		} else {
 			events.add( new MessagesEvent( "An application must be selected") );
