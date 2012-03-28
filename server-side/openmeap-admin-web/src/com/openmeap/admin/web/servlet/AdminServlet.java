@@ -24,18 +24,17 @@
 
 package com.openmeap.admin.web.servlet;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.servlet.http.*;
-
-import java.security.Principal;
-import java.util.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -44,15 +43,12 @@ import com.openmeap.constants.FormConstants;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.ModelServiceImpl;
 import com.openmeap.model.dto.GlobalSettings;
+import com.openmeap.util.ParameterMapUtils;
 import com.openmeap.util.ServletUtils;
-import com.openmeap.web.*;
+import com.openmeap.web.DocumentProcessor;
 
 import freemarker.ext.beans.BeanModel;
 import freemarker.template.DefaultObjectWrapper;
-
-import org.apache.commons.fileupload.*;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 public class AdminServlet extends HttpServlet {
 	
@@ -72,6 +68,9 @@ public class AdminServlet extends HttpServlet {
 	public void service(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			DocumentProcessor documentProcessor = null;
+			
+			logger.debug("Request url: "+request.getRequestURL());
+			logger.debug("Parameter map: "+ParameterMapUtils.toString(request.getParameterMap()));
 			
 			if( request.getParameter("logout")!=null ) {
 				request.getSession().invalidate();
@@ -105,7 +104,7 @@ public class AdminServlet extends HttpServlet {
 				authorizer.setRequest(request);
 			}
 
-			response.setContentType("text/html");
+			response.setContentType(FormConstants.CONT_TYPE_HTML);
 			
 			Map<Object,Object> defaultTemplateVars = new HashMap<Object,Object>();
 			defaultTemplateVars.put("request", new BeanModel(request,new DefaultObjectWrapper()));

@@ -64,4 +64,33 @@ final public class ParameterMapUtils {
 			return Boolean.FALSE;
 		return firstValue(param1,map).equals(firstValue(param2,map));
 	}
+	
+	static public String toString(Map<String,String[]> map) {
+		StringBuilder sb = new StringBuilder();
+		
+		boolean first=true;
+		for( Map.Entry<String,String[]> entry : map.entrySet() ) {
+			
+			if( first==false ) {
+				sb.append(",");
+			} else {
+				first=false;
+			}
+			
+			sb.append(entry.getKey()+"={");
+			boolean innerFirst = true;
+			for( String value : entry.getValue() ) {
+				
+				if( innerFirst==false ) {
+					sb.append(",");
+				} else {
+					innerFirst=false;
+				}
+				sb.append(value);
+			}
+			
+			sb.append("}");
+		}
+		return sb.toString();
+	}
 }

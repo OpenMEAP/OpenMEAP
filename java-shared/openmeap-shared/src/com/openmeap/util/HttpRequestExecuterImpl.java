@@ -30,6 +30,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -45,14 +46,18 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
+
+import com.openmeap.constants.FormConstants;
 
 /**
  * A class to encapsulate the actual transport of http
@@ -74,9 +79,9 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 		
 		((DefaultHttpClient)httpClient).setCredentialsProvider(HttpRequestExecuterFactory.newDefaultCredentialsProvider());
 		
-		httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_0);
-		httpClient.getParams().setParameter(CoreProtocolPNames.HTTP_CONTENT_CHARSET, HTTP.UTF_8);
-		httpClient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.RFC_2965);
+		httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+		httpClient.getParams().setParameter(CoreProtocolPNames.HTTP_CONTENT_CHARSET, FormConstants.CHAR_ENC_DEFAULT);
+		httpClient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
 		
 		// setup any proxy information
 		String proxyHost = System.getProperty("http.proxyHost");
@@ -104,11 +109,11 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 	
 	public HttpResponse postXml(String url, String xmlData) throws ClientProtocolException, IOException {
 		
-    	StringEntity stringEntity = new StringEntity(xmlData,HTTP.UTF_8);
-    	stringEntity.setContentType("text/xml");
+    	StringEntity stringEntity = new StringEntity(xmlData,FormConstants.CHAR_ENC_DEFAULT);
+    	stringEntity.setContentType(FormConstants.CONT_TYPE_XML);
     	
     	HttpPost httppost = new HttpPost(url);
-    	httppost.setHeader("Content-type","text/xml");
+    	httppost.setHeader(FormConstants.CONTENT_TYPE,FormConstants.CONT_TYPE_XML);
     	httppost.setEntity(stringEntity);
     	
     	// TODO: figure out how to get "application/soap+xml;charset=UTF-8" working...keeps giving me a "415: Unsupported Media Type"
@@ -136,13 +141,13 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 		
 		List<NameValuePair> nameValuePairs = createNameValuePairs(postParams);
 		
-		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePairs,HTTP.UTF_8);
-    	//StringEntity entity = new StringEntity(Utils.createParamsString(postParams),HTTP.UTF_8);
+		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePairs,FormConstants.CHAR_ENC_DEFAULT);
+    	//StringEntity entity = new StringEntity(Utils.createParamsString(postParams),FormConstants.CHAR_ENC_DEFAULT);
     	
-		entity.setContentType("application/x-www-form-urlencoded");
+		entity.setContentType(FormConstants.CONT_TYPE_DEFAULT);
 		
 		HttpPost httpPost = new HttpPost(createUrl(url,getParams));
-		httpPost.setHeader("Content-type","application/x-www-form-urlencoded");
+		httpPost.setHeader(FormConstants.CONTENT_TYPE,FormConstants.CONT_TYPE_DEFAULT);
         httpPost.setEntity(entity);
     	
     	return httpClient.execute(httpPost);

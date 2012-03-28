@@ -61,6 +61,7 @@ import com.openmeap.model.event.handler.ArchiveFileUploadHandler;
 import com.openmeap.model.event.handler.ModelServiceRefreshHandler;
 import com.openmeap.services.dto.Result;
 import com.openmeap.util.AuthTokenProvider;
+import com.openmeap.util.ParameterMapUtils;
 import com.openmeap.util.ServletUtils;
 
 /**
@@ -112,6 +113,9 @@ public class ServiceManagementServlet extends HttpServlet {
 		if( action==null ) {
 			action="";
 		}
+		
+		logger.debug("Request url: "+request.getRequestURL());
+		logger.debug("Parameter map: "+ParameterMapUtils.toString(request.getParameterMap()));
 		
 		PrintWriter os = new PrintWriter(response.getOutputStream());
 		GlobalSettings settings = modelManager.getGlobalSettings();

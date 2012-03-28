@@ -180,9 +180,9 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		String storagePathErrors = modelManager.getGlobalSettings().validateTemporaryStoragePath();
 		if( storagePathErrors!=null ) {
 			events.add( new MessagesEvent("WARNING: The archive storage path is not set and file uploads will not be processed.  The archive storage path can be set on the settings page.") );
-			templateVariables.put("encodingType", "");
+			templateVariables.put(FormConstants.ENCODING_TYPE, "");
 		} else {
-			templateVariables.put("encodingType","enctype=\""+FormConstants.ENCTYPE_MULTIPART_FORMDATA+"\"");
+			templateVariables.put(FormConstants.ENCODING_TYPE,"enctype=\""+FormConstants.ENCTYPE_MULTIPART_FORMDATA+"\"");
 		}
 	}
 	

@@ -58,6 +58,8 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 
+import com.openmeap.constants.FormConstants;
+
 public class SSLHelper {
 	
 	@SuppressWarnings("deprecation")
@@ -71,7 +73,7 @@ public class SSLHelper {
 
 	        HttpParams params = new BasicHttpParams();
 	        HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
-	        HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
+	        HttpProtocolParams.setContentCharset(params, FormConstants.CHAR_ENC_DEFAULT);
 
 	        SchemeRegistry registry = new SchemeRegistry();
 	        registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));

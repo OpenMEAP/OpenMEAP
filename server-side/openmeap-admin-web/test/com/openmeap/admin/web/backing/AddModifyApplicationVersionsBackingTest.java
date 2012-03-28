@@ -71,7 +71,7 @@ public class AddModifyApplicationVersionsBackingTest {
 		amab.setModelManager( mm );
 		Collection<ProcessingEvent> events = amab.process(null, vars, parms);
 		Assert.assertTrue(events.size()==1 && ProcessingUtils.containsTarget(events,ProcessingTargets.MESSAGES) );
-		Assert.assertTrue(vars.size()==1 && vars.get("encodingType").equals("enctype=\""+FormConstants.ENCTYPE_MULTIPART_FORMDATA+"\""));
+		Assert.assertTrue(vars.size()==1 && vars.get(FormConstants.ENCODING_TYPE).equals("enctype=\""+FormConstants.ENCTYPE_MULTIPART_FORMDATA+"\""));
 		
 		///////////////////////
 		// verify the correct templateVariables are produced with an invalid applcationId is passed
@@ -82,7 +82,7 @@ public class AddModifyApplicationVersionsBackingTest {
 		amab.setModelManager( mm );
 		events = amab.process(null, vars, parms);
 		Assert.assertTrue(events.size()==1 && ProcessingUtils.containsTarget(events,ProcessingTargets.MESSAGES) );
-		Assert.assertTrue(vars.size()==1 && vars.get("encodingType").equals("enctype=\""+FormConstants.ENCTYPE_MULTIPART_FORMDATA+"\""));
+		Assert.assertTrue(vars.size()==1 && vars.get(FormConstants.ENCODING_TYPE).equals("enctype=\""+FormConstants.ENCTYPE_MULTIPART_FORMDATA+"\""));
 		
 		/////////////////////
 		// verify the correct templateVariables are produced with an valid applcationId, 
@@ -96,7 +96,7 @@ public class AddModifyApplicationVersionsBackingTest {
 		events = amab.process(null, vars, parms);
 		Assert.assertTrue(events.size()==3 && ProcessingUtils.containsTarget(events, ProcessingTargets.MESSAGES) );
 		Assert.assertTrue(vars.size()==6);
-		Assert.assertTrue(vars.get("encodingType").equals("enctype=\""+FormConstants.ENCTYPE_MULTIPART_FORMDATA+"\""));
+		Assert.assertTrue(vars.get(FormConstants.ENCODING_TYPE).equals("enctype=\""+FormConstants.ENCTYPE_MULTIPART_FORMDATA+"\""));
 		Assert.assertTrue(vars.get("application")!=null && ((Application)vars.get("application")).getName().compareTo("Application.name")==0 );
 		Assert.assertTrue(vars.get("version")!=null && ((ApplicationVersion)vars.get("version")).getIdentifier()==null);
 		Assert.assertTrue(vars.get("hashTypes")!=null && ((List)vars.get("hashTypes")).size()==HashAlgorithm.values().length);
@@ -114,7 +114,7 @@ public class AddModifyApplicationVersionsBackingTest {
 		events = amab.process(null, vars, parms);
 		Assert.assertTrue(events.size()==2);
 		Assert.assertTrue(vars.size()==6);
-		Assert.assertTrue(vars.get("encodingType").equals("enctype=\""+FormConstants.ENCTYPE_MULTIPART_FORMDATA+"\""));
+		Assert.assertTrue(vars.get(FormConstants.ENCODING_TYPE).equals("enctype=\""+FormConstants.ENCTYPE_MULTIPART_FORMDATA+"\""));
 		Assert.assertTrue(vars.get("application")!=null && ((Application)vars.get("application")).getName().compareTo("Application.name")==0 );
 		Assert.assertTrue(vars.get("version")!=null && ((ApplicationVersion)vars.get("version")).getIdentifier().compareTo("ApplicationVersion.identifier.1")==0 );
 		Assert.assertTrue(vars.get("hashTypes")!=null && ((List)vars.get("hashTypes")).size()==HashAlgorithm.values().length);

@@ -24,10 +24,19 @@
 
 package com.openmeap.constants;
 
+import org.apache.http.protocol.HTTP;
+
 public class FormConstants {
 	
+	final static public String CONTENT_TYPE = "Content-type";
+	final static public String CONT_TYPE_DEFAULT = "application/x-www-form-urlencoded";
+	final static public String CONT_TYPE_XML = "text/xml";
+	final static public String CONT_TYPE_HTML = "text/html";
+	
+	final static public String ENCODING_TYPE = "encodingType";
 	final static public String ENCTYPE_MULTIPART_FORMDATA = "multipart/form-data";
-	final static public String CHAR_ENC_DEFAULT = "UTF-8";
+	
+	final static public String CHAR_ENC_DEFAULT = HTTP.UTF_8;
 	
 	/*
 	 * Page bean names
