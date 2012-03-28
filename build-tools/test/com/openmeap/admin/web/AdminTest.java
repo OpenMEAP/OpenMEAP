@@ -51,6 +51,7 @@ public class AdminTest {
 		app.setVersionAdmins("juno");
 		app.setAdmins("jacob");
 		app.setInitialVersionIdentifier("ver-1.1.x");
+		
 		HttpResponse response = helper.postAddModifyApp(app);
 		
 		Assert.assertTrue(response.getStatusLine().getStatusCode()==200);

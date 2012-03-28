@@ -23,11 +23,11 @@ public class FileHandlingHttpRequestExecuterImpl extends
 		HttpRequestExecuterImpl {
 	
 	@Override
-	public HttpResponse postData(String url, Map<String,Object> getParams, Map<String, Object> params) throws ClientProtocolException, IOException {
+	public HttpResponse postData(String url, Map<String,Object> getParams, Map<String, Object> postParams) throws ClientProtocolException, IOException {
 		
 		// test to determine whether this is a file upload or not.
 		Boolean isFileUpload = false;
-		for( Object o : params.values() ) {
+		for( Object o : postParams.values() ) {
 			if( o instanceof File ) {
 				isFileUpload = true;
 				break;
@@ -36,18 +36,16 @@ public class FileHandlingHttpRequestExecuterImpl extends
 		
 		if( isFileUpload ) {
 			
-			String finalUrl = url;
-			if(getParams!=null) {
-				finalUrl=finalUrl+(finalUrl.contains("?")?"&":"?")+createParamsString(getParams);
-			}
-			HttpPost post = new HttpPost(finalUrl);
+			HttpPost httpPost = new HttpPost(createUrl(url,getParams));
 			
-			getHttpClient().getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+			httpPost.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
 			
-			MultipartEntity entity = new MultipartEntity( HttpMultipartMode.BROWSER_COMPATIBLE );
+			MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
 	
-			for( Map.Entry<String, Object> entry : params.entrySet() ) {
+			for( Map.Entry<String, Object> entry : postParams.entrySet() ) {
+				
 				if( entry.getValue() instanceof File ) {
+					
 					// For File parameters
 					File file = (File)entry.getValue();
 					FileNameMap fileNameMap = URLConnection.getFileNameMap();
@@ -55,16 +53,18 @@ public class FileHandlingHttpRequestExecuterImpl extends
 					
 					entity.addPart( entry.getKey(), new FileBody((( File ) entry.getValue() ), type ));
 				} else {
+					
 					// For usual String parameters
 					entity.addPart( entry.getKey(), new StringBody( entry.getValue().toString(), "text/plain", Charset.forName( FormConstants.CHAR_ENC_DEFAULT )));
 				}
 			}
 				
-			post.setEntity( entity );
+			httpPost.setEntity(entity);
 		
-			return getHttpClient().execute(post);
+			return getHttpClient().execute(httpPost);
 		} else {
-			return super.postData(url,getParams,params);
+			
+			return super.postData(url,getParams,postParams);
 		}
 	}
 }

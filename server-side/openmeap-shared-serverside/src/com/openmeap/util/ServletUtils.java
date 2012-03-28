@@ -94,8 +94,9 @@ public abstract class ServletUtils {
 		
 		// check for file uploads
 		String contentType = request.getContentType();
-		if( contentType!=null 
-				&& contentType.startsWith(FormConstants.ENCTYPE_MULTIPART_FORMDATA) ) {
+		
+		if( contentType!=null && contentType.startsWith(FormConstants.ENCTYPE_MULTIPART_FORMDATA) ) {
+			
 			try {
 	        	ServletUtils.handleFileUploads(maxFileUploadSize,fileStoragePrefix,request,map);
 			} catch( FileUploadException fue ) {
@@ -103,6 +104,7 @@ public abstract class ServletUtils {
 				throw new RuntimeException(fue);
 			}
 		} else {
+			
 			@SuppressWarnings(value={"unchecked"})
 			Map<String,String[]> params = (Map<String,String[]>)request.getParameterMap();
 			for( Map.Entry<String,String[]> ent : params.entrySet() ) {

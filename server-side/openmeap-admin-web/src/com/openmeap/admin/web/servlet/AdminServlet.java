@@ -71,7 +71,7 @@ public class AdminServlet extends HttpServlet {
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			DocumentProcessor td = null;
+			DocumentProcessor documentProcessor = null;
 			
 			if( request.getParameter("logout")!=null ) {
 				request.getSession().invalidate();
@@ -90,27 +90,27 @@ public class AdminServlet extends HttpServlet {
 			
 			// default to the mainOptionPage, unless otherwise specified
 			if( request.getParameter(FormConstants.PAGE_BEAN)!=null )
-				td = (DocumentProcessor)context.getBean(request.getParameter(FormConstants.PAGE_BEAN));
-			else td = (DocumentProcessor)context.getBean(FormConstants.PAGE_BEAN_MAIN);
+				documentProcessor = (DocumentProcessor)context.getBean(request.getParameter(FormConstants.PAGE_BEAN));
+			else documentProcessor = (DocumentProcessor)context.getBean(FormConstants.PAGE_BEAN_MAIN);
 			
 			ModelManager mgr = getModelManager();
 			Map<Object,Object> map = new HashMap<Object,Object>();
 			
 			// TODO: I'm not really happy with this hacky work-around for the login form not being in actual request scope
-			if( td.getProcessesFormData() ) {
+			if( documentProcessor.getProcessesFormData() ) {
 				GlobalSettings settings = mgr.getGlobalSettings();
 				map = ServletUtils.cloneParameterMap(settings.getMaxFileUploadSize(),settings.getTemporaryStoragePath(),request);
 				
-				AuthorizerImpl auth = (AuthorizerImpl)context.getBean("authorizer");
-				auth.setRequest(request);
+				AuthorizerImpl authorizer = (AuthorizerImpl)context.getBean("authorizer");
+				authorizer.setRequest(request);
 			}
 
 			response.setContentType("text/html");
 			
 			Map<Object,Object> defaultTemplateVars = new HashMap<Object,Object>();
 			defaultTemplateVars.put("request", new BeanModel(request,new DefaultObjectWrapper()));
-			td.setTemplateVariables(defaultTemplateVars);
-			td.handleProcessAndRender(map,response.getWriter());
+			documentProcessor.setTemplateVariables(defaultTemplateVars);
+			documentProcessor.handleProcessAndRender(map,response.getWriter());
 			
 			response.getWriter().flush();
 			response.getWriter().close();

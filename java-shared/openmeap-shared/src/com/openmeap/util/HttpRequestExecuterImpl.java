@@ -34,6 +34,7 @@ import java.util.Map;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -42,11 +43,14 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 
@@ -70,6 +74,10 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 		
 		((DefaultHttpClient)httpClient).setCredentialsProvider(HttpRequestExecuterFactory.newDefaultCredentialsProvider());
 		
+		httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_0);
+		httpClient.getParams().setParameter(CoreProtocolPNames.HTTP_CONTENT_CHARSET, HTTP.UTF_8);
+		httpClient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.RFC_2965);
+		
 		// setup any proxy information
 		String proxyHost = System.getProperty("http.proxyHost");
 		if( proxyHost!=null ) {
@@ -85,7 +93,8 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 		}
 	}
 	
-	@Override public void finalize() {
+	@Override 
+	public void finalize() {
 		this.shutdown();
 	}
 	
@@ -95,12 +104,12 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 	
 	public HttpResponse postXml(String url, String xmlData) throws ClientProtocolException, IOException {
 		
-    	StringEntity se = new StringEntity(xmlData,HTTP.UTF_8);
-    	se.setContentType("text/xml");
+    	StringEntity stringEntity = new StringEntity(xmlData,HTTP.UTF_8);
+    	stringEntity.setContentType("text/xml");
     	
     	HttpPost httppost = new HttpPost(url);
     	httppost.setHeader("Content-type","text/xml");
-    	httppost.setEntity(se);
+    	httppost.setEntity(stringEntity);
     	
     	// TODO: figure out how to get "application/soap+xml;charset=UTF-8" working...keeps giving me a "415: Unsupported Media Type"
     	return httpClient.execute(httppost);
@@ -111,11 +120,8 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 	}
 	
 	public HttpResponse get(String url, Map<String,Object> getParams) throws ClientProtocolException, IOException {
-		
-		HttpGet thisGet = new HttpGet(url);
-		HttpParams httpParams = createHttpParams(getParams);
-		thisGet.setParams(httpParams);
-		return this.get(thisGet);
+		HttpGet thisGet = new HttpGet(createUrl(url,getParams));
+		return get(thisGet);
 	}
 	
 	public HttpResponse get(String url) throws ClientProtocolException, IOException {
@@ -128,42 +134,38 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 	
 	public HttpResponse postData(String url, Map<String,Object> getParams, Map<String, Object> postParams) throws ClientProtocolException, IOException {
 		
-		String finalUrl = url;
-		if(getParams!=null) {
-			finalUrl=finalUrl+(finalUrl.contains("?")?"&":"?")+createParamsString(getParams);
-		}
-		HttpPost post = new HttpPost(finalUrl);
+		List<NameValuePair> nameValuePairs = createNameValuePairs(postParams);
 		
-		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(postParams.size());
-		for( Map.Entry<String,Object> entry : postParams.entrySet() ) {
+		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePairs,HTTP.UTF_8);
+    	//StringEntity entity = new StringEntity(Utils.createParamsString(postParams),HTTP.UTF_8);
+    	
+		entity.setContentType("application/x-www-form-urlencoded");
+		
+		HttpPost httpPost = new HttpPost(createUrl(url,getParams));
+		httpPost.setHeader("Content-type","application/x-www-form-urlencoded");
+        httpPost.setEntity(entity);
+    	
+    	return httpClient.execute(httpPost);
+	}
+	
+	/*
+	 * Protected methods
+	 */
+	
+	protected String createUrl(String url, Map<String,Object> params) throws UnsupportedEncodingException {
+		String finalUrl = url;
+		if(params!=null) {
+			finalUrl = finalUrl + (finalUrl.contains("?")?"&":"?") + Utils.createParamsString(params);
+		}
+		return finalUrl;
+	}
+	
+	protected List<NameValuePair> createNameValuePairs(Map<String,Object> params) {
+		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(params.size());
+		for( Map.Entry<String,Object> entry : params.entrySet() ) {
 			nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue().toString()));
 		}
-		UrlEncodedFormEntity e = new UrlEncodedFormEntity(nameValuePairs);
-		e.setContentType("application/x-www-form-urlencoded");
-		post.setHeader("Content-type","application/x-www-form-urlencoded");
-        post.setEntity(e);
-		
-        /*
-        String postData = createParamsString(postParams);
-    	StringEntity se = new StringEntity(postData.toString(),HTTP.UTF_8);
-    	se.setContentType("application/x-www-form-urlencoded");
-    	post.setHeader("Content-type","application/x-www-form-urlencoded");
-    	post.setEntity(se); 
-    	*/
-    	
-    	return httpClient.execute(post);
-	}
-	
-	protected String createParamsString(Map<String,Object> postParams) throws UnsupportedEncodingException {
-		return Utils.createParamsString(postParams);
-	}
-	
-	protected HttpParams createHttpParams(Map<String,Object> params) {
-		HttpParams httpParams = new BasicHttpParams();
-		for( Map.Entry<String,Object> ent : params.entrySet() ) {
-			httpParams.setParameter(ent.getKey(),ent.getValue());
-		}
-		return httpParams;
+		return nameValuePairs;
 	}
 	
 	protected void setProxy(DefaultHttpClient httpclient, String proxyHost, Integer proxyPort, String proxyUser, String proxyPassword) {  

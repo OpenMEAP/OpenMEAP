@@ -108,10 +108,10 @@ public class ServiceManagementServlet extends HttpServlet {
 		
 		Result result = null;
 		
-		String action = request.getParameter("action");
-		
-		if( action==null )
+		String action = request.getParameter(UrlParamConstants.ACTION);
+		if( action==null ) {
 			action="";
+		}
 		
 		PrintWriter os = new PrintWriter(response.getOutputStream());
 		GlobalSettings settings = modelManager.getGlobalSettings();
