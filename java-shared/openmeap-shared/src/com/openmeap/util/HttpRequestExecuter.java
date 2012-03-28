@@ -37,6 +37,7 @@ public interface HttpRequestExecuter {
 	
 	public HttpResponse postXml(String url, String xmlData)  throws ClientProtocolException, IOException;
 	public HttpResponse postData(String url, Map<String,Object> params) throws ClientProtocolException, IOException;
+	public HttpResponse postData(String url, Map<String,Object> urlParams, Map<String, Object> postParams) throws ClientProtocolException, IOException;
 	public HttpResponse get(HttpGet url) throws ClientProtocolException, IOException;
 	public HttpResponse get(String url) throws ClientProtocolException, IOException;
 	public HttpResponse get(String url, Map<String,Object> params) throws ClientProtocolException, IOException;

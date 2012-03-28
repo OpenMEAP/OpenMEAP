@@ -27,6 +27,8 @@ package com.openmeap.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -42,6 +44,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+
+import com.openmeap.constants.FormConstants;
 
 abstract public class Utils {
 	
@@ -85,6 +89,23 @@ abstract public class Utils {
         	count = inputStream.read(bytes);
         }
     }
+    
+    public static String createParamsString(Map<String,Object> params) throws UnsupportedEncodingException {
+	    if( params==null ) {
+			return null;
+		}
+		StringBuilder data = new StringBuilder();
+		Boolean firstPass = true;
+		for( Map.Entry<String,Object> ent : params.entrySet() ) {
+			if( !firstPass ) {
+				data.append("&");
+			} else firstPass=false;
+			data.append(URLEncoder.encode(ent.getKey(), FormConstants.CHAR_ENC_DEFAULT));
+			data.append("=");
+			data.append(URLEncoder.encode(ent.getValue().toString(), FormConstants.CHAR_ENC_DEFAULT));
+		}
+		return data.toString();
+	}
     
     /**
      * Convenience method to parse an input stream into a document

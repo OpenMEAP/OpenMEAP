@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.openmeap.constants.FormConstants;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.GlobalSettings;
@@ -87,13 +88,13 @@ public class WebViewServlet extends HttpServlet {
 		String remove = pathParts[1]+"/"+pathParts[2]+"/"+pathParts[3];
 		String fileRelative = pathInfo.replace(remove,""); 
 
-		String applicationNameString = URLDecoder.decode(pathParts[APP_NAME_INDEX],"utf-8");
-		String applicationVersionString = URLDecoder.decode(pathParts[APP_VER_INDEX],"utf-8");
+		String applicationNameString = URLDecoder.decode(pathParts[APP_NAME_INDEX],FormConstants.CHAR_ENC_DEFAULT);
+		String applicationVersionString = URLDecoder.decode(pathParts[APP_VER_INDEX],FormConstants.CHAR_ENC_DEFAULT);
 		
 		ApplicationVersion ver = mgr.getModelService().findAppVersionByNameAndId(applicationNameString, applicationVersionString);
 	
 		String authSalt = ver.getApplication().getProxyAuthSalt();
-		String authToken = URLDecoder.decode(pathParts[AUTH_TOKEN_INDEX],"utf-8");
+		String authToken = URLDecoder.decode(pathParts[AUTH_TOKEN_INDEX],FormConstants.CHAR_ENC_DEFAULT);
 		
 		if( ! AuthTokenProvider.validateAuthToken(authSalt, authToken) ) {
 			response.sendError(HttpServletResponse.SC_FORBIDDEN);

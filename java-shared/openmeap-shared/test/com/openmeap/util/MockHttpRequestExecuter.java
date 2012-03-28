@@ -48,6 +48,7 @@ public class MockHttpRequestExecuter implements HttpRequestExecuter {
 	
 	static private String lastPostXmlData = null;
 	
+	static private Map<String,Object> lastGetData = null;
 	static private Map<String,Object> lastPostData = null;
 	static private String lastPostUrl = null;
 	
@@ -60,6 +61,9 @@ public class MockHttpRequestExecuter implements HttpRequestExecuter {
 	static public Map<String,Object> getLastPostData() {
 		return lastPostData;
 	}
+	static public Map<String,Object> getLastGetData() {
+		return lastGetData;
+	}
 	static public String getLastPostUrl() {
 		return lastPostUrl;
 	}
@@ -69,6 +73,12 @@ public class MockHttpRequestExecuter implements HttpRequestExecuter {
 	public HttpResponse postXml(String url,String xmlData) {
 		lastPostUrl = url;
 		lastPostXmlData = xmlData;
+		return putTogetherResponse();
+	}
+	public HttpResponse postData(String url,Map<String,Object> getData, Map<String,Object> postData) {
+		lastGetData = getData;
+		lastPostData = postData;
+		lastPostUrl = url;
 		return putTogetherResponse();
 	}
 	public HttpResponse postData(String url,Map<String,Object> postData) {
@@ -95,7 +105,7 @@ public class MockHttpRequestExecuter implements HttpRequestExecuter {
 	}
 	public HttpResponse get(String url, Map<String, Object> params)
 			throws ClientProtocolException, IOException {
-		lastPostData = params;
+		lastPostData = lastGetData = params;
 		lastPostUrl = url;
 		return putTogetherResponse();
 	}

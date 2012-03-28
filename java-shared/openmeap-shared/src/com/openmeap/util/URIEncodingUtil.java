@@ -28,6 +28,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
+import com.openmeap.constants.FormConstants;
+
 /**
  * Utility class for JavaScript compatible UTF-8 encoding and decoding.
  * 
@@ -55,7 +57,7 @@ public class URIEncodingUtil
 
 		try
 		{
-			result = URLDecoder.decode(s, "UTF-8");
+			result = URLDecoder.decode(s, FormConstants.CHAR_ENC_DEFAULT);
 		}
 
 		// This exception should never occur.
@@ -81,7 +83,7 @@ public class URIEncodingUtil
 
 		try
 		{
-			result = URLEncoder.encode(s, "UTF-8")
+			result = URLEncoder.encode(s, FormConstants.CHAR_ENC_DEFAULT)
 			.replaceAll("\\+", "%20")
 			.replaceAll("\\%21", "!")
 			.replaceAll("\\%27", "'")

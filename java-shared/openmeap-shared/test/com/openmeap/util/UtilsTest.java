@@ -29,6 +29,8 @@ import java.io.*;
 import java.util.*;
 import org.w3c.dom.*;
 
+import com.openmeap.constants.FormConstants;
+
 
 public class UtilsTest {
 	@Test public void testGetDocument() throws Exception {
@@ -45,7 +47,7 @@ public class UtilsTest {
 	@Test public void testReadInputStream() throws Exception {
 		String testXml = "<?xml version=\"1.0\"?><rootNode><childNode attribute=\"one\"/></rootNode>";
 		InputStream is = new BufferedInputStream(new ByteArrayInputStream(testXml.getBytes()));
-		String result = Utils.readInputStream(is,"UTF-8");
+		String result = Utils.readInputStream(is,FormConstants.CHAR_ENC_DEFAULT);
 		Assert.assertTrue(result.compareTo(testXml+System.getProperty("line.separator"))==0);
 	}
 	@Test public void testReplaceFields() {

@@ -17,10 +17,13 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.params.CoreProtocolPNames;
 
+import com.openmeap.constants.FormConstants;
+
 public class FileHandlingHttpRequestExecuterImpl extends
 		HttpRequestExecuterImpl {
 	
-	public HttpResponse postData(String url, Map<String, Object> params) throws ClientProtocolException, IOException {
+	@Override
+	public HttpResponse postData(String url, Map<String,Object> getParams, Map<String, Object> params) throws ClientProtocolException, IOException {
 		
 		// test to determine whether this is a file upload or not.
 		Boolean isFileUpload = false;
@@ -32,7 +35,12 @@ public class FileHandlingHttpRequestExecuterImpl extends
 		}
 		
 		if( isFileUpload ) {
-			HttpPost post = new HttpPost( url );
+			
+			String finalUrl = url;
+			if(getParams!=null) {
+				finalUrl=finalUrl+(finalUrl.contains("?")?"&":"?")+createParamsString(getParams);
+			}
+			HttpPost post = new HttpPost(finalUrl);
 			
 			getHttpClient().getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
 			
@@ -48,7 +56,7 @@ public class FileHandlingHttpRequestExecuterImpl extends
 					entity.addPart( entry.getKey(), new FileBody((( File ) entry.getValue() ), type ));
 				} else {
 					// For usual String parameters
-					entity.addPart( entry.getKey(), new StringBody( entry.getValue().toString(), "text/plain", Charset.forName( "UTF-8" )));
+					entity.addPart( entry.getKey(), new StringBody( entry.getValue().toString(), "text/plain", Charset.forName( FormConstants.CHAR_ENC_DEFAULT )));
 				}
 			}
 				
@@ -56,9 +64,7 @@ public class FileHandlingHttpRequestExecuterImpl extends
 		
 			return getHttpClient().execute(post);
 		} else {
-			
-			return super.postData(url,params);
-	    	
+			return super.postData(url,getParams,params);
 		}
 	}
 }

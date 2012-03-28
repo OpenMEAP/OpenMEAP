@@ -25,20 +25,27 @@
 package com.openmeap.util;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
@@ -103,12 +110,10 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 		return httpClient.execute(httpGet);
 	}
 	
-	public HttpResponse get(String url, Map<String,Object> params) throws ClientProtocolException, IOException {
+	public HttpResponse get(String url, Map<String,Object> getParams) throws ClientProtocolException, IOException {
+		
 		HttpGet thisGet = new HttpGet(url);
-		HttpParams httpParams = new BasicHttpParams();
-		for( Map.Entry<String,Object> ent : params.entrySet() ) {
-			httpParams.setParameter(ent.getKey(),ent.getValue());
-		}
+		HttpParams httpParams = createHttpParams(getParams);
 		thisGet.setParams(httpParams);
 		return this.get(thisGet);
 	}
@@ -117,28 +122,48 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 		return get(new HttpGet(url));
 	}
 
-	public HttpResponse postData(String url, Map<String, Object> params) throws ClientProtocolException, IOException {
+	public HttpResponse postData(String url, Map<String, Object> postParams) throws ClientProtocolException, IOException {
+		return postData(url,null,postParams);
+	}
+	
+	public HttpResponse postData(String url, Map<String,Object> getParams, Map<String, Object> postParams) throws ClientProtocolException, IOException {
 		
-		HttpPost post = new HttpPost( url );
-		
-		StringBuilder postData = new StringBuilder();
-		Boolean firstPass = true;
-		for( Map.Entry<String,Object> ent : params.entrySet() ) {
-			if( !firstPass ) {
-				postData.append("&");
-			} else firstPass=false;
-			postData.append(URLEncoder.encode(ent.getKey(), "UTF-8"));
-			postData.append("=");
-			postData.append(URLEncoder.encode(ent.getValue().toString(), "UTF-8"));
+		String finalUrl = url;
+		if(getParams!=null) {
+			finalUrl=finalUrl+(finalUrl.contains("?")?"&":"?")+createParamsString(getParams);
 		}
+		HttpPost post = new HttpPost(finalUrl);
 		
+		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(postParams.size());
+		for( Map.Entry<String,Object> entry : postParams.entrySet() ) {
+			nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue().toString()));
+		}
+		UrlEncodedFormEntity e = new UrlEncodedFormEntity(nameValuePairs);
+		e.setContentType("application/x-www-form-urlencoded");
+		post.setHeader("Content-type","application/x-www-form-urlencoded");
+        post.setEntity(e);
+		
+        /*
+        String postData = createParamsString(postParams);
     	StringEntity se = new StringEntity(postData.toString(),HTTP.UTF_8);
     	se.setContentType("application/x-www-form-urlencoded");
-    	
     	post.setHeader("Content-type","application/x-www-form-urlencoded");
     	post.setEntity(se); 
+    	*/
     	
     	return httpClient.execute(post);
+	}
+	
+	protected String createParamsString(Map<String,Object> postParams) throws UnsupportedEncodingException {
+		return Utils.createParamsString(postParams);
+	}
+	
+	protected HttpParams createHttpParams(Map<String,Object> params) {
+		HttpParams httpParams = new BasicHttpParams();
+		for( Map.Entry<String,Object> ent : params.entrySet() ) {
+			httpParams.setParameter(ent.getKey(),ent.getValue());
+		}
+		return httpParams;
 	}
 	
 	protected void setProxy(DefaultHttpClient httpclient, String proxyHost, Integer proxyPort, String proxyUser, String proxyPassword) {  

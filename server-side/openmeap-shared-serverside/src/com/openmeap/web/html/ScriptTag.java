@@ -24,10 +24,12 @@
 
 package com.openmeap.web.html;
 
+import com.openmeap.constants.FormConstants;
+
 public class ScriptTag {
 	private String source;
 	private String language  = "Javascript";
-	private String charset   = "utf-8";
+	private String charset   = FormConstants.CHAR_ENC_DEFAULT;
 	private String type      = "text/javascript";
 	public ScriptTag() {}
 	public ScriptTag(String source) {

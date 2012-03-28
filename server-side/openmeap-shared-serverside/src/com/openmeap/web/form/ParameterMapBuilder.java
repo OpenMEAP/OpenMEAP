@@ -39,6 +39,7 @@ public class ParameterMapBuilder {
 	
 	private Boolean mapValuesAsStrings = false;
 	private Boolean useParameterMapUtilsFirstValue = true;
+	private Boolean noNulls = true;
 
 	public void toParameters(Map<String,Object> map, Object obj) throws ParameterMapBuilderException {
 		toParameters(map, obj, "");
@@ -54,6 +55,9 @@ public class ParameterMapBuilder {
 					Object value = method.invoke(obj);
 					if( value!=null && ! PropertyUtils.isSimpleType(value.getClass()) ) {
 						throw new ParameterMapBuilderException("Expecting a simple type");
+					}
+					if( value==null && noNulls ) {
+						continue;
 					}
 					map.put(paramName, mapValuesAsStrings?value.toString():value);
 				} catch(Exception e) {
@@ -155,5 +159,12 @@ public class ParameterMapBuilder {
 	public void setUseParameterMapUtilsFirstValue(
 			Boolean useParameterMapUtilsFirstValue) {
 		this.useParameterMapUtilsFirstValue = useParameterMapUtilsFirstValue;
+	}
+
+	public Boolean getNoNulls() {
+		return noNulls;
+	}
+	public void setNoNulls(Boolean noNulls) {
+		this.noNulls = noNulls;
 	}
 }
