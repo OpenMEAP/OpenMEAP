@@ -168,9 +168,21 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 	}
 	
 	protected List<NameValuePair> createNameValuePairs(Map<String,Object> params) {
+		
 		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(params.size());
 		for( Map.Entry<String,Object> entry : params.entrySet() ) {
-			nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue().toString()));
+			
+			if( entry.getValue() instanceof List ) {
+				
+				List<String> values = (List<String>)entry.getValue();
+				for(String value : values) {
+					
+					nameValuePairs.add(new BasicNameValuePair(entry.getKey()+"[]", value.toString()));
+				}
+			} else {
+				
+				nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue().toString()));
+			}
 		}
 		return nameValuePairs;
 	}

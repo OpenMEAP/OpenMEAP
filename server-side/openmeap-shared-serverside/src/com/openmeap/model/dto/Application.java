@@ -127,7 +127,6 @@ public class Application extends AbstractModelEntity {
 		this.proxyAuthSalt = salt;
 	}
 	@Column(name="proxy_auth_salt")
-	@JSONProperty
 	public String getProxyAuthSalt() {
 		return proxyAuthSalt;
 	}

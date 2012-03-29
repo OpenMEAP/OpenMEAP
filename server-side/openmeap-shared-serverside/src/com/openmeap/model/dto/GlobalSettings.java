@@ -39,8 +39,12 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.openmeap.constants.FormConstants;
+import com.openmeap.json.JSONProperty;
 import com.openmeap.model.AbstractModelEntity;
 import com.openmeap.model.ModelEntity;
+import com.openmeap.web.form.Parameter;
+import com.openmeap.web.form.Validation;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -76,14 +80,12 @@ public class GlobalSettings extends AbstractModelEntity {
 		this.id = id;
 	}
 	
-	@Override public int hashCode() {
-		return id!=null?id.intValue():0;
-	}
-	
 	@Transient public Long getPk() { return getId(); }
 	public void setPk( Object pkValue ) { setId((Long)pkValue); }
 	
 	@Column(name="external_svc_url")
+	@JSONProperty
+	@Parameter(FormConstants.GLOBAL_SETTINGS_EXTERNAL_SVC_URL)
 	public String getExternalServiceUrlPrefix() {
 		return externalServiceUrlPrefix;
 	}
@@ -92,6 +94,8 @@ public class GlobalSettings extends AbstractModelEntity {
 	}
 	
 	@Column(name="max_file_upload_size")
+	@JSONProperty
+	@Parameter(FormConstants.GLOBAL_SETTINGS_MAX_UPLOAD)
 	public Integer getMaxFileUploadSize() {
 		return maxFileUploadSize;
 	}
@@ -99,17 +103,19 @@ public class GlobalSettings extends AbstractModelEntity {
 		maxFileUploadSize = size;		
 	}
 	
-	@OneToMany(fetch=FetchType.EAGER,cascade={CascadeType.ALL},targetEntity=ClusterNode.class)
-	@MapKey(name="serviceWebUrlPrefix")
-	@Lob
-	public Map<String,ClusterNode> getClusterNodes() {
-		return clusterNodes;
+	@Column(name="svc_mgmt_auth_salt",length=4000)
+	@JSONProperty
+	@Parameter(value=FormConstants.GLOBAL_SETTINGS_AUTH_SALT,password=true,validation=@Validation(verify=true))
+	public String getServiceManagementAuthSalt() {
+		return serviceManagementAuthSalt;
 	}
-	public void setClusterNodes(Map<String,ClusterNode> clusterNodes) {
-		this.clusterNodes = clusterNodes;
+	public void setServiceManagementAuthSalt(String serviceManagementAuthSalt) {
+		this.serviceManagementAuthSalt = serviceManagementAuthSalt;
 	}
 	
 	@Column(name="temp_strg_path",length=4000)
+	@JSONProperty
+	@Parameter(FormConstants.GLOBAL_SETTINGS_STORAGE_PATH_PREFIX)
 	public String getTemporaryStoragePath() {
 		return temporaryStoragePath;
 	}
@@ -140,12 +146,19 @@ public class GlobalSettings extends AbstractModelEntity {
 		return null;
 	}
 	
-	@Column(name="svc_mgmt_auth_salt",length=4000)
-	public String getServiceManagementAuthSalt() {
-		return serviceManagementAuthSalt;
+	@Override public int hashCode() {
+		return id!=null?id.intValue():0;
 	}
-	public void setServiceManagementAuthSalt(String serviceManagementAuthSalt) {
-		this.serviceManagementAuthSalt = serviceManagementAuthSalt;
+	
+	@JSONProperty
+	@OneToMany(fetch=FetchType.EAGER,cascade={CascadeType.ALL},targetEntity=ClusterNode.class)
+	@MapKey(name="serviceWebUrlPrefix")
+	@Lob
+	public Map<String,ClusterNode> getClusterNodes() {
+		return clusterNodes;
+	}
+	public void setClusterNodes(Map<String,ClusterNode> clusterNodes) {
+		this.clusterNodes = clusterNodes;
 	}
 	
 	public Map<Method,String> validate() {

@@ -25,16 +25,22 @@
 package com.openmeap.admin.web;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
+import org.junit.Assert;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.openmeap.constants.FormConstants;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.Application;
+import com.openmeap.model.dto.ApplicationVersion;
+import com.openmeap.model.dto.ClusterNode;
+import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.util.FileHandlingHttpRequestExecuterImpl;
 import com.openmeap.util.HttpRequestExecuter;
 import com.openmeap.web.form.ParameterMapBuilder;
@@ -110,7 +116,6 @@ public class AdminTestHelper {
 		}
 		
 		Map<String,Object> postData = new HashMap<String,Object>();
-		postData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_APP_ADDMODIFY);
 		postData.put(FormConstants.PROCESS_TARGET, ProcessingTargets.ADDMODIFY_APP);
 		postData.put("submit","Submit!");
 		
@@ -128,7 +133,6 @@ public class AdminTestHelper {
 		}
 		
 		Map<String,Object> postData = new HashMap<String,Object>();
-		postData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_APP_ADDMODIFY);
 		postData.put(FormConstants.PROCESS_TARGET, ProcessingTargets.ADDMODIFY_APP);
 		postData.put("deleteConfirm",FormConstants.APP_DELETE_CONFIRM_TEXT);
 		postData.put(FormConstants.DELETE,"Delete!");
@@ -138,4 +142,79 @@ public class AdminTestHelper {
 		
 		return requestExecuter.postData(adminUrl,getData,postData);
 	}
+	
+	/*
+	 * APPLICATiON VERSIONs
+	 */
+	
+	public HttpResponse getAddModifyAppVer(Application application) throws ClientProtocolException, IOException {
+		
+		Map<String,Object> getData = new HashMap<String,Object>();
+		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_APPVER_ADDMODIFY);
+		getData.put(FormConstants.APP_ID, application.getPk().toString());
+		return requestExecuter.get(adminUrl,getData);
+	}
+	
+	public HttpResponse postAddModifyAppVer(ApplicationVersion appVer) throws ClientProtocolException, IOException {
+		
+		Map<String,Object> getData = new HashMap<String,Object>();
+		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_APPVER_ADDMODIFY);
+		getData.put(FormConstants.APP_ID, appVer.getApplication().getPk().toString());
+		if( appVer.getPk()!=null ) {
+			getData.put(FormConstants.APPVER_ID, appVer.getPk().toString());
+		}
+		
+		return requestExecuter.get(adminUrl,getData);
+	}
+	
+	/*
+	 * DEPLOYMENTS
+	 */
+	
+	/*
+	 * GLOBAL SETTINGS
+	 */
+	
+	public HttpResponse getGlobalSettings() throws ClientProtocolException, IOException {
+		Map<String,Object> getData = new HashMap<String,Object>();
+		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_GLOBAL_SETTINGS);
+		return requestExecuter.get(adminUrl,getData);
+	}
+	
+	public HttpResponse postGlobalSettings(GlobalSettings settings) throws ClientProtocolException, IOException, ParameterMapBuilderException {
+		
+		Map<String,Object> getData = new HashMap<String,Object>();
+		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_GLOBAL_SETTINGS);
+		
+		Map<String,Object> postData = new HashMap<String,Object>();
+		postData.put(FormConstants.PROCESS_TARGET, ProcessingTargets.GLOBAL_SETTINGS);
+		paramsBuilder.toParameters(postData, settings);
+		if(settings.getClusterNodes()!=null && !settings.getClusterNodes().isEmpty()) {
+			List<String> nodeUrls = new ArrayList<String>();
+			List<String> nodePaths = new ArrayList<String>();
+			for( ClusterNode clusterNode : settings.getClusterNodes().values() ) {
+				nodeUrls.add(clusterNode.getServiceWebUrlPrefix());
+				nodeUrls.add(clusterNode.getFileSystemStoragePathPrefix());
+			}
+			postData.put("clusterNodeUrl", nodeUrls);
+			postData.put("clusterNodePath", nodePaths);
+		}
+		
+		return requestExecuter.postData(adminUrl,getData,postData);
+	}
+	
+	/*
+	 * ASSERTION 
+	 */
+	
+	public void assertSame(Application app, Application dbApp) {
+		Assert.assertEquals(app.getName(),dbApp.getName());
+		Assert.assertEquals(app.getDescription(),dbApp.getDescription());
+		Assert.assertEquals(app.getDeploymentHistoryLength(),dbApp.getDeploymentHistoryLength());
+		Assert.assertEquals(app.getAdmins(),dbApp.getAdmins());
+		Assert.assertEquals(app.getVersionAdmins(),dbApp.getVersionAdmins());
+		Assert.assertEquals(app.getInitialVersionIdentifier(),dbApp.getInitialVersionIdentifier());
+	}
 }
+
+

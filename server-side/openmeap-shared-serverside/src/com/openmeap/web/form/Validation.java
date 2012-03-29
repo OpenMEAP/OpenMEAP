@@ -27,4 +27,6 @@ package com.openmeap.web.form;
 public @interface Validation {
 	boolean optional() default true;
 	String message() default "";
+	boolean verify() default false;
+	String verifySuffix() default "Verify";
 }

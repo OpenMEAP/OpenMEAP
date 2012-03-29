@@ -51,6 +51,7 @@ public class ParameterMapBuilder {
 			Parameter param = method.getAnnotation(Parameter.class);
 			if(param!=null) {
 				String paramName = prefix+formNameForMethod(param,method);
+				Validation validation = param.validation();
 				try {
 					Object value = method.invoke(obj);
 					if( value!=null && ! PropertyUtils.isSimpleType(value.getClass()) ) {
@@ -60,6 +61,9 @@ public class ParameterMapBuilder {
 						continue;
 					}
 					map.put(paramName, mapValuesAsStrings?value.toString():value);
+					if( validation.verify() ) {
+						map.put(paramName+validation.verifySuffix(), mapValuesAsStrings?value.toString():value);
+					}
 				} catch(Exception e) {
 					throw new ParameterMapBuilderException(e);
 				}

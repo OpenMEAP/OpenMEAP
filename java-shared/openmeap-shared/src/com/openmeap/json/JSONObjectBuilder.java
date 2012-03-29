@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -126,16 +127,7 @@ public class JSONObjectBuilder {
 					Enum ret = (Enum)method.invoke(obj);
 					jsonObj.put(propertyName, ret.toString());
 				} else if( PropertyUtils.isSimpleType(returnType) ) {
-					if( returnType.isArray() ) {
-						Object[] returnValues = (Object[])method.invoke(obj);
-						JSONArray jsonArray = new JSONArray();
-						for( Object value : returnValues ) {
-							jsonArray.put(value);
-						}
-						jsonObj.put(propertyName, jsonArray);
-					} else {
-						jsonObj.put(propertyName, method.invoke(obj));
-					}
+					jsonObj.put(propertyName, handleSimpleType(returnType,method.invoke(obj)) );
 				} else {
 					if( returnType.isArray() ) {
 						Object[] returnValue = (Object[])method.invoke(obj);
@@ -144,6 +136,18 @@ public class JSONObjectBuilder {
 							jsonArray.put(toJSON(value));
 						}
 						jsonObj.put(propertyName, jsonArray);
+					} else if( Map.class.isAssignableFrom(returnType) ) {
+						Map map = (Map)method.invoke(obj);
+						JSONObject jsonMap = new JSONObject();
+						for( Object o : map.entrySet() ) {
+							Map.Entry entry = (Map.Entry)o; 
+							if(PropertyUtils.isSimpleType(entry.getValue().getClass())) {
+								jsonMap.put(entry.getKey().toString(), handleSimpleType(returnType,entry.getValue()));
+							} else {
+								jsonMap.put(entry.getKey().toString(), toJSON(entry.getValue()));
+							}
+						}
+						jsonObj.put(propertyName, jsonMap);
 					} else {
 						jsonObj.put(propertyName, toJSON(method.invoke(obj)));
 					}
@@ -158,6 +162,19 @@ public class JSONObjectBuilder {
 			
 		}
 		return jsonObj;
+	}
+	
+	private Object handleSimpleType(Class returnType, Object value) {
+		if( returnType.isArray() ) {
+			Object[] returnValues = (Object[])value;
+			JSONArray jsonArray = new JSONArray();
+			for( Object thisValue : returnValues ) {
+				jsonArray.put(thisValue);
+			}
+			return jsonArray;
+		} else {
+			return value;
+		}
 	}
 	
 	private Object[] toTypedArray(List<?> list) {

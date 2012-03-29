@@ -39,6 +39,7 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.openmeap.json.JSONProperty;
 import com.openmeap.model.AbstractModelEntity;
 import com.openmeap.model.ModelEntity;
 
@@ -56,6 +57,7 @@ public class ClusterNode extends AbstractModelEntity {
 	@Transient public String getPk() { return getServiceWebUrlPrefix(); }
 	public void setPk( Object pkValue ) { setServiceWebUrlPrefix((String)pkValue); }
 	
+	@JSONProperty
 	@Id @Column(name="svc_web_url_prfx",length=256)
 	public String getServiceWebUrlPrefix() {
 		return serviceWebUrlPrefix;
@@ -64,6 +66,7 @@ public class ClusterNode extends AbstractModelEntity {
 		this.serviceWebUrlPrefix = serviceWebUrlPrefix;
 	}
 	
+	@JSONProperty
 	@Column(name="file_sys_strg_path_prfx", length=512)
 	public String getFileSystemStoragePathPrefix() {
 		return fileSystemStoragePathPrefix;

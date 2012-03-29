@@ -45,8 +45,11 @@ public class FormConstants {
 	 * Page bean names
 	 */
 	
+	final static public String PAGE_BEAN_GLOBAL_SETTINGS = "settingsPage";
 	final static public String PAGE_BEAN_APP_ADDMODIFY = "addModifyAppPage";
 	final static public String PAGE_BEAN_MAIN = "mainOptionsPage";
+	final static public String PAGE_BEAN_APPVER_LISTINGS = "appVersionListingsPage";
+	final static public String PAGE_BEAN_APPVER_ADDMODIFY = "addModifyAppVersionPage";
 	
 	/*
 	 * Shared form parameter names
@@ -55,6 +58,7 @@ public class FormConstants {
 	final static public String PAGE_BEAN = "bean";
 	final static public String DELETE = "delete";
 	final static public String APP_ID = "applicationId";
+	final static public String APPVER_ID = "versionId";
 	
 	/*
 	 * App Add/Modify unique parameter constants
@@ -63,6 +67,14 @@ public class FormConstants {
 	final static public String APP_ADMINS = "admins";
 	final static public String APP_VERSIONADMINS = "versionAdmins";
 	final static public String APP_DEPL_HIST_LEN = "deploymentHistoryLength";
+	
+	/*
+	 * Global settings unique parameter constants
+	 */
+	final static public String GLOBAL_SETTINGS_EXTERNAL_SVC_URL = "externalServiceUrlPrefix";
+	final static public String GLOBAL_SETTINGS_MAX_UPLOAD = "maxFileUploadSize";
+	final static public String GLOBAL_SETTINGS_AUTH_SALT = "authSalt";		
+	final static public String GLOBAL_SETTINGS_STORAGE_PATH_PREFIX = "tempStoragePathPrefix";
 	
 	/*
 	 * App Add/Modify unique parameter string values

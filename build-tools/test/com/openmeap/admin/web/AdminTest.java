@@ -42,6 +42,8 @@ import com.openmeap.constants.FormConstants;
 import com.openmeap.json.JSONObjectBuilder;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.Application;
+import com.openmeap.model.dto.ClusterNode;
+import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.util.Utils;
 import com.openmeap.web.form.ParameterMapBuilder;
 
@@ -58,11 +60,13 @@ public class AdminTest {
 	final static private String APP_NAME = "Happy Appy";
 	
 	static private AdminTestHelper helper;
+	static private ModelManager modelManager;
 	static private Logger logger = LoggerFactory.getLogger(AdminTest.class);
 	
 	@BeforeClass static public void beforeClass() {
 		org.apache.log4j.BasicConfigurator.configure();
 		helper = new AdminTestHelper();
+		modelManager = helper.getModelManager();
 	}
 	
 	@AfterClass static public void afterClass() {
@@ -88,12 +92,36 @@ public class AdminTest {
 	}
 	
 	@Test public void testUpdateGlobalSettings() throws Exception {
+		
 		// correct location of storage path prefix
+		GlobalSettings settings = new GlobalSettings();
+		settings.setExternalServiceUrlPrefix("http://localhost:7000/openmeap-services-web");
+		settings.setMaxFileUploadSize(123455);
+		settings.setServiceManagementAuthSalt("auth-salt");
+		settings.setTemporaryStoragePath("/tmp");
+		
 		// correct cluster node location and path prefix
+		Map<String,ClusterNode> clusterNodeMap = new HashMap<String,ClusterNode>();
+		ClusterNode node = new ClusterNode();
+		node.setServiceWebUrlPrefix("http://localhost:7000/openmeap-services-web");
+		node.setFileSystemStoragePathPrefix("/tmp/archs");
+		clusterNodeMap.put(node.getServiceWebUrlPrefix(), node);
+		settings.setClusterNodes(clusterNodeMap);
+		
 		// validate settings stored in database
+		EntityUtils.consume(helper.postGlobalSettings(settings).getEntity());
+		
+		GlobalSettings insertedSettings = modelManager.getGlobalSettings();
+		
+		JSONObjectBuilder job = new JSONObjectBuilder();
+		String insertedSettingsJSON = job.toJSON(insertedSettings).toString(3);
+		String originalSettingsJSON = job.toJSON(settings).toString(3);
+		logger.info("original: {}",originalSettingsJSON);
+		logger.info("inserted: {}",insertedSettingsJSON);
+		Assert.assertEquals(insertedSettingsJSON,originalSettingsJSON);
 	}
 	
-	@Test public void testCreateApplication() throws Exception {
+	@Test public void testAddApplication() throws Exception {
 		
 		Application app = new Application();
 		app.setName(APP_NAME);
@@ -109,28 +137,38 @@ public class AdminTest {
 		String output = Utils.readInputStream(response.getEntity().getContent(),FormConstants.CHAR_ENC_DEFAULT);
 		Assert.assertTrue(output.contains("Application successfully created/modified!"));
 		
-		ModelManager modelManager = helper.getModelManager();
-		
 		// Now check the database, to make sure everything got in there
 		
 		Application dbApp = modelManager.getModelService().findApplicationByName(APP_NAME);
 		Assert.assertTrue(dbApp!=null);
-		Assert.assertEquals(app.getName(),dbApp.getName());
-		Assert.assertEquals(app.getDescription(),dbApp.getDescription());
-		Assert.assertEquals(app.getDeploymentHistoryLength(),dbApp.getDeploymentHistoryLength());
-		Assert.assertEquals(app.getAdmins(),dbApp.getAdmins());
-		Assert.assertEquals(app.getVersionAdmins(),dbApp.getVersionAdmins());
-		Assert.assertEquals(app.getInitialVersionIdentifier(),dbApp.getInitialVersionIdentifier());
+		helper.assertSame(app,dbApp);
 		Assert.assertTrue(dbApp.getProxyAuthSalt()!=null && dbApp.getProxyAuthSalt().length()==36);
 	}
 	
 	@Test public void testModifyApplication() throws Exception {
+		
+		Application dbApp = modelManager.getModelService().findApplicationByName(APP_NAME);
+		Assert.assertTrue(dbApp!=null);
+		
+		// make some changes
+		String newDesc = "Creating a new description";
+		Integer newLen = 2;
+		dbApp.setDescription(newDesc);
+		dbApp.setDeploymentHistoryLength(newLen);
+		EntityUtils.consume(helper.postAddModifyApp(dbApp).getEntity());
+		
 		// validate changes
+		modelManager.getModelService().refresh(dbApp);
+		Assert.assertTrue(dbApp.getDescription().equals(newDesc));
+		Assert.assertTrue(dbApp.getDeploymentHistoryLength().equals(newLen));
+		
 		// validate changes are reflected by service-web
 	}
 	
 	@Test public void testCreateApplicationVersion() throws Exception {
+		
 		// archive is uploaded
+		
 		// version created
 	}
 	
