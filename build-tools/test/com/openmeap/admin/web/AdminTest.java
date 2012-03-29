@@ -24,6 +24,7 @@
 
 package com.openmeap.admin.web;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,6 +43,7 @@ import com.openmeap.constants.FormConstants;
 import com.openmeap.json.JSONObjectBuilder;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.Application;
+import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.util.Utils;
@@ -96,7 +98,7 @@ public class AdminTest {
 		// correct location of storage path prefix
 		GlobalSettings settings = new GlobalSettings();
 		settings.setExternalServiceUrlPrefix("http://localhost:7000/openmeap-services-web");
-		settings.setMaxFileUploadSize(123455);
+		settings.setMaxFileUploadSize(1234550);
 		settings.setServiceManagementAuthSalt("auth-salt");
 		settings.setTemporaryStoragePath("/tmp");
 		
@@ -162,12 +164,29 @@ public class AdminTest {
 		Assert.assertTrue(dbApp.getDescription().equals(newDesc));
 		Assert.assertTrue(dbApp.getDeploymentHistoryLength().equals(newLen));
 		
-		// validate changes are reflected by service-web
+		// TODO: validate changes are reflected by service-web
 	}
 	
 	@Test public void testCreateApplicationVersion() throws Exception {
 		
+		Application app = modelManager.getModelService().findApplicationByName(APP_NAME);
+		ApplicationVersion version = new ApplicationVersion();
+		app.addVersion(version);
+		version.setIdentifier("ver-1.1.x");
+		version.setNotes("Test notes");
+		File uploadArchive = new File(this.getClass().getResource("version01.zip").getFile());
+
+		EntityUtils.consume(helper.postAddModifyAppVer(version, uploadArchive).getEntity());
+		
 		// archive is uploaded
+		modelManager.getModelService().refresh(app);
+		version = app.getVersions().get("ver-1.1.x");
+		Assert.assertTrue(version!=null);
+		
+		File uploadedArchive = version.getArchive().getFile(modelManager.getGlobalSettings().getTemporaryStoragePath());
+		File webViewDir = version.getArchive().getExplodedPath(modelManager.getGlobalSettings().getTemporaryStoragePath());
+		Assert.assertTrue(uploadedArchive.exists());
+		Assert.assertTrue(webViewDir.exists());
 		
 		// version created
 	}

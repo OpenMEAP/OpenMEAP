@@ -69,6 +69,13 @@ public class FormConstants {
 	final static public String APP_DEPL_HIST_LEN = "deploymentHistoryLength";
 	
 	/*
+	 * App Version Add/Modify unique parameter constants
+	 */
+	final static public String APPVER_IDENTIFIER = "identifier";
+	final static public String APPVER_NOTES = "notes";
+	final static public String UPLOAD_ARCHIVE = "uploadArchive";
+	
+	/*
 	 * Global settings unique parameter constants
 	 */
 	final static public String GLOBAL_SETTINGS_EXTERNAL_SVC_URL = "externalServiceUrlPrefix";

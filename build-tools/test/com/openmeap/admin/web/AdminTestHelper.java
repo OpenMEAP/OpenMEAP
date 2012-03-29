@@ -24,6 +24,7 @@
 
 package com.openmeap.admin.web;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -155,7 +156,7 @@ public class AdminTestHelper {
 		return requestExecuter.get(adminUrl,getData);
 	}
 	
-	public HttpResponse postAddModifyAppVer(ApplicationVersion appVer) throws ClientProtocolException, IOException {
+	public HttpResponse postAddModifyAppVer(ApplicationVersion appVer, File uploadArchive) throws ClientProtocolException, IOException, ParameterMapBuilderException {
 		
 		Map<String,Object> getData = new HashMap<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_APPVER_ADDMODIFY);
@@ -164,7 +165,13 @@ public class AdminTestHelper {
 			getData.put(FormConstants.APPVER_ID, appVer.getPk().toString());
 		}
 		
-		return requestExecuter.get(adminUrl,getData);
+		Map<String,Object> postData = new HashMap<String,Object>();
+		postData.put(FormConstants.PROCESS_TARGET, ProcessingTargets.ADDMODIFY_APPVER);
+		postData.put(FormConstants.APP_ID, appVer.getApplication().getPk().toString());
+		postData.put(FormConstants.UPLOAD_ARCHIVE, uploadArchive);
+		paramsBuilder.toParameters(postData, appVer);
+		
+		return requestExecuter.postData(adminUrl,getData,postData);
 	}
 	
 	/*

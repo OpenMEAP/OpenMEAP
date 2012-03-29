@@ -41,6 +41,7 @@ import com.openmeap.constants.ServletNameConstants;
 import com.openmeap.constants.UrlParamConstants;
 import com.openmeap.model.AbstractModelEntity;
 import com.openmeap.util.AuthTokenProvider;
+import com.openmeap.web.form.Parameter;
 
 @Entity @Table(name="application_archive")
 public class ApplicationArchive extends AbstractModelEntity {
@@ -147,6 +148,7 @@ public class ApplicationArchive extends AbstractModelEntity {
 	 * @return Either an http, https, or app schemed url to the actual version archive.
 	 */
 	@Column(name="url")
+	@Parameter("url")
 	public String getUrl() {
 		/*
 		 * Justification:
@@ -165,6 +167,7 @@ public class ApplicationArchive extends AbstractModelEntity {
 	 * @return A hash the artifact residing at the url can be verified with.
 	 */
 	@Column(name="hash")
+	@Parameter("hash")
 	public String getHash() {
 		return hash;
 	}
@@ -176,6 +179,7 @@ public class ApplicationArchive extends AbstractModelEntity {
 	 * @return The algorithm ran against the archive to generate the hash.
 	 */
 	@Column(name="hash_algorithm")
+	@Parameter("hashType")
 	public String getHashAlgorithm() {
 		return hashAlgorithm;
 	}
@@ -196,6 +200,7 @@ public class ApplicationArchive extends AbstractModelEntity {
 	}
 	
 	@Column(name="bytes_length")
+	@Parameter("bytesLength")
 	public Integer getBytesLength() {
 		return bytesLength;
 	}
@@ -204,6 +209,7 @@ public class ApplicationArchive extends AbstractModelEntity {
 	}
 	
 	@Column(name="bytes_length_uncompressed")
+	@Parameter("bytesLengthUncompressed")
 	public Integer getBytesLengthUncompressed() {
 		return bytesLengthUncompressed;
 	}

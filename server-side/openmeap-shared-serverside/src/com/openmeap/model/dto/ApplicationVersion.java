@@ -25,12 +25,29 @@
 package com.openmeap.model.dto;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
+import com.openmeap.constants.FormConstants;
 import com.openmeap.model.AbstractModelEntity;
-import com.openmeap.model.ModelEntity;
+import com.openmeap.web.form.Parameter;
 
 @Entity @Table(name="application_version")
 public class ApplicationVersion extends AbstractModelEntity {
@@ -69,6 +86,7 @@ public class ApplicationVersion extends AbstractModelEntity {
 	 * @return The chosen version identifier
 	 */
 	@Column(name="identifier",nullable=false)
+	@Parameter(FormConstants.APPVER_IDENTIFIER)
 	public String getIdentifier() {
 		return identifier;
 	}
@@ -77,6 +95,7 @@ public class ApplicationVersion extends AbstractModelEntity {
 	}
 	
 	@Column(name="notes",length=4000)
+	@Parameter(FormConstants.APPVER_NOTES)
 	public String getNotes() {
 		return notes;
 	}
