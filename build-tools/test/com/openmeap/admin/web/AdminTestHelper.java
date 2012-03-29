@@ -30,8 +30,10 @@ import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.openmeap.constants.FormConstants;
+import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.Application;
 import com.openmeap.util.FileHandlingHttpRequestExecuterImpl;
 import com.openmeap.util.HttpRequestExecuter;
@@ -43,6 +45,7 @@ public class AdminTestHelper {
 	private String adminUrl = "http://localhost:7000/openmeap-admin-web/interface/";
 	private HttpRequestExecuter requestExecuter;
 	private ParameterMapBuilder paramsBuilder;
+	private ClassPathXmlApplicationContext persistenceBeans;
 	
 	public AdminTestHelper() {
 		requestExecuter = new FileHandlingHttpRequestExecuterImpl();
@@ -58,6 +61,16 @@ public class AdminTestHelper {
 	}
 	public void setAdminUrl(String url) {
 		adminUrl = url;
+	}
+	
+	public ModelManager getModelManager() {
+		if( persistenceBeans==null ) {
+			persistenceBeans=new ClassPathXmlApplicationContext(
+					new String[]{"/META-INF/persistenceContext.xml",
+					"/META-INF/test/persistenceContext.xml"}
+				);
+		}
+		return (ModelManager)persistenceBeans.getBean("modelManager");
 	}
 	
 	/*

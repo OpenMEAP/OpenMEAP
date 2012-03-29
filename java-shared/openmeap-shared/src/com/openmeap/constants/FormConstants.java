@@ -28,7 +28,10 @@ import org.apache.http.protocol.HTTP;
 
 public class FormConstants {
 	
-	final static public String CONTENT_TYPE = "Content-type";
+	final static public String USERAGENT = "User-Agent";
+	final static public String USERAGENT_DEFAULT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:9.0.1) Gecko/20100101 Firefox/9.0.1";
+	
+	final static public String CONTENT_TYPE = "Content-Type";
 	final static public String CONT_TYPE_DEFAULT = "application/x-www-form-urlencoded";
 	final static public String CONT_TYPE_XML = "text/xml";
 	final static public String CONT_TYPE_HTML = "text/html";
@@ -58,7 +61,7 @@ public class FormConstants {
 	 */
 	final static public String APP_DESCRIPTION = "description";
 	final static public String APP_ADMINS = "admins";
-	final static public String APP_VERSIONADMINS = "admins";
+	final static public String APP_VERSIONADMINS = "versionAdmins";
 	final static public String APP_DEPL_HIST_LEN = "deploymentHistoryLength";
 	
 	/*

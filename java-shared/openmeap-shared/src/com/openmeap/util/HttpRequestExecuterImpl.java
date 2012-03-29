@@ -82,6 +82,7 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 		httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
 		httpClient.getParams().setParameter(CoreProtocolPNames.HTTP_CONTENT_CHARSET, FormConstants.CHAR_ENC_DEFAULT);
 		httpClient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
+		httpClient.getParams().setParameter(ClientPNames.HANDLE_REDIRECTS, true);
 		
 		// setup any proxy information
 		String proxyHost = System.getProperty("http.proxyHost");
@@ -105,19 +106,6 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 	
 	public void shutdown() {
 		httpClient.getConnectionManager().shutdown();
-	}
-	
-	public HttpResponse postXml(String url, String xmlData) throws ClientProtocolException, IOException {
-		
-    	StringEntity stringEntity = new StringEntity(xmlData,FormConstants.CHAR_ENC_DEFAULT);
-    	stringEntity.setContentType(FormConstants.CONT_TYPE_XML);
-    	
-    	HttpPost httppost = new HttpPost(url);
-    	httppost.setHeader(FormConstants.CONTENT_TYPE,FormConstants.CONT_TYPE_XML);
-    	httppost.setEntity(stringEntity);
-    	
-    	// TODO: figure out how to get "application/soap+xml;charset=UTF-8" working...keeps giving me a "415: Unsupported Media Type"
-    	return httpClient.execute(httppost);
 	}
 	
 	public HttpResponse get(HttpGet httpGet) throws ClientProtocolException, IOException {
@@ -148,9 +136,23 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 		
 		HttpPost httpPost = new HttpPost(createUrl(url,getParams));
 		httpPost.setHeader(FormConstants.CONTENT_TYPE,FormConstants.CONT_TYPE_DEFAULT);
+		httpPost.setHeader(FormConstants.USERAGENT,FormConstants.USERAGENT_DEFAULT);
         httpPost.setEntity(entity);
     	
     	return httpClient.execute(httpPost);
+	}
+	
+	public HttpResponse postXml(String url, String xmlData) throws ClientProtocolException, IOException {
+		
+    	StringEntity stringEntity = new StringEntity(xmlData,FormConstants.CHAR_ENC_DEFAULT);
+    	stringEntity.setContentType(FormConstants.CONT_TYPE_XML);
+    	
+    	HttpPost httppost = new HttpPost(url);
+    	httppost.setHeader(FormConstants.CONTENT_TYPE,FormConstants.CONT_TYPE_XML);
+    	httppost.setEntity(stringEntity);
+    	
+    	// TODO: figure out how to get "application/soap+xml;charset=UTF-8" working...keeps giving me a "415: Unsupported Media Type"
+    	return httpClient.execute(httppost);
 	}
 	
 	/*

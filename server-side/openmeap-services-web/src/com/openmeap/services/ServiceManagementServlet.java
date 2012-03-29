@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -109,13 +110,17 @@ public class ServiceManagementServlet extends HttpServlet {
 		
 		Result result = null;
 		
+		logger.debug("Request uri: {}",request.getRequestURI());
+		logger.debug("Request url: {}",request.getRequestURL());
+		logger.debug("Query string: {}",request.getQueryString());
+		if(logger.isDebugEnabled()) {
+			logger.debug("Parameter map: {}",ParameterMapUtils.toString(request.getParameterMap()));
+		}
+		
 		String action = request.getParameter(UrlParamConstants.ACTION);
 		if( action==null ) {
 			action="";
 		}
-		
-		logger.debug("Request url: "+request.getRequestURL());
-		logger.debug("Parameter map: "+ParameterMapUtils.toString(request.getParameterMap()));
 		
 		PrintWriter os = new PrintWriter(response.getOutputStream());
 		GlobalSettings settings = modelManager.getGlobalSettings();
@@ -135,20 +140,24 @@ public class ServiceManagementServlet extends HttpServlet {
 			
 		} else if( request.getParameter("clearPersistenceContext")!=null && context instanceof AbstractApplicationContext ) {
 			
+			logger.trace("Clearing persistence context");
 			clearPersistenceContext();
 			
 		} else if( action.equals(ModelEntityEventAction.ARCHIVE_UPLOAD.getActionName()) ) {
 
+			logger.trace("Processing archive upload - max file size: {}, storage path prefix: {}",settings.getMaxFileUploadSize(),node.getFileSystemStoragePathPrefix());
 			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings.getMaxFileUploadSize(),node.getFileSystemStoragePathPrefix(),request);
 			result = handleArchiveEvent(archiveUploadHandler, new MapPayloadEvent(paramMap), paramMap);
 			
 		} else if( action.equals(ModelEntityEventAction.ARCHIVE_DELETE.getActionName()) ) {
 			
+			logger.trace("Processing archive delete - max file size: {}, storage path prefix: {}",settings.getMaxFileUploadSize(),node.getFileSystemStoragePathPrefix());
 			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings.getMaxFileUploadSize(),node.getFileSystemStoragePathPrefix(), request);
 			result = handleArchiveEvent(archiveDeleteHandler, new MapPayloadEvent(paramMap), paramMap);
 			
 		} else if( action.equals(ModelEntityEventAction.MODEL_REFRESH.getActionName()) ) {
 			
+			logger.trace("Processing refresh");
 			result = refresh(request,response);
 			
 		}
@@ -157,7 +166,10 @@ public class ServiceManagementServlet extends HttpServlet {
 			if( result.getStatus()!=Result.Status.SUCCESS ) {
 				response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
 			}
-			os.print( new JSONObjectBuilder().toJSON(result).toString(3) );
+			JSONObject jsonResult = new JSONObjectBuilder().toJSON(result);
+			String stringResult = jsonResult.toString(3);
+			logger.debug("returning json result: {}",stringResult);
+			os.print(jsonResult);
 		} catch( JSONException jse ) {
 			throw new IOException(jse);
 		}
@@ -166,9 +178,7 @@ public class ServiceManagementServlet extends HttpServlet {
 	}
 	
 	private void clearPersistenceContext() {
-		if( logger.isInfoEnabled() ) {
-			logger.info("Received request to clear the persistence context");
-		}
+		logger.info("Clearing the persistence context");
 		ModelServiceImpl ms = (ModelServiceImpl)((AbstractApplicationContext)context).getBean("modelService");
 		ms.clearPersistenceContext();
 	}
@@ -178,9 +188,7 @@ public class ServiceManagementServlet extends HttpServlet {
 		
 		String hash = firstValue(UrlParamConstants.APPARCH_HASH,paramMap);
 		String hashType = firstValue(UrlParamConstants.APPARCH_HASH_ALG,paramMap);
-		if( logger.isInfoEnabled() ) {
-			logger.info("Received request archive upload notification "+hashType+":"+hash);
-		}
+		logger.info("Received request archive upload notification {}:{}",hashType,hash);
 		
 		Result result = null;
 		if( hash!=null && hashType!=null ) {
@@ -222,15 +230,11 @@ public class ServiceManagementServlet extends HttpServlet {
 		
 		if( refreshType!=null && objectId!=null ) {
 		
-			if( logger.isInfoEnabled() ) {
-				logger.info("Received request to refresh "+refreshType+" with id "+objectId,request);
-			}
+			logger.info("Received request to refresh {} with id {}",refreshType,objectId);
 			
 			try {
 				modelServiceRefreshHandler.handleRefresh(refreshType,objectId);
-				if( logger.isInfoEnabled() ) { 
-					logger.info("Refresh for "+refreshType+" with id "+objectId+" was successful");
-				}
+				logger.info("Refresh for {} with id {} was successful",refreshType,objectId);
 				result = new Result(Result.Status.SUCCESS);
 			} catch( Exception e ) {
 				String msg = "Exception occurred refreshing "+refreshType+" with object id "+objectId;
@@ -255,6 +259,7 @@ public class ServiceManagementServlet extends HttpServlet {
 		String authSalt = getAuthSalt();
 		String auth = (String)arg0.getParameter(UrlParamConstants.AUTH_TOKEN);
 		Boolean isGood = AuthTokenProvider.validateAuthToken(authSalt, auth);
+		logger.debug("Authentication of token \"{}\" with salt \"{}\" returned {}",new Object[]{authSalt,auth,isGood});
 		return (auth!=null && isGood);
 	}
 	

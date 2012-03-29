@@ -66,31 +66,44 @@ public class AdminServlet extends HttpServlet {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) {
+		
+		logger.trace("Entering service()");
+		
 		try {
 			DocumentProcessor documentProcessor = null;
 			
-			logger.debug("Request url: "+request.getRequestURL());
-			logger.debug("Parameter map: "+ParameterMapUtils.toString(request.getParameterMap()));
+			logger.debug("Request uri: {}",request.getRequestURI());
+			logger.debug("Request url: {}",request.getRequestURL());
+			logger.debug("Query string: {}",request.getQueryString());
+			if(logger.isDebugEnabled()) {
+				logger.debug("Parameter map: {}",ParameterMapUtils.toString(request.getParameterMap()));
+			}
 			
 			if( request.getParameter("logout")!=null ) {
+				logger.trace("Executing logout");
 				request.getSession().invalidate();
 				response.sendRedirect(request.getContextPath()+"/interface/");
 			}
 			
 			if( request.getParameter("refreshContext")!=null && context instanceof AbstractApplicationContext ) {
+				logger.trace("Refreshing context");
 				((AbstractApplicationContext)context).refresh();
 			}
 			
 			// support for clearing the persistence context
 			if( request.getParameter("clearPersistenceContext")!=null && context instanceof AbstractApplicationContext ) {
+				logger.trace("Clearing the persistence context");
 				ModelServiceImpl ms = (ModelServiceImpl)((AbstractApplicationContext)context).getBean("modelService");
 				ms.clearPersistenceContext();
 			}
 			
 			// default to the mainOptionPage, unless otherwise specified
+			String pageBean = null;
 			if( request.getParameter(FormConstants.PAGE_BEAN)!=null )
-				documentProcessor = (DocumentProcessor)context.getBean(request.getParameter(FormConstants.PAGE_BEAN));
-			else documentProcessor = (DocumentProcessor)context.getBean(FormConstants.PAGE_BEAN_MAIN);
+				pageBean = request.getParameter(FormConstants.PAGE_BEAN);
+			else pageBean = FormConstants.PAGE_BEAN_MAIN;
+			logger.debug("Using page bean: {}", pageBean);
+			documentProcessor = (DocumentProcessor)context.getBean(pageBean);
 			
 			ModelManager mgr = getModelManager();
 			Map<Object,Object> map = new HashMap<Object,Object>();
@@ -116,6 +129,8 @@ public class AdminServlet extends HttpServlet {
 		} catch(IOException te) {
 			throw new RuntimeException(te);
 		} 
+		
+		logger.trace("Leaving service()");
 	}
 	
 	public void setModelManager(ModelManager manager) {

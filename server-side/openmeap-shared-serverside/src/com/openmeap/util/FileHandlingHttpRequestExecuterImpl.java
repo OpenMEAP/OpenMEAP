@@ -19,8 +19,7 @@ import org.apache.http.params.CoreProtocolPNames;
 
 import com.openmeap.constants.FormConstants;
 
-public class FileHandlingHttpRequestExecuterImpl extends
-		HttpRequestExecuterImpl {
+public class FileHandlingHttpRequestExecuterImpl extends HttpRequestExecuterImpl {
 	
 	@Override
 	public HttpResponse postData(String url, Map<String,Object> getParams, Map<String, Object> postParams) throws ClientProtocolException, IOException {

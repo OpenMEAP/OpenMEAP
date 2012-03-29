@@ -24,12 +24,16 @@
 
 package com.openmeap.util;
 
-import java.security.*;
-import java.util.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Date;
+import java.util.UUID;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
 public class AuthTokenProvider {
+	
 	public static String newAuthToken(String authSalt) {
 		String authToken = UUID.randomUUID().toString() + "." + new Date().getTime();
 		authToken = authToken + "." + getSha1( authSalt+authToken );
