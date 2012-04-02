@@ -103,7 +103,7 @@ public class Deployment extends AbstractModelEntity {
 		this.type = type;
 	}
 
-	@ManyToOne(fetch=FetchType.LAZY,cascade={},targetEntity=Application.class)
+	@ManyToOne(fetch=FetchType.LAZY,cascade={},targetEntity=Application.class,optional=false)
 	public Application getApplication() {
 		return application;
 	}
@@ -111,7 +111,7 @@ public class Deployment extends AbstractModelEntity {
 		this.application = application;
 	}
 	
-	@ManyToOne(fetch=FetchType.LAZY,cascade={},targetEntity=ApplicationVersion.class)
+	@ManyToOne(fetch=FetchType.LAZY,cascade={},targetEntity=ApplicationVersion.class,optional=false)
 	public ApplicationVersion getApplicationVersion() {
 		return applicationVersion;
 	}

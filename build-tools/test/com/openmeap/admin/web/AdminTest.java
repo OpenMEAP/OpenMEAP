@@ -217,9 +217,10 @@ public class AdminTest {
 		_createDeployment(VERSION_01,Deployment.Type.IMMEDIATE);
 		_createDeployment(VERSION_02,Deployment.Type.REQUIRED);
 		
-		// as this deployment is created, 
-		// the archive for version01 should be removed from the deployed location
 		_createDeployment(VERSION_02,Deployment.Type.REQUIRED);
+		Assert.assertTrue("as this deployment is created, the archive for version01 should be removed from the deployed location",
+				!_isVersionArchiveInDeployedLocation(VERSION_01_HASH));
+		
 	}
 	
 	@Test public void testDeleteApplication() throws Exception {

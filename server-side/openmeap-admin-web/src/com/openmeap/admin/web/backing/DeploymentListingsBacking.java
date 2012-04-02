@@ -176,7 +176,7 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 			List<Deployment> oldDeployments = new ArrayList<Deployment>(deployments.subList(0,currentSize-lengthToMaintain));
 			
 			for( Deployment deployment : oldDeployments ) {
-				modelManager.getModelService().delete(deployment);
+				modelManager.delete(deployment);
 			}
 			
 			for( Deployment deployment : newDeployments ) {

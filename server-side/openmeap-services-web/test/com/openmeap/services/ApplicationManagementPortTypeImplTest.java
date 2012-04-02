@@ -110,7 +110,7 @@ public class ApplicationManagementPortTypeImplTest {
 		Iterator<Deployment> i = new ArrayList<Deployment>(app.getDeployments()).iterator();
 		while(i.hasNext()) {
 			Deployment d = i.next();
-			modelManager.getModelService().delete(d);
+			modelManager.delete(d);
 		}
 		
 		try {
@@ -196,7 +196,7 @@ public class ApplicationManagementPortTypeImplTest {
 		Iterator<Deployment> i = new ArrayList<Deployment>(app.getDeployments()).iterator();
 		while(i.hasNext()) {
 			Deployment d = i.next();
-			modelManager.getModelService().delete(d);
+			modelManager.delete(d);
 		}
 		app = modelManager.getModelService().findByPrimaryKey(Application.class,1L);
 		Assert.assertTrue(app.getDeployments().size()==0);
@@ -221,7 +221,7 @@ public class ApplicationManagementPortTypeImplTest {
 		Iterator<Deployment> i = new ArrayList<Deployment>(app.getDeployments()).iterator();
 		while(i.hasNext()) {
 			Deployment d = i.next();
-			modelManager.getModelService().delete(d);
+			modelManager.delete(d);
 		}
 		app = modelManager.getModelService().findByPrimaryKey(Application.class,1L);
 		Assert.assertTrue(app.getDeployments().size()==0);

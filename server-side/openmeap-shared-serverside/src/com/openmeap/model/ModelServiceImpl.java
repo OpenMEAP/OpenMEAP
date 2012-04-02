@@ -92,21 +92,34 @@ public class ModelServiceImpl implements ModelService
 
 	@Override
 	public void delete(Application app) throws PersistenceException {
+				
+		// flip all the versions to inactive, so they don't prevent archive deletion
+		for( ApplicationVersion appVer : app.getVersions().values() ) {
+			appVer.setActiveFlag(false);
+			saveOrUpdate(appVer);
+		}
 		
+		// call the event notifiers on each deployment that will be deleted
 		Iterator iterator = app.getDeployments().iterator();
-		List<Deployment> deplList = new ArrayList<Deployment>();
+		List<Deployment> depls = new ArrayList<Deployment>();
 		while(iterator.hasNext()) {
 			Deployment depl = (Deployment)iterator.next();
-			deplList.add(depl);
-		}	
+			depls.add(depl);
+		}
+		iterator = depls.iterator();
+		while(iterator.hasNext()) {
+			Deployment depl = (Deployment)iterator.next();
+			app.removeDeployment(depl);
+			delete(depl);
+		}
 		
-		app.setDeployments(deplList);
-		app.getVersions().clear();
-		iterator = app.getDeployments().iterator();
-		while(iterator.hasNext()) {
-			Deployment depl = (Deployment)iterator.next();
-			callEventNotifiers(ModelServiceOperation.DELETE,depl);
-			iterator.remove();
+		List<ApplicationVersion> appVers = new ArrayList<ApplicationVersion>();
+		for( ApplicationVersion appVer : app.getVersions().values() ) {
+			appVers.add(appVer);
+		}
+		for( ApplicationVersion appVer : appVers ) {
+			app.removeVersion(appVer);
+			delete(appVer);
 		}
 		
 		_delete(app);

@@ -64,6 +64,13 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 		setModelService(service);
 	}
 	
+	public <T extends ModelEntity> void delete(T o) {
+		if( ! getAuthorizer().may(Authorizer.Action.DELETE, o) ) {
+			throw new PersistenceException(new AuthorizationException("The user logged in does not have permissions to DELETE Application objects."));
+		}
+		modelService.delete(o);
+	}
+	
 	public void delete(Application app) {
 		
 		if( ! getAuthorizer().may(Authorizer.Action.DELETE, app) ) {

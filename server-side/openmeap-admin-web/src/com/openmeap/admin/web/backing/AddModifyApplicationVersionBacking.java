@@ -213,7 +213,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 				events.add( new MessagesEvent(pe.getMessage()) );								
 			}
 		} else {
-			modelManager.getModelService().delete(version);
+			modelManager.delete(version);
 			if( archive2Delete!=null ) {
 				maintainFileSystemCleanliness(archive2Delete, events);
 			}

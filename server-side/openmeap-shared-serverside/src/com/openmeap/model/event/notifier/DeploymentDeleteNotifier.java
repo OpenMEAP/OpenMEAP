@@ -27,9 +27,16 @@ package com.openmeap.model.event.notifier;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.persistence.PersistenceException;
+
+import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.openmeap.Event;
 import com.openmeap.EventHandlingException;
 import com.openmeap.cluster.ClusterNotificationException;
+import com.openmeap.model.InvalidPropertiesException;
 import com.openmeap.model.ModelEntity;
 import com.openmeap.model.ModelServiceEventNotifier;
 import com.openmeap.model.ModelServiceOperation;
@@ -49,8 +56,9 @@ import com.openmeap.model.event.handler.ArchiveFileDeleteHandler;
  */
 public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deployment> {
 	
-	ArchiveFileDeleteNotifier archiveDeleteNotifier = null;
-	ArchiveFileDeleteHandler archiveDeleteHandler = null;
+	private Logger logger = LoggerFactory.getLogger(DeploymentDeleteNotifier.class);
+	private ArchiveFileDeleteNotifier archiveDeleteNotifier = null;
+	private ArchiveFileDeleteHandler archiveDeleteHandler = null;
 	
 	@Override
 	public Boolean notifiesFor(ModelServiceOperation operation,
@@ -67,6 +75,7 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 		Deployment deployment2Delete = (Deployment)event.getPayload();
 		ApplicationVersion version = deployment2Delete.getApplicationVersion();
 		Application app = version.getApplication();
+		//archiveDeleteHandler.getModelManager().getModelService().refresh(app);
 		
 		// if there are any other deployments with this hash,
 		//   then we cannot yet delete it's archive.
@@ -83,19 +92,7 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 			}
 		}
 		
-		// if there are any application versions with this archive, 
-		//   then we cannot delete it's archive.
-		for( String versionId : app.getVersions().keySet() ) {
-			version = app.getVersions().get(versionId);
-			ApplicationArchive archive = version.getArchive();
-			if( version.getActiveFlag().equals(Boolean.TRUE)
-					&& archive.getHash().equals(deployment2Delete.getHash()) 
-					&& archive.getHashAlgorithm().equals(deployment2Delete.getHashAlgorithm()) ) {
-				return;
-			} 
-		}
-		
-		// our checks have passed, so we can remove the archive from the local and cluster file-systems
+		// OK TO CLEANUP CLUSTER FILE SYSTEM
 		
 		// use the archive delete notifier to cleanup to cluster nodes
 		ApplicationArchive archive = new ApplicationArchive();
@@ -103,11 +100,25 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 		archive.setHashAlgorithm(deployment2Delete.getHashAlgorithm());
 		archiveDeleteNotifier.notify(new ModelEntityEvent(ModelServiceOperation.DELETE,archive));
 		
+		// if there are any application versions with this archive, 
+		//   then we cannot delete it's archive.
+		for( String versionId : app.getVersions().keySet() ) {
+			version = app.getVersions().get(versionId);
+			archive = version.getArchive();
+			if( version.getActiveFlag().equals(Boolean.TRUE)
+					&& archive.getHash().equals(deployment2Delete.getHash()) 
+					&& archive.getHashAlgorithm().equals(deployment2Delete.getHashAlgorithm()) ) {
+				return;
+			} 
+		}
+		
+		// OK TO CLEANUP LOCAL FILE SYSTEM
+		
 		// use the archive delete handler to cleanup localhost
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("archive", archive);
 		try {
-			GlobalSettings settings = archiveDeleteNotifier.getModelManager().getGlobalSettings();
+			GlobalSettings settings = archiveDeleteHandler.getModelManager().getGlobalSettings();
 			archiveDeleteHandler.setFileSystemStoragePathPrefix(settings.getTemporaryStoragePath());
 			archiveDeleteHandler.handle(new MapPayloadEvent(map));
 		} catch (EventHandlingException e) {
@@ -117,7 +128,8 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 		// if all other deployments using the version of this deployment have been deleted,
 		// and this version is inactive...then delete this version.
 		if( versionCount==1 ) {
-			archiveDeleteHandler.getModelManager().getModelService().delete(version);
+			app.removeVersion(version);
+			archiveDeleteHandler.getModelManager().delete(version);
 		}		
 	}
 

@@ -60,6 +60,8 @@ public interface ModelManager {
 	
 	void delete(Application app);
 	
+	<T extends ModelEntity> void delete(T o);
+	
 	/**
 	 * Save or update an Application object.
 	 * 
