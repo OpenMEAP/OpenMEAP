@@ -50,6 +50,7 @@ public class FormConstants {
 	final static public String PAGE_BEAN_MAIN = "mainOptionsPage";
 	final static public String PAGE_BEAN_APPVER_LISTINGS = "appVersionListingsPage";
 	final static public String PAGE_BEAN_APPVER_ADDMODIFY = "addModifyAppVersionPage";
+	final static public String PAGE_BEAN_DEPLOYMENTS = "deploymentListingsPage";
 	
 	/*
 	 * Shared form parameter names
@@ -71,6 +72,7 @@ public class FormConstants {
 	/*
 	 * App Version Add/Modify unique parameter constants
 	 */
+	final static public String APPVER_DELETE_CONFIRM_TEXT = "delete the version";
 	final static public String APPVER_IDENTIFIER = "identifier";
 	final static public String APPVER_NOTES = "notes";
 	final static public String UPLOAD_ARCHIVE = "uploadArchive";
@@ -88,4 +90,9 @@ public class FormConstants {
 	 */
 	final static public String APP_DELETE_CONFIRM_TEXT = "delete the application";
 	
+	
+	/*
+	 * Deployment listings unique parameter string values
+	 */
+	final static public String DEPLOYMENT_TYPE = "deploymentType";
 }

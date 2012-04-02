@@ -45,6 +45,7 @@ import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.ClusterNode;
+import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.util.Utils;
 import com.openmeap.web.form.ParameterMapBuilder;
@@ -59,7 +60,37 @@ import com.openmeap.web.form.ParameterMapBuilder;
  */
 public class AdminTest {
 
-	final static private String APP_NAME = "Happy Appy";
+	final static private String HOST = "localhost:7000";
+	
+	final static private String ADMIN_USER = "tomcat";
+	final static private String ADMIN_PASS = "tomcat";
+	final static private String ADMIN_WEB_STORAGE = "/tmp";
+	
+	final static private String SERVICES_WEB_URL = "http://"+HOST+"/openmeap-services-web";
+	final static private String SERVICES_WEB_AUTH_SALT = "auth-salt";
+	
+	final static private String NODE_01_SERVICES_URL = SERVICES_WEB_URL;
+	final static private String NODE_01_STORAGE = "/tmp/archs";
+	
+	final static private String APP_NAME = "Integration Test Application";
+	final static private String APP_DESC = "This application has been created programmatically in order to test the functions of the administrative console";
+	final static private Integer APP_DEPL_LEN = 10;
+	final static private String APP_ADMINS = "default-admin";
+	final static private String APP_VERSION_ADMINS = "default-versioner";
+	
+	final static private String APP_ADDMODIFY_SUCCESS = "Application successfully created/modified!";
+	
+	final static private String VERSION_ORIG = "initialVersionId";
+	
+	final static private String VERSION_01 = "version01Id";
+	final static private String VERSION_01_ZIP = "version01.zip";
+	final static private String VERSION_01_HASH = "08c7f5cb8486466b872aac2059cd47f4";
+	final static private String VERSION_01_NOTES = "Test notes - version01";
+	
+	final static private String VERSION_02 = "version02Id";
+	final static private String VERSION_02_ZIP = "version02.zip";
+	final static private String VERSION_02_HASH = "d2ed29ae33e7ddf9ff99fa9b6ad0724d";
+	final static private String VERSION_02_NOTES = "Test notes - version02";
 	
 	static private AdminTestHelper helper;
 	static private ModelManager modelManager;
@@ -71,15 +102,12 @@ public class AdminTest {
 		modelManager = helper.getModelManager();
 	}
 	
-	@AfterClass static public void afterClass() {
-	}
-	
 	@Test public void testLogin() throws Exception {
 		
 		HttpResponse response = helper.getLogin();
 		EntityUtils.consume(response.getEntity());
 		
-		response = helper.postLogin("tomcat", "tomcat");
+		response = helper.postLogin(ADMIN_USER, ADMIN_PASS);
 		
 		Assert.assertTrue(response.getStatusLine().getStatusCode()==302);
 		Header[] headers = response.getHeaders("Location");
@@ -97,16 +125,16 @@ public class AdminTest {
 		
 		// correct location of storage path prefix
 		GlobalSettings settings = new GlobalSettings();
-		settings.setExternalServiceUrlPrefix("http://localhost:7000/openmeap-services-web");
+		settings.setExternalServiceUrlPrefix(SERVICES_WEB_URL);
 		settings.setMaxFileUploadSize(1234550);
-		settings.setServiceManagementAuthSalt("auth-salt");
-		settings.setTemporaryStoragePath("/tmp");
+		settings.setServiceManagementAuthSalt(SERVICES_WEB_AUTH_SALT);
+		settings.setTemporaryStoragePath(ADMIN_WEB_STORAGE);
 		
 		// correct cluster node location and path prefix
 		Map<String,ClusterNode> clusterNodeMap = new HashMap<String,ClusterNode>();
 		ClusterNode node = new ClusterNode();
-		node.setServiceWebUrlPrefix("http://localhost:7000/openmeap-services-web");
-		node.setFileSystemStoragePathPrefix("/tmp/archs");
+		node.setServiceWebUrlPrefix(NODE_01_SERVICES_URL);
+		node.setFileSystemStoragePathPrefix(NODE_01_STORAGE);
 		clusterNodeMap.put(node.getServiceWebUrlPrefix(), node);
 		settings.setClusterNodes(clusterNodeMap);
 		
@@ -127,17 +155,17 @@ public class AdminTest {
 		
 		Application app = new Application();
 		app.setName(APP_NAME);
-		app.setDescription("This is my happy appy");
-		app.setDeploymentHistoryLength(10);
-		app.setVersionAdmins("juno");
-		app.setAdmins("jacob");
-		app.setInitialVersionIdentifier("ver-1.1.x");
+		app.setDescription(APP_DESC);
+		app.setDeploymentHistoryLength(APP_DEPL_LEN);
+		app.setVersionAdmins(APP_VERSION_ADMINS);
+		app.setAdmins(APP_ADMINS);
+		app.setInitialVersionIdentifier(VERSION_ORIG);
 		
 		HttpResponse response = helper.postAddModifyApp(app);
 		
 		Assert.assertTrue(response.getStatusLine().getStatusCode()==200);
 		String output = Utils.readInputStream(response.getEntity().getContent(),FormConstants.CHAR_ENC_DEFAULT);
-		Assert.assertTrue(output.contains("Application successfully created/modified!"));
+		Assert.assertTrue(output.contains(APP_ADDMODIFY_SUCCESS));
 		
 		// Now check the database, to make sure everything got in there
 		
@@ -164,38 +192,112 @@ public class AdminTest {
 		Assert.assertTrue(dbApp.getDescription().equals(newDesc));
 		Assert.assertTrue(dbApp.getDeploymentHistoryLength().equals(newLen));
 		
-		// TODO: validate changes are reflected by service-web
+		// TODO: validate changes are reflected by services-web, from the refresh hit
 	}
 	
 	@Test public void testCreateApplicationVersion() throws Exception {
+		_createApplicationVersion(VERSION_01,VERSION_01_NOTES,VERSION_01_ZIP,VERSION_01_HASH);
+		_createApplicationVersion(VERSION_02,VERSION_02_NOTES,VERSION_02_ZIP,VERSION_02_HASH);
+	}
+	
+	@Test public void testDeleteApplicationVersion() throws Exception {
+		
+		Assert.assertTrue("if no other version shares the archive, then the archive file should be deleted",_deleteApplicationVersion(VERSION_01));
+		
+		// recreate version01, except with the archive used by version02 
+		_createApplicationVersion(VERSION_01,VERSION_01_NOTES,VERSION_02_ZIP,VERSION_02_HASH);
+		Assert.assertTrue("if another version shares the archive, then leave it there",!_deleteApplicationVersion(VERSION_01));
+		
+		// restore original version01
+		_createApplicationVersion(VERSION_01,VERSION_01_NOTES,VERSION_01_ZIP,VERSION_01_HASH);
+	}
+	
+	@Test public void testCreateDeployments() throws Exception {
+		
+		_createDeployment(VERSION_01,Deployment.Type.IMMEDIATE);
+		_createDeployment(VERSION_02,Deployment.Type.REQUIRED);
+		
+		// as this deployment is created, 
+		// the archive for version01 should be removed from the deployed location
+		_createDeployment(VERSION_02,Deployment.Type.REQUIRED);
+	}
+	
+	@Test public void testDeleteApplication() throws Exception {
+		
+		ModelManager modelManager = helper.getModelManager();
+		Application dbApp = modelManager.getModelService().findApplicationByName(APP_NAME);
+		
+		HttpResponse response = helper.postAddModifyApp_delete(dbApp);
+		
+		modelManager.getModelService().clearPersistenceContext();
+		dbApp = modelManager.getModelService().findApplicationByName(APP_NAME);
+		Assert.assertTrue(dbApp==null);
+		
+		Assert.assertTrue(!_isVersionArchiveInAdminLocation(VERSION_01_HASH));
+		Assert.assertTrue(!_isVersionArchiveInAdminLocation(VERSION_02_HASH));
+		Assert.assertTrue(!_isVersionArchiveInDeployedLocation(VERSION_01_HASH));
+		Assert.assertTrue(!_isVersionArchiveInDeployedLocation(VERSION_02_HASH));
+	}
+	
+	/*
+	 * PRIVATE HELPER METHODS
+	 */
+	
+	private void _createApplicationVersion(String identifier, String notes, String archiveName, String hash) throws Exception {
 		
 		Application app = modelManager.getModelService().findApplicationByName(APP_NAME);
 		ApplicationVersion version = new ApplicationVersion();
+		version.setIdentifier(identifier);
+		version.setNotes(notes);
 		app.addVersion(version);
-		version.setIdentifier("ver-1.1.x");
-		version.setNotes("Test notes");
-		File uploadArchive = new File(this.getClass().getResource("version01.zip").getFile());
+		File uploadArchive = new File(this.getClass().getResource(archiveName).getFile());
 
 		EntityUtils.consume(helper.postAddModifyAppVer(version, uploadArchive).getEntity());
 		
 		// archive is uploaded
-		modelManager.getModelService().refresh(app);
-		version = app.getVersions().get("ver-1.1.x");
+		modelManager.getModelService().clearPersistenceContext();
+		app = modelManager.getModelService().findApplicationByName(APP_NAME);
+		version = app.getVersions().get(identifier);
 		Assert.assertTrue(version!=null);
 		
-		File uploadedArchive = version.getArchive().getFile(modelManager.getGlobalSettings().getTemporaryStoragePath());
-		File webViewDir = version.getArchive().getExplodedPath(modelManager.getGlobalSettings().getTemporaryStoragePath());
-		Assert.assertTrue(uploadedArchive.exists());
-		Assert.assertTrue(webViewDir.exists());
-		
-		// version created
+		// validate that the archive was uploaded and exploded
+		Assert.assertTrue(_isVersionArchiveInAdminLocation(hash));
 	}
 	
-	@Test public void testDeleteApplication() throws Exception {
-		ModelManager modelManager = helper.getModelManager();
-		Application dbApp = modelManager.getModelService().findApplicationByName(APP_NAME);
-		HttpResponse response = helper.postAddModifyApp_delete(dbApp);
-		dbApp = modelManager.getModelService().findApplicationByName(APP_NAME);
-		Assert.assertTrue(dbApp==null);
+	/**
+	 * 
+	 * @param identifier
+	 * @return true if archive deleted
+	 * @throws Exception
+	 */
+	private Boolean _deleteApplicationVersion(String identifier) throws Exception {
+		
+		ApplicationVersion version = modelManager.getModelService().findAppVersionByNameAndId(APP_NAME, identifier);
+		String hash = version.getArchive().getHash();
+		
+		EntityUtils.consume(helper.postAddModifyAppVer_delete(version).getEntity());
+		
+		modelManager.getModelService().clearPersistenceContext();
+		version = modelManager.getModelService().findAppVersionByNameAndId(APP_NAME, identifier);
+		
+		Assert.assertTrue(version==null);
+		return !_isVersionArchiveInAdminLocation(hash);
+	}
+	
+	private void _createDeployment(String identifier, Deployment.Type type) throws Exception {
+		ApplicationVersion version = modelManager.getModelService().findAppVersionByNameAndId(APP_NAME, identifier);
+		EntityUtils.consume(helper.postCreateDeployment(version, type).getEntity());
+		Assert.assertTrue(_isVersionArchiveInDeployedLocation(version.getArchive().getHash()));
+	}
+	
+	private Boolean _isVersionArchiveInAdminLocation(String hash) {
+		File verAr = new File(ADMIN_WEB_STORAGE+"/"+hash);
+		File verAr2 = new File(ADMIN_WEB_STORAGE+"/"+hash+".zip");
+		return verAr2.exists() && verAr2.isFile() && verAr.exists() && verAr.isDirectory();
+	}
+	
+	private Boolean _isVersionArchiveInDeployedLocation(String hash) {
+		File verAr = new File(NODE_01_STORAGE+"/"+hash+".zip");
+		return verAr.exists() && verAr.isFile();
 	}
 }

@@ -150,7 +150,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 			// TODO: check to see if the user can delete versions
 			if( ParameterMapUtils.notEmpty(FormConstants.DELETE,parameterMap) && ParameterMapUtils.notEmpty("deleteConfirm",parameterMap) ) {
 				
-				if( ParameterMapUtils.firstValue("deleteConfirm", parameterMap).equals("delete the version") ) {
+				if( ParameterMapUtils.firstValue("deleteConfirm", parameterMap).equals(FormConstants.APPVER_DELETE_CONFIRM_TEXT) ) {
 					
 					processApplicationVersionDeletion(version, events);
 					

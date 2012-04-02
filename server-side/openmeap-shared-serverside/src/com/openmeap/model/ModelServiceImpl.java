@@ -100,8 +100,6 @@ public class ModelServiceImpl implements ModelService
 			deplList.add(depl);
 		}	
 		
-		_delete(app);
-			
 		app.setDeployments(deplList);
 		app.getVersions().clear();
 		iterator = app.getDeployments().iterator();
@@ -110,6 +108,8 @@ public class ModelServiceImpl implements ModelService
 			callEventNotifiers(ModelServiceOperation.DELETE,depl);
 			iterator.remove();
 		}
+		
+		_delete(app);
 	}
 	
 	@Override
@@ -152,13 +152,13 @@ public class ModelServiceImpl implements ModelService
 	}
 	
 	@Override
-	public ApplicationVersion findAppVersionByNameAndId(String appName, String versionId) {
+	public ApplicationVersion findAppVersionByNameAndId(String appName, String identifier) {
 		Query q = entityManager.createQuery("select distinct av "
 				+"from ApplicationVersion av inner join fetch av.application a "
 				+"where av.identifier=:identifier "
 				+"and a.name=:name");
 		q.setParameter("name", appName);
-		q.setParameter("identifier", versionId);
+		q.setParameter("identifier", identifier);
 		try {
 			ApplicationVersion ver = (ApplicationVersion)q.getSingleResult();
 			return ver;
@@ -168,13 +168,13 @@ public class ModelServiceImpl implements ModelService
 	}
 	
 	@Override
-	public List<Deployment> findDeploymentsByNameAndId(String appName, String versionId) {
+	public List<Deployment> findDeploymentsByNameAndId(String appName, String identifier) {
 		Query q = entityManager.createQuery("select d "
 				+"from Deployment d inner join fetch d.applicationVersion av inner join fetch d.application a "
 				+"where av.identifier=:identifier "
 				+"and a.name=:name ");
 		q.setParameter("name", appName);
-		q.setParameter("identifier", versionId);
+		q.setParameter("identifier", identifier);
 		try {
 			@SuppressWarnings(value={"unchecked"})
 			List<Deployment> deployments = (List<Deployment>)q.getResultList();

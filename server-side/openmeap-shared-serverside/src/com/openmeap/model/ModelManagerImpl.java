@@ -24,12 +24,9 @@
 
 package com.openmeap.model;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.UUID;
-import java.lang.reflect.Method;
 
 import javax.persistence.PersistenceException;
 
@@ -45,7 +42,6 @@ import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationInstallation;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.ClusterNode;
-import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
 
 /**

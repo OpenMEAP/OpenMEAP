@@ -41,6 +41,7 @@ import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.ClusterNode;
+import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.util.FileHandlingHttpRequestExecuterImpl;
 import com.openmeap.util.HttpRequestExecuter;
@@ -174,9 +175,46 @@ public class AdminTestHelper {
 		return requestExecuter.postData(adminUrl,getData,postData);
 	}
 	
+	public HttpResponse postAddModifyAppVer_delete(ApplicationVersion appVer) throws ClientProtocolException, IOException, ParameterMapBuilderException {
+		
+		Map<String,Object> getData = new HashMap<String,Object>();
+		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_APPVER_ADDMODIFY);
+		getData.put(FormConstants.APP_ID, appVer.getApplication().getPk().toString());
+		if( appVer.getPk()!=null ) {
+			getData.put(FormConstants.APPVER_ID, appVer.getPk().toString());
+		}
+		
+		Map<String,Object> postData = new HashMap<String,Object>();
+		postData.put(FormConstants.PROCESS_TARGET, ProcessingTargets.ADDMODIFY_APPVER);
+		postData.put(FormConstants.APP_ID, appVer.getApplication().getPk().toString());
+		if( appVer.getPk()!=null ) {
+			postData.put(FormConstants.APPVER_ID, appVer.getPk().toString());
+		}
+		paramsBuilder.toParameters(postData, appVer);
+		postData.put("deleteConfirm",FormConstants.APPVER_DELETE_CONFIRM_TEXT);
+		postData.put(FormConstants.DELETE,"Delete!");
+		postData.put("Delete!","Delete!");
+		
+		return requestExecuter.postData(adminUrl,getData,postData);
+	}
+	
 	/*
 	 * DEPLOYMENTS
 	 */
+	
+	public HttpResponse postCreateDeployment(ApplicationVersion appVer, Deployment.Type deplType) throws ClientProtocolException, IOException {
+		
+		Map<String,Object> getData = new HashMap<String,Object>();
+		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_DEPLOYMENTS);
+		getData.put(FormConstants.APP_ID, appVer.getApplication().getPk().toString());
+		
+		Map<String,Object> postData = new HashMap<String,Object>();
+		postData.put(FormConstants.PROCESS_TARGET, ProcessingTargets.DEPLOYMENTS);
+		postData.put(FormConstants.APPVER_ID, appVer.getPk().toString());
+		postData.put(FormConstants.DEPLOYMENT_TYPE, deplType.toString());
+		
+		return requestExecuter.postData(adminUrl,getData,postData);
+	}
 	
 	/*
 	 * GLOBAL SETTINGS
@@ -201,7 +239,7 @@ public class AdminTestHelper {
 			List<String> nodePaths = new ArrayList<String>();
 			for( ClusterNode clusterNode : settings.getClusterNodes().values() ) {
 				nodeUrls.add(clusterNode.getServiceWebUrlPrefix());
-				nodeUrls.add(clusterNode.getFileSystemStoragePathPrefix());
+				nodePaths.add(clusterNode.getFileSystemStoragePathPrefix());
 			}
 			postData.put("clusterNodeUrl", nodeUrls);
 			postData.put("clusterNodePath", nodePaths);

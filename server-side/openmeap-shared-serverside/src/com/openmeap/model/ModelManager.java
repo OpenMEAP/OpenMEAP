@@ -41,7 +41,10 @@ import com.openmeap.model.dto.GlobalSettings;
  * 
  * All business rules specifically related to CRUD operations on any ModelEntity object
  * should be performed by the implementing class of this interface.
- *  
+ * 
+ * Yes, I realize that all the business logic is currently in the backings...
+ * that needs to change.
+ * 
  * @author schang
  */
 public interface ModelManager {
@@ -75,5 +78,8 @@ public interface ModelManager {
 	
 	GlobalSettings getGlobalSettings();
 	
+	/**
+	 * @return The cluster node of this services war instance, else null if the admin war
+	 */
 	ClusterNode getClusterNode();
 }

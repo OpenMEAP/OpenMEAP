@@ -84,11 +84,13 @@ public interface ModelService {
 
 	public Application findApplicationByName(String name);
 	
-	public ApplicationVersion findAppVersionByNameAndId(String appName, String versionId);
+	public ApplicationVersion findAppVersionByNameAndId(String appName, String identifier);
 	
-	public List<Deployment> findDeploymentsByNameAndId(String appName, String versionId);
+	public List<Deployment> findDeploymentsByNameAndId(String appName, String identifier);
 	
 	public List<ApplicationArchive> findApplicationArchivesByHashAndAlgorithm(String hash, String hashAlgorithm);
 	
 	public Deployment getLastDeployment(Application app);
+	
+	public void clearPersistenceContext();
 }

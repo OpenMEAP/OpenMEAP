@@ -24,21 +24,27 @@
 
 package com.openmeap.admin.web.backing;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import javax.persistence.PersistenceException;
 
-import com.openmeap.util.ParameterMapUtils;
-import com.openmeap.web.*;
-import com.openmeap.web.html.*;
+import com.openmeap.Authorizer;
 import com.openmeap.admin.web.ProcessingTargets;
-import com.openmeap.admin.web.backing.event.MessagesEvent;
 import com.openmeap.admin.web.backing.event.AddSubNavAnchorEvent;
+import com.openmeap.admin.web.backing.event.MessagesEvent;
 import com.openmeap.constants.FormConstants;
-import com.openmeap.model.*;
+import com.openmeap.model.InvalidPropertiesException;
+import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationVersion;
-import com.openmeap.Authorizer;
+import com.openmeap.util.ParameterMapUtils;
+import com.openmeap.web.AbstractTemplatedSectionBacking;
+import com.openmeap.web.ProcessingContext;
+import com.openmeap.web.ProcessingEvent;
+import com.openmeap.web.html.Anchor;
 
 /**
  * Mediates information between the ModelManager and the add/modify form.
