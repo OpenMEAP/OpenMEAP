@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.openmeap.event.ProcessingEvent;
+
 abstract public class ProcessingUtils {
 	
 	private ProcessingUtils() {}

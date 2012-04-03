@@ -22,13 +22,8 @@
  ###############################################################################
  */
 
-package com.openmeap.admin.web.backing.event;
+package com.openmeap.event;
 
-import com.openmeap.admin.web.ProcessingTargets;
-import com.openmeap.web.GenericProcessingEvent;
-
-public class MessagesEvent extends GenericProcessingEvent<String> {
-	public MessagesEvent(String payload) {
-		super(ProcessingTargets.MESSAGES,payload);
-	}
+public interface EventHandler<T> {
+	<E extends Event<T>> void handle(E event) throws EventHandlingException;
 }

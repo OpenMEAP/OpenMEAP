@@ -24,7 +24,7 @@
 
 package com.openmeap.model.event;
 
-import com.openmeap.AbstractEvent;
+import com.openmeap.event.AbstractEvent;
 import com.openmeap.model.ModelEntity;
 import com.openmeap.model.ModelServiceOperation;
 

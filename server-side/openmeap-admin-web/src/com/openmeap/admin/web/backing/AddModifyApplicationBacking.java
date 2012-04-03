@@ -32,10 +32,11 @@ import java.util.Map;
 import javax.persistence.PersistenceException;
 
 import com.openmeap.Authorizer;
-import com.openmeap.admin.web.ProcessingTargets;
-import com.openmeap.admin.web.backing.event.AddSubNavAnchorEvent;
-import com.openmeap.admin.web.backing.event.MessagesEvent;
+import com.openmeap.admin.web.events.AddSubNavAnchorEvent;
 import com.openmeap.constants.FormConstants;
+import com.openmeap.event.MessagesEvent;
+import com.openmeap.event.ProcessingEvent;
+import com.openmeap.event.ProcessingTargets;
 import com.openmeap.model.InvalidPropertiesException;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.Application;
@@ -43,7 +44,6 @@ import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.util.ParameterMapUtils;
 import com.openmeap.web.AbstractTemplatedSectionBacking;
 import com.openmeap.web.ProcessingContext;
-import com.openmeap.web.ProcessingEvent;
 import com.openmeap.web.html.Anchor;
 
 /**
@@ -111,7 +111,7 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 			
 			if( events.size()==0 ) {
 				try {
-					app = modelManager.addModify(app);
+					app = modelManager.addModify(app,events);
 					events.add( new MessagesEvent("Application successfully created/modified!") );
 				} catch( InvalidPropertiesException ipe ) {
 					events.add( new MessagesEvent(ipe.getMessage()) );
@@ -128,7 +128,7 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 				
 					if( ParameterMapUtils.firstValue("deleteConfirm", parameterMap).equals(FormConstants.APP_DELETE_CONFIRM_TEXT) ) {
 						
-						modelManager.delete(app);
+						modelManager.delete(app,events);
 						events.add( new MessagesEvent("Application successfully deleted!") );
 						app = null;
 						// we remove the applicationId parameter, so that the form can populate empty

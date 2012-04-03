@@ -37,6 +37,7 @@ import org.junit.Assert;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.openmeap.constants.FormConstants;
+import com.openmeap.event.ProcessingTargets;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationVersion;

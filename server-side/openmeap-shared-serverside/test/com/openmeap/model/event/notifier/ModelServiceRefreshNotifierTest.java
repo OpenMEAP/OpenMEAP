@@ -91,7 +91,7 @@ public class ModelServiceRefreshNotifierTest {
 		notifier.setModelManager(modelManager);
 		notifier.setHttpRequestExecuter(httpExecuter);
 		
-		notifier.notify(new ModelEntityModifyEvent(app));
+		notifier.notify(new ModelEntityModifyEvent(app),null);
 		
 		String lastPostUrl = MockHttpRequestExecuter.getLastPostUrl();
 		Map<String,Object> lastPostData = MockHttpRequestExecuter.getLastPostData();

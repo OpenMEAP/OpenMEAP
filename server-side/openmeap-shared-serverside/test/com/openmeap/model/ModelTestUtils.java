@@ -10,6 +10,7 @@ import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.UrlResource;
 
+import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationInstallation;
 
 public class ModelTestUtils {
@@ -96,8 +97,9 @@ public class ModelTestUtils {
 	}
 	
 	static public void createModel(EntityManager em) {
-		if( em==null )
+		if( em==null ) {
 			em = createEntityManager();
+		}
 		try {
 			Map<String,Map<String,? extends ModelEntity>>  modelBeans = (Map<String,Map<String,? extends ModelEntity>> )ModelTestUtils.newModelBeans().getBean("mockModel");
 			
@@ -114,6 +116,9 @@ public class ModelTestUtils {
 			for( String className : new String[] {"GlobalSettings","Application","ApplicationVersion","Deployment","ApplicationInstallation"} ) {
 				Map<String,? extends ModelEntity> members = modelBeans.get(className);
 				for( ModelEntity member : members.values() ) {
+					if( className.equals("Application") ) {
+						((Application)member).setDeployments(null);
+					}
 					em.persist(member);
 					em.flush();
 				}

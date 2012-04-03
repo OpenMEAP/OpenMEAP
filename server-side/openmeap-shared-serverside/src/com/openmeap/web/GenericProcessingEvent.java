@@ -24,6 +24,8 @@
 
 package com.openmeap.web;
 
+import com.openmeap.event.ProcessingEvent;
+
 public class GenericProcessingEvent<T> implements ProcessingEvent<T> {
 
 	protected T payload; 

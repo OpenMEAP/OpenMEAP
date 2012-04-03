@@ -22,8 +22,23 @@
  ###############################################################################
  */
 
-package com.openmeap;
+package com.openmeap.event;
 
-public interface EventNotifier<T> {
-	<E extends Event<T>> void notify(E event) throws EventNotificationException;
+public class EventHandlingException extends Exception {
+
+	public EventHandlingException() {
+	}
+
+	public EventHandlingException(String arg0) {
+		super(arg0);
+	}
+
+	public EventHandlingException(Throwable arg0) {
+		super(arg0);
+	}
+
+	public EventHandlingException(String arg0, Throwable arg1) {
+		super(arg0, arg1);
+	}
+
 }

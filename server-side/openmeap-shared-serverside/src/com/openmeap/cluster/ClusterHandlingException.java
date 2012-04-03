@@ -24,7 +24,7 @@
 
 package com.openmeap.cluster;
 
-import com.openmeap.EventHandlingException;
+import com.openmeap.event.EventHandlingException;
 
 public class ClusterHandlingException extends EventHandlingException {
 

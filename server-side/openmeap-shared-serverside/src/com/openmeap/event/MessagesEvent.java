@@ -22,13 +22,12 @@
  ###############################################################################
  */
 
-package com.openmeap.web;
+package com.openmeap.event;
 
-import com.openmeap.Event;
+import com.openmeap.web.GenericProcessingEvent;
 
-public interface ProcessingEvent<T> extends Event<T> {
-	void setTargets(String[] processTargets);
-	String[] getTargets();
+public class MessagesEvent extends GenericProcessingEvent<String> {
+	public MessagesEvent(String payload) {
+		super(ProcessingTargets.MESSAGES,payload);
+	}
 }
-
-

@@ -28,6 +28,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.List;
 
+import com.openmeap.event.ProcessingEvent;
+
 /**
  * Handles backend processing for one little section of a page.
  * It's a controllette, essentially.

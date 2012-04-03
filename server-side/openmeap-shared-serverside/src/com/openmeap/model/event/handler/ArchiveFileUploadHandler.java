@@ -32,9 +32,9 @@ import org.apache.commons.fileupload.FileItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.openmeap.Event;
-import com.openmeap.EventHandler;
 import com.openmeap.cluster.ClusterHandlingException;
+import com.openmeap.event.Event;
+import com.openmeap.event.EventHandler;
 import com.openmeap.model.InvalidPropertiesException;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.ApplicationArchive;

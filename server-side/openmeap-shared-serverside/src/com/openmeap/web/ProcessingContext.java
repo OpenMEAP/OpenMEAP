@@ -26,6 +26,8 @@ package com.openmeap.web;
 
 import java.util.List;
 
+import com.openmeap.event.ProcessingEvent;
+
 public interface ProcessingContext {
 	/**
 	 * This does not provide an accessor for the events array because

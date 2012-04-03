@@ -47,10 +47,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.openmeap.Authorizer;
-import com.openmeap.admin.web.ProcessingTargets;
-import com.openmeap.admin.web.backing.event.AddSubNavAnchorEvent;
-import com.openmeap.admin.web.backing.event.MessagesEvent;
+import com.openmeap.admin.web.events.AddSubNavAnchorEvent;
 import com.openmeap.constants.FormConstants;
+import com.openmeap.event.MessagesEvent;
+import com.openmeap.event.ProcessingEvent;
+import com.openmeap.event.ProcessingTargets;
 import com.openmeap.model.InvalidPropertiesException;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.ModelServiceOperation;
@@ -68,7 +69,6 @@ import com.openmeap.util.ZipUtils;
 import com.openmeap.web.AbstractTemplatedSectionBacking;
 import com.openmeap.web.GenericProcessingEvent;
 import com.openmeap.web.ProcessingContext;
-import com.openmeap.web.ProcessingEvent;
 import com.openmeap.web.ProcessingUtils;
 import com.openmeap.web.html.Anchor;
 import com.openmeap.web.html.Option;
@@ -204,8 +204,8 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		
 			version.setActiveFlag(false);
 			try {
-				version = modelManager.addModify(version);
-				modelManager.getModelService().refresh(version.getApplication());
+				version = modelManager.addModify(version,events);
+				modelManager.refresh(version.getApplication());
 				events.add( new MessagesEvent("Application version successfully set to inactive.  It will be deleted when the last deployment made with it is removed.") );
 			} catch( InvalidPropertiesException ipe ) {
 				events.add( new MessagesEvent(ipe.getMessage()) );
@@ -213,7 +213,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 				events.add( new MessagesEvent(pe.getMessage()) );								
 			}
 		} else {
-			modelManager.delete(version);
+			modelManager.delete(version,events);
 			if( archive2Delete!=null ) {
 				maintainFileSystemCleanliness(archive2Delete, events);
 			}
@@ -304,8 +304,8 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		} else {
 			try {
 				//app.addVersion(version);
-				version = modelManager.addModify(version);
-				modelManager.getModelService().refresh(app);
+				version = modelManager.addModify(version,events);
+				modelManager.refresh(app);
 				events.add( new MessagesEvent("Application version successfully created/modified!") );
 			} catch( InvalidPropertiesException ipe ) {
 				events.add( new MessagesEvent(ipe.getMessage()) );

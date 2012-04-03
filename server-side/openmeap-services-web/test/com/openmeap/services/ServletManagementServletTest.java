@@ -25,9 +25,11 @@
 package com.openmeap.services;
 
 import com.openmeap.constants.UrlParamConstants;
+import com.openmeap.json.JSONObjectBuilder;
 import com.openmeap.model.*;
 
 import org.springframework.mock.web.*;
+import org.json.JSONObject;
 import org.junit.*;
 
 import java.util.*;
@@ -35,6 +37,7 @@ import java.io.*;
 import org.w3c.dom.*;
 
 import com.openmeap.services.ServiceManagementServlet;
+import com.openmeap.services.dto.Result;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.model.event.ModelEntityEventAction;
@@ -80,7 +83,7 @@ public class ServletManagementServletTest {
 		app.setName(randomUuid);
 		Assert.assertTrue(modelManager.getModelService().findByPrimaryKey(Application.class,1L).getName().equals(randomUuid));
 		
-		modelManager.getModelService().refresh(app);
+		modelManager.refresh(app);
 		app = modelManager.getModelService().findByPrimaryKey(Application.class,1L);
 		Assert.assertTrue(!modelManager.getModelService().findByPrimaryKey(Application.class,1L).getName().equals(randomUuid));
 		
@@ -99,8 +102,9 @@ public class ServletManagementServletTest {
 		request.setParameter(UrlParamConstants.ACTION, ModelEntityEventAction.MODEL_REFRESH.getActionName());
 		servlet.service(request,response);
 		String contentString = response.getContentAsString();
-		Document result = Utils.getDocument(new ByteArrayInputStream(contentString.getBytes()));
-		Assert.assertTrue( result.getFirstChild().getAttributes().getNamedItem("status").getNodeValue().equals("success"));
+		JSONObjectBuilder job = new JSONObjectBuilder();
+		Result result = (Result)job.fromJSON(new JSONObject(contentString), new Result());
+		Assert.assertTrue( result.getStatus().equals(Result.Status.SUCCESS));
 		Assert.assertTrue( ! modelManager.getModelService().findByPrimaryKey(Application.class,1L).getName().equals(randomUuid) );
 		
 		////////////////////
@@ -114,8 +118,8 @@ public class ServletManagementServletTest {
 		request.setParameter(UrlParamConstants.REFRESH_OBJ_PKID, "1");
 		servlet.service(request,response);
 		contentString = response.getContentAsString();
-		result = Utils.getDocument(new ByteArrayInputStream(response.getContentAsString().getBytes()));
-		Assert.assertTrue( result.getFirstChild().getAttributes().getNamedItem("status").getNodeValue().equals("failure"));
+		result = (Result)job.fromJSON(new JSONObject(contentString), new Result());
+		Assert.assertTrue( result.getStatus().equals(Result.Status.FAILURE));
 		Assert.assertTrue( modelManager.getModelService().findByPrimaryKey(Application.class,1L).getName().equals(randomUuid) );
 
 	}

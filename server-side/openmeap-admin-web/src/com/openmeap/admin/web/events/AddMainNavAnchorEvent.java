@@ -22,8 +22,14 @@
  ###############################################################################
  */
 
-package com.openmeap;
+package com.openmeap.admin.web.events;
 
-public interface EventHandler<T> {
-	<E extends Event<T>> void handle(E event) throws EventHandlingException;
+import com.openmeap.event.ProcessingTargets;
+import com.openmeap.web.GenericProcessingEvent;
+import com.openmeap.web.html.Anchor;
+
+public class AddMainNavAnchorEvent extends GenericProcessingEvent<Anchor> {
+	public AddMainNavAnchorEvent(Anchor payload) {
+		super(ProcessingTargets.NAV_MAIN,payload);
+	}
 }

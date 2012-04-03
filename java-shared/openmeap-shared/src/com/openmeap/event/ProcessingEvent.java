@@ -22,23 +22,12 @@
  ###############################################################################
  */
 
-package com.openmeap;
+package com.openmeap.event;
 
-public class EventNotificationException extends Exception {
 
-	public EventNotificationException(String arg0, Throwable arg1) {
-		super(arg0, arg1);
-	}
-
-	public EventNotificationException(String arg0) {
-		super(arg0);
-	}
-
-	public EventNotificationException(Throwable arg0) {
-		super(arg0);
-	}
-
-	public EventNotificationException() {
-	}
-
+public interface ProcessingEvent<T> extends Event<T> {
+	void setTargets(String[] processTargets);
+	String[] getTargets();
 }
+
+

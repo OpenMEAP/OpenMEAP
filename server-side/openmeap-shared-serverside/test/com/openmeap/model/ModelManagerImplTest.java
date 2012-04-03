@@ -1,6 +1,7 @@
 package com.openmeap.model;
 
 import java.util.*;
+
 import javax.persistence.*;
 
 import org.junit.Assert;
@@ -8,6 +9,9 @@ import org.junit.Test;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
+import com.openmeap.event.Event;
+import com.openmeap.event.EventNotificationException;
+import com.openmeap.event.ProcessingEvent;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationInstallation;
@@ -47,7 +51,7 @@ public class ModelManagerImplTest {
 		// to modify a completely invalid Application
 		try {
 			app = new Application();
-			modelManager.addModify(app);
+			modelManager.addModify(app,null);
 		} catch( InvalidPropertiesException ipe ) {
 			e = ipe;
 		}
@@ -60,7 +64,7 @@ public class ModelManagerImplTest {
 		try {
 			app = new Application();
 			app.setName("Application.2.name");
-			app = modelManager.addModify(app);
+			app = modelManager.addModify(app,null);
 		} catch( InvalidPropertiesException ipe ) {
 			e = ipe;
 		}
@@ -71,7 +75,7 @@ public class ModelManagerImplTest {
 		// now modify the application returned by addModifyApplication
 		Long id = app.getId();
 		app.setName("Application.2.name_modified");
-		app = modelManager.addModify(app);
+		app = modelManager.addModify(app,null);
 		Application appFound = modelManager.getModelService().findByPrimaryKey(Application.class,id);
 		Assert.assertTrue(appFound.getName().compareTo("Application.2.name_modified")==0);
 	}
@@ -80,7 +84,7 @@ public class ModelManagerImplTest {
 		GlobalSettings settings = new GlobalSettings();
 		Boolean peThrown = false;
 		try {
-			modelManager.addModify(settings);
+			modelManager.addModify(settings,null);
 		} catch(PersistenceException pe) {
 			peThrown = true;
 		}
@@ -93,9 +97,9 @@ public class ModelManagerImplTest {
 		nodes.put("http://test",new ClusterNode());
 		nodes.get("http://test").setServiceWebUrlPrefix("http://test");
 		nodes.get("http://test").setFileSystemStoragePathPrefix("/tmp2");
-		settings = modelManager.addModify(settings);
+		settings = modelManager.addModify(settings,null);
 		
-		modelManager.getModelService().refresh(settings);
+		modelManager.refresh(settings);
 		settings = modelManager.getGlobalSettings();
 		Assert.assertTrue(settings.getClusterNodes().size()==3);
 		Assert.assertTrue(settings.getClusterNodes().get("http://test")!=null);
@@ -110,7 +114,7 @@ public class ModelManagerImplTest {
 		////////////////////////////
 		// Verify creating a new application version
 		ApplicationVersion version = newValidAppVersion(app);
-		version = modelManager.addModify(version);
+		version = modelManager.addModify(version,null);
 		modelManager.getModelService().delete(version);
 		
 		////////////////////////////
@@ -119,7 +123,7 @@ public class ModelManagerImplTest {
 		version = newValidAppVersion(app);
 		version.getArchive().setBytesLength(null);
 		try {
-			version = modelManager.addModify(version);
+			version = modelManager.addModify(version,null);
 		} catch( InvalidPropertiesException ipe ) {
 			e=ipe;
 			thrown=true;
@@ -132,7 +136,7 @@ public class ModelManagerImplTest {
 		// with no content length specified throws an exception
 		version.getArchive().setBytesLength(0);
 		try {
-			version = modelManager.addModify(version);
+			version = modelManager.addModify(version,null);
 		} catch( InvalidPropertiesException ipe ) {
 			e=ipe;
 			thrown=true;
@@ -144,7 +148,7 @@ public class ModelManagerImplTest {
 		// Verify that trying to add a version with an invalid hash throws an exception
 		version.getArchive().setHashAlgorithm("NOT_SUCH_ALGORITHM");
 		try {
-			version = modelManager.addModify(version);
+			version = modelManager.addModify(version,null);
 		} catch( InvalidPropertiesException ipe ) {
 			e=ipe;
 		}
@@ -158,9 +162,33 @@ public class ModelManagerImplTest {
 		ApplicationInstallation ai = new ApplicationInstallation();
 		ai.setApplicationVersion( modelManager.getModelService().findAppVersionByNameAndId("Application.name","ApplicationVersion.identifier.1") );
 		ai.setUuid("AppInst.name.1");
-		modelManager.addModify(ai);
+		modelManager.addModify(ai,null);
 		ai = modelManager.getModelService().findByPrimaryKey(ApplicationInstallation.class,"AppInst.name.1");
 		Assert.assertTrue(ai!=null);
+	}
+	
+	@Test public void testFireEventHandlers() throws InvalidPropertiesException, PersistenceException {
+		List<ModelServiceEventNotifier> handlers = new ArrayList<ModelServiceEventNotifier>();
+		class MockUpdateNotifier implements ModelServiceEventNotifier<ModelEntity> {
+			public Boolean eventFired = false;
+			public Boolean getEventFired() {
+				return eventFired;
+			}
+			@Override
+			public <E extends Event<ModelEntity>> void notify(E event, List<ProcessingEvent> events) throws EventNotificationException {
+				eventFired = true;
+			}
+			@Override
+			public Boolean notifiesFor(ModelServiceOperation operation,
+					ModelEntity payload) {
+				return true;
+			}
+		};	
+		handlers.add(new MockUpdateNotifier());
+		modelManager.setEventNotifiers(handlers);
+		Application app = modelManager.getModelService().findByPrimaryKey(Application.class, 1L);
+		modelManager.addModify(app,null);
+		Assert.assertTrue(((MockUpdateNotifier)modelManager.getEventNotifiers().toArray()[0]).getEventFired());
 	}
 	
 	/**

@@ -40,10 +40,7 @@ import com.openmeap.model.dto.Deployment;
  * @author schang
  */
 public interface ModelService {	
-	
-	public void setEventNotifiers(Collection<ModelServiceEventNotifier> notifiers);
-	public Collection<ModelServiceEventNotifier> getEventNotifiers();
-	
+		
 	/**
 	 * Save or update any ModelEntity
 	 * @param <T>
@@ -54,16 +51,11 @@ public interface ModelService {
 	
 	public <T extends ModelEntity> void refresh(T obj2Refresh) throws PersistenceException;
 	
-	/**
-	 * Find any ModelEntity by the primary key of the class passed in
-	 * @param <T>
-	 * @param clazz The class of the object to find
-	 * @param pk The primary key of the object to find
-	 * @return The entity with the primary key value passed in, or null
-	 */
-	public <T extends ModelEntity> T findByPrimaryKey(Class<T> clazz, Object pk);
-	
 	public <T extends ModelEntity> void delete(T obj2Delete) throws PersistenceException;
+	
+	/*
+	 * DELETE METHODS
+	 */
 	
 	/**
 	 * Handles application deletion.
@@ -72,6 +64,19 @@ public interface ModelService {
 	 * @throws PersistenceException
 	 */
 	public void delete(Application app) throws PersistenceException;
+	
+	/*
+	 * FIND METHODS
+	 */
+	
+	/**
+	 * Find any ModelEntity by the primary key of the class passed in
+	 * @param <T>
+	 * @param clazz The class of the object to find
+	 * @param pk The primary key of the object to find
+	 * @return The entity with the primary key value passed in, or null
+	 */
+	public <T extends ModelEntity> T findByPrimaryKey(Class<T> clazz, Object pk);
 	
 	/**
 	 * Pulls back every instance of a particular ModelEntity.

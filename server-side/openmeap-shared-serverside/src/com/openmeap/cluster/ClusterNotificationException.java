@@ -24,7 +24,7 @@
 
 package com.openmeap.cluster;
 
-import com.openmeap.EventNotificationException;
+import com.openmeap.event.EventNotificationException;
 
 /**
  * @author schang

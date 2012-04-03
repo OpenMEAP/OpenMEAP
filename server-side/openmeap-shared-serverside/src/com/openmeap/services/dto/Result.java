@@ -40,6 +40,8 @@ public class Result {
 	private Status resultStatus;
 	private String message;
 	
+	public Result() {
+	}
 	public Result(Status status, String message) {
 		setStatus(status);
 		setMessage(message);

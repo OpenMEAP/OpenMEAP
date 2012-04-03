@@ -4,7 +4,9 @@ import java.util.*;
 
 import javax.persistence.EntityManager;
 
-import com.openmeap.Event;
+import com.openmeap.event.Event;
+import com.openmeap.event.EventNotificationException;
+import com.openmeap.event.ProcessingEvent;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.Deployment;
@@ -95,30 +97,6 @@ public class ModelServiceImplTest {
 		List<Deployment> deployments = modelService.findDeploymentsByNameAndId("Application.name","ApplicationVersion.identifier.1");
 		Assert.assertTrue(deployments!=null);
 		Assert.assertTrue(deployments.size()==2);
-	}
-	
-	@Test public void testFireEventHandlers() {
-		List<ModelServiceEventNotifier> handlers = new ArrayList<ModelServiceEventNotifier>();
-		class MockUpdateNotifier implements ModelServiceEventNotifier<ModelEntity> {
-			public Boolean eventFired = false;
-			public Boolean getEventFired() {
-				return eventFired;
-			}
-			@Override
-			public <E extends Event<ModelEntity>> void notify(E event) {
-				eventFired = true;
-			}
-			@Override
-			public Boolean notifiesFor(ModelServiceOperation operation,
-					ModelEntity payload) {
-				return true;
-			}
-		};	
-		handlers.add(new MockUpdateNotifier());
-		modelService.setEventNotifiers(handlers);
-		Application app = modelService.findByPrimaryKey(Application.class, 1L);
-		modelService.saveOrUpdate(app);
-		Assert.assertTrue(((MockUpdateNotifier)modelService.getEventNotifiers().toArray()[0]).getEventFired());
 	}
 	
 	// putting this last because it corrupts the model

@@ -24,11 +24,14 @@
 
 package com.openmeap.model;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.PersistenceException;
 
 import com.openmeap.Authorizer;
+import com.openmeap.event.Event;
+import com.openmeap.event.ProcessingEvent;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationInstallation;
 import com.openmeap.model.dto.ApplicationVersion;
@@ -49,6 +52,9 @@ import com.openmeap.model.dto.GlobalSettings;
  */
 public interface ModelManager {
 	
+	void setEventNotifiers(Collection<ModelServiceEventNotifier> notifiers);
+	Collection<ModelServiceEventNotifier> getEventNotifiers();
+	
 	void setAuthorizer(Authorizer auth);
 	Authorizer getAuthorizer();
 	
@@ -58,9 +64,11 @@ public interface ModelManager {
 	void setModelService(ModelService service);
 	ModelService getModelService();
 	
-	void delete(Application app);
+	public <T extends ModelEntity> void refresh(T obj2Refresh) throws PersistenceException;
 	
-	<T extends ModelEntity> void delete(T o);
+	void delete(Application app, List<ProcessingEvent> events);
+	
+	<T extends ModelEntity> void delete(T o, List<ProcessingEvent> events);
 	
 	/**
 	 * Save or update an Application object.
@@ -70,13 +78,9 @@ public interface ModelManager {
 	 * @throws InvalidPropertiesException when name, description, or device types are empty
 	 * @throws PersistenceException 
 	 */
-	Application addModify(Application application) throws InvalidPropertiesException, PersistenceException;
+	<T extends ModelEntity> T addModify(T application, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException;
 	
-	ApplicationInstallation addModify(ApplicationInstallation appInst) throws InvalidPropertiesException, PersistenceException;
-	
-	ApplicationVersion addModify(ApplicationVersion applicationVersion) throws InvalidPropertiesException, PersistenceException;
-	
-	GlobalSettings addModify(GlobalSettings settings) throws InvalidPropertiesException, PersistenceException;
+	GlobalSettings addModify(GlobalSettings settings, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException;
 	
 	GlobalSettings getGlobalSettings();
 	

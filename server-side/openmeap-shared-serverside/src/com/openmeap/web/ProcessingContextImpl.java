@@ -26,6 +26,8 @@ package com.openmeap.web;
 
 import java.util.*;
 
+import com.openmeap.event.ProcessingEvent;
+
 public class ProcessingContextImpl implements ProcessingContext {
 	
 	private List<ProcessingEvent> events = null;

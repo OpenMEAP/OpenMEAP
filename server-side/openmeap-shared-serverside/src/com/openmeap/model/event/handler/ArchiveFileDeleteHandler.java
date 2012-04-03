@@ -8,9 +8,9 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.openmeap.Event;
-import com.openmeap.EventHandler;
-import com.openmeap.EventHandlingException;
+import com.openmeap.event.Event;
+import com.openmeap.event.EventHandler;
+import com.openmeap.event.EventHandlingException;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.ApplicationArchive;
 

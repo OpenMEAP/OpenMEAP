@@ -22,14 +22,21 @@
  ###############################################################################
  */
 
-package com.openmeap.admin.web.backing.event;
+package com.openmeap.event;
 
-import com.openmeap.admin.web.ProcessingTargets;
-import com.openmeap.web.GenericProcessingEvent;
-import com.openmeap.web.html.Anchor;
 
-public class AddSubNavAnchorEvent extends GenericProcessingEvent<Anchor> {
-	public AddSubNavAnchorEvent(Anchor payload) {
-		super(ProcessingTargets.NAV_SUB,payload);
+@SuppressWarnings("serial")
+abstract public class AbstractEvent<T> implements Event<T> {
+		
+	private T payload = null;
+	
+	public AbstractEvent(T payload) {
+		setPayload(payload);
+	}
+	public void setPayload(T object) {
+		payload = object;
+	}
+	public T getPayload() {
+		return payload;
 	}
 }

@@ -33,12 +33,12 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.openmeap.admin.web.ProcessingTargets;
 import com.openmeap.constants.FormConstants;
+import com.openmeap.event.ProcessingEvent;
+import com.openmeap.event.ProcessingTargets;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.ModelTestUtils;
 import com.openmeap.model.dto.Application;
-import com.openmeap.web.ProcessingEvent;
 import com.openmeap.web.ProcessingUtils;
 
 public class AddModifyApplicationBackingTest {

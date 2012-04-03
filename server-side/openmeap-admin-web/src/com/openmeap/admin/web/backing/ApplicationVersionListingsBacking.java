@@ -33,10 +33,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.openmeap.Authorizer;
-import com.openmeap.admin.web.ProcessingTargets;
-import com.openmeap.admin.web.backing.event.AddSubNavAnchorEvent;
-import com.openmeap.admin.web.backing.event.MessagesEvent;
+import com.openmeap.admin.web.events.AddSubNavAnchorEvent;
 import com.openmeap.constants.FormConstants;
+import com.openmeap.event.MessagesEvent;
+import com.openmeap.event.ProcessingEvent;
+import com.openmeap.event.ProcessingTargets;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationVersion;
@@ -45,7 +46,6 @@ import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.util.ParameterMapUtils;
 import com.openmeap.web.AbstractTemplatedSectionBacking;
 import com.openmeap.web.ProcessingContext;
-import com.openmeap.web.ProcessingEvent;
 import com.openmeap.web.html.Anchor;
 
 public class ApplicationVersionListingsBacking extends AbstractTemplatedSectionBacking {

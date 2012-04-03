@@ -44,10 +44,10 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.openmeap.Event;
-import com.openmeap.EventHandler;
-import com.openmeap.EventHandlingException;
 import com.openmeap.constants.UrlParamConstants;
+import com.openmeap.event.Event;
+import com.openmeap.event.EventHandler;
+import com.openmeap.event.EventHandlingException;
 import com.openmeap.json.JSONObjectBuilder;
 import com.openmeap.model.InvalidPropertiesException;
 import com.openmeap.model.ModelManager;

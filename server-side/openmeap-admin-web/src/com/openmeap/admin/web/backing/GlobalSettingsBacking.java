@@ -39,16 +39,16 @@ import java.util.Map;
 import javax.persistence.PersistenceException;
 
 import com.openmeap.Authorizer.Action;
-import com.openmeap.admin.web.ProcessingTargets;
-import com.openmeap.admin.web.backing.event.MessagesEvent;
 import com.openmeap.constants.FormConstants;
+import com.openmeap.event.MessagesEvent;
+import com.openmeap.event.ProcessingEvent;
+import com.openmeap.event.ProcessingTargets;
 import com.openmeap.model.InvalidPropertiesException;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.web.AbstractTemplatedSectionBacking;
 import com.openmeap.web.ProcessingContext;
-import com.openmeap.web.ProcessingEvent;
 
 public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 	private ModelManager modelManager;
@@ -161,7 +161,7 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 				}
 			}
 			try {
-				modelManager.addModify(settings);
+				modelManager.addModify(settings,events);
 				events.add(new MessagesEvent("The settings were successfully modified."));
 			} catch( InvalidPropertiesException ipe ) {
 				events.add( new MessagesEvent(ipe.getMessage()) );

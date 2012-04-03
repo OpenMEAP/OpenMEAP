@@ -24,7 +24,7 @@
 
 package com.openmeap.model;
 
-import com.openmeap.EventNotifier;
+import com.openmeap.event.EventNotifier;
 
 /**
  * 

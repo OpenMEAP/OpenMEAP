@@ -24,11 +24,13 @@
 
 package com.openmeap.model.event.notifier;
 
+import java.util.List;
 import java.util.Map;
 
-import com.openmeap.Event;
 import com.openmeap.cluster.ClusterNotificationException;
 import com.openmeap.constants.UrlParamConstants;
+import com.openmeap.event.Event;
+import com.openmeap.event.ProcessingEvent;
 import com.openmeap.model.ModelEntity;
 import com.openmeap.model.ModelServiceOperation;
 import com.openmeap.model.dto.ApplicationArchive;
@@ -57,10 +59,10 @@ public class ArchiveFileUploadNotifier extends AbstractArchiveEventNotifier {
 	}
 	
 	@Override
-	public <E extends Event<ApplicationArchive>> void notify(final E event) throws ClusterNotificationException {
+	public <E extends Event<ApplicationArchive>> void notify(final E event, List<ProcessingEvent> events) throws ClusterNotificationException {
 		ApplicationArchive archive = (ApplicationArchive)event.getPayload();
 		if( archive.getNewFileUploaded() ) {
-			super.notify(event);
+			super.notify(event, events);
 		}
 	}
 }

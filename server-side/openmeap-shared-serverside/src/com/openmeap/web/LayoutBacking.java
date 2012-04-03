@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 
+import com.openmeap.event.ProcessingEvent;
 import com.openmeap.web.event.AddScriptTagEvent;
 import com.openmeap.web.event.AddLinkTagEvent;
 import com.openmeap.web.html.ScriptTag;

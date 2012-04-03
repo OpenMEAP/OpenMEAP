@@ -25,6 +25,7 @@
 package com.openmeap.model.event.notifier;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.PersistenceException;
@@ -33,9 +34,10 @@ import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.openmeap.Event;
-import com.openmeap.EventHandlingException;
 import com.openmeap.cluster.ClusterNotificationException;
+import com.openmeap.event.Event;
+import com.openmeap.event.EventHandlingException;
+import com.openmeap.event.ProcessingEvent;
 import com.openmeap.model.InvalidPropertiesException;
 import com.openmeap.model.ModelEntity;
 import com.openmeap.model.ModelServiceEventNotifier;
@@ -70,7 +72,7 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 	}
 
 	@Override
-	public <E extends Event<Deployment>> void notify(final E event) throws ClusterNotificationException {
+	public <E extends Event<Deployment>> void notify(final E event, List<ProcessingEvent> events) throws ClusterNotificationException {
 		
 		Deployment deployment2Delete = (Deployment)event.getPayload();
 		ApplicationVersion version = deployment2Delete.getApplicationVersion();
@@ -98,7 +100,7 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 		ApplicationArchive archive = new ApplicationArchive();
 		archive.setHash(deployment2Delete.getHash());
 		archive.setHashAlgorithm(deployment2Delete.getHashAlgorithm());
-		archiveDeleteNotifier.notify(new ModelEntityEvent(ModelServiceOperation.DELETE,archive));
+		archiveDeleteNotifier.notify(new ModelEntityEvent(ModelServiceOperation.DELETE,archive), events);
 		
 		// if there are any application versions with this archive, 
 		//   then we cannot delete it's archive.
@@ -129,7 +131,7 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 		// and this version is inactive...then delete this version.
 		if( versionCount==1 ) {
 			app.removeVersion(version);
-			archiveDeleteHandler.getModelManager().delete(version);
+			archiveDeleteHandler.getModelManager().delete(version,events);
 		}		
 	}
 

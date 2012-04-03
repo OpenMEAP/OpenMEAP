@@ -30,8 +30,8 @@ public class EntityRelationshipsTest {
 		Logger.getRootLogger().setLevel(Level.TRACE);
 		
 		ModelTestUtils.resetTestDb();
+		ModelTestUtils.createModel(null);
 		em = ModelTestUtils.createEntityManager();
-		ModelTestUtils.createModel(em);
 	}
 	
 	@AfterClass static public void afterClass() {

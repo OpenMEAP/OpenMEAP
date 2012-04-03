@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
+import com.openmeap.event.ProcessingEvent;
+
 import freemarker.template.TemplateException;
 
 public class GenericDocumentProcessor implements DocumentProcessor {

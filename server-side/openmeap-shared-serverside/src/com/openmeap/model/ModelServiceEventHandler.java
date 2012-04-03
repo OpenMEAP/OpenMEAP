@@ -24,7 +24,7 @@
 
 package com.openmeap.model;
 
-import com.openmeap.EventHandler;
+import com.openmeap.event.EventHandler;
 
 /**
  * Serves as a base for ModelService event handling classes

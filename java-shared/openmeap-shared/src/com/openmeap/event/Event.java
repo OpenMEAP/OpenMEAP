@@ -22,21 +22,11 @@
  ###############################################################################
  */
 
-package com.openmeap;
+package com.openmeap.event;
 
+import java.io.Serializable;
 
-@SuppressWarnings("serial")
-abstract public class AbstractEvent<T> implements Event<T> {
-		
-	private T payload = null;
-	
-	public AbstractEvent(T payload) {
-		setPayload(payload);
-	}
-	public void setPayload(T object) {
-		payload = object;
-	}
-	public T getPayload() {
-		return payload;
-	}
+public interface Event<T> extends Serializable {
+	void setPayload(T object);
+	T getPayload();
 }

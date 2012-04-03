@@ -30,13 +30,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.openmeap.admin.web.ProcessingTargets;
+import com.openmeap.event.ProcessingEvent;
+import com.openmeap.event.ProcessingTargets;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.web.AbstractTemplatedSectionBacking;
 import com.openmeap.web.ProcessingContext;
-import com.openmeap.web.ProcessingEvent;
 import com.openmeap.web.html.Anchor;
 
 public class ApplicationListingsBacking extends AbstractTemplatedSectionBacking {

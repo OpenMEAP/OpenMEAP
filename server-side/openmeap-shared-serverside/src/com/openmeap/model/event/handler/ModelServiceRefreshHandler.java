@@ -29,7 +29,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.openmeap.Event;
+import com.openmeap.event.Event;
 import com.openmeap.model.ModelEntity;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.ModelServiceEventHandler;
@@ -70,7 +70,7 @@ public class ModelServiceRefreshHandler implements ModelServiceEventHandler {
 		Class<ModelEntity> clazz = (Class<ModelEntity>)Class.forName("com.openmeap.model.dto."+refreshType);
 		ModelEntity app = (ModelEntity)modelManager.getModelService().findByPrimaryKey(clazz, id);
 		
-		modelManager.getModelService().refresh(app);
+		modelManager.refresh(app);
 		return true;	
 	}
 

@@ -26,7 +26,7 @@ package com.openmeap.model.event;
 
 import java.util.Map;
 
-import com.openmeap.AbstractEvent;
+import com.openmeap.event.AbstractEvent;
 
 @SuppressWarnings("rawtypes")
 public class MapPayloadEvent extends AbstractEvent<Map> {

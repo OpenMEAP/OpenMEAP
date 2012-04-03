@@ -9,6 +9,14 @@
   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
 
+    <bean id="openmeapServicesWebPropertiesMap" class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="sourceMap">
+			<map>
+				<entry key="clusterNodeUrlPrefix" value="http://localhost:8080/openmeap-service-web"/>
+			</map>
+		</property>
+	</bean>
+    
 	<bean id="entityManager" 
 			scope="prototype" 
 			factory-bean="www_entityManagerFactory" 

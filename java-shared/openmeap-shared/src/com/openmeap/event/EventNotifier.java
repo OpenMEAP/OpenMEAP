@@ -22,23 +22,10 @@
  ###############################################################################
  */
 
-package com.openmeap;
+package com.openmeap.event;
 
-public class EventHandlingException extends Exception {
+import java.util.List;
 
-	public EventHandlingException() {
-	}
-
-	public EventHandlingException(String arg0) {
-		super(arg0);
-	}
-
-	public EventHandlingException(Throwable arg0) {
-		super(arg0);
-	}
-
-	public EventHandlingException(String arg0, Throwable arg1) {
-		super(arg0, arg1);
-	}
-
+public interface EventNotifier<T> {
+	<E extends Event<T>> void notify(E event, List<ProcessingEvent> events) throws EventNotificationException;
 }

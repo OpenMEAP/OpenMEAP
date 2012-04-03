@@ -22,7 +22,7 @@
  ###############################################################################
  */
 
-package com.openmeap.admin.web;
+package com.openmeap.event;
 
 public class ProcessingTargets {
 	public static String NAV_SUB          = "com.openmeap.admin.web.SubNavigationLinks";

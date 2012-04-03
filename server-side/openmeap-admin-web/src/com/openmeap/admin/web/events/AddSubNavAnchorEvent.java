@@ -22,11 +22,14 @@
  ###############################################################################
  */
 
-package com.openmeap;
+package com.openmeap.admin.web.events;
 
-import java.io.Serializable;
+import com.openmeap.event.ProcessingTargets;
+import com.openmeap.web.GenericProcessingEvent;
+import com.openmeap.web.html.Anchor;
 
-public interface Event<T> extends Serializable {
-	void setPayload(T object);
-	T getPayload();
+public class AddSubNavAnchorEvent extends GenericProcessingEvent<Anchor> {
+	public AddSubNavAnchorEvent(Anchor payload) {
+		super(ProcessingTargets.NAV_SUB,payload);
+	}
 }

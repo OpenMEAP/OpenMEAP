@@ -38,8 +38,9 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.openmeap.Event;
-import com.openmeap.EventNotifier;
+import com.openmeap.event.Event;
+import com.openmeap.event.ProcessingEvent;
+import com.openmeap.event.EventNotifier;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.GlobalSettings;
@@ -65,7 +66,7 @@ public abstract class AbstractClusterServiceMgmtNotifier<T> implements EventNoti
 	
 	abstract protected void makeRequest(URL url, Event<T> message) throws ClusterNotificationException;
 	
-	public <E extends Event<T>> void notify(final E event) throws ClusterNotificationException {
+	public <E extends Event<T>> void notify(final E event, List<ProcessingEvent> events) throws ClusterNotificationException {
 		
 		final ThrowableList exceptions = new ThrowableList();
 		

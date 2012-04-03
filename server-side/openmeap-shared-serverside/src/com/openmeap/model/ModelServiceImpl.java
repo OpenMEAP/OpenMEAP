@@ -26,8 +26,9 @@ package com.openmeap.model;
 
 import java.util.*;
 
-import com.openmeap.EventNotificationException;
 import com.openmeap.cluster.ClusterNotificationException;
+import com.openmeap.event.EventNotificationException;
+import com.openmeap.event.ProcessingEvent;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
@@ -56,7 +57,6 @@ public class ModelServiceImpl implements ModelService
 	
 	@PersistenceContext(name="openmeap-jpa")
 	private EntityManager entityManager = null;
-	private Collection<ModelServiceEventNotifier> eventNotifiers = null;
 	
 	public void clearPersistenceContext() {
 		entityManager.clear();
@@ -81,13 +81,12 @@ public class ModelServiceImpl implements ModelService
 			}
 			throw new PersistenceException(pe);
 		}
-		callEventNotifiers(ModelServiceOperation.SAVE_OR_UPDATE,obj2Persist);
 		return obj2Persist;
 	}
 	
 	@Override
 	public <T extends ModelEntity> void delete(T obj2Delete) throws PersistenceException {		
-		_delete(obj2Delete);		
+		_delete(obj2Delete,null);		
 	}
 
 	@Override
@@ -122,13 +121,12 @@ public class ModelServiceImpl implements ModelService
 			delete(appVer);
 		}
 		
-		_delete(app);
+		_delete(app,null);
 	}
 	
 	@Override
 	public <T extends ModelEntity> void refresh(T obj2Refresh) throws PersistenceException {
 		this._refresh(obj2Refresh);
-		callEventNotifiers(ModelServiceOperation.REFRESH,obj2Refresh);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -232,13 +230,6 @@ public class ModelServiceImpl implements ModelService
 	
 	// ACCESSORS
 	
-	public void setEventNotifiers(Collection<ModelServiceEventNotifier> handlers) {
-		eventNotifiers = handlers;
-	}
-	public Collection<ModelServiceEventNotifier> getEventNotifiers() {
-		return eventNotifiers;
-	}
-	
 	public void setEntityManager(EntityManager manager) {
 		entityManager = manager;
 	}
@@ -248,9 +239,8 @@ public class ModelServiceImpl implements ModelService
 	
 	// PRIVATE METHODS
 	
-	private <T extends ModelEntity> void _delete(T obj2Delete) throws PersistenceException {		
+	private <T extends ModelEntity> void _delete(T obj2Delete, List<ProcessingEvent> events) throws PersistenceException {		
 		// give the event notifiers an opportunity to act, prior to deletion
-		callEventNotifiers(ModelServiceOperation.DELETE,obj2Delete);
 		try {
 			entityManager.getTransaction().begin();
 			this._refresh(obj2Delete);
@@ -270,28 +260,5 @@ public class ModelServiceImpl implements ModelService
 			entityManager.merge(obj2Refresh);
 		}
 		entityManager.refresh(obj2Refresh);
-	}
-	
-	private void callEventNotifiers(ModelServiceOperation op, ModelEntity obj2ActOn) {
-		// if there are any web-servers out there to notify of the update,
-		// then do so
-		if( eventNotifiers!=null ) {
-			for( ModelServiceEventNotifier handler : eventNotifiers ) {
-				try {
-					if( handler.notifiesFor(op,obj2ActOn) ) {
-						handler.notify( new ModelEntityEvent(op,obj2ActOn) );
-					}
-				} catch( EventNotificationException e ) {
-					/* TODO: in order to handle this elegantly, i need to convert this whole interface
-					 * to accept request objects and return response objects,
-					 * as I do not want to simply throw these exceptions, but rather
-					 * alert the user.
-					 * 
-					 * Perhaps I should have a more global event system?
-					 */
-					logger.error(String.format("EventNotificationException occurred: %s",e.getMessage()));
-				}
-			}
-		}
 	}
 }

@@ -30,6 +30,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.*;
 
+import com.openmeap.event.ProcessingEvent;
 import com.openmeap.web.*;
 
 import freemarker.cache.ClassTemplateLoader;

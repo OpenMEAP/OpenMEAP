@@ -31,17 +31,17 @@
 	
 	<bean id="modelService" class="com.openmeap.model.ModelServiceImpl">
 		<property name="entityManager" ref="entityManager"/>
+	</bean>
+	
+	<bean id="modelManager" class="com.openmeap.model.ModelManagerImpl">
+		<property name="modelService" ref="modelService"/>
+		<property name="authorizer" ref="authorizer"/>
 		<property name="eventNotifiers">
 			<list>
 				<ref bean="modelServiceRefreshNotifier"/>
 				<ref bean="deploymentDeleteNotifier"/>
 			</list>
 		</property>
-	</bean>
-	
-	<bean id="modelManager" class="com.openmeap.model.ModelManagerImpl">
-		<property name="modelService" ref="modelService"/>
-		<property name="authorizer" ref="authorizer"/>
 	</bean>
 	
 </beans>

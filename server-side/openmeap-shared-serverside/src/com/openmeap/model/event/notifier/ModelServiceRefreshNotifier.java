@@ -32,11 +32,11 @@ import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.openmeap.Event;
 import com.openmeap.cluster.AbstractClusterServiceMgmtNotifier;
 import com.openmeap.cluster.ClusterNotificationException;
 import com.openmeap.constants.ServletNameConstants;
 import com.openmeap.constants.UrlParamConstants;
+import com.openmeap.event.Event;
 import com.openmeap.model.ModelEntity;
 import com.openmeap.model.ModelServiceEventNotifier;
 import com.openmeap.model.ModelServiceOperation;

@@ -26,6 +26,7 @@ package com.openmeap.admin.web.backing;
 
 import java.util.*;
 
+import com.openmeap.event.ProcessingEvent;
 import com.openmeap.web.html.*;
 import com.openmeap.web.*;
 

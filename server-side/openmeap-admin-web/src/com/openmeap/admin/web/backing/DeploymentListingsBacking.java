@@ -40,9 +40,10 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.openmeap.admin.web.ProcessingTargets;
-import com.openmeap.admin.web.backing.event.MessagesEvent;
 import com.openmeap.constants.FormConstants;
+import com.openmeap.event.MessagesEvent;
+import com.openmeap.event.ProcessingEvent;
+import com.openmeap.event.ProcessingTargets;
 import com.openmeap.model.InvalidPropertiesException;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.ModelServiceImpl;
@@ -56,7 +57,6 @@ import com.openmeap.model.event.ModelEntityEvent;
 import com.openmeap.model.event.notifier.ArchiveFileUploadNotifier;
 import com.openmeap.web.AbstractTemplatedSectionBacking;
 import com.openmeap.web.ProcessingContext;
-import com.openmeap.web.ProcessingEvent;
 
 public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 	
@@ -101,7 +101,7 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 				
 				try {
 					maintainDeploymentHistoryLength(app);
-					app = modelManager.addModify(app);
+					app = modelManager.addModify(app,events);
 					events.add( new MessagesEvent("Deployment successfully create!") );
 				} catch (PersistenceException pe) {
 					Throwable root = ExceptionUtils.getRootCause(pe);
@@ -153,7 +153,7 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 			archive.setHash(depl.getHash());
 			archive.setHashAlgorithm(depl.getHashAlgorithm());
 			archive.setNewFileUploaded(true);
-			archiveFileUploadNotifier.notify( new ModelEntityEvent(ModelServiceOperation.SAVE_OR_UPDATE,archive) );
+			archiveFileUploadNotifier.notify(new ModelEntityEvent(ModelServiceOperation.SAVE_OR_UPDATE,archive), events);
 		} catch (Exception e) {
 			logger.error("An exception occurred pushing the new archive to cluster nodes: {}",e);
 			events.add(new MessagesEvent(String.format("An exception occurred pushing the new archive to cluster nodes: %s",e.getMessage())));
@@ -176,7 +176,7 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 			List<Deployment> oldDeployments = new ArrayList<Deployment>(deployments.subList(0,currentSize-lengthToMaintain));
 			
 			for( Deployment deployment : oldDeployments ) {
-				modelManager.delete(deployment);
+				modelManager.delete(deployment,null);
 			}
 			
 			for( Deployment deployment : newDeployments ) {

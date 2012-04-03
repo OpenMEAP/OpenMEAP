@@ -29,8 +29,8 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.openmeap.admin.web.ProcessingTargets;
 import com.openmeap.constants.FormConstants;
+import com.openmeap.event.ProcessingTargets;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.ModelTestUtils;
 import com.openmeap.util.ParameterMapUtils;

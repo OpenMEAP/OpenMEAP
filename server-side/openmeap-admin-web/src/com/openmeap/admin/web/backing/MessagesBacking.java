@@ -26,10 +26,10 @@ package com.openmeap.admin.web.backing;
 
 import java.util.*;
 
-import com.openmeap.admin.web.ProcessingTargets;
+import com.openmeap.event.ProcessingEvent;
+import com.openmeap.event.ProcessingTargets;
 import com.openmeap.web.AbstractTemplatedSectionBacking;
 import com.openmeap.web.ProcessingContext;
-import com.openmeap.web.ProcessingEvent;
 
 public class MessagesBacking extends AbstractTemplatedSectionBacking {
 

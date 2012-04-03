@@ -110,7 +110,7 @@ public class ApplicationManagementPortTypeImplTest {
 		Iterator<Deployment> i = new ArrayList<Deployment>(app.getDeployments()).iterator();
 		while(i.hasNext()) {
 			Deployment d = i.next();
-			modelManager.delete(d);
+			modelManager.delete(d,null);
 		}
 		
 		try {
@@ -196,7 +196,7 @@ public class ApplicationManagementPortTypeImplTest {
 		Iterator<Deployment> i = new ArrayList<Deployment>(app.getDeployments()).iterator();
 		while(i.hasNext()) {
 			Deployment d = i.next();
-			modelManager.delete(d);
+			modelManager.delete(d,null);
 		}
 		app = modelManager.getModelService().findByPrimaryKey(Application.class,1L);
 		Assert.assertTrue(app.getDeployments().size()==0);
@@ -208,32 +208,6 @@ public class ApplicationManagementPortTypeImplTest {
 			thrown = true;
 		}
 		Assert.assertTrue("If no deployments have been made, it should be ok, providing the initial version is reported by SLIC.",!thrown);
-		app=modelManager.addModify(app);
-	}
-	
-	/**
-	 * Verify an exception occurs,
-	 * if no deployments have been made
-	 * and a version is reported
-	 */ 
-	@Test public void testConnectionOpen_verifyExceptionOnUndeployedVersion() throws Exception {
-		com.openmeap.model.dto.Application app = modelManager.getModelService().findByPrimaryKey(Application.class,1L);
-		Iterator<Deployment> i = new ArrayList<Deployment>(app.getDeployments()).iterator();
-		while(i.hasNext()) {
-			Deployment d = i.next();
-			modelManager.delete(d);
-		}
-		app = modelManager.getModelService().findByPrimaryKey(Application.class,1L);
-		Assert.assertTrue(app.getDeployments().size()==0);
-		Assert.assertTrue(app.getVersions().size()==2);
-		request.getApplication().setVersionId("ApplicationVersion.identifier.1");
-		thrown = false;
-		try {
-			response = appMgmtSvc.connectionOpen(request);
-		} catch( WebServiceException wse ) {
-			thrown = true;
-		}
-		Assert.assertTrue("SLIC reporting an undeployed version should throw an exception",thrown);
-		app=modelManager.addModify(app);
+		app=modelManager.addModify(app,null);
 	}
 }

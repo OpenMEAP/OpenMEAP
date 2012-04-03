@@ -188,7 +188,7 @@ public class AdminTest {
 		EntityUtils.consume(helper.postAddModifyApp(dbApp).getEntity());
 		
 		// validate changes
-		modelManager.getModelService().refresh(dbApp);
+		modelManager.refresh(dbApp);
 		Assert.assertTrue(dbApp.getDescription().equals(newDesc));
 		Assert.assertTrue(dbApp.getDeploymentHistoryLength().equals(newLen));
 		

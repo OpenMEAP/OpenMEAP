@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Collection;
 
 import com.openmeap.Authorizer;
+import com.openmeap.event.ProcessingEvent;
 
 abstract public class AbstractTemplatedSectionBacking implements TemplatedSectionBacking {
 

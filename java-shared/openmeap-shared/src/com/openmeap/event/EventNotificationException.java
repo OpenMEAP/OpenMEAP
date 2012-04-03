@@ -22,14 +22,23 @@
  ###############################################################################
  */
 
-package com.openmeap.admin.web.backing.event;
+package com.openmeap.event;
 
-import com.openmeap.admin.web.ProcessingTargets;
-import com.openmeap.web.GenericProcessingEvent;
-import com.openmeap.web.html.Anchor;
+public class EventNotificationException extends Exception {
 
-public class AddMainNavAnchorEvent extends GenericProcessingEvent<Anchor> {
-	public AddMainNavAnchorEvent(Anchor payload) {
-		super(ProcessingTargets.NAV_MAIN,payload);
+	public EventNotificationException(String arg0, Throwable arg1) {
+		super(arg0, arg1);
 	}
+
+	public EventNotificationException(String arg0) {
+		super(arg0);
+	}
+
+	public EventNotificationException(Throwable arg0) {
+		super(arg0);
+	}
+
+	public EventNotificationException() {
+	}
+
 }
