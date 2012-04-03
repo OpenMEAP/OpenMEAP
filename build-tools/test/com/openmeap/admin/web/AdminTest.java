@@ -188,7 +188,7 @@ public class AdminTest {
 		EntityUtils.consume(helper.postAddModifyApp(dbApp).getEntity());
 		
 		// validate changes
-		modelManager.refresh(dbApp);
+		modelManager.refresh(dbApp,null);
 		Assert.assertTrue(dbApp.getDescription().equals(newDesc));
 		Assert.assertTrue(dbApp.getDeploymentHistoryLength().equals(newLen));
 		
@@ -221,6 +221,14 @@ public class AdminTest {
 		Assert.assertTrue("as this deployment is created, the archive for version01 should be removed from the deployed location",
 				!_isVersionArchiveInDeployedLocation(VERSION_01_HASH));
 		
+		_createDeployment(VERSION_01,Deployment.Type.IMMEDIATE);
+		Assert.assertTrue("as this deployment is created, the archive for version01 should be in the deployed location",
+				_isVersionArchiveInDeployedLocation(VERSION_01_HASH));
+		
+		Application app = modelManager.getModelService().findApplicationByName(APP_NAME);
+		Assert.assertTrue(app.getDeployments().size()==2);
+		Assert.assertTrue(app.getDeployments().get(0).getApplicationVersion().getIdentifier().equals(VERSION_02));
+		Assert.assertTrue(app.getDeployments().get(1).getApplicationVersion().getIdentifier().equals(VERSION_01));
 	}
 	
 	@Test public void testDeleteApplication() throws Exception {

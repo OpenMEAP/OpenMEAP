@@ -24,6 +24,7 @@
 
 package com.openmeap.model;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import com.openmeap.cluster.ClusterNotificationException;
@@ -87,41 +88,6 @@ public class ModelServiceImpl implements ModelService
 	@Override
 	public <T extends ModelEntity> void delete(T obj2Delete) throws PersistenceException {		
 		_delete(obj2Delete,null);		
-	}
-
-	@Override
-	public void delete(Application app) throws PersistenceException {
-				
-		// flip all the versions to inactive, so they don't prevent archive deletion
-		for( ApplicationVersion appVer : app.getVersions().values() ) {
-			appVer.setActiveFlag(false);
-			saveOrUpdate(appVer);
-		}
-		
-		// call the event notifiers on each deployment that will be deleted
-		Iterator iterator = app.getDeployments().iterator();
-		List<Deployment> depls = new ArrayList<Deployment>();
-		while(iterator.hasNext()) {
-			Deployment depl = (Deployment)iterator.next();
-			depls.add(depl);
-		}
-		iterator = depls.iterator();
-		while(iterator.hasNext()) {
-			Deployment depl = (Deployment)iterator.next();
-			app.removeDeployment(depl);
-			delete(depl);
-		}
-		
-		List<ApplicationVersion> appVers = new ArrayList<ApplicationVersion>();
-		for( ApplicationVersion appVer : app.getVersions().values() ) {
-			appVers.add(appVer);
-		}
-		for( ApplicationVersion appVer : appVers ) {
-			app.removeVersion(appVer);
-			delete(appVer);
-		}
-		
-		_delete(app,null);
 	}
 	
 	@Override
@@ -226,6 +192,21 @@ public class ModelServiceImpl implements ModelService
 		} catch( NoResultException nre ) {
 			return null;
 		}
+	}
+	
+	public <E extends ModelEntity, T extends ModelEntity> List<T> getOrderedDeployments(E entity, String listMethod, Comparator<T> comparator) {
+		EntityManager entityManager = getEntityManager(); 
+		entityManager.getTransaction().begin();
+		entityManager.merge(entity);
+		List<T> depls;
+		try {
+			depls = (List<T>) entity.getClass().getMethod(listMethod).invoke(entity);
+		} catch (Exception e) {
+			throw new PersistenceException(e);
+		}
+		Collections.sort( depls, comparator );
+		entityManager.getTransaction().commit();
+		return depls;
 	}
 	
 	// ACCESSORS

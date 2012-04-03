@@ -99,7 +99,7 @@ public class ModelManagerImplTest {
 		nodes.get("http://test").setFileSystemStoragePathPrefix("/tmp2");
 		settings = modelManager.addModify(settings,null);
 		
-		modelManager.refresh(settings);
+		modelManager.refresh(settings,null);
 		settings = modelManager.getGlobalSettings();
 		Assert.assertTrue(settings.getClusterNodes().size()==3);
 		Assert.assertTrue(settings.getClusterNodes().get("http://test")!=null);

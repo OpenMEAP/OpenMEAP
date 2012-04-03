@@ -25,6 +25,7 @@
 package com.openmeap.model;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.persistence.PersistenceException;
@@ -52,18 +53,6 @@ public interface ModelService {
 	public <T extends ModelEntity> void refresh(T obj2Refresh) throws PersistenceException;
 	
 	public <T extends ModelEntity> void delete(T obj2Delete) throws PersistenceException;
-	
-	/*
-	 * DELETE METHODS
-	 */
-	
-	/**
-	 * Handles application deletion.
-	 * 
-	 * @param app
-	 * @throws PersistenceException
-	 */
-	public void delete(Application app) throws PersistenceException;
 	
 	/*
 	 * FIND METHODS
@@ -98,4 +87,6 @@ public interface ModelService {
 	public Deployment getLastDeployment(Application app);
 	
 	public void clearPersistenceContext();
+	
+	<E extends ModelEntity, T extends ModelEntity> List<T> getOrderedDeployments(E entity, String listMethod, Comparator<T> comparator);
 }

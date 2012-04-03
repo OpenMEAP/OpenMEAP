@@ -64,6 +64,7 @@ import com.openmeap.model.event.ModelEntityEvent;
 import com.openmeap.model.event.notifier.ArchiveFileUploadNotifier;
 import com.openmeap.protocol.dto.HashAlgorithm;
 import com.openmeap.util.ParameterMapUtils;
+import com.openmeap.util.ServletUtils;
 import com.openmeap.util.Utils;
 import com.openmeap.util.ZipUtils;
 import com.openmeap.web.AbstractTemplatedSectionBacking;
@@ -152,7 +153,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 				
 				if( ParameterMapUtils.firstValue("deleteConfirm", parameterMap).equals(FormConstants.APPVER_DELETE_CONFIRM_TEXT) ) {
 					
-					processApplicationVersionDeletion(version, events);
+					modelManager.delete(version, events);
 					
 				} else {
 					
@@ -184,42 +185,6 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		} else {
 			templateVariables.put(FormConstants.ENCODING_TYPE,"enctype=\""+FormConstants.ENCTYPE_MULTIPART_FORMDATA+"\"");
 		}
-	}
-	
-	private void processApplicationVersionDeletion(ApplicationVersion version, List<ProcessingEvent> events) {
-		ApplicationArchive archive2Delete = null;
-		if( version.getArchive()!=null ) {
-			archive2Delete = new ApplicationArchive();
-			archive2Delete.setHash(version.getArchive().getHash());
-			archive2Delete.setHashAlgorithm(version.getArchive().getHashAlgorithm());
-		}
-		
-		Boolean versionInUse = false;
-		for( Deployment depl : version.getApplication().getDeployments() ) {
-			if( depl.getApplicationVersion().getPk().equals(version.getPk()) ) {
-				versionInUse = true;
-			}
-		}
-		if( versionInUse ) {
-		
-			version.setActiveFlag(false);
-			try {
-				version = modelManager.addModify(version,events);
-				modelManager.refresh(version.getApplication());
-				events.add( new MessagesEvent("Application version successfully set to inactive.  It will be deleted when the last deployment made with it is removed.") );
-			} catch( InvalidPropertiesException ipe ) {
-				events.add( new MessagesEvent(ipe.getMessage()) );
-			} catch( PersistenceException pe ) {
-				events.add( new MessagesEvent(pe.getMessage()) );								
-			}
-		} else {
-			modelManager.delete(version,events);
-			if( archive2Delete!=null ) {
-				maintainFileSystemCleanliness(archive2Delete, events);
-			}
-			events.add( new MessagesEvent("Application version successfully deleted!") );
-		}
-		version=null;
 	}
 	
 	private Boolean canUserModifyOrCreate(Application app, ApplicationVersion version) {
@@ -305,7 +270,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 			try {
 				//app.addVersion(version);
 				version = modelManager.addModify(version,events);
-				modelManager.refresh(app);
+				modelManager.refresh(app,events);
 				events.add( new MessagesEvent("Application version successfully created/modified!") );
 			} catch( InvalidPropertiesException ipe ) {
 				events.add( new MessagesEvent(ipe.getMessage()) );
@@ -342,9 +307,23 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 				
 				if( size>0 ) {
 					
-					ApplicationArchive archive = processApplicationArchiveFileUpload(version.getArchive(),item,events);
-					version.setArchive(archive);
-					archiveUncreated = archive==null;
+					try {
+						
+						File tempFile = ServletUtils.tempFileFromFileItem(modelManager.getGlobalSettings().getTemporaryStoragePath(), item);
+						ApplicationArchive archive = new ApplicationArchive();
+						archive.setNewFileUploaded(true);
+						archive.setHash(tempFile.getAbsolutePath());
+						archive.setVersion(version);
+						version.setArchive(archive);
+						archiveUncreated = false;
+					} catch(Exception ioe) {
+						
+						logger.error("An error transpired creating an uploadArchive temp file: {}",ioe);
+						events.add( new MessagesEvent(ioe.getMessage()) );
+						return;
+					} finally {
+						item.delete();
+					}
 				} else {
 					
 					events.add( new MessagesEvent("Uploaded file not processed!  Is the archive storage path set in settings?") );
@@ -354,205 +333,20 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		
 		// else there was no zip archive uploaded
 		if( archiveUncreated ) {
-			version.getArchive().setUrl(firstValue("url",parameterMap));
+			ApplicationArchive archive = version.getArchive();
+			
+			archive.setUrl(firstValue("url",parameterMap));
 			
 			// TODO: this should be selectable
-			version.getArchive().setHashAlgorithm(firstValue("hashType",parameterMap));
-			version.getArchive().setHash(firstValue("hash",parameterMap));
-			if( notEmpty("bytesLength",parameterMap) )
-				version.getArchive().setBytesLength(Integer.valueOf(firstValue("bytesLength",parameterMap)));
-			if( notEmpty("bytesLengthUncompressed",parameterMap) )
-				version.getArchive().setBytesLengthUncompressed(Integer.valueOf(firstValue("bytesLengthUncompressed",parameterMap)));
-		}
-		
-		if( version.getArchive()==null ) {
-			events.add( new MessagesEvent("Zip archive failed to process!") );
-		}
-	}
-	
-	@SuppressWarnings("unchecked")
-	private ApplicationArchive processApplicationArchiveFileUpload(ApplicationArchive archive, FileItem item, List<ProcessingEvent> events) {
-		
-		GlobalSettings settings = modelManager.getGlobalSettings();
-		Long size = item.getSize();
-		
-		String pathError = settings.validateTemporaryStoragePath();
-		if( pathError!=null ) {
-			logger.error("There is an issue with the global settings temporary storage path: "+settings.validateTemporaryStoragePath()+"\n {}",pathError);
-			events.add( new MessagesEvent("There is an issue with the global settings temporary storage path: "+settings.validateTemporaryStoragePath()+" - "+pathError) );
-			return null;
-		}
-		
-		// create a temp file
-		File tempFile = null;
-		File destinationFile = null;
-		try {
-			tempFile = File.createTempFile("uploadArchive","",new File(settings.getTemporaryStoragePath()));
-			item.write(tempFile);
-		} catch(Exception ioe) {
-			logger.error("An error transpired creating an uploadArchive temp file: {}",ioe);
-			events.add( new MessagesEvent(ioe.getMessage()) );
-			return null;
-		} 
-		item.delete();
-		
-		// determine the md5 hash of the uploaded file
-		// and rename the temp file by the hash
-		FileInputStream is = null;
-		
-		try {	
-			String hashValue = null;
-			try {
-				is = new FileInputStream(tempFile);
-				hashValue = Utils.hashInputStream("MD5", is);
-			} finally {
-				is.close();
+			archive.setHashAlgorithm(firstValue("hashType",parameterMap));
+			archive.setHash(firstValue("hash",parameterMap));
+			if( notEmpty("bytesLength",parameterMap) ) {
+				archive.setBytesLength(Integer.valueOf(firstValue("bytesLength",parameterMap)));
 			}
-			
-			// if the archive is pre-existing and not the same,
-			// then determine if the web-view and zip should be deleted
-			// that is, they are not used by any other versions
-			if( archive.getId()!=null && !archive.getHash().equals(hashValue) ) {
-
-				maintainFileSystemCleanliness(archive,events);
-			}
-			
-			archive.setHashAlgorithm("MD5");
-			archive.setHash(hashValue);
-			
-			destinationFile = archive.getFile(settings.getTemporaryStoragePath());
-			
-			// if the upload destination exists, then try to delete and overwrite
-			// even though they are theoretically the same.
-			if( destinationFile.exists() && !destinationFile.delete() ) {
-				String mesg = String.format("Failed to delete old file (theoretically the same anyways, so proceeding) %s",destinationFile.getName());
-				logger.error(mesg);
-				events.add(new MessagesEvent(mesg));
-				if( ! tempFile.delete() ) {
-					mesg = String.format("Failed to delete temporary file %s",tempFile.getName());
-					logger.error(mesg);
-					events.add(new MessagesEvent(mesg));	
-				}
-			}
-			
-			// if it didn't exist or it was successfully deleted,
-			// then rename the upload to our destination and unzip it
-			// into the web-view directory
-			else if( tempFile.renameTo(destinationFile) ) {
-				
-				String mesg = String.format("Uploaded temporary file %s successfully renamed to %s",tempFile.getName(),destinationFile.getName());
-				logger.debug(mesg);
-				events.add(new MessagesEvent(mesg));
-				unzipFile(archive,destinationFile,events);
-			} else {
-				String mesg = String.format("Failed to renamed file %s to %s",tempFile.getName(),destinationFile.getName());
-				logger.error(mesg);
-				events.add(new MessagesEvent(mesg));
-				return null;
-			}
-		} catch(IOException ioe) {
-			events.add(new MessagesEvent(ioe.getMessage()));
-			return null;
-		} catch(NoSuchAlgorithmException nsae) {
-			events.add(new MessagesEvent(nsae.getMessage()));
-			return null;
-		} 
-
-		// determine the compressed and uncompressed size of the zip archive
-		try {
-			archive.setBytesLength(size.intValue());
-			ZipFile zipFile = null;
-			try {
-				zipFile = new ZipFile(destinationFile);
-				Integer uncompressedSize = ZipUtils.getUncompressedSize(zipFile).intValue();
-				archive.setBytesLengthUncompressed(new Long(uncompressedSize).intValue());
-			} finally {
-				if(zipFile!=null) {
-					zipFile.close();
-				}
-			}
-		} catch( IOException ioe ) {
-			logger.error("An exception occurred while calculating the uncompressed size of the archive: {}",ioe);
-			events.add(new MessagesEvent(String.format("An exception occurred while calculating the uncompressed size of the archive: %s",ioe.getMessage())));
-			return null;
-		}
-		
-		archive.setUrl(ApplicationArchive.URL_TEMPLATE);
-		archive.setNewFileUploaded(true);
-		
-		return archive;
-	}
-	
-	private void maintainFileSystemCleanliness(ApplicationArchive archive, List<ProcessingEvent> events) {
-		
-		GlobalSettings settings = modelManager.getGlobalSettings();
-		
-		// check to see if any other archives have this hash and md5
-		List<ApplicationArchive> archives = modelManager
-				.getModelService()
-				.findApplicationArchivesByHashAndAlgorithm(archive.getHash(), archive.getHashAlgorithm());
-		
-		// either more than one archive has this file
-		Boolean archiveIsInUseElsewhere = 
-				archives!=null 
-				&& (
-						archives.size()>1
-						|| (
-								archives.size()==1 
-								&& !archives.get(0).getPk().equals(archive.getPk())
-						)
-				);
-		
-		if( !archiveIsInUseElsewhere ) {
-			
-			// delete the web-view
-			try {
-				File oldExplodedPath = archive.getExplodedPath(settings.getTemporaryStoragePath());
-				if( oldExplodedPath!=null && oldExplodedPath.exists() ) {
-					FileUtils.deleteDirectory(oldExplodedPath);
-				}
-			} catch( IOException ioe ) {
-				logger.error("There was an exception deleting the old web-view directory: {}",ioe);
-				events.add(new MessagesEvent(String.format("Upload process will continue.  There was an exception deleting the old web-view directory: %s",ioe.getMessage())));
-			}
-			
-			// delete the zip file
-			File originalFile = archive.getFile(settings.getTemporaryStoragePath());
-			if( originalFile.exists() && !originalFile.delete() ) {
-				String mesg = String.format("Failed to delete old file %s, was different so proceeding anyhow.",originalFile.getName());
-				logger.error(mesg);
-				events.add(new MessagesEvent(mesg));
+			if( notEmpty("bytesLengthUncompressed",parameterMap) ) {
+				archive.setBytesLengthUncompressed(Integer.valueOf(firstValue("bytesLengthUncompressed",parameterMap)));
 			}
 		}
-	}
-	
-	/**
-	 * 
-	 * @param archive
-	 * @param zipFile
-	 * @param events
-	 * @return TRUE if the file successfully is exploded, FALSE otherwise.
-	 */
-	private Boolean unzipFile(ApplicationArchive archive, File zipFile, List<ProcessingEvent> events) {
-		try {
-			GlobalSettings settings = modelManager.getGlobalSettings();
-			File dest = archive.getExplodedPath(settings.getTemporaryStoragePath());
-			if( dest.exists() ) {
-				FileUtils.deleteDirectory(dest);
-			}
-			ZipFile file = null;
-			try {
-				file = new ZipFile(zipFile);
-				ZipUtils.unzipFile(file, dest);
-			} finally {
-				file.close();
-			}
-			return Boolean.TRUE;
-		} catch( Exception e ) {
-			logger.error("An exception occurred unzipping the archive to the viewing location: {}",e);
-			events.add(new MessagesEvent(String.format("An exception occurred unzipping the archive to the viewing location: %s",e.getMessage())));
-		}
-		return Boolean.FALSE;
 	}
 	
 	// ACCESSORS

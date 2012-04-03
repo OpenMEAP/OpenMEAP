@@ -61,7 +61,7 @@ public class ArchiveFileUploadHandler implements EventHandler<Map> {
 		File file = arch.getFile(getFileSystemStoragePathPrefix());
 		
 		if( file.exists() ) {
-			logger.warn("ApplicationArchive with %s already exists, ignoring ArchiveUploadEvent.",hashId);
+			logger.warn("ApplicationArchive with {} hash already exists, ignoring ArchiveUploadEvent.",hashId);
 			return;
 		}
 		

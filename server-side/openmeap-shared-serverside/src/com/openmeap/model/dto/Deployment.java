@@ -25,6 +25,7 @@
 package com.openmeap.model.dto;
 
 import java.lang.reflect.Method;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Date;
 
@@ -73,6 +74,12 @@ public class Deployment extends AbstractModelEntity {
 		 * This deployment type is intended for emergency situations.
 		 */
 		IMMEDIATE
+	}
+	
+	static public class DateComparator implements Comparator<Deployment> {
+		public int compare(Deployment arg0, Deployment arg1) {
+			return arg0.getCreateDate().compareTo(arg1.getCreateDate()) > 0 ? -1 : 1;
+		}
 	}
 	
 	private Long id;

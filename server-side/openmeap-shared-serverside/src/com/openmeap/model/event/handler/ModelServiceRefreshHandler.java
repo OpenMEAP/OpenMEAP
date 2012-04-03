@@ -70,7 +70,7 @@ public class ModelServiceRefreshHandler implements ModelServiceEventHandler {
 		Class<ModelEntity> clazz = (Class<ModelEntity>)Class.forName("com.openmeap.model.dto."+refreshType);
 		ModelEntity app = (ModelEntity)modelManager.getModelService().findByPrimaryKey(clazz, id);
 		
-		modelManager.refresh(app);
+		modelManager.refresh(app,null);
 		return true;	
 	}
 

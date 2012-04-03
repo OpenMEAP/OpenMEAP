@@ -24,7 +24,13 @@
 
 package com.openmeap.util;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +43,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.openmeap.constants.FormConstants;
+import com.openmeap.event.MessagesEvent;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.GlobalSettings;
 
@@ -122,5 +129,18 @@ public abstract class ServletUtils {
 		}
 		
 		return map;
+	}
+	
+	static final public File tempFileFromFileItem(String temporaryStoragePath, FileItem item) throws IOException {
+		File destinationFile = File.createTempFile("uploadArchive","",new File(temporaryStoragePath));
+		InputStream is = item.getInputStream();
+		OutputStream os = new FileOutputStream(destinationFile);
+		try {
+			Utils.pipeInputStreamIntoOutputStream(is, os);
+		} finally {
+			is.close();
+			os.close();
+		}
+		return destinationFile;
 	}
 }

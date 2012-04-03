@@ -83,7 +83,7 @@ public class ServletManagementServletTest {
 		app.setName(randomUuid);
 		Assert.assertTrue(modelManager.getModelService().findByPrimaryKey(Application.class,1L).getName().equals(randomUuid));
 		
-		modelManager.refresh(app);
+		modelManager.refresh(app,null);
 		app = modelManager.getModelService().findByPrimaryKey(Application.class,1L);
 		Assert.assertTrue(!modelManager.getModelService().findByPrimaryKey(Application.class,1L).getName().equals(randomUuid));
 		

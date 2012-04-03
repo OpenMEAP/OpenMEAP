@@ -97,11 +97,9 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 			if( version!=null ) {
 				Deployment depl = createDeployment(version,deploymentType);
 				pushArchiveToClusterForDeployment(depl,events);
-				app.addDeployment(depl);
 				
 				try {
-					maintainDeploymentHistoryLength(app);
-					app = modelManager.addModify(app,events);
+					depl = modelManager.addModify(depl,events);
 					events.add( new MessagesEvent("Deployment successfully create!") );
 				} catch (PersistenceException pe) {
 					Throwable root = ExceptionUtils.getRootCause(pe);
@@ -115,24 +113,10 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 		
 		// making sure to order the deployments by date
 		if( app!=null && app.getDeployments()!=null ) {
-			templateVariables.put("deployments", getOrderedDeployments(app));
+			templateVariables.put("deployments", modelManager.getModelService().getOrderedDeployments(app, "getDeployments", new Deployment.DateComparator()));
 		}
 		
 		return events;
-	}
-	
-	private List<Deployment> getOrderedDeployments(Application app) {
-		EntityManager entityManager = ((ModelServiceImpl)modelManager.getModelService()).getEntityManager(); 
-		entityManager.getTransaction().begin();
-		entityManager.merge(app);
-		List<Deployment> depls = app.getDeployments();
-		Collections.sort( depls, new Comparator<Deployment>() {
-			public int compare(Deployment arg0, Deployment arg1) {
-				return arg0.getCreateDate().compareTo(arg1.getCreateDate()) > 0 ? -1 : 1;
-			}
-		});
-		entityManager.getTransaction().commit();
-		return depls;
 	}
 	
 	private Deployment createDeployment(ApplicationVersion version, String deploymentType) {
@@ -144,6 +128,7 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 		depl.setHashAlgorithm(version.getArchive().getHashAlgorithm());
 		depl.setDownloadUrl(version.getArchive().getDirectDownloadUrl(settings));
 		depl.setCreateDate(new java.util.Date());
+		version.getApplication().addDeployment(depl);
 		return depl;
 	}
 	
@@ -152,36 +137,10 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 			ApplicationArchive archive = new ApplicationArchive();
 			archive.setHash(depl.getHash());
 			archive.setHashAlgorithm(depl.getHashAlgorithm());
-			archive.setNewFileUploaded(true);
 			archiveFileUploadNotifier.notify(new ModelEntityEvent(ModelServiceOperation.SAVE_OR_UPDATE,archive), events);
 		} catch (Exception e) {
 			logger.error("An exception occurred pushing the new archive to cluster nodes: {}",e);
 			events.add(new MessagesEvent(String.format("An exception occurred pushing the new archive to cluster nodes: %s",e.getMessage())));
-		}
-	}
-	
-	/**
-	 * Trim the deployment history table.  Deleting old archives as we go.
-	 * @param app
-	 */
-	private void maintainDeploymentHistoryLength(Application app) {
-		
-		Integer lengthToMaintain = app.getDeploymentHistoryLength();
-		List<Deployment> deployments = app.getDeployments();
-		if( deployments!=null && deployments.size()>lengthToMaintain ) {
-			
-			Integer currentSize = deployments.size();
-			
-			List<Deployment> newDeployments = new ArrayList<Deployment>(deployments.subList(currentSize-lengthToMaintain,currentSize));
-			List<Deployment> oldDeployments = new ArrayList<Deployment>(deployments.subList(0,currentSize-lengthToMaintain));
-			
-			for( Deployment deployment : oldDeployments ) {
-				modelManager.delete(deployment,null);
-			}
-			
-			for( Deployment deployment : newDeployments ) {
-				app.getDeployments().add(deployment);
-			}
 		}
 	}
 	

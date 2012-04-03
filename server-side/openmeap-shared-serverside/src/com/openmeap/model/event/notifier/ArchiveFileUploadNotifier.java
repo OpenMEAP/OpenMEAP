@@ -24,12 +24,17 @@
 
 package com.openmeap.model.event.notifier;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.openmeap.cluster.ClusterNotificationException;
 import com.openmeap.constants.UrlParamConstants;
 import com.openmeap.event.Event;
+import com.openmeap.event.MessagesEvent;
 import com.openmeap.event.ProcessingEvent;
 import com.openmeap.model.ModelEntity;
 import com.openmeap.model.ModelServiceOperation;
@@ -37,6 +42,8 @@ import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.event.ModelEntityEventAction;
 
 public class ArchiveFileUploadNotifier extends AbstractArchiveEventNotifier {	
+	
+	private Logger logger = LoggerFactory.getLogger(ArchiveFileUploadNotifier.class);
 	
 	@Override
 	protected String getEventActionName() {
@@ -61,8 +68,13 @@ public class ArchiveFileUploadNotifier extends AbstractArchiveEventNotifier {
 	@Override
 	public <E extends Event<ApplicationArchive>> void notify(final E event, List<ProcessingEvent> events) throws ClusterNotificationException {
 		ApplicationArchive archive = (ApplicationArchive)event.getPayload();
-		if( archive.getNewFileUploaded() ) {
-			super.notify(event, events);
+		File archiveFile = archive.getFile(getModelManager().getGlobalSettings().getTemporaryStoragePath());
+		if( !archiveFile.exists() ) {
+			String msg = String.format("The archive file %s cannot be found.  This could be because you opted to fill in the version details yourself.",archiveFile.getAbsoluteFile());
+			logger.warn(msg);
+			events.add(new MessagesEvent(msg));
+			return;
 		}
+		super.notify(event, events);
 	}
 }

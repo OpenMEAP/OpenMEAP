@@ -77,7 +77,6 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 		Deployment deployment2Delete = (Deployment)event.getPayload();
 		ApplicationVersion version = deployment2Delete.getApplicationVersion();
 		Application app = version.getApplication();
-		//archiveDeleteHandler.getModelManager().getModelService().refresh(app);
 		
 		// if there are any other deployments with this hash,
 		//   then we cannot yet delete it's archive.
@@ -130,9 +129,8 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 		// if all other deployments using the version of this deployment have been deleted,
 		// and this version is inactive...then delete this version.
 		if( versionCount==1 ) {
-			app.removeVersion(version);
 			archiveDeleteHandler.getModelManager().delete(version,events);
-		}		
+		}
 	}
 
 	public ArchiveFileDeleteNotifier getArchiveDeleteNotifier() {

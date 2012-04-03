@@ -64,9 +64,7 @@ public interface ModelManager {
 	void setModelService(ModelService service);
 	ModelService getModelService();
 	
-	public <T extends ModelEntity> void refresh(T obj2Refresh) throws PersistenceException;
-	
-	void delete(Application app, List<ProcessingEvent> events);
+	public <T extends ModelEntity> void refresh(T obj2Refresh, List<ProcessingEvent> events) throws PersistenceException;
 	
 	<T extends ModelEntity> void delete(T o, List<ProcessingEvent> events);
 	
@@ -79,8 +77,6 @@ public interface ModelManager {
 	 * @throws PersistenceException 
 	 */
 	<T extends ModelEntity> T addModify(T application, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException;
-	
-	GlobalSettings addModify(GlobalSettings settings, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException;
 	
 	GlobalSettings getGlobalSettings();
 	
