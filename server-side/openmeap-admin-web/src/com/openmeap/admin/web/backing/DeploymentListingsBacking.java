@@ -40,6 +40,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.openmeap.admin.web.events.AddSubNavAnchorEvent;
 import com.openmeap.constants.FormConstants;
 import com.openmeap.event.MessagesEvent;
 import com.openmeap.event.ProcessingEvent;
@@ -57,6 +58,7 @@ import com.openmeap.model.event.ModelEntityEvent;
 import com.openmeap.model.event.notifier.ArchiveFileUploadNotifier;
 import com.openmeap.web.AbstractTemplatedSectionBacking;
 import com.openmeap.web.ProcessingContext;
+import com.openmeap.web.html.Anchor;
 
 public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 	
@@ -83,6 +85,9 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 		} catch(NumberFormatException nfe) {
 			events.add( new MessagesEvent("A valid applicationId must be supplied to either view or create deployments.") );
 		}
+		
+		events.add( new AddSubNavAnchorEvent(new Anchor("?bean=addModifyAppPage&applicationId="+app.getId(),"View/Modify Application","View/Modify Application")) );
+		events.add( new AddSubNavAnchorEvent(new Anchor("?bean=appVersionListingsPage&applicationId="+app.getId(),"Version Listings","Version Listings")) );
 		
 		// TODO: I'm pretty sure I should create new deployments elsewhere and forward to here from there.
 		if( deploymentType!=null && PROCESS_TARGET.compareTo(processTarget)==0 && app!=null ) {

@@ -121,8 +121,10 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		if( app==null ) {
 			return ProcessingUtils.newList(new GenericProcessingEvent<String>(ProcessingTargets.MESSAGES,"The application with id "+appId+" could not be found."));
 		}
+		
 		events.add( new AddSubNavAnchorEvent(new Anchor("?bean=addModifyAppPage&applicationId="+app.getId(),"View/Modify Application","View/Modify Application")) );
 		events.add( new AddSubNavAnchorEvent(new Anchor("?bean=appVersionListingsPage&applicationId="+app.getId(),"Version Listings","Version Listings")) );
+		events.add( new AddSubNavAnchorEvent(new Anchor("?bean=deploymentListingsPage&applicationId="+app.getId(),"Deployment History","Deployment History")) );
 		
 		// at this point, we're committed to form setup at least
 		templateVariables.put(FormConstants.PROCESS_TARGET,PROCESS_TARGET);

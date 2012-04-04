@@ -250,6 +250,7 @@
 						<entry key="mainMenu"><ref bean="headerSection"/></entry>
 						<entry key="mainOptionsRow"><ref bean="mainOptionsRowSection"/></entry>
 						<entry key="messages"><ref bean="messagesSection"/></entry>
+						<entry key="subMenu"><ref bean="subnavigationSection"/></entry>
 						<entry key="body"><ref bean="deploymentListingsSection"/></entry>
 						<entry key="footer"><ref bean="footerSection"/></entry>
 					</map>

@@ -148,24 +148,17 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 		if( app == null && ParameterMapUtils.notEmpty(FormConstants.APP_ID,parameterMap) ) {
 			events.add( new MessagesEvent("Application with id "+ParameterMapUtils.firstValue(FormConstants.APP_ID, parameterMap)+" not found") );
 		} else if( app!=null && app.getId()!=null ) { 
-			if( app.getVersions()!=null && app.getVersions().size()>0 )
-				events.add( 
-						new AddSubNavAnchorEvent(
-								new Anchor("?bean=appVersionListingsPage&applicationId="+app.getId(),
-										"View Application Versions",
-										"View Application Versions")) );
 			
 			// in order to create the 
 			ApplicationVersion testVer = new ApplicationVersion();
 			testVer.setApplication(app);
 			Boolean mayCreateVersions = modelManager.getAuthorizer().may(Authorizer.Action.CREATE, testVer);
+			
 			if( mayCreateVersions ) {
-				events.add( 
-						new AddSubNavAnchorEvent( 
-								new Anchor("?bean=addModifyAppVersionPage&applicationId="+app.getId(),
-										"Add an Application Version",
-										"Create Application Version")) );
+				events.add( new AddSubNavAnchorEvent( new Anchor("?bean=addModifyAppVersionPage&applicationId="+app.getId(),"Create new version","Create new version")) );
 			}
+			events.add( new AddSubNavAnchorEvent(new Anchor("?bean=appVersionListingsPage&applicationId="+app.getId(),"Version Listings","Version Listings")) );
+			events.add( new AddSubNavAnchorEvent(new Anchor("?bean=deploymentListingsPage&applicationId="+app.getId(),"Deployment History","Deployment History")) );
 		}
 		
 		fillInVariablesFromApplication(templateVariables,app);

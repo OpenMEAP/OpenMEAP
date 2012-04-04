@@ -94,13 +94,13 @@ public class ApplicationVersionListingsBacking extends AbstractTemplatedSectionB
 				} else {
 					events.add( new MessagesEvent( "Application with id "+ParameterMapUtils.firstValue(FormConstants.APP_ID, parameterMap)+" has no versions associated to it") );
 				}
-				if( modelManager.getAuthorizer().may(Authorizer.Action.CREATE, new Application()) ) {
-					events.add( new AddSubNavAnchorEvent( new Anchor("?bean=addModifyAppVersionPage&applicationId="+app.getId(),"Add an Application Version","Create Application Version")) );
-				}
 				
-				Anchor deploymentHistoryAnchor = new Anchor("?bean=deploymentListingsPage&applicationId="+app.getId(),"Deployment History","Deployment History");
-				templateVariables.put("deploymentsAnchor",deploymentHistoryAnchor);
-				events.add( new AddSubNavAnchorEvent(deploymentHistoryAnchor));
+				
+				if( modelManager.getAuthorizer().may(Authorizer.Action.CREATE, new ApplicationVersion()) ) {
+					events.add( new AddSubNavAnchorEvent( new Anchor("?bean=addModifyAppVersionPage&applicationId="+app.getId(),"Create new version","Create new version")) );
+				}
+				events.add( new AddSubNavAnchorEvent(new Anchor("?bean=addModifyAppPage&applicationId="+app.getId(),"View/Modify Application","View/Modify Application")) );
+				events.add( new AddSubNavAnchorEvent(new Anchor("?bean=deploymentListingsPage&applicationId="+app.getId(),"Deployment History","Deployment History")) );
 				
 			} else {
 				events.add( new MessagesEvent( "Application with id "+ParameterMapUtils.firstValue(FormConstants.APP_ID, parameterMap)+" not found") );
