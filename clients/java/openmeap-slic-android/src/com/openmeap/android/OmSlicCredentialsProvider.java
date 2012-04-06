@@ -11,12 +11,12 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 
 import com.openmeap.thinclient.LoginFormCallback;
 import com.openmeap.thinclient.LoginFormLauncher;
-import com.openmeap.util.HttpRequestExecuterFactory;
+import com.openmeap.util.CredentialsProviderFactory;
 
 @SuppressWarnings("rawtypes")
 public class OmSlicCredentialsProvider extends BasicCredentialsProvider implements LoginFormCallback {
 
-	static public class Factory implements HttpRequestExecuterFactory.CredentialsProviderFactory {
+	static public class Factory extends CredentialsProviderFactory {
 
 		private LoginFormLauncher launcher;
 		public Factory(LoginFormLauncher launcher) {

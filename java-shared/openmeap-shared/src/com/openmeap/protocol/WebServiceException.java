@@ -24,7 +24,10 @@
 
 package com.openmeap.protocol;
 
+import java.lang.reflect.Field;
+
 import com.openmeap.protocol.dto.ErrorCode;
+import com.openmeap.protocol.dto.HashAlgorithm;
 
 /**
  * Provides a bridge to the xml generated type errorcode enum
@@ -54,6 +57,24 @@ public class WebServiceException extends Exception {
 		public int hashCode() {
 			return this.name.hashCode();
 		}
+		public String value() {
+			return name;
+		}
+		public static TypeEnum fromValue(String v) {
+	    	Field[] fields = TypeEnum.class.getDeclaredFields();
+	    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
+	    		Field field = fields[fieldIdx];
+	    		try {
+		    		if( ((TypeEnum)field.get(null)).value().equals(v) ) {
+		    			return (TypeEnum)field.get(null);
+						
+		    		}
+	    		} catch(Exception e) {
+	    			throw new IllegalArgumentException(v);
+	    		}
+	    	}
+	    	throw new IllegalArgumentException(v);
+	    }
 		public ErrorCode asErrorCode() {
 			if( APPLICATION_NOTFOUND.equals(this) ) {
 				return ErrorCode.APPLICATION_NOTFOUND;

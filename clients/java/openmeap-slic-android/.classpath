@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/openmeap-shared"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/openmeap-slic-core"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/openmeap-shared-jdk5"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

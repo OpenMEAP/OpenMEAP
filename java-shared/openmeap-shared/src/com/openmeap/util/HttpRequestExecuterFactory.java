@@ -24,25 +24,12 @@
 
 package com.openmeap.util;
 
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-
 public class HttpRequestExecuterFactory {
 	
-	static public interface CredentialsProviderFactory {
-		CredentialsProvider newCredentialsProvider();
-	}
-	
-	static private Class defaultExecuter = HttpRequestExecuterImpl.class;
-	
-	static private CredentialsProviderFactory credentialsProviderFactory = new CredentialsProviderFactory() {
-		public CredentialsProvider newCredentialsProvider() {
-			return new BasicCredentialsProvider();
-		}
-	};
+	static private Class defaultExecuter = null;
 	
 	public void setStaticDefaultType(Class defaultNew) {
-		defaultExecuter = defaultNew;
+		setDefaultType(defaultNew);
 	}
 	static public void setDefaultType(Class defaultNew) {
 		defaultExecuter = defaultNew;
@@ -56,15 +43,5 @@ public class HttpRequestExecuterFactory {
 		} catch( Exception ie ) {
 			throw new RuntimeException(ie);
 		}
-	}
-	
-	static public void setDefaultCredentialsProviderFactory(CredentialsProviderFactory factory) {
-		credentialsProviderFactory = factory;
-	}
-	static public CredentialsProviderFactory getDefaultCredentialsProviderFactory() {
-		return credentialsProviderFactory;
-	}
-	static public CredentialsProvider newDefaultCredentialsProvider() {
-		return credentialsProviderFactory.newCredentialsProvider();
 	}
 }

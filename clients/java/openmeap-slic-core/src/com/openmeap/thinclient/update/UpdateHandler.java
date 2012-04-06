@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.apache.http.HttpResponse;
+import com.openmeap.util.HttpResponse;
 
 import com.openmeap.protocol.ApplicationManagementService;
 import com.openmeap.protocol.WebServiceException;
@@ -22,6 +22,7 @@ import com.openmeap.protocol.dto.UpdateHeader;
 import com.openmeap.thinclient.AppMgmtClientFactory;
 import com.openmeap.thinclient.LocalStorage;
 import com.openmeap.thinclient.SLICConfig;
+import com.openmeap.util.HttpRequestException;
 import com.openmeap.util.HttpRequestExecuter;
 import com.openmeap.util.HttpRequestExecuterFactory;
 import com.openmeap.util.Utils;
@@ -256,17 +257,22 @@ public class UpdateHandler {
 		OutputStream os = null;
 		InputStream is = null;
 		HttpRequestExecuter requester = HttpRequestExecuterFactory.newDefault();
-		HttpResponse updateRequestResponse = requester.get(update.getUpdateHeader().getUpdateUrl());
-		if( updateRequestResponse.getStatusLine().getStatusCode()!=200 )
-			throw new UpdateException(UpdateResult.RESPONSE_STATUS_CODE,"Status was "+updateRequestResponse.getStatusLine().getStatusCode()+", expecting 200" );
+		HttpResponse updateRequestResponse;
+		try {
+			updateRequestResponse = requester.get(update.getUpdateHeader().getUpdateUrl());
+		} catch(HttpRequestException e){
+			throw new IOException(e);
+		}
+		if( updateRequestResponse.getStatusCode()!=200 )
+			throw new UpdateException(UpdateResult.RESPONSE_STATUS_CODE,"Status was "+updateRequestResponse.getStatusCode()+", expecting 200" );
 		try {
 			os = storage.getImportArchiveOutputStream();
-			is = updateRequestResponse.getEntity().getContent();
+			is = updateRequestResponse.getResponseBody();
 
 			byte[] bytes = new byte[1024];
 	        int count = is.read(bytes);
 	        
-	        int contentLength = (int)updateRequestResponse.getEntity().getContentLength();
+	        int contentLength = (int)updateRequestResponse.getContentLength();
 	        int contentDownloaded = 0;
 	        int lastContentDownloaded = contentDownloaded;
 	        int percent = contentLength/100;

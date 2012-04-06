@@ -5,4 +5,5 @@ import java.io.InputStream;
 public interface HttpResponse {
 	int getStatusCode();
 	InputStream getResponseBody();
+	long getContentLength();
 }

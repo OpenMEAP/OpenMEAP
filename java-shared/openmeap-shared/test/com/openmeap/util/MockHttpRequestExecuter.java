@@ -26,30 +26,16 @@ package com.openmeap.util;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.Map;
-
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.HttpResponse;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.StatusLine;
-import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.message.BasicStatusLine;
-
-import com.openmeap.util.HttpRequestExecuterImpl;
-
 
 public class MockHttpRequestExecuter implements HttpRequestExecuter {
 	static private int responseCode = 200;
 	static private String responseText = "";
-	static private HttpGet lastHttpGet = null;
 	
 	static private String lastPostXmlData = null;
 	
-	static private Map<String,Object> lastGetData = null;
-	static private Map<String,Object> lastPostData = null;
+	static private Map lastGetData = null;
+	static private Map lastPostData = null;
 	static private String lastPostUrl = null;
 	
 	static public void setResponseCode(int responseCode) {
@@ -58,53 +44,50 @@ public class MockHttpRequestExecuter implements HttpRequestExecuter {
 	static public void setResponseText(String text) {
 		MockHttpRequestExecuter.responseText = text;
 	}
-	static public Map<String,Object> getLastPostData() {
+	static public Map getLastPostData() {
 		return lastPostData;
 	}
-	static public Map<String,Object> getLastGetData() {
+	static public Map getLastGetData() {
 		return lastGetData;
 	}
 	static public String getLastPostUrl() {
 		return lastPostUrl;
 	}
-	static public HttpGet getLastHttpGet() {
-		return lastHttpGet;
+	static public String getLastPostXmlData() {
+		return lastPostXmlData;
 	}
-	public HttpResponse postXml(String url,String xmlData) {
+	public HttpResponse postXml(String url, String xmlData) throws HttpRequestException {
 		lastPostUrl = url;
 		lastPostXmlData = xmlData;
 		return putTogetherResponse();
 	}
-	public HttpResponse postData(String url,Map<String,Object> getData, Map<String,Object> postData) {
+	public HttpResponse postData(String url,Map getData, Map postData) throws HttpRequestException {
 		lastGetData = getData;
 		lastPostData = postData;
 		lastPostUrl = url;
 		return putTogetherResponse();
 	}
-	public HttpResponse postData(String url,Map<String,Object> postData) {
+	public HttpResponse postData(String url, Map postData) throws HttpRequestException {
 		lastPostData = postData;
 		lastPostUrl = url;
 		return putTogetherResponse();
 	}
-	public HttpResponse get(HttpGet httpGet) {
-		lastHttpGet = httpGet;
-		return putTogetherResponse();
-	}
-	public HttpResponse get(String url) {
+	public HttpResponse get(String url) throws HttpRequestException {
 		return putTogetherResponse();
 	}
 	
-	private HttpResponse putTogetherResponse() {
-		ProtocolVersion ver = new ProtocolVersion("HTTP",1,1);
-		StatusLine status = new BasicStatusLine(ver,responseCode,"OK");
-		HttpResponse resp = new BasicHttpResponse(status);
-		BasicHttpEntity ent = new BasicHttpEntity();
-		ent.setContent(new BufferedInputStream(new ByteArrayInputStream(responseText.getBytes())));
-		resp.setEntity(ent);
-		return resp;
+	private HttpResponse putTogetherResponse() throws HttpRequestException {
+		try {
+			HttpResponseImpl response = new HttpResponseImpl();
+			response.setContentLength(responseText.length());
+			response.setStatusCode(responseCode);
+			response.setResponseBody(new BufferedInputStream(new ByteArrayInputStream(responseText.getBytes())));
+			return response;
+		} catch(Exception e) {
+			throw new HttpRequestException(e);
+		}
 	}
-	public HttpResponse get(String url, Map<String, Object> params)
-			throws ClientProtocolException, IOException {
+	public HttpResponse get(String url, Map params) throws HttpRequestException {
 		lastPostData = lastGetData = params;
 		lastPostUrl = url;
 		return putTogetherResponse();

@@ -26,15 +26,11 @@ package com.openmeap.util;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
@@ -42,20 +38,15 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
-import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreProtocolPNames;
-import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.HTTP;
 
 import com.openmeap.constants.FormConstants;
 
@@ -77,7 +68,7 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 			httpClient = new DefaultHttpClient();
 		}
 		
-		((DefaultHttpClient)httpClient).setCredentialsProvider(HttpRequestExecuterFactory.newDefaultCredentialsProvider());
+		((DefaultHttpClient)httpClient).setCredentialsProvider(CredentialsProviderFactory.newDefaultCredentialsProvider());
 		
 		httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
 		httpClient.getParams().setParameter(CoreProtocolPNames.HTTP_CONTENT_CHARSET, FormConstants.CHAR_ENC_DEFAULT);
@@ -109,50 +100,82 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 	}
 	
 	public HttpResponse get(HttpGet httpGet) throws ClientProtocolException, IOException {
-		return httpClient.execute(httpGet);
+		org.apache.http.HttpResponse clientResponse = httpClient.execute(httpGet);
+		
+		HttpResponseImpl returnResponse = new HttpResponseImpl();
+		returnResponse.setResponseBody(clientResponse.getEntity().getContent());
+		returnResponse.setContentLength(clientResponse.getEntity().getContentLength());
+		returnResponse.setStatusCode(clientResponse.getStatusLine().getStatusCode());
+    	return returnResponse;
 	}
 	
-	public HttpResponse get(String url, Map<String,Object> getParams) throws ClientProtocolException, IOException {
-		HttpGet thisGet = new HttpGet(createUrl(url,getParams));
-		return get(thisGet);
+	public HttpResponse get(String url, Map getParams) throws HttpRequestException {
+		try {
+			HttpGet thisGet = new HttpGet(createUrl(url,getParams));
+			return get(thisGet);
+		} catch(Exception e) {
+			throw new HttpRequestException(e);
+		}
 	}
 	
-	public HttpResponse get(String url) throws ClientProtocolException, IOException {
-		return get(new HttpGet(url));
+	public HttpResponse get(String url) throws HttpRequestException {
+		try {
+			return get(new HttpGet(url));
+		} catch(Exception e) {
+			throw new HttpRequestException(e);
+		}
 	}
 
-	public HttpResponse postData(String url, Map<String, Object> postParams) throws ClientProtocolException, IOException {
+	public HttpResponse postData(String url, Map postParams) throws HttpRequestException {
 		return postData(url,null,postParams);
 	}
 	
-	public HttpResponse postData(String url, Map<String,Object> getParams, Map<String, Object> postParams) throws ClientProtocolException, IOException {
-		
-		List<NameValuePair> nameValuePairs = createNameValuePairs(postParams);
-		
-		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePairs,FormConstants.CHAR_ENC_DEFAULT);
-    	//StringEntity entity = new StringEntity(Utils.createParamsString(postParams),FormConstants.CHAR_ENC_DEFAULT);
-    	
-		entity.setContentType(FormConstants.CONT_TYPE_DEFAULT);
-		
-		HttpPost httpPost = new HttpPost(createUrl(url,getParams));
-		httpPost.setHeader(FormConstants.CONTENT_TYPE,FormConstants.CONT_TYPE_DEFAULT);
-		httpPost.setHeader(FormConstants.USERAGENT,FormConstants.USERAGENT_DEFAULT);
-        httpPost.setEntity(entity);
-    	
-    	return httpClient.execute(httpPost);
+	public HttpResponse postData(String url, Map getParams, Map postParams) throws HttpRequestException {
+		try {
+			List<NameValuePair> nameValuePairs = createNameValuePairs(postParams);
+			
+			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePairs,FormConstants.CHAR_ENC_DEFAULT);
+	    	//StringEntity entity = new StringEntity(Utils.createParamsString(postParams),FormConstants.CHAR_ENC_DEFAULT);
+	    	
+			entity.setContentType(FormConstants.CONT_TYPE_DEFAULT);
+			
+			HttpPost httpPost = new HttpPost(createUrl(url,getParams));
+			httpPost.setHeader(FormConstants.CONTENT_TYPE,FormConstants.CONT_TYPE_DEFAULT);
+			httpPost.setHeader(FormConstants.USERAGENT,FormConstants.USERAGENT_DEFAULT);
+	        httpPost.setEntity(entity);
+	    	
+	        org.apache.http.HttpResponse clientResponse = httpClient.execute(httpPost);
+	        
+	        HttpResponseImpl returnResponse = new HttpResponseImpl();
+			returnResponse.setResponseBody(clientResponse.getEntity().getContent());
+			returnResponse.setContentLength(clientResponse.getEntity().getContentLength());
+			returnResponse.setStatusCode(clientResponse.getStatusLine().getStatusCode());
+	    	return returnResponse;
+		} catch(Exception e) {
+			throw new HttpRequestException(e);
+		}
 	}
 	
-	public HttpResponse postXml(String url, String xmlData) throws ClientProtocolException, IOException {
-		
-    	StringEntity stringEntity = new StringEntity(xmlData,FormConstants.CHAR_ENC_DEFAULT);
-    	stringEntity.setContentType(FormConstants.CONT_TYPE_XML);
-    	
-    	HttpPost httppost = new HttpPost(url);
-    	httppost.setHeader(FormConstants.CONTENT_TYPE,FormConstants.CONT_TYPE_XML);
-    	httppost.setEntity(stringEntity);
-    	
-    	// TODO: figure out how to get "application/soap+xml;charset=UTF-8" working...keeps giving me a "415: Unsupported Media Type"
-    	return httpClient.execute(httppost);
+	public HttpResponse postXml(String url, String xmlData) throws HttpRequestException {
+		try {
+	    	StringEntity stringEntity = new StringEntity(xmlData,FormConstants.CHAR_ENC_DEFAULT);
+	    	stringEntity.setContentType(FormConstants.CONT_TYPE_XML);
+	    	
+	    	HttpPost httppost = new HttpPost(url);
+	    	httppost.setHeader(FormConstants.CONTENT_TYPE,FormConstants.CONT_TYPE_XML);
+	    	httppost.setEntity(stringEntity);
+	    	
+	    	// TODO: figure out how to get "application/soap+xml;charset=UTF-8" working...keeps giving me a "415: Unsupported Media Type"
+	    	org.apache.http.HttpResponse clientResponse = httpClient.execute(httppost);
+	    	
+	    	HttpResponseImpl returnResponse = new HttpResponseImpl();
+			returnResponse.setResponseBody(clientResponse.getEntity().getContent());
+			returnResponse.setContentLength(clientResponse.getEntity().getContentLength());
+			returnResponse.setStatusCode(clientResponse.getStatusLine().getStatusCode());
+	    	return returnResponse;
+		} catch(Exception e) {
+			throw new HttpRequestException(e);
+		}
 	}
 	
 	/*

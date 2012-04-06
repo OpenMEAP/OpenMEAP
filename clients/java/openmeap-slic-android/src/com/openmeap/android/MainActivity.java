@@ -63,8 +63,10 @@ import com.openmeap.thinclient.LoginFormLauncher;
 import com.openmeap.thinclient.Preferences;
 import com.openmeap.thinclient.SLICConfig;
 import com.openmeap.thinclient.update.UpdateHandler;
+import com.openmeap.util.CredentialsProviderFactory;
 import com.openmeap.util.HttpRequestExecuter;
 import com.openmeap.util.HttpRequestExecuterFactory;
+import com.openmeap.util.HttpRequestExecuterImpl;
 import com.openmeap.util.Utils;
 
 public class MainActivity extends Activity implements LoginFormLauncher<OmSlicCredentialsProvider> {
@@ -87,7 +89,8 @@ public class MainActivity extends Activity implements LoginFormLauncher<OmSlicCr
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        HttpRequestExecuterFactory.setDefaultCredentialsProviderFactory(new OmSlicCredentialsProvider.Factory(this));
+        CredentialsProviderFactory.setDefaultCredentialsProviderFactory(new OmSlicCredentialsProvider.Factory(this));
+        HttpRequestExecuterFactory.setDefaultType(HttpRequestExecuterImpl.class);
         
         // setup the SLICConfig instance 
         Preferences prefs = new SharedPreferencesImpl(getSharedPreferences(SLICConfig.PREFERENCES_FILE,MODE_PRIVATE));
