@@ -24,22 +24,16 @@
 
 package com.openmeap.util;
 
-import java.io.IOException;
 import java.util.Map;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
 
 public interface HttpRequestExecuter {
 	
 	public final static String SSL_PEER_NOVERIFY_PROPERTY = "com.openmeap.sslPeerNoVerify";
 	
-	public HttpResponse postXml(String url, String xmlData)  throws ClientProtocolException, IOException;
-	public HttpResponse postData(String url, Map<String,Object> params) throws ClientProtocolException, IOException;
-	public HttpResponse postData(String url, Map<String,Object> urlParams, Map<String, Object> postParams) throws ClientProtocolException, IOException;
-	public HttpResponse get(HttpGet url) throws ClientProtocolException, IOException;
-	public HttpResponse get(String url) throws ClientProtocolException, IOException;
-	public HttpResponse get(String url, Map<String,Object> params) throws ClientProtocolException, IOException;
+	public HttpResponse postXml(String url, String xmlData)  throws HttpRequestException;
+	public HttpResponse postData(String url, Map params) throws HttpRequestException;
+	public HttpResponse postData(String url, Map urlParams, Map postParams) throws HttpRequestException;
+	public HttpResponse get(String url) throws HttpRequestException;
+	public HttpResponse get(String url, Map params) throws HttpRequestException;
 	public void shutdown();
 }

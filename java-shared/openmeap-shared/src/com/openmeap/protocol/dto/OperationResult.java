@@ -24,10 +24,12 @@
 
 package com.openmeap.protocol.dto;
 
-public enum OperationResult {
+import java.lang.reflect.Field;
 
-    SUCCESS("success"),
-    FAILURE("failure");
+public class OperationResult {
+
+	static final public OperationResult SUCCESS = new OperationResult("success");
+	static final public OperationResult FAILURE = new OperationResult("failure");
     private final String value;
 
     OperationResult(String v) {
@@ -39,12 +41,20 @@ public enum OperationResult {
     }
 
     public static OperationResult fromValue(String v) {
-        for (OperationResult c: OperationResult.values()) {
-            if (c.value.equals(v)) {
-                return c;
-            }
-        }
-        throw new IllegalArgumentException(v);
+    	Field[] fields = OperationResult.class.getDeclaredFields();
+    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
+    		Field field = fields[fieldIdx];
+    		try {
+	    		if( ((OperationResult)field.get(null)).value().equals(v) ) {
+	    			return (OperationResult)field.get(null);
+					
+	    		}
+    		} catch(Exception e) {
+    			throw new IllegalArgumentException(v);
+    		}
+    	}
+    	throw new IllegalArgumentException(v);
     }
+
 
 }

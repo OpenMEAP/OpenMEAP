@@ -1,77 +1,121 @@
 package com.openmeap.json;
 
+import java.lang.reflect.Field;
+
 import org.json.JSONObject;
 
-import org.junit.Test;
-import org.junit.Assert;
+import junit.framework.TestCase;
+import junit.framework.Assert;
 
-
-public class JSONObjectBuilderTest {
+public class JSONObjectBuilderTest extends TestCase {
 	
-	public enum Types {
-		ONE,TWO
+	static public class Types implements Enum {
+
+		static final public Types ONE = new Types("ONE");
+		static final public Types TWO = new Types("TWO");
+		private String name;
+		public Types(String name) {
+			this.name = name;
+		}
+		public String value() {
+			return name;
+		}
+		public static Types valueOf(String v) {
+	    	Field[] fields = Types.class.getDeclaredFields();
+	    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
+	    		Field field = fields[fieldIdx];
+	    		if( field.getName().equals(v) ) {
+	    			try {
+						return (Types)field.get(null);
+					} catch (Exception e) {
+						throw new IllegalArgumentException(v);
+					}
+	    		}
+	    	}
+	    	throw new IllegalArgumentException(v);
+	    }
+		
 	}
-	static public class RootClass {
+	static public class RootClass implements HasJSONProperties {
 		private BranchClass child;
 		private String stringValue;
 		private String[] stringArrayValue;
 		private Long longValue;
 		private Integer integerValue;
 		private Double doubleValue;
-		@JSONProperty public BranchClass getChild() {
+		private static JSONProperty[] jsonProperties = new JSONProperty[] {
+	    	new JSONProperty("getChild"),
+	    	new JSONProperty("getStringValue"),
+	    	new JSONProperty("getStringArrayValue"),
+	    	new JSONProperty("getLongValue"),
+	    	new JSONProperty("getIntegerValue"),
+	    	new JSONProperty("getDoubleValue")
+	    };
+	    public JSONProperty[] getJSONProperties() {
+			return jsonProperties;
+		}
+		public BranchClass getChild() {
 			return child;
 		}
 		public void setChild(BranchClass child) {
 			this.child = child;
 		}
-		@JSONProperty public String getStringValue() {
+		public String getStringValue() {
 			return stringValue;
 		}
 		public void setStringValue(String stringValue) {
 			this.stringValue = stringValue;
 		}
-		@JSONProperty public String[] getStringArrayValue() {
+		public String[] getStringArrayValue() {
 			return stringArrayValue;
 		}
 		public void setStringArrayValue(String[] stringArrayValue) {
 			this.stringArrayValue = stringArrayValue;
 		}
-		@JSONProperty public Long getLongValue() {
+		public Long getLongValue() {
 			return longValue;
 		}
 		public void setLongValue(Long longValue) {
 			this.longValue = longValue;
 		}
-		@JSONProperty public Integer getIntegerValue() {
+		public Integer getIntegerValue() {
 			return integerValue;
 		}
 		public void setIntegerValue(Integer integerValue) {
 			this.integerValue = integerValue;
 		}
-		@JSONProperty public Double getDoubleValue() {
+		public Double getDoubleValue() {
 			return doubleValue;
 		}
 		public void setDoubleValue(Double doubleValue) {
 			this.doubleValue = doubleValue;
 		}
 	}
-	static public class BranchClass {
+	static public class BranchClass implements HasJSONProperties {
 		private String string;
 		private Types typeOne;
 		private Types typeTwo;
-		@JSONProperty public String getString() {
+		private static JSONProperty[] jsonProperties = new JSONProperty[] {
+	    	new JSONProperty("getString"),
+	    	new JSONProperty("getTypeOne"),
+	    	new JSONProperty("getTypeTwo")
+	    };
+	    public JSONProperty[] getJSONProperties() {
+			return jsonProperties;
+		}
+		public String getString() {
 			return string;
 		}
 		public void setString(String string) {
 			this.string = string;
 		}
-		@JSONProperty public Types getTypeOne() {
+		public Types getTypeOne() {
 			return typeOne;
 		}
 		public void setTypeOne(Types typeOne) {
 			this.typeOne = typeOne;
 		}
-		@JSONProperty public Types getTypeTwo() {
+		public Types getTypeTwo() {
 			return typeTwo;
 		}
 		public void setTypeTwo(Types typeTwo) {
@@ -79,11 +123,11 @@ public class JSONObjectBuilderTest {
 		}
 	}
 	
-	@Test public void testToJSON() throws Exception {
+	public void testToJSON() throws Exception {
 		RootClass root = new RootClass();
-		root.setDoubleValue(3.14);
-		root.setLongValue(1000L);
-		root.setIntegerValue(2000);
+		root.setDoubleValue(Double.valueOf(3.14));
+		root.setLongValue(Long.valueOf(1000L));
+		root.setIntegerValue(Integer.valueOf(2000));
 		root.setStringValue("value");
 		root.setStringArrayValue(new String[]{"value1","value2"});
 		root.setChild(new BranchClass());

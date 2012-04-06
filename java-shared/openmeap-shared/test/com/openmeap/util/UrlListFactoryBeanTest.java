@@ -24,18 +24,19 @@
 
 package com.openmeap.util;
 
-import org.junit.*;
+import junit.framework.TestCase;
+import junit.framework.Assert;
 import java.net.*;
 
-public class UrlListFactoryBeanTest {
-	@Test public void testSetListValues() throws Exception {
+public class UrlListFactoryBeanTest extends TestCase {
+	public void testSetListValues() throws Exception {
 		String validUrls = "http://www.validurl.com,https://another.valid.url";
 		String invalidUrls = "http_invalidurl,https:/another.invalid.url";
 		UrlListFactoryBean b = new UrlListFactoryBean();
 		b.setListValues(validUrls);
 		Assert.assertTrue(b.getListValues().equals(validUrls));
 		
-		Boolean thrown = false;
+		boolean thrown = false;
 		try {
 			b.setListValues(invalidUrls);
 		} catch( MalformedURLException mue ) {

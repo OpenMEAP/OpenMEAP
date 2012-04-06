@@ -40,15 +40,7 @@
 	
 	<dependencies>
 	
-		<!-- NOTE: this is shared by all OpenMEAP Java builds...including mobile devices -->
-		
-		<dependency org="org.apache.httpcomponents" name="httpclient" rev="4.1.1" conf="core->default"/>
-		<dependency org="org.apache.httpcomponents" name="httpclient-cache" rev="4.1.1" conf="core->default"/>
-		<dependency org="org.apache.httpcomponents" name="httpmime" rev="4.1.1" conf="core->default"/>
-		<dependency org="commons-lang" name="commons-lang" rev="2.6" conf="core->default"/>
-		<dependency org="commons-fileupload" name="commons-fileupload" rev="1.2.2" conf="core->default"/>
-		<dependency org="log4j" name="log4j" rev="1.2.16" conf="core->default"/>
-		<dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.4" conf="core->default"/>	  
+		  
 	</dependencies>
 	
 </ivy-module>

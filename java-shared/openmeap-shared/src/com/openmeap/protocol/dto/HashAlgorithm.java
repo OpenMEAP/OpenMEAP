@@ -24,13 +24,17 @@
 
 package com.openmeap.protocol.dto;
 
-public enum HashAlgorithm {
+import java.lang.reflect.Field;
+import com.openmeap.json.Enum;
 
-    MD5("MD5"),
-    SHA1("SHA1");
+public class HashAlgorithm implements Enum {
+
+	static final public HashAlgorithm MD5 = new HashAlgorithm("MD5");
+	static final public HashAlgorithm SHA1 = new HashAlgorithm("SHA1");
+
     private final String value;
 
-    HashAlgorithm(String v) {
+    private HashAlgorithm(String v) {
         value = v;
     }
 
@@ -38,13 +42,20 @@ public enum HashAlgorithm {
         return value;
     }
 
-    public static HashAlgorithm fromValue(String v) {
-        for (HashAlgorithm c: HashAlgorithm.values()) {
-            if (c.value.equals(v)) {
-                return c;
-            }
-        }
-        throw new IllegalArgumentException(v);
+    public static Object fromValue(String v) {
+    	Field[] fields = HashAlgorithm.class.getDeclaredFields();
+    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
+    		Field field = fields[fieldIdx];
+    		try {
+	    		if( ((HashAlgorithm)field.get(null)).value().equals(v) ) {
+	    			return (HashAlgorithm)field.get(null);
+					
+	    		}
+    		} catch(Exception e) {
+    			throw new IllegalArgumentException(v);
+    		}
+    	}
+    	throw new IllegalArgumentException(v);
     }
 
 }

@@ -8,12 +8,15 @@ import com.openmeap.util.HttpRequestExecuterFactory;
 
 public class AppMgmtClientFactory {
 	
-	static private Class<? extends ApplicationManagementService> defaultClient = RESTAppMgmtClient.class;
+	static private Class defaultClient = RESTAppMgmtClient.class;
 	
-	static public void setDefaultType(Class<? extends ApplicationManagementService> defaultNew) {
+	static public void setDefaultType(Class defaultNew) {
+		if( !ApplicationManagementService.class.isAssignableFrom(defaultNew) ) {
+			throw new RuntimeException("setDefaultType only accepts ApplicationManagementService subclasses/implementors");
+		}
 		defaultClient = defaultNew;		
 	}
-	static public Class<? extends ApplicationManagementService> getDefaultType() {
+	static public Class getDefaultType() {
 		return defaultClient;
 	}
 	

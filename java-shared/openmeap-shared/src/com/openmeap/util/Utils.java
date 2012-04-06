@@ -34,7 +34,10 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import java.util.Arrays;
 import java.util.Formatter;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Map;
 
@@ -90,17 +93,19 @@ abstract public class Utils {
         }
     }
     
-    public static String createParamsString(Map<String,Object> params) throws UnsupportedEncodingException {
+    public static String createParamsString(Map params) throws UnsupportedEncodingException {
 	    if( params==null ) {
 			return null;
 		}
 		StringBuilder data = new StringBuilder();
-		Boolean firstPass = true;
-		for( Map.Entry<String,Object> ent : params.entrySet() ) {
+		boolean firstPass = true;
+		Iterator entriesIter = params.entrySet().iterator();
+		while( entriesIter.hasNext() ) { 
+			Map.Entry ent = (Entry) entriesIter.next();
 			if( !firstPass ) {
 				data.append("&");
 			} else firstPass=false;
-			data.append(URLEncoder.encode(ent.getKey(), FormConstants.CHAR_ENC_DEFAULT));
+			data.append(URLEncoder.encode((String)ent.getKey(), FormConstants.CHAR_ENC_DEFAULT));
 			data.append("=");
 			data.append(URLEncoder.encode(ent.getValue().toString(), FormConstants.CHAR_ENC_DEFAULT));
 		}
@@ -131,9 +136,11 @@ abstract public class Utils {
      * @param content The template content to replace fields in
      * @return
      */
-    public static String replaceFields(Map<String,String> variables, String content) {
-		for( Map.Entry<String,String> variable : variables.entrySet() ) {
-			content = content.replaceAll("\\$\\{"+variable.getKey()+"\\}", variable.getValue());
+    public static String replaceFields(Map variables, String content) {
+    	Iterator variablesIter = variables.entrySet().iterator();
+		while( variablesIter.hasNext() ) {
+			Map.Entry variable = (Entry) variablesIter.next();
+			content = content.replaceAll("\\$\\{"+variable.getKey()+"\\}", (String) variable.getValue());
 		}
 		return content;
 	}
@@ -152,10 +159,14 @@ abstract public class Utils {
     }
     
     public static String byteArray2Hex(byte[] hash) {
-        Formatter formatter = new Formatter();
-        for (byte b : hash) {
-            formatter.format("%02x", b);
-        }
-        return formatter.toString();
+    	final StringBuilder sb = new StringBuilder();     
+        for (int i = 0; i < hash.length; i++)     
+        {     
+            int low = hash[i] & 0xF;  
+            int high = (hash[i] >> 8) & 0xF;  
+            sb.append(Character.forDigit(high, 16));  
+            sb.append(Character.forDigit(low, 16));  
+        }     
+        return sb.toString(); 
     }
 }

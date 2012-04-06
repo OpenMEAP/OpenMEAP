@@ -25,24 +25,35 @@
 package com.openmeap.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.net.URL;
 import java.net.MalformedURLException;
 
-public class UrlListFactoryBean extends ArrayList<URL> {
+public class UrlListFactoryBean extends ArrayList {
+
+	private static final long serialVersionUID = 6143243343274185728L;
+	
 	public UrlListFactoryBean() { super(); }
 	public UrlListFactoryBean(String listValues) throws MalformedURLException {
 		super();
 		setListValues(listValues);
 	}
 	public void setListValues(String commaDelimitedUrls) throws MalformedURLException {
-		String[] urls = commaDelimitedUrls.split(",");
 		this.clear();
-		for( String url : urls )
+		List urls = Arrays.asList(commaDelimitedUrls.split(","));
+		Iterator urlIter = urls.iterator();
+		while(urlIter.hasNext()) {
+			String url = (String) urlIter.next(); 
 			this.add( new URL(url) );
+		}
 	}
 	public String getListValues() {
 		StringBuilder sb = null;
-		for( URL url : this ) {
+		Iterator urlItr = this.iterator();
+		while( urlItr.hasNext() ) {
+			URL url = (URL) urlItr.next();
 			if( sb!=null )
 				sb.append(',');
 			else sb = new StringBuilder();

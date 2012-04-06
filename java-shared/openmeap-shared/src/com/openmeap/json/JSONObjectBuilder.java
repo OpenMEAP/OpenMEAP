@@ -1,10 +1,38 @@
+/*
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011-2012 OpenMEAP, Inc.                                   #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the LGPLv3                                                #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU Lesser General Public License as published #
+ #    by the Free Software Foundation, either version 3 of the License, or     #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU Lesser General Public License for more details.                      #
+ #                                                                             #
+ #    You should have received a copy of the GNU Lesser General Public License #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+ */
+
 package com.openmeap.json;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import com.openmeap.json.HasJSONProperties;
+import com.openmeap.json.Enum;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,13 +56,19 @@ public class JSONObjectBuilder {
 		if( jsonObj==null ) {
 			return null;
 		}
-		
-		Method[] methods = rootObject.getClass().getMethods();
-		for( Method getterMethod : methods ) {
-			if( getterMethod.getAnnotation(JSONProperty.class)==null ) {
-				continue;
-			}
-			Class<?> returnType = getterMethod.getReturnType();
+		if( ! HasJSONProperties.class.isAssignableFrom(rootObject.getClass()) ) {
+			throw new RuntimeException("The rootObject being converted to JSON must implement the HashJSONProperties interface.");
+		}		
+		JSONProperty[] properties = ((HasJSONProperties)rootObject).getJSONProperties();
+		for( int jsonPropertyIdx=0; jsonPropertyIdx<properties.length; jsonPropertyIdx++ ) {
+			JSONProperty property = properties[jsonPropertyIdx];
+			Method getterMethod;
+			try {
+				getterMethod = rootObject.getClass().getMethod(property.getGetterName(),null);
+			} catch (Exception e1) {
+				throw new JSONException(e1);
+			} 
+			Class returnType = getterMethod.getReturnType();
 			Method setterMethod = PropertyUtils.setterForGetterMethod(getterMethod);
 			String propertyName = PropertyUtils.propertyForGetterMethodName(getterMethod.getName());
 			try {
@@ -52,10 +86,14 @@ public class JSONObjectBuilder {
 						
 						continue;
 					}
-					if( returnType.isEnum() ) {
+					if( Enum.class.isAssignableFrom(returnType) ) {
 						
-						Class<? extends Enum> e = (Class<? extends Enum>)returnType; 
-						setterMethod.invoke(rootObject,Enum.valueOf(e,(String)value));
+						Class e = (Class)returnType; 
+						try {
+							setterMethod.invoke(rootObject,new Object[]{returnType.getDeclaredField((String)value).get(null)});
+						} catch (Exception p) {
+							throw new JSONException(p);
+						}
 					} else if( value instanceof JSONArray ) {
 						
 						JSONArray array = (JSONArray)value;
@@ -74,10 +112,10 @@ public class JSONObjectBuilder {
 						
 						// instantiate a new object, of the type correct for the
 						Object obj = (Object)returnType.newInstance();
-						setterMethod.invoke(rootObject, fromJSON((JSONObject)value,obj));
+						setterMethod.invoke(rootObject, new Object[]{fromJSON((JSONObject)value,obj)});
 					} else if( PropertyUtils.isSimpleType(returnType) ) {
 						
-						setterMethod.invoke(rootObject, PropertyUtils.correctCasting(returnType,value));
+						setterMethod.invoke(rootObject, new Object[]{PropertyUtils.correctCasting(returnType,value)});
 					} 
 				}
 			} catch( InstantiationException e ) {
@@ -98,15 +136,21 @@ public class JSONObjectBuilder {
 		if( obj==null ) {
 			return null;
 		}
-		
+		if( ! HasJSONProperties.class.isAssignableFrom(obj.getClass()) ) {
+			throw new RuntimeException("The rootObject being converted to JSON must implement the HashJSONProperties interface.");
+		}		
+		JSONProperty[] properties = ((HasJSONProperties)obj).getJSONProperties();
 		JSONObject jsonObj = new JSONObject();
+		
 		// iterate over each JSONProperty annotated method
-		Method[] methods = obj.getClass().getMethods();
-		for( Method method : methods ) {
+		for( int jsonPropertyIdx=0; jsonPropertyIdx<properties.length; jsonPropertyIdx++ ) {
+			JSONProperty property = properties[jsonPropertyIdx];
 			
-			// if the method is not annotated, then skip it
-			if( method.getAnnotation(JSONProperty.class)==null ) {
-				continue;
+			Method method;
+			try {
+				method = obj.getClass().getMethod(property.getGetterName(),null);
+			} catch (Exception e1) {
+				throw new JSONException(e1);
 			}
 			
 			// determine the method return type
@@ -123,23 +167,26 @@ public class JSONObjectBuilder {
 			String propertyName = PropertyUtils.propertyForGetterMethodName(method.getName());
 			
 			try {
-				if( returnType.isEnum() ) {
-					Enum ret = (Enum)method.invoke(obj);
-					jsonObj.put(propertyName, ret.toString());
+				if( Enum.class.isAssignableFrom(returnType) ) {
+					Enum ret = (Enum)method.invoke(obj,null);
+					jsonObj.put(propertyName, ret.value());
 				} else if( PropertyUtils.isSimpleType(returnType) ) {
-					jsonObj.put(propertyName, handleSimpleType(returnType,method.invoke(obj)) );
+					jsonObj.put(propertyName, handleSimpleType(returnType,method.invoke(obj,null)) );
 				} else {
 					if( returnType.isArray() ) {
-						Object[] returnValue = (Object[])method.invoke(obj);
+						Object[] returnValues = (Object[])method.invoke(obj,null);
 						JSONArray jsonArray = new JSONArray();
-						for( Object value : returnValue ) {
+						for( int returnValueIdx=0; returnValueIdx<returnValues.length; returnValueIdx++ ) {
+							Object value = returnValues[returnValueIdx];
 							jsonArray.put(toJSON(value));
 						}
 						jsonObj.put(propertyName, jsonArray);
 					} else if( Map.class.isAssignableFrom(returnType) ) {
-						Map map = (Map)method.invoke(obj);
+						Map map = (Map)method.invoke(obj,null);
 						JSONObject jsonMap = new JSONObject();
-						for( Object o : map.entrySet() ) {
+						Iterator iterator = map.entrySet().iterator();
+						while( iterator.hasNext() ) {
+							Object o = iterator.next();
 							Map.Entry entry = (Map.Entry)o; 
 							if(PropertyUtils.isSimpleType(entry.getValue().getClass())) {
 								jsonMap.put(entry.getKey().toString(), handleSimpleType(returnType,entry.getValue()));
@@ -149,7 +196,7 @@ public class JSONObjectBuilder {
 						}
 						jsonObj.put(propertyName, jsonMap);
 					} else {
-						jsonObj.put(propertyName, toJSON(method.invoke(obj)));
+						jsonObj.put(propertyName, toJSON(method.invoke(obj,null)));
 					}
 				}
 			} catch( InvocationTargetException ite ) {
@@ -168,7 +215,8 @@ public class JSONObjectBuilder {
 		if( returnType.isArray() ) {
 			Object[] returnValues = (Object[])value;
 			JSONArray jsonArray = new JSONArray();
-			for( Object thisValue : returnValues ) {
+			for( int returnValuesIdx=0; returnValuesIdx<returnValues.length; returnValuesIdx++ ) {
+				Object thisValue = returnValues[returnValuesIdx];
 				jsonArray.put(thisValue);
 			}
 			return jsonArray;
@@ -177,7 +225,7 @@ public class JSONObjectBuilder {
 		}
 	}
 	
-	private Object[] toTypedArray(List<?> list) {
+	private Object[] toTypedArray(List list) {
 		if( list.isEmpty() ) {
 			return null;
 		}

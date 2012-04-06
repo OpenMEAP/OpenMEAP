@@ -35,21 +35,34 @@ public class WebServiceException extends Exception {
 
 	public TypeEnum type = null;
 	
-	public enum TypeEnum {
-		CLIENT,
-		CLIENT_CONNECTION,
-		CLIENT_UPDATE,
-		APPLICATION_NOTFOUND,
-		APPLICATION_VERSION_NOTFOUND,
-		MISSING_PARAMETER,
-		DATABASE_ERROR,
-		UNDEFINED;
+	static public class TypeEnum {
+		static final public TypeEnum CLIENT = new TypeEnum("CLIENT");
+		static final public TypeEnum CLIENT_CONNECTION = new TypeEnum("CLIENT_CONNECTION");
+		static final public TypeEnum CLIENT_UPDATE = new TypeEnum("CLIENT_UPDATE");
+		static final public TypeEnum APPLICATION_NOTFOUND = new TypeEnum("APPLICATION_NOTFOUND");
+		static final public TypeEnum APPLICATION_VERSION_NOTFOUND = new TypeEnum("APPLICATION_VERSION_NOTFOUND");
+		static final public TypeEnum MISSING_PARAMETER = new TypeEnum("MISSING_PARAMETER");
+		static final public TypeEnum DATABASE_ERROR = new TypeEnum("DATABASE_ERROR");
+		static final public TypeEnum UNDEFINED = new TypeEnum("UNDEFINED");
+		private String name;
+		private TypeEnum(String name) {
+			this.name = name;
+		};
+		public boolean equals(Object o) {
+			return this.hashCode()==o.hashCode();
+		}
+		public int hashCode() {
+			return this.name.hashCode();
+		}
 		public ErrorCode asErrorCode() {
-			switch(this) {
-				case APPLICATION_NOTFOUND:         return ErrorCode.APPLICATION_NOTFOUND; 
-				case APPLICATION_VERSION_NOTFOUND: return ErrorCode.APPLICATION_VERSION_NOTFOUND; 
-				case MISSING_PARAMETER:            return ErrorCode.MISSING_PARAMETER; 
-				case DATABASE_ERROR:               return ErrorCode.DATABASE_ERROR; 
+			if( APPLICATION_NOTFOUND.equals(this) ) {
+				return ErrorCode.APPLICATION_NOTFOUND;
+			} else if( APPLICATION_VERSION_NOTFOUND.equals(this) ) {
+				return ErrorCode.APPLICATION_VERSION_NOTFOUND;
+			} else if( MISSING_PARAMETER.equals(this) ) {
+				return ErrorCode.MISSING_PARAMETER;
+			} else if( DATABASE_ERROR.equals(this) ) {
+				return ErrorCode.DATABASE_ERROR;
 			}
 			return ErrorCode.UNDEFINED;
 		}

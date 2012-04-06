@@ -24,14 +24,22 @@
 
 package com.openmeap.protocol.dto;
 
+import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
 
-public class Error {
+public class Error implements HasJSONProperties {
 
     protected ErrorCode code;
     protected String message;
 
-    @JSONProperty 
+    private static JSONProperty[] jsonProperties = new JSONProperty[] {
+    	new JSONProperty("getCode"),
+    	new JSONProperty("getMessage")
+    };
+    public JSONProperty[] getJSONProperties() {
+		return jsonProperties;
+	}
+    
     public ErrorCode getCode() {
         return code;
     }
@@ -39,7 +47,6 @@ public class Error {
         this.code = value;
     }
 
-    @JSONProperty 
     public String getMessage() {
         return message;
     }

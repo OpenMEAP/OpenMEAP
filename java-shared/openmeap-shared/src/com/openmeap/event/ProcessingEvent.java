@@ -25,7 +25,7 @@
 package com.openmeap.event;
 
 
-public interface ProcessingEvent<T> extends Event<T> {
+public interface ProcessingEvent extends Event {
 	void setTargets(String[] processTargets);
 	String[] getTargets();
 }

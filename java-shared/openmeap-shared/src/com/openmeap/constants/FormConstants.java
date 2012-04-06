@@ -24,8 +24,6 @@
 
 package com.openmeap.constants;
 
-import org.apache.http.protocol.HTTP;
-
 public class FormConstants {
 	
 	final static public String USERAGENT = "User-Agent";
@@ -39,7 +37,7 @@ public class FormConstants {
 	final static public String ENCODING_TYPE = "encodingType";
 	final static public String ENCTYPE_MULTIPART_FORMDATA = "multipart/form-data";
 	
-	final static public String CHAR_ENC_DEFAULT = HTTP.UTF_8;
+	final static public String CHAR_ENC_DEFAULT = "utf-8";
 	
 	/*
 	 * Page bean names

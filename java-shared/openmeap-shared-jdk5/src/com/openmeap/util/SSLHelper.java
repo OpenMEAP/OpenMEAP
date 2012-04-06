@@ -62,7 +62,6 @@ import com.openmeap.constants.FormConstants;
 
 public class SSLHelper {
 	
-	@SuppressWarnings("deprecation")
 	static public HttpClient getRelaxedSSLVerificationHttpClient() {
 	    try {
 	        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -88,7 +87,7 @@ public class SSLHelper {
 	}
 
 	
-	public static <I extends InputStream> KeyStore loadKeyStore(I keyStoreStream, String password) 
+	public static KeyStore loadKeyStore(InputStream keyStoreStream, String password) 
 			throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
 		
 		KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -151,11 +150,9 @@ public class SSLHelper {
 	        };
 	        sslContext.init(null, new TrustManager[] { tm }, null);
 	    }
-	    @Override
 	    public Socket createSocket(Socket socket, String host, int port, boolean autoClose) throws IOException, UnknownHostException {
 	        return sslContext.getSocketFactory().createSocket(socket, host, port, autoClose);
 	    }
-	    @Override
 	    public Socket createSocket() throws IOException {
 	        return sslContext.getSocketFactory().createSocket();
 	    }

@@ -24,13 +24,20 @@
 
 package com.openmeap.protocol.dto;
 
+import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
 
-public class ApplicationInstallation {
+public class ApplicationInstallation implements HasJSONProperties {
 
     protected String uuid;
     
-    @JSONProperty 
+    private static JSONProperty[] jsonProperties = new JSONProperty[] {
+    	new JSONProperty("getUuid")
+    };
+    public JSONProperty[] getJSONProperties() {
+		return jsonProperties;
+	}
+    
     public String getUuid() {
         return uuid;
     }

@@ -43,7 +43,7 @@ public class PropertyUtils {
 		try {
 			Class clazz = getterMethod.getDeclaringClass();
 			Class returnType = getterMethod.getReturnType();
-			setterMethod = clazz.getMethod(setterName,returnType);
+			setterMethod = clazz.getMethod(setterName,new Class[]{returnType});
 		} catch( NoSuchMethodException ite ) {
 			// we don't care, here
 		}
@@ -63,9 +63,9 @@ public class PropertyUtils {
 		return propertyName;
 	}
 	
-	static public Boolean isSimpleType(Class<?> returnType) {
+	static public boolean isSimpleType(Class returnType) {
 		
-		Class<?> testAgainst = returnType.isArray() ? returnType.getComponentType() : returnType;
+		Class testAgainst = returnType.isArray() ? returnType.getComponentType() : returnType;
 		return Boolean.class.isAssignableFrom(testAgainst) 
 			|| Long.class.isAssignableFrom(testAgainst) 
 			|| Double.class.isAssignableFrom(testAgainst)
@@ -73,7 +73,7 @@ public class PropertyUtils {
 			|| String.class.isAssignableFrom(testAgainst);
 	}
 	
-	static public Object correctCasting(Class<?> type, Object obj) {
+	static public Object correctCasting(Class type, Object obj) {
 		
 		if( type.equals(Long.class) ) {
 			return Long.valueOf(obj.toString());

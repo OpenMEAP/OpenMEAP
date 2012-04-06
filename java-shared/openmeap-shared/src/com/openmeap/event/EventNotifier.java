@@ -26,6 +26,12 @@ package com.openmeap.event;
 
 import java.util.List;
 
-public interface EventNotifier<T> {
-	<E extends Event<T>> void notify(E event, List<ProcessingEvent> events) throws EventNotificationException;
+public interface EventNotifier {
+	/**
+	 * 
+	 * @param event
+	 * @param events a List of ProcessingEvent objects
+	 * @throws EventNotificationException
+	 */
+	void notify(Event event, List events) throws EventNotificationException;
 }

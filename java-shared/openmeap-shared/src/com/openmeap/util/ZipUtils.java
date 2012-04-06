@@ -37,14 +37,13 @@ abstract public class ZipUtils {
 	private ZipUtils() {}
 	
 	static public Long getUncompressedSize(ZipFile zipFile) {
-		@SuppressWarnings("rawtypes")
 		Enumeration e = zipFile.entries();
-		Long uncompressedSize = 0L;
+		long uncompressedSize = 0L;
 		while(e.hasMoreElements()) {
 			ZipEntry zipEntry = (ZipEntry)e.nextElement();
-			uncompressedSize += zipEntry.getSize();
+			uncompressedSize = uncompressedSize + zipEntry.getSize();
 		}
-		return uncompressedSize;
+		return Long.valueOf(uncompressedSize);
 	}
 	
 	static public void unzipFile(ZipFile zipFile, File destinationDir) throws IOException {
@@ -57,7 +56,7 @@ abstract public class ZipUtils {
 		} 
 		
 		ZipEntry entry;
-		@SuppressWarnings("rawtypes")
+		
 		Enumeration e = zipFile.entries();
 		while(e.hasMoreElements()) {
 			try {

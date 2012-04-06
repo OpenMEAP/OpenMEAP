@@ -26,6 +26,8 @@ package com.openmeap.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.Iterator;
 
 public abstract class FileUtils {
 	private FileUtils() {}
@@ -41,7 +43,9 @@ public abstract class FileUtils {
         if (!path.exists()) throw new FileNotFoundException(path.getAbsolutePath());
         boolean ret = true;
         if (path.isDirectory()){
-            for (File f : path.listFiles()){
+        	Iterator filesIter = Arrays.asList(path.listFiles()).iterator();
+            while ( filesIter.hasNext() ){
+            	File f = (File) filesIter.next();
                 ret = ret && FileUtils.deleteRecursive(f);
             }
         }

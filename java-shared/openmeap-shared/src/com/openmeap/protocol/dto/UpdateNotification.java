@@ -24,14 +24,22 @@
 
 package com.openmeap.protocol.dto;
 
+import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
 
-public class UpdateNotification {
+public class UpdateNotification implements HasJSONProperties {
 
     protected OperationResult result;
     protected String authToken;
 
-    @JSONProperty 
+    private static JSONProperty[] jsonProperties = new JSONProperty[] {
+    	new JSONProperty("getResult"),
+    	new JSONProperty("getAuthToken")
+    };
+    public JSONProperty[] getJSONProperties() {
+		return jsonProperties;
+	}
+    
     public OperationResult getResult() {
         return result;
     }
@@ -39,7 +47,6 @@ public class UpdateNotification {
         this.result = value;
     }
 
-    @JSONProperty 
     public String getAuthToken() {
         return authToken;
     }

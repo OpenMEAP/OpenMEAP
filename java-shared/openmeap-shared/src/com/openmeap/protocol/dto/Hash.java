@@ -24,14 +24,22 @@
 
 package com.openmeap.protocol.dto;
 
+import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
 
-public class Hash {
+public class Hash implements HasJSONProperties {
 
     protected HashAlgorithm algorithm;
     protected String value;
+    
+    private static JSONProperty[] jsonProperties = new JSONProperty[] {
+    	new JSONProperty("getAlgorithm"),
+    	new JSONProperty("getValue")
+    };
+    public JSONProperty[] getJSONProperties() {
+		return jsonProperties;
+	}
 
-    @JSONProperty 
     public HashAlgorithm getAlgorithm() {
         return algorithm;
     }
@@ -39,7 +47,6 @@ public class Hash {
         this.algorithm = value;
     }
 
-    @JSONProperty 
     public String getValue() {
         return value;
     }

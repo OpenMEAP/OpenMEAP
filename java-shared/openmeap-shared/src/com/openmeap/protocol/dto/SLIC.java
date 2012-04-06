@@ -24,13 +24,20 @@
 
 package com.openmeap.protocol.dto;
 
+import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
 
-public class SLIC {
+public class SLIC implements HasJSONProperties {
 
     protected String versionId;
     
-    @JSONProperty 
+    private static JSONProperty[] jsonProperties = new JSONProperty[] {
+    	new JSONProperty("getVersionId")
+    };
+    public JSONProperty[] getJSONProperties() {
+		return jsonProperties;
+	}
+    
     public String getVersionId() {
         return versionId;
     }

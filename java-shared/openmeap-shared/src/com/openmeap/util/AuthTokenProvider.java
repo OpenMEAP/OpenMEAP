@@ -26,11 +26,10 @@ package com.openmeap.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.UUID;
-
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 
 public class AuthTokenProvider {
 	
@@ -40,13 +39,26 @@ public class AuthTokenProvider {
 		return authToken;
 	}
 	
-	public static Boolean validateAuthToken(String authSalt, String authToken) {
+	public static boolean validateAuthToken(String authSalt, String authToken) {
 		if( authToken==null )
 			return false;
 		String[] parts = authToken.split("\\.");
 		if( parts.length!=3 )
 			return false;
-		String prefix = StringUtils.join(ArrayUtils.subarray(parts, 0, parts.length-1),".");
+		
+		Iterator partsIter = Arrays.asList(parts).subList(0, parts.length-1).iterator();
+		StringBuilder sb = new StringBuilder();
+		boolean firstRun = true;
+		while(partsIter.hasNext()) {
+			if( !firstRun ) {
+				sb.append(".");
+			} else {
+				firstRun = false;
+			}
+			sb.append((String)partsIter.next());
+		}
+		String prefix = sb.toString();
+		
 		return getSha1( authSalt+prefix ).compareTo(parts[parts.length-1])==0;
 	}
 	

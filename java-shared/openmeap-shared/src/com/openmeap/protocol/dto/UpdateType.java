@@ -24,11 +24,15 @@
 
 package com.openmeap.protocol.dto;
 
-public enum UpdateType {
+import java.lang.reflect.Field;
 
-    REQUIRED("required"),
-    OPTIONAL("optional"),
-    IMMEDIATE("immediate");
+import com.openmeap.json.Enum;
+
+public class UpdateType implements Enum {
+
+    final static public UpdateType REQUIRED = new UpdateType("required");
+    final static public UpdateType OPTIONAL = new UpdateType("optional");
+    final static public UpdateType IMMEDIATE = new UpdateType("immediate");
     private final String value;
 
     UpdateType(String v) {
@@ -39,13 +43,20 @@ public enum UpdateType {
         return value;
     }
 
-    public static UpdateType fromValue(String v) {
-        for (UpdateType c: UpdateType.values()) {
-            if (c.value.equals(v)) {
-                return c;
-            }
-        }
-        throw new IllegalArgumentException(v);
+    public static Object fromValue(String v) {
+    	Field[] fields = UpdateType.class.getDeclaredFields();
+    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
+    		Field field = fields[fieldIdx];
+    		try {
+	    		if( ((UpdateType)field.get(null)).value().equals(v) ) {
+	    			return (UpdateType)field.get(null);
+					
+	    		}
+    		} catch(Exception e) {
+    			throw new IllegalArgumentException(v);
+    		}
+    	}
+    	throw new IllegalArgumentException(v);
     }
 
 }

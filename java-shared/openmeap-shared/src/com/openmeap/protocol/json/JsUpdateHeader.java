@@ -33,7 +33,6 @@ public class JsUpdateHeader {
 		return updateHeader;
 	}
 	
-	@Override
 	public String toString() {
 		return toJSON().toString();
 	}

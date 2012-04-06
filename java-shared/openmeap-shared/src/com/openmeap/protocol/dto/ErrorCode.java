@@ -24,21 +24,42 @@
 
 package com.openmeap.protocol.dto;
 
-public enum ErrorCode {
+import java.lang.reflect.Field;
 
-    UNDEFINED,
-    MISSING_PARAMETER,
-    DATABASE_ERROR,
-    AUTHENTICATION_FAILURE,
-    APPLICATION_NOTFOUND,
-    APPLICATION_VERSION_NOTFOUND;
+public class ErrorCode {
+
+	static final public ErrorCode UNDEFINED = new ErrorCode("UNDEFINED");
+	static final public ErrorCode MISSING_PARAMETER = new ErrorCode("MISSING_PARAMETER");
+	static final public ErrorCode DATABASE_ERROR = new ErrorCode("DATABASE_ERROR");
+	static final public ErrorCode AUTHENTICATION_FAILURE = new ErrorCode("AUTHENTICATION_FAILURE");
+	static final public ErrorCode APPLICATION_NOTFOUND = new ErrorCode("APPLICATION_NOTFOUND");
+	static final public ErrorCode APPLICATION_VERSION_NOTFOUND = new ErrorCode("APPLICATION_VERSION_NOTFOUND");
+	
+	private String name;
+	private ErrorCode(String name) {
+		this.name = name;
+	}
     
     public String value() {
-        return name();
+        return name;
     }
 
     public static ErrorCode fromValue(String v) {
         return valueOf(v);
     }
-
+    
+    public static ErrorCode valueOf(String v) {
+    	Field[] fields = ErrorCode.class.getDeclaredFields();
+    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
+    		Field field = fields[fieldIdx];
+    		if( field.getName().equals(v) ) {
+    			try {
+					return (ErrorCode)field.get(null);
+				} catch (Exception e) {
+					throw new IllegalArgumentException(v);
+				}
+    		}
+    	}
+    	throw new IllegalArgumentException(v);
+    }
 }

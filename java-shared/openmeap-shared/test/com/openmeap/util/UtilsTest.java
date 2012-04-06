@@ -24,16 +24,23 @@
 
 package com.openmeap.util;
 
-import org.junit.*;
-import java.io.*;
-import java.util.*;
-import org.w3c.dom.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import junit.framework.Assert;
+import junit.framework.TestCase;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 import com.openmeap.constants.FormConstants;
 
 
-public class UtilsTest {
-	@Test public void testGetDocument() throws Exception {
+public class UtilsTest extends TestCase {
+	public void testGetDocument() throws Exception {
 		// just validate that we can parse an xml document
 		String testXml = "<?xml version=\"1.0\"?><rootNode><childNode attribute=\"one\"/></rootNode>";
 		InputStream is = new BufferedInputStream(new ByteArrayInputStream(testXml.getBytes()));
@@ -44,16 +51,16 @@ public class UtilsTest {
 		Assert.assertTrue(childNode.getNodeName().compareTo("childNode")==0);
 		Assert.assertTrue(childNode.getAttributes().getNamedItem("attribute").getNodeValue().compareTo("one")==0);
 	}
-	@Test public void testReadInputStream() throws Exception {
+	public void testReadInputStream() throws Exception {
 		String testXml = "<?xml version=\"1.0\"?><rootNode><childNode attribute=\"one\"/></rootNode>";
 		InputStream is = new BufferedInputStream(new ByteArrayInputStream(testXml.getBytes()));
 		String result = Utils.readInputStream(is,FormConstants.CHAR_ENC_DEFAULT);
 		Assert.assertTrue(result.compareTo(testXml+System.getProperty("line.separator"))==0);
 	}
-	@Test public void testReplaceFields() {
+	public void testReplaceFields() {
 		String template = "${TEST} and ${ANOTHER_TEST} making sure that ${TEST} gets replace.";
 		String result = "test and test making sure that test gets replace.";
-		Map<String,String> parms = new HashMap<String,String>();
+		Map parms = new HashMap();
 		parms.put("TEST", "test");
 		parms.put("ANOTHER_TEST", "test");
 		Assert.assertTrue(Utils.replaceFields(parms,template).compareTo(result)==0);

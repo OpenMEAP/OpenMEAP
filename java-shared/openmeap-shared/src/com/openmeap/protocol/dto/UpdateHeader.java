@@ -24,9 +24,10 @@
 
 package com.openmeap.protocol.dto;
 
+import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
 
-public class UpdateHeader {
+public class UpdateHeader implements HasJSONProperties {
 
     protected Hash hash;
     protected String versionIdentifier;
@@ -36,7 +37,19 @@ public class UpdateHeader {
     protected UpdateType type;
     protected Long spaceAvailable;
 
-    @JSONProperty 
+    private static JSONProperty[] jsonProperties = new JSONProperty[] {
+    	new JSONProperty("getHash"),
+    	new JSONProperty("getVersionIdentifier"),
+    	new JSONProperty("getInstallNeeds"),
+    	new JSONProperty("getStorageNeeds"),
+    	new JSONProperty("getUpdateUrl"),
+    	new JSONProperty("getType"),
+    	new JSONProperty("getSpaceAvailable")
+    };
+    public JSONProperty[] getJSONProperties() {
+		return jsonProperties;
+	}
+    
     public Hash getHash() {
         return hash;
     }
@@ -44,7 +57,6 @@ public class UpdateHeader {
         this.hash = value;
     }
 
-    @JSONProperty 
     public String getVersionIdentifier() {
         return versionIdentifier;
     }
@@ -52,7 +64,6 @@ public class UpdateHeader {
         this.versionIdentifier = value;
     }
 
-    @JSONProperty 
     public Long getInstallNeeds() {
         return installNeeds;
     }
@@ -60,7 +71,6 @@ public class UpdateHeader {
         this.installNeeds = value;
     }
 
-    @JSONProperty 
     public Long getStorageNeeds() {
         return storageNeeds;
     }
@@ -68,7 +78,6 @@ public class UpdateHeader {
         this.storageNeeds = value;
     }
 
-    @JSONProperty 
     public String getUpdateUrl() {
         return updateUrl;
     }
@@ -76,7 +85,6 @@ public class UpdateHeader {
         this.updateUrl = value;
     }
 
-    @JSONProperty 
     public UpdateType getType() {
         return type;
     }
@@ -84,7 +92,6 @@ public class UpdateHeader {
         this.type = value;
     }
     
-    @JSONProperty 
 	public Long getSpaceAvailable() {
 		return spaceAvailable;
 	}

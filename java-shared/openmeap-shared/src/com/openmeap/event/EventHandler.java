@@ -24,6 +24,6 @@
 
 package com.openmeap.event;
 
-public interface EventHandler<T> {
-	<E extends Event<T>> void handle(E event) throws EventHandlingException;
+public interface EventHandler {
+	void handle(Event event) throws EventHandlingException;
 }

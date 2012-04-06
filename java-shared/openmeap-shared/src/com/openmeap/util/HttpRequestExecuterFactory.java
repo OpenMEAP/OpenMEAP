@@ -33,7 +33,7 @@ public class HttpRequestExecuterFactory {
 		CredentialsProvider newCredentialsProvider();
 	}
 	
-	static private Class<? extends HttpRequestExecuter> defaultExecuter = HttpRequestExecuterImpl.class;
+	static private Class defaultExecuter = HttpRequestExecuterImpl.class;
 	
 	static private CredentialsProviderFactory credentialsProviderFactory = new CredentialsProviderFactory() {
 		public CredentialsProvider newCredentialsProvider() {
@@ -41,18 +41,18 @@ public class HttpRequestExecuterFactory {
 		}
 	};
 	
-	public void setStaticDefaultType(Class<? extends HttpRequestExecuter> defaultNew) {
+	public void setStaticDefaultType(Class defaultNew) {
 		defaultExecuter = defaultNew;
 	}
-	static public void setDefaultType(Class<? extends HttpRequestExecuter> defaultNew) {
+	static public void setDefaultType(Class defaultNew) {
 		defaultExecuter = defaultNew;
 	}
-	static public Class<? extends HttpRequestExecuter> getDefaultType() {
+	static public Class getDefaultType() {
 		return defaultExecuter;
 	}
 	static public HttpRequestExecuter newDefault() {
 		try {
-			return defaultExecuter.newInstance();
+			return (HttpRequestExecuter) defaultExecuter.newInstance();
 		} catch( Exception ie ) {
 			throw new RuntimeException(ie);
 		}

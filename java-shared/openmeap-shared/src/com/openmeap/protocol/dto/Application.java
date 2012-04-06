@@ -24,16 +24,26 @@
 
 package com.openmeap.protocol.dto;
 
+import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
 
-public class Application {
+public class Application implements HasJSONProperties {
 
     protected ApplicationInstallation installation;
     protected String name;
     protected String versionId;
     protected String hashValue;
 
-    @JSONProperty 
+    private static JSONProperty[] jsonProperties = new JSONProperty[] {
+    	new JSONProperty("getInstallation"),
+    	new JSONProperty("getName"),
+    	new JSONProperty("getVersionId"),
+    	new JSONProperty("getHashValue")
+    };
+    public JSONProperty[] getJSONProperties() {
+		return jsonProperties;
+	}
+    
     public ApplicationInstallation getInstallation() {
         return installation;
     }
@@ -41,7 +51,6 @@ public class Application {
         this.installation = value;
     }
 
-    @JSONProperty 
     public String getName() {
         return name;
     }
@@ -49,7 +58,6 @@ public class Application {
         this.name = value;
     }
 
-    @JSONProperty 
     public String getVersionId() {
         return versionId;
     }
@@ -57,12 +65,10 @@ public class Application {
         this.versionId = value;
     }
 
-    @JSONProperty 
     public String getHashValue() {
         return hashValue;
     }
     public void setHashValue(String value) {
         this.hashValue = value;
     }
-
 }

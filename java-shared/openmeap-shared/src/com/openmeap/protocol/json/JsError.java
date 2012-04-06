@@ -18,7 +18,6 @@ public class JsError {
 		this.message = message;
 	}
 	
-	@Override
 	public String toString() {
 		return toJSON();
 	}

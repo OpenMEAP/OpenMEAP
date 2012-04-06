@@ -24,12 +24,13 @@
 
 package com.openmeap.util;
 
-import org.junit.*;
+import junit.framework.Assert;
+import junit.framework.TestCase;
 
 import com.openmeap.util.AuthTokenProvider;
 
-public class AuthTokenProviderTest {
-	@Test public void test() {
+public class AuthTokenProviderTest extends TestCase {
+	public void test() {
 		String token = AuthTokenProvider.newAuthToken("testSalt");
 		Assert.assertTrue( AuthTokenProvider.validateAuthToken("testSalt",token));
 	}

@@ -25,18 +25,17 @@
 package com.openmeap.event;
 
 
-@SuppressWarnings("serial")
-abstract public class AbstractEvent<T> implements Event<T> {
+abstract public class AbstractEvent implements Event {
 		
-	private T payload = null;
+	private Object payload = null;
 	
-	public AbstractEvent(T payload) {
+	public AbstractEvent(Object payload) {
 		setPayload(payload);
 	}
-	public void setPayload(T object) {
+	public void setPayload(Object object) {
 		payload = object;
 	}
-	public T getPayload() {
+	public Object getPayload() {
 		return payload;
 	}
 }
