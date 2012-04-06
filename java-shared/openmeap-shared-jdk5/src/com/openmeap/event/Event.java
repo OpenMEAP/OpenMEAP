@@ -26,7 +26,7 @@ package com.openmeap.event;
 
 import java.io.Serializable;
 
-public interface Event extends Serializable {
-	void setPayload(Object object);
-	Object getPayload();
+public interface Event<T> extends Serializable {
+	void setPayload(T object);
+	T getPayload();
 }

@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
@@ -40,6 +41,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.conn.params.ConnRoutePNames;
@@ -100,13 +102,7 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 	}
 	
 	public HttpResponse get(HttpGet httpGet) throws ClientProtocolException, IOException {
-		org.apache.http.HttpResponse clientResponse = httpClient.execute(httpGet);
-		
-		HttpResponseImpl returnResponse = new HttpResponseImpl();
-		returnResponse.setResponseBody(clientResponse.getEntity().getContent());
-		returnResponse.setContentLength(clientResponse.getEntity().getContentLength());
-		returnResponse.setStatusCode(clientResponse.getStatusLine().getStatusCode());
-    	return returnResponse;
+		return execute(httpGet);
 	}
 	
 	public HttpResponse get(String url, Map getParams) throws HttpRequestException {
@@ -144,13 +140,7 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 			httpPost.setHeader(FormConstants.USERAGENT,FormConstants.USERAGENT_DEFAULT);
 	        httpPost.setEntity(entity);
 	    	
-	        org.apache.http.HttpResponse clientResponse = httpClient.execute(httpPost);
-	        
-	        HttpResponseImpl returnResponse = new HttpResponseImpl();
-			returnResponse.setResponseBody(clientResponse.getEntity().getContent());
-			returnResponse.setContentLength(clientResponse.getEntity().getContentLength());
-			returnResponse.setStatusCode(clientResponse.getStatusLine().getStatusCode());
-	    	return returnResponse;
+	        return execute(httpPost);
 		} catch(Exception e) {
 			throw new HttpRequestException(e);
 		}
@@ -166,13 +156,7 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 	    	httppost.setEntity(stringEntity);
 	    	
 	    	// TODO: figure out how to get "application/soap+xml;charset=UTF-8" working...keeps giving me a "415: Unsupported Media Type"
-	    	org.apache.http.HttpResponse clientResponse = httpClient.execute(httppost);
-	    	
-	    	HttpResponseImpl returnResponse = new HttpResponseImpl();
-			returnResponse.setResponseBody(clientResponse.getEntity().getContent());
-			returnResponse.setContentLength(clientResponse.getEntity().getContentLength());
-			returnResponse.setStatusCode(clientResponse.getStatusLine().getStatusCode());
-	    	return returnResponse;
+	    	return execute(httppost);
 		} catch(Exception e) {
 			throw new HttpRequestException(e);
 		}
@@ -224,5 +208,23 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 	
 	protected HttpClient getHttpClient() {
 		return httpClient;
+	}
+	
+	protected HttpResponse execute(HttpUriRequest request) throws IllegalStateException, IOException {
+		org.apache.http.HttpResponse clientResponse = httpClient.execute(request);
+		
+    	HttpResponseImpl returnResponse = new HttpResponseImpl();
+    	
+		returnResponse.setResponseBody(clientResponse.getEntity().getContent());
+		returnResponse.setContentLength(clientResponse.getEntity().getContentLength());
+		returnResponse.setStatusCode(clientResponse.getStatusLine().getStatusCode());
+		
+		List<HttpHeader> headers = new ArrayList<HttpHeader>();
+		for( Header header : clientResponse.getAllHeaders() ) {
+			headers.add(new HttpHeader(header.getName(),header.getValue()));
+		}
+		returnResponse.setHeaders(headers.toArray(new HttpHeader[headers.size()]));
+		
+    	return returnResponse;
 	}
 }

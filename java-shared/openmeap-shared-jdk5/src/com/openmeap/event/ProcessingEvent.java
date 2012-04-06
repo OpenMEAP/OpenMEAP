@@ -25,17 +25,9 @@
 package com.openmeap.event;
 
 
-abstract public class AbstractEvent implements Event {
-		
-	private Object payload = null;
-	
-	public AbstractEvent(Object payload) {
-		setPayload(payload);
-	}
-	public void setPayload(Object object) {
-		payload = object;
-	}
-	public Object getPayload() {
-		return payload;
-	}
+public interface ProcessingEvent<T> extends Event<T> {
+	void setTargets(String[] processTargets);
+	String[] getTargets();
 }
+
+

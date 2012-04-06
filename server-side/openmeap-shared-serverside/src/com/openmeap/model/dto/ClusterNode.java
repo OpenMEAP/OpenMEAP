@@ -39,12 +39,13 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
 import com.openmeap.model.AbstractModelEntity;
 import com.openmeap.model.ModelEntity;
 
 @Entity @Table(name="cluster_node")
-public class ClusterNode extends AbstractModelEntity {
+public class ClusterNode extends AbstractModelEntity implements HasJSONProperties {
 	
 	/**
 	 * This is the url to the deployment of openmeap-service-web.war
@@ -54,10 +55,18 @@ public class ClusterNode extends AbstractModelEntity {
 	private String serviceWebUrlPrefix;
 	private String fileSystemStoragePathPrefix;
 	
+	static final private JSONProperty[] jsonProperties = new JSONProperty[] {
+		new JSONProperty("getServiceWebUrlPrefix"),
+		new JSONProperty("getFileSystemStoragePathPrefix")
+	};
+	@Override @Transient
+	public JSONProperty[] getJSONProperties() {
+		return jsonProperties;
+	}
+	
 	@Transient public String getPk() { return getServiceWebUrlPrefix(); }
 	public void setPk( Object pkValue ) { setServiceWebUrlPrefix((String)pkValue); }
 	
-	@JSONProperty
 	@Id @Column(name="svc_web_url_prfx",length=256)
 	public String getServiceWebUrlPrefix() {
 		return serviceWebUrlPrefix;
@@ -66,7 +75,6 @@ public class ClusterNode extends AbstractModelEntity {
 		this.serviceWebUrlPrefix = serviceWebUrlPrefix;
 	}
 	
-	@JSONProperty
 	@Column(name="file_sys_strg_path_prfx", length=512)
 	public String getFileSystemStoragePathPrefix() {
 		return fileSystemStoragePathPrefix;

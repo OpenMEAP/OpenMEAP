@@ -43,7 +43,7 @@ public class UpdateType implements Enum {
         return value;
     }
 
-    public static Object fromValue(String v) {
+    public static UpdateType fromValue(String v) {
     	Field[] fields = UpdateType.class.getDeclaredFields();
     	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
     		Field field = fields[fieldIdx];

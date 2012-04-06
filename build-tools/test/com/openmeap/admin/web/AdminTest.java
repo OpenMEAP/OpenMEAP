@@ -28,8 +28,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
+import com.openmeap.util.HttpHeader;
+import com.openmeap.util.HttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -57,7 +57,7 @@ import com.openmeap.util.Utils;
  */
 public class AdminTest {
 
-	final static private String HOST = "localhost:7000";
+	final static private String HOST = "localhost:8080";
 	
 	final static private String ADMIN_USER = "tomcat";
 	final static private String ADMIN_PASS = "tomcat";
@@ -102,20 +102,20 @@ public class AdminTest {
 	@Test public void testLogin() throws Exception {
 		
 		HttpResponse response = helper.getLogin();
-		EntityUtils.consume(response.getEntity());
+		Utils.consumeInputStream(response.getResponseBody());
 		
 		response = helper.postLogin(ADMIN_USER, ADMIN_PASS);
 		
-		Assert.assertTrue(response.getStatusLine().getStatusCode()==302);
-		Header[] headers = response.getHeaders("Location");
+		Assert.assertTrue(response.getStatusCode()==302);
+		HttpHeader[] headers = response.getHeaders("Location");
 		Assert.assertTrue(headers.length==1);
 		Assert.assertTrue(headers[0].getValue().equals(helper.getAdminUrl()));
 		
-		EntityUtils.consume(response.getEntity());
+		Utils.consumeInputStream(response.getResponseBody());
 		
 		// Tomcat will shoot you in the face if you don't follow it's redirects
 		response = helper.getRequestExecuter().get(headers[0].getValue());
-		EntityUtils.consume(response.getEntity());
+		Utils.consumeInputStream(response.getResponseBody());
 	}
 	
 	@Test public void testUpdateGlobalSettings() throws Exception {
@@ -136,7 +136,7 @@ public class AdminTest {
 		settings.setClusterNodes(clusterNodeMap);
 		
 		// validate settings stored in database
-		EntityUtils.consume(helper.postGlobalSettings(settings).getEntity());
+		Utils.consumeInputStream(helper.postGlobalSettings(settings).getResponseBody());
 		
 		GlobalSettings insertedSettings = modelManager.getGlobalSettings();
 		
@@ -160,8 +160,8 @@ public class AdminTest {
 		
 		HttpResponse response = helper.postAddModifyApp(app);
 		
-		Assert.assertTrue(response.getStatusLine().getStatusCode()==200);
-		String output = Utils.readInputStream(response.getEntity().getContent(),FormConstants.CHAR_ENC_DEFAULT);
+		Assert.assertTrue(response.getStatusCode()==200);
+		String output = Utils.readInputStream(response.getResponseBody(),FormConstants.CHAR_ENC_DEFAULT);
 		Assert.assertTrue(output.contains(APP_ADDMODIFY_SUCCESS));
 		
 		// Now check the database, to make sure everything got in there
@@ -182,7 +182,7 @@ public class AdminTest {
 		Integer newLen = 2;
 		dbApp.setDescription(newDesc);
 		dbApp.setDeploymentHistoryLength(newLen);
-		EntityUtils.consume(helper.postAddModifyApp(dbApp).getEntity());
+		Utils.consumeInputStream(helper.postAddModifyApp(dbApp).getResponseBody());
 		
 		// validate changes
 		modelManager.refresh(dbApp,null);
@@ -258,7 +258,7 @@ public class AdminTest {
 		app.addVersion(version);
 		File uploadArchive = new File(this.getClass().getResource(archiveName).getFile());
 
-		EntityUtils.consume(helper.postAddModifyAppVer(version, uploadArchive).getEntity());
+		Utils.consumeInputStream(helper.postAddModifyAppVer(version, uploadArchive).getResponseBody());
 		
 		// archive is uploaded
 		modelManager.getModelService().clearPersistenceContext();
@@ -281,7 +281,7 @@ public class AdminTest {
 		ApplicationVersion version = modelManager.getModelService().findAppVersionByNameAndId(APP_NAME, identifier);
 		String hash = version.getArchive().getHash();
 		
-		EntityUtils.consume(helper.postAddModifyAppVer_delete(version).getEntity());
+		Utils.consumeInputStream(helper.postAddModifyAppVer_delete(version).getResponseBody());
 		
 		modelManager.getModelService().clearPersistenceContext();
 		version = modelManager.getModelService().findAppVersionByNameAndId(APP_NAME, identifier);
@@ -292,7 +292,7 @@ public class AdminTest {
 	
 	private void _createDeployment(String identifier, Deployment.Type type) throws Exception {
 		ApplicationVersion version = modelManager.getModelService().findAppVersionByNameAndId(APP_NAME, identifier);
-		EntityUtils.consume(helper.postCreateDeployment(version, type).getEntity());
+		Utils.consumeInputStream(helper.postCreateDeployment(version, type).getResponseBody());
 		Assert.assertTrue(_isVersionArchiveInDeployedLocation(version.getArchive().getHash()));
 	}
 	

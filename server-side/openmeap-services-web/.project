@@ -5,6 +5,7 @@
 	<projects>
 		<project>openmeap-shared</project>
 		<project>openmeap-shared-serverside</project>
+		<project>openmeap-shared-jdk5</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

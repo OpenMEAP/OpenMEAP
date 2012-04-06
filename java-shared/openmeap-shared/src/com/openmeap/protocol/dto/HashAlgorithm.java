@@ -25,6 +25,9 @@
 package com.openmeap.protocol.dto;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.openmeap.json.Enum;
 
 public class HashAlgorithm implements Enum {
@@ -41,8 +44,21 @@ public class HashAlgorithm implements Enum {
     public String value() {
         return value;
     }
+    
+    static public HashAlgorithm[] values() {
+    	List list = new ArrayList();
+    	Field[] fields = HashAlgorithm.class.getDeclaredFields();
+    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
+    		try {
+				list.add(fields[fieldIdx].get(null));
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			} 
+    	}
+    	return (HashAlgorithm[])list.toArray();
+    }
 
-    public static Object fromValue(String v) {
+    public static HashAlgorithm fromValue(String v) {
     	Field[] fields = HashAlgorithm.class.getDeclaredFields();
     	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
     		Field field = fields[fieldIdx];

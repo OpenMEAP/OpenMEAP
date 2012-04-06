@@ -24,14 +24,19 @@
 
 package com.openmeap.event;
 
-import java.util.List;
 
-public interface EventNotifier {
-	/**
-	 * 
-	 * @param event
-	 * @param events a List of ProcessingEvent objects
-	 * @throws EventNotificationException
-	 */
-	void notify(Event event, List events) throws EventNotificationException;
+@SuppressWarnings("serial")
+abstract public class AbstractEvent<T> implements Event<T> {
+		
+	private T payload = null;
+	
+	public AbstractEvent(T payload) {
+		setPayload(payload);
+	}
+	public void setPayload(T object) {
+		payload = object;
+	}
+	public T getPayload() {
+		return payload;
+	}
 }

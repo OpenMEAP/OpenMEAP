@@ -31,8 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
+import com.openmeap.util.HttpResponse;
 import org.junit.Assert;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -45,19 +44,20 @@ import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.util.FileHandlingHttpRequestExecuterImpl;
+import com.openmeap.util.HttpRequestException;
 import com.openmeap.util.HttpRequestExecuter;
 import com.openmeap.web.form.ParameterMapBuilder;
 import com.openmeap.web.form.ParameterMapBuilderException;
 
 public class AdminTestHelper {
 	
-	private String adminUrl = "http://localhost:7000/openmeap-admin-web/interface/";
+	private String adminUrl = "http://localhost:8080/openmeap-admin-web/interface/";
 	private HttpRequestExecuter requestExecuter;
 	private ParameterMapBuilder paramsBuilder;
 	private ClassPathXmlApplicationContext persistenceBeans;
 	
 	public AdminTestHelper() {
-		requestExecuter = new FileHandlingHttpRequestExecuterImpl();
+		requestExecuter = (HttpRequestExecuter) new FileHandlingHttpRequestExecuterImpl();
 		paramsBuilder = new ParameterMapBuilder();
 	}
 	
@@ -86,11 +86,11 @@ public class AdminTestHelper {
 	 * Login 
 	 */
 	
-	public HttpResponse getLogin() throws ClientProtocolException, IOException {
+	public HttpResponse getLogin() throws HttpRequestException {
 		return requestExecuter.get(adminUrl);
 	}
 	
-	public HttpResponse postLogin(String userName, String password) throws ClientProtocolException, IOException {
+	public HttpResponse postLogin(String userName, String password) throws HttpRequestException {
 		Map<String,Object> postData = new HashMap<String,Object>();
 		postData.put("j_username", userName);
 		postData.put("j_password", password);
@@ -101,7 +101,7 @@ public class AdminTestHelper {
 	 * Application Add/Modify
 	 */
 	
-	public HttpResponse getAddModifyAppPage(Application application) throws ClientProtocolException, IOException {
+	public HttpResponse getAddModifyAppPage(Application application) throws HttpRequestException {
 		Map<String,Object> getData = new HashMap<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_APP_ADDMODIFY);
 		if(application!=null && application.getPk()!=null) {
@@ -110,7 +110,7 @@ public class AdminTestHelper {
 		return requestExecuter.get(adminUrl,getData);
 	}
 	
-	public HttpResponse postAddModifyApp(Application application) throws ClientProtocolException, IOException, ParameterMapBuilderException {
+	public HttpResponse postAddModifyApp(Application application) throws HttpRequestException, ParameterMapBuilderException {
 		
 		Map<String,Object> getData = new HashMap<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_APP_ADDMODIFY);
@@ -127,7 +127,7 @@ public class AdminTestHelper {
 		return requestExecuter.postData(adminUrl,getData,postData);
 	}
 	
-	public HttpResponse postAddModifyApp_delete(Application application) throws ParameterMapBuilderException, ClientProtocolException, IOException {
+	public HttpResponse postAddModifyApp_delete(Application application) throws HttpRequestException, ParameterMapBuilderException {
 		
 		Map<String,Object> getData = new HashMap<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_APP_ADDMODIFY);
@@ -150,7 +150,7 @@ public class AdminTestHelper {
 	 * APPLICATiON VERSIONs
 	 */
 	
-	public HttpResponse getAddModifyAppVer(Application application) throws ClientProtocolException, IOException {
+	public HttpResponse getAddModifyAppVer(Application application) throws HttpRequestException {
 		
 		Map<String,Object> getData = new HashMap<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_APPVER_ADDMODIFY);
@@ -158,7 +158,7 @@ public class AdminTestHelper {
 		return requestExecuter.get(adminUrl,getData);
 	}
 	
-	public HttpResponse postAddModifyAppVer(ApplicationVersion appVer, File uploadArchive) throws ClientProtocolException, IOException, ParameterMapBuilderException {
+	public HttpResponse postAddModifyAppVer(ApplicationVersion appVer, File uploadArchive) throws HttpRequestException, ParameterMapBuilderException {
 		
 		Map<String,Object> getData = new HashMap<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_APPVER_ADDMODIFY);
@@ -176,7 +176,7 @@ public class AdminTestHelper {
 		return requestExecuter.postData(adminUrl,getData,postData);
 	}
 	
-	public HttpResponse postAddModifyAppVer_delete(ApplicationVersion appVer) throws ClientProtocolException, IOException, ParameterMapBuilderException {
+	public HttpResponse postAddModifyAppVer_delete(ApplicationVersion appVer) throws HttpRequestException, ParameterMapBuilderException {
 		
 		Map<String,Object> getData = new HashMap<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_APPVER_ADDMODIFY);
@@ -203,7 +203,7 @@ public class AdminTestHelper {
 	 * DEPLOYMENTS
 	 */
 	
-	public HttpResponse postCreateDeployment(ApplicationVersion appVer, Deployment.Type deplType) throws ClientProtocolException, IOException {
+	public HttpResponse postCreateDeployment(ApplicationVersion appVer, Deployment.Type deplType) throws HttpRequestException {
 		
 		Map<String,Object> getData = new HashMap<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_DEPLOYMENTS);
@@ -221,13 +221,13 @@ public class AdminTestHelper {
 	 * GLOBAL SETTINGS
 	 */
 	
-	public HttpResponse getGlobalSettings() throws ClientProtocolException, IOException {
+	public HttpResponse getGlobalSettings() throws HttpRequestException {
 		Map<String,Object> getData = new HashMap<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_GLOBAL_SETTINGS);
 		return requestExecuter.get(adminUrl,getData);
 	}
 	
-	public HttpResponse postGlobalSettings(GlobalSettings settings) throws ClientProtocolException, IOException, ParameterMapBuilderException {
+	public HttpResponse postGlobalSettings(GlobalSettings settings) throws HttpRequestException, ParameterMapBuilderException {
 		
 		Map<String,Object> getData = new HashMap<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_GLOBAL_SETTINGS);

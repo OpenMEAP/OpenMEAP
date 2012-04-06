@@ -114,7 +114,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 			uh.setVersionIdentifier(currentVersion.getIdentifier());
 			uh.setInstallNeeds(Long.valueOf(currentVersionArchive.getBytesLength()+currentVersionArchive.getBytesLengthUncompressed())); 
 			uh.setStorageNeeds(Long.valueOf(currentVersionArchive.getBytesLengthUncompressed())); 
-			uh.setType( UpdateType.valueOf(lastDeployment.getType().toString()) );
+			uh.setType( UpdateType.fromValue(lastDeployment.getType().toString()) );
 			uh.setUpdateUrl(currentVersionArchive.getDownloadUrl(settings));
 			uh.setHash(new Hash());
 			uh.getHash().setAlgorithm(

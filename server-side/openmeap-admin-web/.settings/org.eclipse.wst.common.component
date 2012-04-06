@@ -10,6 +10,9 @@
         <dependent-module archiveName="openmeap-shared-serverside.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/openmeap-shared-serverside/openmeap-shared-serverside">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="openmeap-shared-jdk5.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/openmeap-shared-jdk5/openmeap-shared-jdk5">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="java-output-path" value="/openmeap-admin-web2/bin"/>
         <property name="context-root" value="openmeap-admin-web"/>
     </wb-module>

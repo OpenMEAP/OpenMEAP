@@ -24,21 +24,46 @@
 
 package com.openmeap.services.dto;
 
+import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
 
 /**
  * Generic result to return from the service-management servlet
  * @author schang
  */
-public class Result {
+public class Result implements HasJSONProperties {
 	
-	public enum Status {
-		SUCCESS,
-		FAILURE;
+	static public class Status implements com.openmeap.json.Enum {
+		static final public Status SUCCESS=new Status("SUCCESS");
+		static final public Status FAILURE=new Status("FAILURE");
+		private String value;
+		private Status(String value) {
+			this.value=value;
+		}
+		public String value() {
+			return value;
+		}
+		static Status fromValue(String v) {
+			if( v.equalsIgnoreCase(SUCCESS.value())) {
+				return SUCCESS;
+			} else if( v.equalsIgnoreCase(FAILURE.value())) {
+				return FAILURE;
+			}
+			throw new IllegalArgumentException(v);
+		}
 	};
 	
 	private Status resultStatus;
 	private String message;
+	
+	static final private JSONProperty[] jsonProperties = new JSONProperty[] {
+		new JSONProperty("getStatus"),
+		new JSONProperty("getMessage")
+	};
+	@Override
+	public JSONProperty[] getJSONProperties() {
+		return jsonProperties;
+	}
 	
 	public Result() {
 	}
@@ -51,14 +76,14 @@ public class Result {
 		setMessage(status.toString());
 	}
 	
-	@JSONProperty public Status getStatus() {
+	public Status getStatus() {
 		return resultStatus;
 	}
 	public void setStatus(Status result) {
 		this.resultStatus = result;
 	}
 	
-	@JSONProperty public String getMessage() {
+	public String getMessage() {
 		return message;
 	}
 	public void setMessage(String message) {

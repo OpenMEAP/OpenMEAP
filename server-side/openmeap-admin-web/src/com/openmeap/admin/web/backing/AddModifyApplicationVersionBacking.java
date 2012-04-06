@@ -208,6 +208,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 	 * @param vars
 	 * @param archive
 	 */
+	@SuppressWarnings("unchecked")
 	private void createHashTypes(Map<Object,Object> vars, ApplicationArchive archive) {
 		List<Option> opts = new ArrayList<Option>();
 		String archiveHashAlg = archive!=null?archive.getHashAlgorithm():null;

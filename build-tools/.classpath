@@ -11,5 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/openmeap-shared-serverside"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/openmeap-admin-web"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/openmeap-services-web"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/openmeap-shared-jdk5"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

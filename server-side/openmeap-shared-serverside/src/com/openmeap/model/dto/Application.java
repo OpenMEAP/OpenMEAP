@@ -44,12 +44,13 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import com.openmeap.constants.FormConstants;
+import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
 import com.openmeap.model.AbstractModelEntity;
 import com.openmeap.web.form.Parameter;
 
 @Entity @Table(name="application")
-public class Application extends AbstractModelEntity {
+public class Application extends AbstractModelEntity implements HasJSONProperties {
 	
 	private Long id;
 	private Map<String,ApplicationVersion> versions;
@@ -61,6 +62,19 @@ public class Application extends AbstractModelEntity {
 	private String initialVersionIdentifier;
 	private List<Deployment> deployments;
 	private Integer deploymentHistoryLength = 10;
+	
+	static final private JSONProperty[] jsonProperties = new JSONProperty[] {
+		new JSONProperty("getName"),
+		new JSONProperty("getDescription"),
+		new JSONProperty("getAdmins"),
+		new JSONProperty("getVersionAdmins"),
+		new JSONProperty("getDeploymentHistoryLength"),
+		new JSONProperty("getInitialVersionIdentifier")
+	};
+	@Override @Transient
+	public JSONProperty[] getJSONProperties() {
+		return jsonProperties;
+	}
 	
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	@Parameter(FormConstants.APP_ID)
@@ -76,7 +90,6 @@ public class Application extends AbstractModelEntity {
 	
 	@Column(name="name",unique=true,nullable=false)
 	@Parameter("name")
-	@JSONProperty
 	public String getName() {
 		return this.name;
 	}
@@ -86,7 +99,6 @@ public class Application extends AbstractModelEntity {
 	
 	@Column(name="description",length=4000)
 	@Parameter(FormConstants.APP_DESCRIPTION)
-	@JSONProperty
 	public String getDescription() {
 		return description;
 	}
@@ -96,7 +108,6 @@ public class Application extends AbstractModelEntity {
 	
 	@Column(name="admins",length=4000)
 	@Parameter(FormConstants.APP_ADMINS)
-	@JSONProperty
 	public String getAdmins() {
 		return admins;
 	}
@@ -115,7 +126,6 @@ public class Application extends AbstractModelEntity {
 	}
 	@Column(name="version_admins",length=4000)
 	@Parameter(FormConstants.APP_VERSIONADMINS)
-	@JSONProperty
 	public String getVersionAdmins() {
 		return versionAdmins;
 	}
@@ -137,7 +147,6 @@ public class Application extends AbstractModelEntity {
 	 */
 	@Column(name="depl_hist_len")
 	@Parameter(FormConstants.APP_DEPL_HIST_LEN)
-	@JSONProperty
 	public Integer getDeploymentHistoryLength() {
 		return deploymentHistoryLength;
 	}
@@ -147,7 +156,6 @@ public class Application extends AbstractModelEntity {
 	
 	@Column(name="initial_version_id",length=255)
 	@Parameter("initialVersionIdentifier")
-	@JSONProperty
 	public String getInitialVersionIdentifier() {
 		return initialVersionIdentifier;
 	}

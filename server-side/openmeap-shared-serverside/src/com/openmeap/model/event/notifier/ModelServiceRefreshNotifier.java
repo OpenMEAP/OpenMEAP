@@ -28,10 +28,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.openmeap.util.HttpResponse;
 import com.openmeap.cluster.AbstractClusterServiceMgmtNotifier;
 import com.openmeap.cluster.ClusterNotificationException;
 import com.openmeap.constants.ServletNameConstants;
@@ -101,8 +101,8 @@ public class ModelServiceRefreshNotifier
 		try {
 			logger.debug("Refresh post to {} for {} with id {}",new Object[]{thisUrl,simpleName,obj.getPk()});
 			httpResponse = getHttpRequestExecuter().postData(thisUrl,parms);
-			Utils.consumeInputStream(httpResponse.getEntity().getContent());
-			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			Utils.consumeInputStream(httpResponse.getResponseBody());
+			int statusCode = httpResponse.getStatusCode();
 			if( statusCode!=200 ) {
 				String exMesg = "HTTP "+statusCode+" returned for refresh post to "+thisUrl+" for "+simpleName+" with id "+obj.getPk();
 				logger.error(exMesg);

@@ -40,6 +40,7 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.StringUtils;
 
 import com.openmeap.constants.FormConstants;
+import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
 import com.openmeap.model.AbstractModelEntity;
 import com.openmeap.model.ModelEntity;
@@ -58,12 +59,24 @@ import java.util.Map;
  * @author schang
  */
 @Entity @Table(name="global_settings")
-public class GlobalSettings extends AbstractModelEntity {
+public class GlobalSettings extends AbstractModelEntity implements HasJSONProperties {
 	private Long id = null;
 	private Map<String,ClusterNode> clusterNodes = null;
 	private String temporaryStoragePath = null;
 	private String serviceManagementAuthSalt = null;
 	private Integer maxFileUploadSize = 1000000;
+	
+	static final private JSONProperty[] jsonProperties = new JSONProperty[] {
+		new JSONProperty("getExternalServiceUrlPrefix"),
+		new JSONProperty("getMaxFileUploadSize"),
+		new JSONProperty("getServiceManagementAuthSalt"),
+		new JSONProperty("getTemporaryStoragePath"),
+		new JSONProperty("getClusterNodes")
+	};
+	@Override @Transient
+	public JSONProperty[] getJSONProperties() {
+		return jsonProperties;
+	}
 	
 	/**
 	 * This is the external url which is used as the root for uploaded archives.
@@ -84,7 +97,6 @@ public class GlobalSettings extends AbstractModelEntity {
 	public void setPk( Object pkValue ) { setId((Long)pkValue); }
 	
 	@Column(name="external_svc_url")
-	@JSONProperty
 	@Parameter(FormConstants.GLOBAL_SETTINGS_EXTERNAL_SVC_URL)
 	public String getExternalServiceUrlPrefix() {
 		return externalServiceUrlPrefix;
@@ -94,7 +106,6 @@ public class GlobalSettings extends AbstractModelEntity {
 	}
 	
 	@Column(name="max_file_upload_size")
-	@JSONProperty
 	@Parameter(FormConstants.GLOBAL_SETTINGS_MAX_UPLOAD)
 	public Integer getMaxFileUploadSize() {
 		return maxFileUploadSize;
@@ -104,7 +115,6 @@ public class GlobalSettings extends AbstractModelEntity {
 	}
 	
 	@Column(name="svc_mgmt_auth_salt",length=4000)
-	@JSONProperty
 	@Parameter(value=FormConstants.GLOBAL_SETTINGS_AUTH_SALT,password=true,validation=@Validation(verify=true))
 	public String getServiceManagementAuthSalt() {
 		return serviceManagementAuthSalt;
@@ -114,7 +124,6 @@ public class GlobalSettings extends AbstractModelEntity {
 	}
 	
 	@Column(name="temp_strg_path",length=4000)
-	@JSONProperty
 	@Parameter(FormConstants.GLOBAL_SETTINGS_STORAGE_PATH_PREFIX)
 	public String getTemporaryStoragePath() {
 		return temporaryStoragePath;
@@ -150,7 +159,6 @@ public class GlobalSettings extends AbstractModelEntity {
 		return id!=null?id.intValue():0;
 	}
 	
-	@JSONProperty
 	@OneToMany(fetch=FetchType.EAGER,cascade={CascadeType.ALL},targetEntity=ClusterNode.class)
 	@MapKey(name="serviceWebUrlPrefix")
 	@Lob

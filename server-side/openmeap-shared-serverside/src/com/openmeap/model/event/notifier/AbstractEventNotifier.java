@@ -28,7 +28,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,9 +38,9 @@ import com.openmeap.constants.ServletNameConstants;
 import com.openmeap.constants.UrlParamConstants;
 import com.openmeap.event.Event;
 import com.openmeap.model.ModelEntity;
-import com.openmeap.model.ModelManager;
 import com.openmeap.model.ModelServiceEventNotifier;
 import com.openmeap.model.event.ModelEntityEvent;
+import com.openmeap.util.HttpResponse;
 import com.openmeap.util.Utils;
 
 abstract public class AbstractEventNotifier<T extends ModelEntity> extends
@@ -85,16 +84,16 @@ abstract public class AbstractEventNotifier<T extends ModelEntity> extends
 			logger.debug("Notification to {} with params {}",sendUrl,parms);
 
 			HttpResponse response = this.getHttpRequestExecuter().postData( sendUrl, parms );
-			int statusCode = response.getStatusLine().getStatusCode();
+			int statusCode = response.getStatusCode();
 			
 			logger.debug("Notification to {} returned status code {}",sendUrl,statusCode);
 			
 			if( statusCode!=200 ) {
-				String responseText = Utils.readInputStream(response.getEntity().getContent(), FormConstants.CHAR_ENC_DEFAULT);
+				String responseText = Utils.readInputStream(response.getResponseBody(), FormConstants.CHAR_ENC_DEFAULT);
 				logger.error(responseText);
 				throw new ClusterNotificationException(String.format("Notification to %s returned status code %s and response text was ",sendUrl,statusCode));
 			} else {
-				Utils.consumeInputStream(response.getEntity().getContent());
+				Utils.consumeInputStream(response.getResponseBody());
 			}
 		} catch( Exception e ) {
 			throw new ClusterNotificationException(e.getMessage(),e);

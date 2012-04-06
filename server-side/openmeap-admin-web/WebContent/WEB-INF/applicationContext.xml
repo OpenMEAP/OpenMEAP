@@ -32,6 +32,10 @@
 
 	<bean id="servletContext" class="org.springframework.web.context.support.ServletContextFactoryBean"/>
 
+	<bean id="httpRequestExecuterFactory" class="com.openmeap.util.HttpRequestExecuterFactory">
+		<property name="staticDefaultType" value="com.openmeap.util.FileHandlingHttpRequestExecuterImpl"/>
+	</bean>
+
 	<bean id="freeMarkerConfiguration" class="freemarker.template.Configuration">
 		<property name="templateLoader">
 			<bean class="freemarker.cache.WebappTemplateLoader">
