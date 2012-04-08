@@ -80,6 +80,7 @@
 		
 		<!-- javase->default; javaee->default -->
 		<dependency org="com.openmeap" name="shared" rev="latest.integration" conf="openmeap->default;"/>
+		<dependency org="com.openmeap" name="shared-jdk5" rev="latest.integration" conf="openmeap->default;"/>
 		<dependency org="com.openmeap" name="shared-serverside" rev="latest.integration" conf="openmeap->default;"/>
 		
 		<!-- javaee->default -->

@@ -26,7 +26,7 @@
 
 	<info revision="${openmeap.revision}"
 	    organisation="com.openmeap"
-	    module="shared"
+	    module="shared-jdk5"
 	    status="integration">
 	</info>
 	

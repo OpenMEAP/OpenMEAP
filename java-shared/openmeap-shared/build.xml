@@ -24,6 +24,8 @@
 -->
 <project name="openmeap-shared" basedir="." default="dist">
 	
+	<property name="openmeap.targetJdk" value="1.2"/>
+	<property name="openmeap.sourceJdk" value="1.2"/>
 	<import file="../../build-tools/ant_scripts/shared.xml"/>
 	<property name="openmeap.project.current.file.ivy" value="${openmeap.project.shared}/ivy.xml"/>
 	<property name="openmeap.project.current.dist" value="${openmeap.project.shared.dist.jar}"/>

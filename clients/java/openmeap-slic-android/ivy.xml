@@ -42,6 +42,7 @@
 	
 	<dependencies>
 	  	<dependency org="com.openmeap" name="shared" rev="latest.integration" conf="core->default"/>
+	  	<dependency org="com.openmeap" name="shared-jdk5" rev="latest.integration" conf="core->default"/>
 	  	<dependency org="com.openmeap" name="slic-core" rev="latest.integration" conf="core->default"/>
 	</dependencies>
 	

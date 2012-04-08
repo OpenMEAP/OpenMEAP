@@ -33,13 +33,7 @@
 
 	<!-- BEGIN CLEAN SECTION +++++++++++++++++++++++++++++++++++++ -->
 	
-	<target name="clean-generated-sources">
-		<delete includeemptydirs="true" quiet="true">
-			<fileset dir="gen" includes="**/*" excludes="deleteme*"/>
-		</delete>
-	</target>
-	
-	<target name="clean" depends="clean-generated-sources">
+	<target name="clean">
 		<delete file="${openmeap.project.shared-serverside.dist.jar}"/>
 		<delete includeemptydirs="true" quiet="true">
 			<fileset dir="bin" includes="**/*"/>
@@ -47,36 +41,10 @@
 	</target>
 	
 	<!-- END CLEAN SECTION +++++++++++++++++++++++++++++++++++++++ -->
-		
-	<!-- BEGIN GENERATE SECTION ++++++++++++++++++++++++++++++++++ -->
-			
-	<!-- //TODO: figure out how to get the XJCTask functional. -->
-	<!-- <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask" classpathref="openmeap.classpath"/> -->
-	<target name="generate-sources"> 
-		<description>
-			Create and populate the ./gen/ directory with the source resulting 
-			from running XJC against the schemas in schema.
-		</description>
-		 
-		<mkdir dir="gen"/>
-		<mkdir dir="bin"/>
-		
-		<!-- Start Schema-compile template. 
-		<exec executable="xjc">
-			<arg value="src/com/openmeap/cluster/node/config/cluster-node-configuration.xsd"/>
-			<arg value="-xmlschema"/>
-			<arg value="-d"/><arg value="gen"/>
-			<arg value="-p"/><arg value="com.openmeap.cluster.node.config"/>
-		</exec>
-		<!- - End Schema-compile template. -->
-		
-	</target>
-		
-	<!-- END GENERATE SECTION +++++++++++++++++++++++++++++++++++++ -->
 	
 	<!-- BEGIN COMPILE SECTION ++++++++++++++++++++++++++++++++++++ -->
 	
-	<target name="compile" depends="generate-sources,resolve">
+	<target name="compile" depends="resolve">
 		<mkdir dir="bin"/>
 		<javac debug="${openmeap.debug}" debuglevel="${openmeap.debuglevel}" 
 				target="${openmeap.targetJdk}" 
@@ -92,9 +60,6 @@
 		<copy todir="bin">
 			<fileset dir="src" includes="openmeap-jpa.properties"/>
 			<fileset dir="src" includes="hibernate.cfg.xml"/>
-		</copy>
-		<copy todir="bin/com/openmeap/cluster/node/config">
-			<fileset dir="src/com/openmeap/cluster/node/config" includes="**/*.xsd"/>
 		</copy>
 	</target>
 	

@@ -158,15 +158,14 @@ abstract public class Utils {
     	return byteArray2Hex(md.digest());
     }
     
-    public static String byteArray2Hex(byte[] hash) {
-    	final StringBuilder sb = new StringBuilder();     
-        for (int i = 0; i < hash.length; i++)     
-        {     
-            int low = hash[i] & 0xF;  
-            int high = (hash[i] >> 8) & 0xF;  
-            sb.append(Character.forDigit(high, 16));  
-            sb.append(Character.forDigit(low, 16));  
-        }     
-        return sb.toString(); 
-    }
+    private static char[] hexChars = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+	public static String byteArray2Hex(byte[] bytes){
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < bytes.length; i++){
+			int highBits = (bytes[i]>>4) & 0xf;
+			int lowBits = bytes[i] & 0xf;
+			sb.append(""+hexChars[highBits]+hexChars[lowBits]);
+		}
+		return sb.toString();
+	}
 }
