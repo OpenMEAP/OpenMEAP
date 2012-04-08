@@ -59,6 +59,7 @@ import com.openmeap.protocol.WebServiceException;
 import com.openmeap.protocol.dto.UpdateHeader;
 import com.openmeap.protocol.dto.UpdateType;
 import com.openmeap.thinclient.FirstRunCheck;
+import com.openmeap.thinclient.LoginFormCallback;
 import com.openmeap.thinclient.LoginFormLauncher;
 import com.openmeap.thinclient.Preferences;
 import com.openmeap.thinclient.SLICConfig;
@@ -69,7 +70,7 @@ import com.openmeap.util.HttpRequestExecuterFactory;
 import com.openmeap.util.HttpRequestExecuterImpl;
 import com.openmeap.util.Utils;
 
-public class MainActivity extends Activity implements LoginFormLauncher<OmSlicCredentialsProvider> {
+public class MainActivity extends Activity implements LoginFormLauncher {
 	
 	private static String SOURCE_ENCODING = "utf-8";
 	private static String DIRECTORY_INDEX = "index.html";
@@ -80,7 +81,7 @@ public class MainActivity extends Activity implements LoginFormLauncher<OmSlicCr
 	private UpdateHandler updateHandler = null;
 	private WebView webView = null;
 	private LocalStorageImpl storage = null;
-	private OmSlicCredentialsProvider credentialsProvider = null;
+	private LoginFormCallback loginFormCallback = null;
 	
     /** 
      * Called when the activity is first created. 
@@ -126,8 +127,8 @@ public class MainActivity extends Activity implements LoginFormLauncher<OmSlicCr
         setupWindowTitle();
     }
     
-    public void launchLoginForm(OmSlicCredentialsProvider credProv) {
-    	this.credentialsProvider = credProv;
+    public void launchLoginForm(LoginFormCallback credProv) {
+    	this.loginFormCallback = credProv;
     	this.runOnUiThread(new Runnable() {
     		public void run() {
 		    	showDialog(LOGIN_DIALOG);
@@ -337,10 +338,7 @@ public class MainActivity extends Activity implements LoginFormLauncher<OmSlicCr
     	dialog.setContentView(layout);
     	dialog.setTitle("Authentication Prompt");
     	
-    	AuthScope authScope = credentialsProvider.getAuthScope();
-    	String infoText = authScope.getHost() + ":" +
-    			authScope.getPort() + "\n" + 
-    			authScope.getRealm();
+    	String infoText = loginFormCallback.getInfoText();
     	TextView infoTextView = (TextView)layout.findViewById(R.id.info);
     	infoTextView.setText(infoText);
     	
@@ -350,11 +348,11 @@ public class MainActivity extends Activity implements LoginFormLauncher<OmSlicCr
 				EditText passwordText = (EditText)layout.findViewById(R.id.password);
 		    	EditText usernameText = (EditText)layout.findViewById(R.id.username);
 		    	CheckBox rememberBox = (CheckBox)layout.findViewById(R.id.remember);
-				credentialsProvider.onProceed(
+				loginFormCallback.onProceed(
 						usernameText.getEditableText().toString(), 
 						passwordText.getEditableText().toString(), 
 						rememberBox.isChecked());
-				credentialsProvider=null;
+				loginFormCallback=null;
 				if( ! rememberBox.isChecked() ) {
 					usernameText.setText("");
 					passwordText.setText("");
@@ -369,8 +367,8 @@ public class MainActivity extends Activity implements LoginFormLauncher<OmSlicCr
     			EditText passwordText = (EditText)layout.findViewById(R.id.password);
 		    	EditText usernameText = (EditText)layout.findViewById(R.id.username);
 		    	CheckBox rememberBox = (CheckBox)layout.findViewById(R.id.remember);
-    			credentialsProvider.onCancel();
-    			credentialsProvider=null;
+    			loginFormCallback.onCancel();
+    			loginFormCallback=null;
     			if( ! rememberBox.isChecked() ) {
 					usernameText.setText("");
 					passwordText.setText("");

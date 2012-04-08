@@ -1,6 +1,8 @@
 package com.openmeap.thinclient.update;
 
 public class UpdateException extends Exception {
+
+	private static final long serialVersionUID = 1940779386542633906L;
 	
 	private UpdateResult updateResult;
 	

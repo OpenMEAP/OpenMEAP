@@ -38,6 +38,13 @@ public class OmSlicCredentialsProvider extends BasicCredentialsProvider implemen
 		this.launcher = launcher;
 	}
 	
+	public String getInfoText() {
+		if( authScope==null ) {
+			return null;
+		}
+		return authScope.getHost() + ":" + authScope.getPort() + "\n" + authScope.getRealm();
+	}
+	
 	@Override
 	public void clear() {
 		super.clear();

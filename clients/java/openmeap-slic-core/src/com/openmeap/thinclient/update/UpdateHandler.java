@@ -36,7 +36,8 @@ public class UpdateHandler {
 	
 	private SLICConfig config = null;
 	private LocalStorage storage = null;
-	private Boolean interrupt = false;
+	private Object interruptLock = new Object();
+	private Boolean interrupt = Boolean.valueOf(false);
 	
 	public UpdateHandler(SLICConfig config, LocalStorage storage) {
 		this.setSLICConfig(config);
@@ -53,7 +54,7 @@ public class UpdateHandler {
 	public UpdateHeader checkForUpdate() throws WebServiceException {
 		// we'll go ahead and flip the flag that we tried to update now
     	// at the beginning of our intent
-		config.setLastUpdateAttempt(new Date().getTime());
+		config.setLastUpdateAttempt(Long.valueOf(new Date().getTime()));
 		
 		// put together the communication coordination request
     	ConnectionOpenRequest request = getConnectionOpenRequest();
@@ -150,14 +151,14 @@ public class UpdateHandler {
 	}
 	
 	public void clearInterruptFlag() {
-		synchronized(interrupt) {
-			interrupt = false;
+		synchronized(interruptLock) {
+			interrupt = Boolean.valueOf(false);
 		}
 	}
 	
 	public void interruptRunningUpdate() {
-		synchronized(interrupt) {
-			interrupt = true;
+		synchronized(interruptLock) {
+			interrupt = Boolean.valueOf(true);
 		}
 	}
 	
@@ -165,7 +166,7 @@ public class UpdateHandler {
 		
 		String lastUpdateResult = config.getLastUpdateResult();
 		
-		Boolean hasTimedOut = hasUpdatePendingTimedOut();
+		boolean hasTimedOut = hasUpdatePendingTimedOut();
 		if( !hasTimedOut && lastUpdateResult!=null && lastUpdateResult.compareTo(UpdateResult.PENDING.toString())==0 ) {
 			return;
 		} else {
@@ -177,7 +178,7 @@ public class UpdateHandler {
 		// if the new version is the original version,
 		// then we'll just update the app version, delete internal storage and return
 		String versionId = updateHeader.getVersionIdentifier();
-		if( config.isVersionOriginal(versionId) ) {
+		if( config.isVersionOriginal(versionId).booleanValue() ) {
 			config.setApplicationVersion(versionId);
 			config.setArchiveHash(updateHeader.getHash().getValue());
      		storage.resetStorage();
@@ -185,14 +186,14 @@ public class UpdateHandler {
      		return;
 		}
 		
-		if( !deviceHasEnoughSpace(update) ) {
+		if( ! deviceHasEnoughSpace(update).booleanValue() ) {
 			// TODO: whether this is a deal breaker or not should be configurable.  client should have the ability to override default behavior.  default behavior should be informative
 			throw new UpdateException(UpdateResult.OUT_OF_SPACE,"Need more space to install than is available");
 		}
 		
 		try {
 			// TODO: whether this is a deal breaker or not should be configurable.  client should have the ability to override default behavior.  default behavior should be informative
-			if( !downloadToArchive(update, eventHandler) ) {
+			if( ! downloadToArchive(update, eventHandler).booleanValue() ) {
 				return;
 			}
 		} catch( IOException ioe ) {
@@ -202,7 +203,7 @@ public class UpdateHandler {
 		
 		try {
 			 
-			if( !archiveIsValid(update) ) {
+			if( ! archiveIsValid(update).booleanValue() ) {
 				throw new UpdateException(UpdateResult.HASH_MISMATCH,"hash value of update does not match file hash value");
 			}
 				
@@ -224,7 +225,7 @@ public class UpdateHandler {
 			String newPrefix = "com.openmeap.storage."+update.getUpdateHeader().getHash().getValue();
 			config.setStorageLocation(newPrefix);
 
-			config.setApplicationUpdated(true);
+			config.setApplicationUpdated(Boolean.TRUE);
 			
 			if( eventHandler!=null ) { 
 				update.setComplete(true);
@@ -242,7 +243,7 @@ public class UpdateHandler {
 	public Boolean deviceHasEnoughSpace(UpdateStatus update) {
 		// test to make sure the device has enough space for the installation
 		Long avail = storage.getBytesFree();
-		return avail.compareTo(update.getUpdateHeader().getInstallNeeds()) > 0; 
+		return Boolean.valueOf(avail.compareTo(update.getUpdateHeader().getInstallNeeds()) > 0); 
 	}
 	
 	/**
@@ -286,8 +287,8 @@ public class UpdateHandler {
 	        		eventHandler.onStatusChange(update);
 	        		lastContentDownloaded = contentDownloaded;
 	        	}
-	        	synchronized(interrupt) {
-		        	if( interrupt ) {
+	        	synchronized(interruptLock) {
+		        	if( interrupt.booleanValue() ) {
 		        		clearInterruptFlag();
 		        		throw new UpdateException(UpdateResult.INTERRUPTED,"Download of archive was interrupted");
 		        	}
@@ -301,7 +302,7 @@ public class UpdateHandler {
 			// so that we can retain control over when the connection manager shut's down
 			requester.shutdown();
 		}
-		return true;
+		return Boolean.TRUE;
 	}
 	
 	public Boolean archiveIsValid(UpdateStatus update) throws IOException, NoSuchAlgorithmException {
@@ -314,9 +315,9 @@ public class UpdateHandler {
 			// TODO: handle hash validation failure differently
 			
 			if( !hashValue.equals(update.getUpdateHeader().getHash().getValue()) ) {
-				return false;
+				return Boolean.FALSE;
 			}
-			return true;
+			return Boolean.TRUE;
 		} finally {
 			fis.close();
 		}
@@ -362,12 +363,12 @@ public class UpdateHandler {
 		}
 	}
 	
-	private Boolean hasUpdatePendingTimedOut() {
+	private boolean hasUpdatePendingTimedOut() {
 		Integer pendingTimeout = config.getUpdatePendingTimeout();
 		Long lastAttempt = config.getLastUpdateAttempt();
-		Long currentTime = new Date().getTime();
+		Long currentTime = Long.valueOf(new Date().getTime());
 		if( lastAttempt!=null ) {
-			return currentTime > lastAttempt+(pendingTimeout*1000);
+			return currentTime.longValue() > lastAttempt.longValue()+(pendingTimeout.intValue()*1000);
 		}
 		return true;
 	}

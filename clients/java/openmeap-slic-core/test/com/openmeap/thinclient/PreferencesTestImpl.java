@@ -5,21 +5,21 @@ import java.util.*;
 import com.openmeap.thinclient.Preferences;
 
 public class PreferencesTestImpl implements Preferences {
-	private Map<String,String> map = null;
+	private Map map = null;
 	public PreferencesTestImpl() {
-		this.map = new HashMap<String,String>();
+		this.map = new HashMap();
 	}
 	public String get(String key) {
-		return map.get(key);
+		return (String)map.get(key);
 	}
 	public Boolean put(String key, String value) {
-		return map.put(key,value)!=null;
+		return Boolean.valueOf(map.put(key,value)!=null);
 	}
 	public Boolean remove(String key) {
-		return map.remove(key)!=null;
+		return Boolean.valueOf(map.remove(key)!=null);
 	}
 	public Boolean clear() {
 		map.clear();
-		return true;
+		return Boolean.TRUE;
 	}
 }

@@ -28,11 +28,11 @@ public class FirstRunCheck implements Runnable {
 		this.macAddress = macAddress;
 	}
 	public void run() {
-		if( config.isDevelopmentMode() ) {
+		if( config.isDevelopmentMode().equals(Boolean.TRUE) ) {
 			return;
 		}
 		if( config.getNotFirstRun()==null ) {
-			config.setNotFirstRun(true);
+			config.setNotFirstRun(Boolean.TRUE);
 			try {
 				String macWithSalt = macAddress+".OPENMEAP#$!@3__234";
 				String hashValue = Utils.hashInputStream("sha1", new ByteArrayInputStream(macWithSalt.getBytes("UTF-8")));

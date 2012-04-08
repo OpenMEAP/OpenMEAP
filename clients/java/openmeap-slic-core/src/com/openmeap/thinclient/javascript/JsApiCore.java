@@ -10,7 +10,6 @@ import com.openmeap.thinclient.Preferences;
  * @author schang
  */
 public interface JsApiCore {
-	public enum Orientation { PORTRAIT, LANDSCAPE, SQUARE, UNDEFINED };
 
 	public String getOrientation();
 	

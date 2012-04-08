@@ -7,15 +7,15 @@ import com.openmeap.protocol.dto.UpdateHeader;
  */
 public class UpdateStatus {
 	private UpdateHeader updateHeader = null;
-	private Integer bytesDownloaded = 0;
-	private Boolean complete = false;
+	private int bytesDownloaded = 0;
+	private boolean complete = false;
 	private UpdateException error = null;
-	public UpdateStatus(UpdateHeader header, Integer bytesDownloaded, Boolean complete) {
+	public UpdateStatus(UpdateHeader header, int i, boolean b) {
 		this.updateHeader = header;
-		this.bytesDownloaded = bytesDownloaded;
-		this.complete = complete;
+		this.bytesDownloaded = i;
+		this.complete = b;
 	}
-	public UpdateStatus(UpdateHeader header, Boolean complete, UpdateException error) {
+	public UpdateStatus(UpdateHeader header, boolean complete, UpdateException error) {
 		this.complete = complete;
 		this.error = error;
 		this.updateHeader = header;
@@ -26,16 +26,16 @@ public class UpdateStatus {
 	public void setUpdateHeader(UpdateHeader header) {
 		this.updateHeader = header;
 	}
-	public Integer getBytesDownloaded() {
+	public int getBytesDownloaded() {
 		return bytesDownloaded;
 	}
-	public void setBytesDownloaded(Integer bytesDownloaded) {
+	public void setBytesDownloaded(int bytesDownloaded) {
 		this.bytesDownloaded = bytesDownloaded;
 	}
-	public Boolean getComplete() {
+	public boolean getComplete() {
 		return complete;
 	}
-	public void setComplete(Boolean complete) {
+	public void setComplete(boolean complete) {
 		this.complete = complete;
 	}
 	public UpdateException getError() {

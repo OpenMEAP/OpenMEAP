@@ -66,7 +66,7 @@ public class SLICConfig {
 	public Boolean getNotFirstRun() {
 		String notFirstRun = getProperty("com.openmeap.slic.notFirstRun");
 		if( notFirstRun!=null ) {
-			return Boolean.parseBoolean(notFirstRun);
+			return Boolean.valueOf(notFirstRun);
 		}
 		return null;
 	}
@@ -80,29 +80,29 @@ public class SLICConfig {
 		return getProperty("com.openmeap.slic.deviceType");
 	}
 	public Boolean shouldPerformUpdateCheck() {
-		return isTimeForUpdateCheck() && getProperty("com.openmeap.slic.pullUpdates").equals("true");
+		return Boolean.valueOf(isTimeForUpdateCheck().booleanValue() && getProperty("com.openmeap.slic.pullUpdates").equals("true"));
 	}
 	public Boolean isDevelopmentMode() {
 		String devMode = getProperty("com.openmeap.slic.developmentMode");
 		if( devMode!=null ) {
-			return Boolean.parseBoolean(devMode);
+			return Boolean.valueOf(devMode);
 		}
-		return false;
+		return Boolean.FALSE;
 	}
 	public Boolean isTimeForUpdateCheck() {
 		// proceed with an update, if one is requested
     	Long lastUpdate = getLastUpdateAttempt();
-    	Boolean shouldUpdate = true;
+    	boolean shouldUpdate = true;
     	if( lastUpdate!=null ) {
     		Date now = new Date();
-    		shouldUpdate = getUpdateFrequency()!=null? ((now.getTime()-lastUpdate)/1000 > getUpdateFrequency()) : false;
+    		shouldUpdate = getUpdateFrequency()!=null? ((now.getTime()-lastUpdate.longValue())/1000 > getUpdateFrequency().intValue()) : false;
     	}
-		return shouldUpdate;
+		return Boolean.valueOf(shouldUpdate);
 	}
 	public Boolean isVersionOriginal(String version) {
 		if( version.equals( properties.getProperty("com.openmeap.slic.appVersion") ) )
-			return true;
-		return false;
+			return Boolean.TRUE;
+		return Boolean.FALSE;
 	}
 	
 	public Long getLastUpdateAttempt() {

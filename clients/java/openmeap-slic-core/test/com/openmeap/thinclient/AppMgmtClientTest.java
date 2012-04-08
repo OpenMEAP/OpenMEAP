@@ -3,8 +3,8 @@ package com.openmeap.thinclient;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import junit.framework.Assert;
+import junit.framework.TestCase;
 
 import com.openmeap.protocol.ApplicationManagementService;
 import com.openmeap.protocol.WebServiceException;
@@ -18,9 +18,9 @@ import com.openmeap.util.HttpRequestExecuterFactory;
 import com.openmeap.util.MockHttpRequestExecuter;
 import com.openmeap.util.Utils;
 
-public class AppMgmtClientTest {
+public class AppMgmtClientTest extends TestCase {
 
-	@Test public void testRESTOpenConnection() throws Exception {
+	public void testRESTOpenConnection() throws Exception {
 		AppMgmtClientFactory.setDefaultType(RESTAppMgmtClient.class);
 		String[] templates = {
 			"xml/connectionResponse-rest-update.xml",
@@ -41,7 +41,7 @@ public class AppMgmtClientTest {
 		request.setSlic(new SLIC());
 		
 		// setup the response xml that we'll spoof as though it's from the server
-		Map<String,String> parms = new HashMap<String,String>();
+		Map parms = new HashMap();
 		parms.put("AUTH_TOKEN", "authToken");
 		parms.put("UPDATE_TYPE", "required");
 		parms.put("UPDATE_URL", "file://none");
@@ -67,8 +67,8 @@ public class AppMgmtClientTest {
 		ConnectionOpenResponse response = client.connectionOpen(request);
 		Assert.assertTrue(response.getAuthToken().equals("authToken"));
 		Assert.assertTrue(response.getUpdate().getUpdateUrl().equals("file://none"));
-		Assert.assertTrue(response.getUpdate().getInstallNeeds().equals(15L));
-		Assert.assertTrue(response.getUpdate().getStorageNeeds().equals(15L));
+		Assert.assertTrue(response.getUpdate().getInstallNeeds().equals(Long.valueOf(15)));
+		Assert.assertTrue(response.getUpdate().getStorageNeeds().equals(Long.valueOf(15)));
 		Assert.assertTrue(response.getUpdate().getVersionIdentifier().equals("versionId"));
 		Assert.assertTrue(response.getUpdate().getHash().getValue().equals("asdf"));
 		Assert.assertTrue(response.getUpdate().getHash().getAlgorithm().equals(HashAlgorithm.MD5));
@@ -83,20 +83,20 @@ public class AppMgmtClientTest {
 		
 		//////////////
 		// Verify that a non-200 will result in a WebServiceException
-		Boolean thrown = false;
+		Boolean thrown = Boolean.FALSE;
 		Exception e = null;
 		MockHttpRequestExecuter.setResponseCode(304); // 304 is not 200
 		try {
 			response = client.connectionOpen(request);
 		} catch( Exception wse ) {
 			e = wse;
-			thrown = true;
+			thrown = Boolean.TRUE;
 		}
-		Assert.assertTrue(thrown && e instanceof WebServiceException);
+		Assert.assertTrue(thrown.booleanValue() && e instanceof WebServiceException);
 		
 		//////////////
 		// Verify that invalid response content will throw an exception
-		thrown = false; e=null;
+		thrown = Boolean.FALSE; e=null;
 		MockHttpRequestExecuter.setResponseText( Utils.replaceFields(parms, 
 				Utils.readInputStream(AppMgmtClientTest.class.getResourceAsStream(templates[2]),"UTF-8") ) );
 		MockHttpRequestExecuter.setResponseCode(200);
@@ -104,8 +104,8 @@ public class AppMgmtClientTest {
 			response = client.connectionOpen(request);
 		} catch( Exception wse ) {
 			e = wse;
-			thrown = true;
+			thrown = Boolean.TRUE;
 		}
-		Assert.assertTrue(thrown && e instanceof WebServiceException);
+		Assert.assertTrue(thrown.booleanValue() && e instanceof WebServiceException);
 	}
 }

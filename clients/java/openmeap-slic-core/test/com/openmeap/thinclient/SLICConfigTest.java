@@ -1,14 +1,15 @@
 package com.openmeap.thinclient;
 
-import org.junit.*;
+import junit.framework.TestCase;
+import junit.framework.Assert;
 
 import com.openmeap.thinclient.Preferences;
 import com.openmeap.thinclient.SLICConfig;
 
 import java.util.*;
 
-public class SLICConfigTest {
-	@Test public void testGetInstance() {
+public class SLICConfigTest extends TestCase {
+	public void testGetInstance() {
 		
 		Preferences prefs = new PreferencesTestImpl();
 		prefs.put("com.openmeap.slic.deviceUuid", "deviceUuid");

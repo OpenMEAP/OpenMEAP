@@ -32,12 +32,11 @@ public class RESTAppMgmtClient implements ApplicationManagementService {
 		this.requester = requestMaker;
 	}
 	
-	@SuppressWarnings("unused")
 	public ConnectionOpenResponse connectionOpen(ConnectionOpenRequest request) throws WebServiceException {
 		
 		ConnectionOpenResponse response = null;
 		
-		Map<String,Object> postData = new HashMap<String,Object>();
+		Map postData = new HashMap();
 		postData.put(UrlParamConstants.ACTION, "connection-open-request");
 		postData.put(UrlParamConstants.DEVICE_UUID, request.getApplication().getInstallation().getUuid());
 		postData.put(UrlParamConstants.APP_NAME, request.getApplication().getName());
