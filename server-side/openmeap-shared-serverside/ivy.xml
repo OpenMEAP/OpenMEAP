@@ -76,6 +76,7 @@
 		
 		<dependency org="org.apache.tomcat" name="servlet-api" rev="6.0.35" conf="compile->default"/>
 		
+		<dependency org="com.openmeap" name="shared-jdk5" rev="latest.integration" conf="core->default"/>
 	  	<dependency org="com.openmeap" name="shared" rev="latest.integration" conf="core->default"/>
 	  
 	</dependencies>

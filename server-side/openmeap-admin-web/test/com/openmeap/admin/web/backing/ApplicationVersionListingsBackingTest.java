@@ -77,7 +77,7 @@ public class ApplicationVersionListingsBackingTest {
 		//   - a list of versions
 		parms.put(FormConstants.APP_ID, new String[]{"1"});
 		events = avlb.process(null,vars,parms);
-		Assert.assertTrue(events!=null && events.size()==2 && ProcessingUtils.containsTarget(events,ProcessingTargets.NAV_SUB));
+		Assert.assertTrue(events!=null && events.size()==3 && ProcessingUtils.containsTarget(events,ProcessingTargets.NAV_SUB));
 		for( ProcessingEvent event : events ) {
 			Assert.assertTrue(event.getPayload() instanceof Anchor);
 		}

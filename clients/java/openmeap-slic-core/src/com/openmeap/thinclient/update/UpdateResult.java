@@ -1,10 +1,7 @@
 package com.openmeap.thinclient.update;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.openmeap.json.Enum;
+import com.openmeap.json.EnumUtils;
 
 public class UpdateResult implements Enum {
 	static final public UpdateResult SUCCESS = new UpdateResult("SUCCESS");
@@ -16,39 +13,18 @@ public class UpdateResult implements Enum {
 	static final public UpdateResult PLATFORM = new UpdateResult("PLATFORM");
 	static final public UpdateResult RESPONSE_STATUS_CODE = new UpdateResult("RESPONSE_STATUS_CODE");
 	static final public UpdateResult IMPORT_UNZIP = new UpdateResult("IMPORT_UNZIP");
-	private String value;
-	private UpdateResult(String value) {
-		this.value = value;
-	}
-	public String value() {
-		return value;
-	}
-	static public UpdateResult[] values() {
-    	List list = new ArrayList();
-    	Field[] fields = UpdateResult.class.getDeclaredFields();
-    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
-    		try {
-				list.add(fields[fieldIdx].get(null));
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			} 
-    	}
-    	return (UpdateResult[])list.toArray();
+	
+    private final String value;
+    private UpdateResult(String v) {
+        value = v;
     }
-
-    public static UpdateResult fromValue(String v) {
-    	Field[] fields = UpdateResult.class.getDeclaredFields();
-    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
-    		Field field = fields[fieldIdx];
-    		try {
-	    		if( ((UpdateResult)field.get(null)).value().equals(v) ) {
-	    			return (UpdateResult)field.get(null);
-					
-	    		}
-    		} catch(Exception e) {
-    			throw new IllegalArgumentException(v);
-    		}
-    	}
-    	throw new IllegalArgumentException(v);
+    public String value() {
+        return value;
+    }
+    static public UpdateResult[] values() {
+    	return (UpdateResult[])EnumUtils.values(UpdateResult.class);
+    }
+    static public UpdateResult fromValue(String v) {
+    	return (UpdateResult)EnumUtils.fromValue(UpdateResult.class, v);
     }
 }

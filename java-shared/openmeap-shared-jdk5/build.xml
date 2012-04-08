@@ -25,14 +25,14 @@
 <project name="openmeap-shared-jdk5" basedir="." default="dist">
 	
 	<import file="../../build-tools/ant_scripts/shared.xml"/>
-	<property name="openmeap.project.current.file.ivy" value="${openmeap.project.shared.jdk5}/ivy.xml"/>
-	<property name="openmeap.project.current.dist" value="${openmeap.project.shared.jdk5.dist.jar}"/>
+	<property name="openmeap.project.current.file.ivy" value="${openmeap.project.shared-jdk5}/ivy.xml"/>
+	<property name="openmeap.project.current.dist" value="${openmeap.project.shared-jdk5.dist.jar}"/>
 	<property name="openmeap.project.current.dist.ext" value="jar"/>
 
 	<!-- BEGIN CLEAN SECTION +++++++++++++++++++++++++++++++++++++ -->
 	
 	<target name="clean">
-		<delete file="${openmeap.dist.project.shared.jdk5.jar}"/>
+		<delete file="${openmeap.dist.project.shared-jdk5.jar}"/>
 		<delete includeemptydirs="true" quiet="true">
 			<fileset dir="bin" includes="**/*"/>
 		</delete>
@@ -59,7 +59,7 @@
 	<!-- END COMPILE SECTION +++++++++++++++++++++++++++++++++++++ -->
 	
 	<target name="export-jar" depends="dist-base,compile">
-		<jar jarfile="${openmeap.project.shared.dist.jar}" basedir="bin">
+		<jar jarfile="${openmeap.project.shared-jdk5.dist.jar}" basedir="bin">
 			<manifest/>
 		</jar>
 	</target>

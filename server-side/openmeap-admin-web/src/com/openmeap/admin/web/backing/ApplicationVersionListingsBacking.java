@@ -100,7 +100,10 @@ public class ApplicationVersionListingsBacking extends AbstractTemplatedSectionB
 					events.add( new AddSubNavAnchorEvent( new Anchor("?bean=addModifyAppVersionPage&applicationId="+app.getId(),"Create new version","Create new version")) );
 				}
 				events.add( new AddSubNavAnchorEvent(new Anchor("?bean=addModifyAppPage&applicationId="+app.getId(),"View/Modify Application","View/Modify Application")) );
-				events.add( new AddSubNavAnchorEvent(new Anchor("?bean=deploymentListingsPage&applicationId="+app.getId(),"Deployment History","Deployment History")) );
+				
+				Anchor deploymentHistoryAnchor = new Anchor("?bean=deploymentListingsPage&applicationId="+app.getId(),"Deployment History","Deployment History");
+				templateVariables.put("deploymentsAnchor",deploymentHistoryAnchor);
+				events.add( new AddSubNavAnchorEvent(deploymentHistoryAnchor));
 				
 			} else {
 				events.add( new MessagesEvent( "Application with id "+ParameterMapUtils.firstValue(FormConstants.APP_ID, parameterMap)+" not found") );

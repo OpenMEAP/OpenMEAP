@@ -31,7 +31,8 @@
 	</info>
 	
 	<configurations>
-		<conf name="core"/>
+		<conf name="ide"/>
+		<conf name="core" extends="ide"/>
 	</configurations>
 	
 	<publications>
@@ -42,11 +43,13 @@
 	
 		<!-- NOTE: this is shared by all OpenMEAP Jdk5 builds including mobile devices -->
 		
-		<dependency org="org.apache.httpcomponents" name="httpclient" rev="4.1.1" conf="core->default"/>
-		<dependency org="org.apache.httpcomponents" name="httpclient-cache" rev="4.1.1" conf="core->default"/>
-		<dependency org="org.apache.httpcomponents" name="httpmime" rev="4.1.1" conf="core->default"/>
-		<dependency org="commons-lang" name="commons-lang" rev="2.6" conf="core->default"/>
-		<dependency org="commons-fileupload" name="commons-fileupload" rev="1.2.2" conf="core->default"/>
+		<dependency org="org.apache.httpcomponents" name="httpclient" rev="4.1.1" conf="ide->default"/>
+		<dependency org="org.apache.httpcomponents" name="httpclient-cache" rev="4.1.1" conf="ide->default"/>
+		<dependency org="org.apache.httpcomponents" name="httpmime" rev="4.1.1" conf="ide->default"/>
+		<dependency org="commons-lang" name="commons-lang" rev="2.6" conf="ide->default"/>
+		<dependency org="commons-fileupload" name="commons-fileupload" rev="1.2.2" conf="ide->default"/>
+			  
+		<dependency org="com.openmeap" name="shared" rev="latest.integration" conf="core->default"/>
 			  
 	</dependencies>
 	

@@ -23,9 +23,9 @@ public class AppMgmtClientTest extends TestCase {
 	public void testRESTOpenConnection() throws Exception {
 		AppMgmtClientFactory.setDefaultType(RESTAppMgmtClient.class);
 		String[] templates = {
-			"xml/connectionResponse-rest-update.xml",
-			"xml/connectionResponse-rest-noupdate.xml",
-			"xml/connectionResponse.404.xml"
+			"xml/connectionResponse-rest-update.json",
+			"xml/connectionResponse-rest-noupdate.json",
+			"xml/connectionResponse.404.text"
 		};
 		this.testOpenConnection(templates);
 	}
@@ -42,7 +42,7 @@ public class AppMgmtClientTest extends TestCase {
 		
 		// setup the response xml that we'll spoof as though it's from the server
 		Map parms = new HashMap();
-		parms.put("AUTH_TOKEN", "authToken");
+		parms.put("AUTH_TOKEN", "auth_token");
 		parms.put("UPDATE_TYPE", "required");
 		parms.put("UPDATE_URL", "file://none");
 		parms.put("STORAGE_NEEDS", String.valueOf(15));
@@ -65,9 +65,9 @@ public class AppMgmtClientTest extends TestCase {
 		//////////////
 		// Verify that a well-formed request will result in a correctly formed response object
 		ConnectionOpenResponse response = client.connectionOpen(request);
-		Assert.assertTrue(response.getAuthToken().equals("authToken"));
+		Assert.assertTrue(response.getAuthToken().equals("auth_token"));
 		Assert.assertTrue(response.getUpdate().getUpdateUrl().equals("file://none"));
-		Assert.assertTrue(response.getUpdate().getInstallNeeds().equals(Long.valueOf(15)));
+		Assert.assertTrue(response.getUpdate().getInstallNeeds().equals(Long.valueOf(16)));
 		Assert.assertTrue(response.getUpdate().getStorageNeeds().equals(Long.valueOf(15)));
 		Assert.assertTrue(response.getUpdate().getVersionIdentifier().equals("versionId"));
 		Assert.assertTrue(response.getUpdate().getHash().getValue().equals("asdf"));
@@ -78,7 +78,7 @@ public class AppMgmtClientTest extends TestCase {
 		MockHttpRequestExecuter.setResponseText( Utils.replaceFields(parms, 
 				Utils.readInputStream(AppMgmtClientTest.class.getResourceAsStream(templates[1]),"UTF-8") ) );
 		response = client.connectionOpen(request);
-		Assert.assertTrue(response.getAuthToken().equals("authToken"));
+		Assert.assertTrue(response.getAuthToken().equals("auth_token"));
 		Assert.assertTrue(response.getUpdate()==null);
 		
 		//////////////

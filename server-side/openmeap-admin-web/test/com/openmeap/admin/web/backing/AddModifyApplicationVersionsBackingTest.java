@@ -94,7 +94,7 @@ public class AddModifyApplicationVersionsBackingTest {
 		amab = new AddModifyApplicationVersionBacking();
 		amab.setModelManager( mm );
 		events = amab.process(null, vars, parms);
-		Assert.assertTrue(events.size()==3 && ProcessingUtils.containsTarget(events, ProcessingTargets.MESSAGES) );
+		Assert.assertTrue(events.size()==4 && ProcessingUtils.containsTarget(events, ProcessingTargets.MESSAGES) );
 		Assert.assertTrue(vars.size()==6);
 		Assert.assertTrue(vars.get(FormConstants.ENCODING_TYPE).equals("enctype=\""+FormConstants.ENCTYPE_MULTIPART_FORMDATA+"\""));
 		Assert.assertTrue(vars.get("application")!=null && ((Application)vars.get("application")).getName().compareTo("Application.name")==0 );
@@ -112,7 +112,7 @@ public class AddModifyApplicationVersionsBackingTest {
 		amab = new AddModifyApplicationVersionBacking();
 		amab.setModelManager( mm );
 		events = amab.process(null, vars, parms);
-		Assert.assertTrue(events.size()==2);
+		Assert.assertTrue(events.size()==3);
 		Assert.assertTrue(vars.size()==6);
 		Assert.assertTrue(vars.get(FormConstants.ENCODING_TYPE).equals("enctype=\""+FormConstants.ENCTYPE_MULTIPART_FORMDATA+"\""));
 		Assert.assertTrue(vars.get("application")!=null && ((Application)vars.get("application")).getName().compareTo("Application.name")==0 );
@@ -145,7 +145,7 @@ public class AddModifyApplicationVersionsBackingTest {
 		AddModifyApplicationVersionBacking amab = new AddModifyApplicationVersionBacking();
 		amab.setModelManager(modelManager);
 		Collection<ProcessingEvent> events = amab.process(null, vars, parms);
-		Assert.assertTrue(events.size()==3 && ProcessingUtils.containsTarget(events, ProcessingTargets.MESSAGES));
+		Assert.assertTrue(events.size()==4 && ProcessingUtils.containsTarget(events, ProcessingTargets.MESSAGES));
 		Assert.assertTrue(vars.get("hashTypes")!=null);
 		Assert.assertTrue(vars.get(FormConstants.PROCESS_TARGET)!=null && ((String)vars.get(FormConstants.PROCESS_TARGET)).compareTo(ProcessingTargets.ADDMODIFY_APPVER)==0);
 		Assert.assertTrue(vars.get("version")!=null);

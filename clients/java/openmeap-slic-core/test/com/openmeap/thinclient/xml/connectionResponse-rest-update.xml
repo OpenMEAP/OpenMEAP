@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<result xmlns="com.openmeap.protocol.dto">
-	<connection-open-response auth-token="${AUTH_TOKEN}">
-		<update type="required" update-url="${UPDATE_URL}" storage-needs="${STORAGE_NEEDS}" install-needs="${INSTALL_NEEDS}" version-identifier="${VERSION_ID}">
-			<hash value="${HASH}" algorithm="${HASH_ALG}"/>
-		</update>
-	</connection-open-response>
-</result>

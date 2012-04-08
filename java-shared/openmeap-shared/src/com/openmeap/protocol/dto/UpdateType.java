@@ -24,39 +24,27 @@
 
 package com.openmeap.protocol.dto;
 
-import java.lang.reflect.Field;
-
 import com.openmeap.json.Enum;
+import com.openmeap.json.EnumUtils;
 
 public class UpdateType implements Enum {
 
-    final static public UpdateType REQUIRED = new UpdateType("required");
-    final static public UpdateType OPTIONAL = new UpdateType("optional");
-    final static public UpdateType IMMEDIATE = new UpdateType("immediate");
+    final static public UpdateType REQUIRED = new UpdateType("REQUIRED");
+    final static public UpdateType OPTIONAL = new UpdateType("OPTIONAL");
+    final static public UpdateType IMMEDIATE = new UpdateType("IMMEDIATE");
+    
     private final String value;
-
-    UpdateType(String v) {
+    private UpdateType(String v) {
         value = v;
     }
-
     public String value() {
         return value;
     }
-
-    public static UpdateType fromValue(String v) {
-    	Field[] fields = UpdateType.class.getDeclaredFields();
-    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
-    		Field field = fields[fieldIdx];
-    		try {
-	    		if( ((UpdateType)field.get(null)).value().equals(v) ) {
-	    			return (UpdateType)field.get(null);
-					
-	    		}
-    		} catch(Exception e) {
-    			throw new IllegalArgumentException(v);
-    		}
-    	}
-    	throw new IllegalArgumentException(v);
+    static public UpdateType[] values() {
+    	return (UpdateType[])EnumUtils.values(UpdateType.class);
+    }
+    static public UpdateType fromValue(String v) {
+    	return (UpdateType)EnumUtils.fromValue(UpdateType.class, v);
     }
 
 }

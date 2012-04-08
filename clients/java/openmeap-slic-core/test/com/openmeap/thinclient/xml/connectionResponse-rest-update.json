@@ -1,0 +1,16 @@
+{
+	"connectionOpenResponse":{
+		"update":{
+			"storageNeeds":15,
+			"updateUrl":"file://none",
+			"hash":{
+				"value":"asdf",
+				"algorithm":"MD5"
+			},
+			"versionIdentifier":"versionId",
+			"type":"IMMEDIATE",
+			"installNeeds":16
+		},
+		"authToken":"auth_token"
+	}
+}

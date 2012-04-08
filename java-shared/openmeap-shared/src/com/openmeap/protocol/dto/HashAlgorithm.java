@@ -24,11 +24,8 @@
 
 package com.openmeap.protocol.dto;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.openmeap.json.Enum;
+import com.openmeap.json.EnumUtils;
 
 public class HashAlgorithm implements Enum {
 
@@ -36,42 +33,17 @@ public class HashAlgorithm implements Enum {
 	static final public HashAlgorithm SHA1 = new HashAlgorithm("SHA1");
 
     private final String value;
-
     private HashAlgorithm(String v) {
         value = v;
     }
-
     public String value() {
         return value;
     }
-    
     static public HashAlgorithm[] values() {
-    	List list = new ArrayList();
-    	Field[] fields = HashAlgorithm.class.getDeclaredFields();
-    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
-    		try {
-				list.add(fields[fieldIdx].get(null));
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			} 
-    	}
-    	return (HashAlgorithm[])list.toArray();
+    	return (HashAlgorithm[])EnumUtils.values(HashAlgorithm.class);
     }
-
-    public static HashAlgorithm fromValue(String v) {
-    	Field[] fields = HashAlgorithm.class.getDeclaredFields();
-    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
-    		Field field = fields[fieldIdx];
-    		try {
-	    		if( ((HashAlgorithm)field.get(null)).value().equals(v) ) {
-	    			return (HashAlgorithm)field.get(null);
-					
-	    		}
-    		} catch(Exception e) {
-    			throw new IllegalArgumentException(v);
-    		}
-    	}
-    	throw new IllegalArgumentException(v);
+    static public HashAlgorithm fromValue(String v) {
+    	return (HashAlgorithm)EnumUtils.fromValue(HashAlgorithm.class, v);
     }
 
 }

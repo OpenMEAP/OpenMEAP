@@ -24,6 +24,7 @@
 
 package com.openmeap.services.dto;
 
+import com.openmeap.json.EnumUtils;
 import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
 
@@ -36,21 +37,19 @@ public class Result implements HasJSONProperties {
 	static public class Status implements com.openmeap.json.Enum {
 		static final public Status SUCCESS=new Status("SUCCESS");
 		static final public Status FAILURE=new Status("FAILURE");
-		private String value;
-		private Status(String value) {
-			this.value=value;
-		}
-		public String value() {
-			return value;
-		}
-		static Status fromValue(String v) {
-			if( v.equalsIgnoreCase(SUCCESS.value())) {
-				return SUCCESS;
-			} else if( v.equalsIgnoreCase(FAILURE.value())) {
-				return FAILURE;
-			}
-			throw new IllegalArgumentException(v);
-		}
+	    private final String value;
+	    private Status(String v) {
+	        value = v;
+	    }
+	    public String value() {
+	        return value;
+	    }
+	    static public Status[] values() {
+	    	return (Status[])EnumUtils.values(Status.class);
+	    }
+	    static public Status fromValue(String v) {
+	    	return (Status)EnumUtils.fromValue(Status.class, v);
+	    }
 	};
 	
 	private Status resultStatus;

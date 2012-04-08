@@ -42,12 +42,7 @@
 	</publications>
 	
 	<dependencies>
-		<dependency org="org.apache.httpcomponents" name="httpclient" rev="4.1.1" conf="ide->default"/>
-		<dependency org="org.apache.httpcomponents" name="httpclient-cache" rev="4.1.1" conf="ide->default"/>
-		<dependency org="org.apache.httpcomponents" name="httpmime" rev="4.1.1" conf="ide->default"/>
-		
-		<dependency org="org.springframework" name="spring-test" rev="3.0.6.RELEASE" conf="test->default"/>
-		
+		<dependency org="org.springframework" name="spring-test" rev="3.0.6.RELEASE" conf="test->default"/>	
 	  	<dependency org="com.openmeap" name="shared" rev="latest.integration" conf="core->default"/>
 	</dependencies>
 	

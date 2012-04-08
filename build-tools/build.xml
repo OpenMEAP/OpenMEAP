@@ -28,14 +28,24 @@
 	
 	<target name="dist-all-web"
 			description="--> Build the openmeap-services-web and openmeap-admin-web war files"
-			depends="publish-local-shared,publish-local-shared-serverside,dist-admin-web,dist-services-web"/>
+			depends="publish-local-shared,publish-local-shared-jdk5,publish-local-shared-serverside,dist-admin-web,dist-services-web"/>
 	<target name="clean-all-web"
 			description="--> Clean-up everything related to the web build, including the war artifacts"
-			depends="clean-shared,clean-shared-serverside,clean-admin-web,clean-services-web">
+			depends="clean-shared,clean-shared-jdk5,clean-shared-serverside,clean-admin-web,clean-services-web">
 		<delete includeemptydirs="true" quiet="true">
 			<fileset dir="gen" includes="**/*"/>
 			<fileset dir="dist" includes="**/*"/>
 		</delete>
+	</target>
+	
+	<target name="dist-shared-jdk5" depends="">
+		<ant dir="${openmeap.project.shared-jdk5}" antfile="build.xml" target="dist" inheritall="false"/>
+	</target>
+	<target name="clean-shared-jdk5">
+		<ant dir="${openmeap.project.shared-jdk5}" antfile="build.xml" target="clean" inheritall="false"/>
+	</target>
+	<target name="publish-local-shared-jdk5" depends="">
+		<ant dir="${openmeap.project.shared-jdk5}" antfile="build.xml" target="publish-local" inheritall="false"/>
 	</target>
 	
 	<target name="dist-shared" depends="">

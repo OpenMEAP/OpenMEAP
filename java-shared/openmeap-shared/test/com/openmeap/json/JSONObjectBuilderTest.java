@@ -1,11 +1,9 @@
 package com.openmeap.json;
 
-import java.lang.reflect.Field;
+import junit.framework.Assert;
+import junit.framework.TestCase;
 
 import org.json.JSONObject;
-
-import junit.framework.TestCase;
-import junit.framework.Assert;
 
 public class JSONObjectBuilderTest extends TestCase {
 	
@@ -13,26 +11,18 @@ public class JSONObjectBuilderTest extends TestCase {
 
 		static final public Types ONE = new Types("ONE");
 		static final public Types TWO = new Types("TWO");
-		private String name;
-		public Types(String name) {
-			this.name = name;
-		}
-		public String value() {
-			return name;
-		}
-		public static Types valueOf(String v) {
-	    	Field[] fields = Types.class.getDeclaredFields();
-	    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
-	    		Field field = fields[fieldIdx];
-	    		if( field.getName().equals(v) ) {
-	    			try {
-						return (Types)field.get(null);
-					} catch (Exception e) {
-						throw new IllegalArgumentException(v);
-					}
-	    		}
-	    	}
-	    	throw new IllegalArgumentException(v);
+	    private final String value;
+	    private Types(String v) {
+	        value = v;
+	    }
+	    public String value() {
+	        return value;
+	    }
+	    static public Types[] values() {
+	    	return (Types[])EnumUtils.values(Types.class);
+	    }
+	    static public Types fromValue(String v) {
+	    	return (Types)EnumUtils.fromValue(Types.class, v);
 	    }
 		
 	}
