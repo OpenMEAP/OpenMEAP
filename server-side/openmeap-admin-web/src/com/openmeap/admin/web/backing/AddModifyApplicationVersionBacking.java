@@ -271,7 +271,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 			events.add( new MessagesEvent("Application archive could not be created.  Not creating empty version.") );
 		} else {
 			try {
-				//app.addVersion(version);
+				version.setLastModifier(firstValue("userPrincipalName",parameterMap));
 				version = modelManager.addModify(version,events);
 				modelManager.refresh(app,events);
 				events.add( new MessagesEvent("Application version successfully created/modified!") );

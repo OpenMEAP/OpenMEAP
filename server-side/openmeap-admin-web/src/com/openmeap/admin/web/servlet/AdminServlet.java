@@ -112,7 +112,7 @@ public class AdminServlet extends HttpServlet {
 			if( documentProcessor.getProcessesFormData() ) {
 				GlobalSettings settings = mgr.getGlobalSettings();
 				map = ServletUtils.cloneParameterMap(settings.getMaxFileUploadSize(),settings.getTemporaryStoragePath(),request);
-				
+				map.put("userPrincipalName",new String[]{request.getUserPrincipal().getName()});
 				AuthorizerImpl authorizer = (AuthorizerImpl)context.getBean("authorizer");
 				authorizer.setRequest(request);
 			}

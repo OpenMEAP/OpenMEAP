@@ -90,6 +90,7 @@ public class Deployment extends AbstractModelEntity {
 	private String hash;
 	private String hashAlgorithm;
 	private String downloadUrl;
+	private String creator;
 	
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	public Long getId() {
@@ -157,6 +158,14 @@ public class Deployment extends AbstractModelEntity {
 	}
 	public void setDownloadUrl(String downloadUrl) {
 		this.downloadUrl = downloadUrl;
+	}
+	
+	@Column(name="creator")
+	public String getCreator() {
+		return creator;
+	}
+	public void setCreator(String creator) {
+		this.creator = creator;
 	}
 	
 	@Override

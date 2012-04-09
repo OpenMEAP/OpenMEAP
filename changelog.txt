@@ -4,6 +4,7 @@ OpenMEAP 1.1.0a
   - The ability to delete versions.
   - Archive distribution to the cluster is deferred to deployment.
   - Relaxed requirement that current SLIC version be known by app mgmt.
+  - Added "last modifier", "last modifier", and "creator" fields to Application, ApplicationVersion, and Deployment, respectively.
 
 OpenMEAP 1.0.4a
   - Fixed JavaSE settings.  Still not quite where we want it to be JavaEE.

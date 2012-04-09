@@ -12,7 +12,7 @@ Input params:
 
 <form name="listApplicationVersions" action="${(deploymentsAnchor.url)!}" method="post">
 	<input type="hidden" name="processTarget" value="${processTarget?html}"/>
-	[#if mayUpdate]
+	[#if mayCreateDeployments]
 		<select name="deploymentType">
 			<option selected>REQUIRED</option>
 			<option>OPTIONAL</option>
@@ -23,8 +23,8 @@ Input params:
 	<table class="application-version">
 		<tr>
 			<th>&nbsp;</th>
+			<th>Last Modifier</th>
 			<th>Identifier</th>
-			<!--<th>Deployment Date</th>-->
 			<th>Hash Alg.</th>
 			<th>Hash</th>
 			<th>View</th>
@@ -33,11 +33,11 @@ Input params:
 		[#list versions?values as version]
 		[#if version.identifier?? && version.activeFlag]
 			<tr>
-				<td>[#if mayUpdate]
+				<td>[#if mayCreateDeployments]
 				<input type="radio" [#if currentVersionId==version.id]checked[/#if] name="versionId" value="${version.id}"/>
 				[#else]&nbsp;[/#if]</td>
+				<td>${(version.lastModifier)!}</td>
 				<td><a href="?bean=addModifyAppVersionPage&applicationId=${application.id}&versionId=${version.id}">${version.identifier}</a></td>
-				<!--<td>${version.deploymentDate!"<em>Never deployed</em>"}</td>-->
 				[#if version.archive??]
 					<td>${version.archive.hashAlgorithm}</td>
 					<td>${version.archive.hash}</td>

@@ -24,15 +24,14 @@
 
 package com.openmeap;
 
-import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationVersion;
+import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
 
 /**
@@ -65,22 +64,23 @@ public class AuthorizerImpl implements Authorizer {
 	 * Role may modify existing versions only
 	 */
 	private static String VER_MODIFY_ROLE = "openmeap-version-modifier";
-	
+		
 	private HttpServletRequest request;
 	
 	public Boolean may(Action action, Object object) {
-		// TODO: make this a bit less reflectiony
 		
 		// the admin may do anything
 		if( request.isUserInRole(ADMIN_ROLE) ) {
 			return Boolean.TRUE;
 		}
 
-		if( object instanceof Application ) {
+		if( Application.class.isAssignableFrom(object.getClass()) ) {
 			return mayApplication(action,(Application)object);
-		} else if( object instanceof ApplicationVersion ) {
+		} else if( ApplicationVersion.class.isAssignableFrom(object.getClass()) ) {
 			return mayAppVersion(action,(ApplicationVersion)object);
-		} else if( object instanceof GlobalSettings ) {
+		} else if( Deployment.class.isAssignableFrom(object.getClass()) ) {
+			return mayDeployment(action,(Deployment)object);
+		} else if( GlobalSettings.class.isAssignableFrom(object.getClass()) ) {
 			return Boolean.FALSE;
 		}
 		
@@ -127,6 +127,23 @@ public class AuthorizerImpl implements Authorizer {
 			return Boolean.TRUE;			
 		}
 		if( request.isUserInRole(VER_MODIFY_ROLE) && action == Action.MODIFY ) {
+			return Boolean.TRUE;
+		}
+		
+		return Boolean.FALSE;
+	}
+	
+	private Boolean mayDeployment(Action action, Deployment deployment) {
+		
+		Application app = deployment.getApplication();
+		
+		if( app!=null && app.getAdmins()!=null 
+				&& request.getUserPrincipal()!=null 
+				&& isUserOrRoleInList(app.getAdmins()) ) {
+			return Boolean.TRUE;
+		}
+		
+		if( request.isUserInRole(APP_MODIFY_ROLE) ) {
 			return Boolean.TRUE;
 		}
 		

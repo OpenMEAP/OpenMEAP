@@ -76,8 +76,7 @@ public class ApplicationVersionListingsBacking extends AbstractTemplatedSectionB
 			Application app = modelManager.getModelService().findByPrimaryKey(Application.class, Long.valueOf( ParameterMapUtils.firstValue(FormConstants.APP_ID, parameterMap) ) );
 			if( app!=null ) {
 				
-				Boolean mayUpdate = modelManager.getAuthorizer().may(Authorizer.Action.MODIFY, app);
-				templateVariables.put("mayUpdate", mayUpdate);
+				setupMayCreateDeployments(templateVariables,app,events);
 				
 				Deployment lastDeployment = modelManager.getModelService().getLastDeployment(app);
 				Long currentVersionId = null;
@@ -115,7 +114,19 @@ public class ApplicationVersionListingsBacking extends AbstractTemplatedSectionB
 		return events;
 	}
 	
-	public void createVersionsDisplayLists(Application app, Map<Object,Object> templateVariables) {
+	private Boolean setupMayCreateDeployments(Map<Object,Object> templateVariables, Application app, List<ProcessingEvent> events) {
+		Deployment authTestDepl = new Deployment();
+		authTestDepl.setApplication(app);
+		Boolean mayCreateDeployments = modelManager.getAuthorizer().may(Authorizer.Action.CREATE, authTestDepl);
+		if( !mayCreateDeployments ) {
+			events.add( new MessagesEvent("NOTE: Current user does not have permissions to create deployments") );
+		}
+		authTestDepl = null;
+		templateVariables.put("mayCreateDeployments",mayCreateDeployments);
+		return mayCreateDeployments;
+	}
+	
+	private void createVersionsDisplayLists(Application app, Map<Object,Object> templateVariables) {
 
 		templateVariables.put("versions", app.getVersions());
 		GlobalSettings settings = modelManager.getGlobalSettings();

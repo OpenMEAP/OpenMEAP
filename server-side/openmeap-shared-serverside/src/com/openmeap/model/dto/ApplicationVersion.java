@@ -46,6 +46,8 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import com.openmeap.constants.FormConstants;
+import com.openmeap.json.HasJSONProperties;
+import com.openmeap.json.JSONProperty;
 import com.openmeap.model.AbstractModelEntity;
 import com.openmeap.web.form.Parameter;
 
@@ -59,6 +61,7 @@ public class ApplicationVersion extends AbstractModelEntity {
 	private Long id;
 	private String notes;
 	private Boolean activeFlag = true;
+	private String lastModifier;
 	
 	// TODO: the primary key for this class should really be a composite key
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
@@ -80,6 +83,14 @@ public class ApplicationVersion extends AbstractModelEntity {
 	}
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
+	}
+	
+	@Column(name="last_modifier")
+	public String getLastModifier() {
+		return lastModifier;
+	}
+	public void setLastModifier(String lastModifier) {
+		this.lastModifier = lastModifier;
 	}
 	
 	/**

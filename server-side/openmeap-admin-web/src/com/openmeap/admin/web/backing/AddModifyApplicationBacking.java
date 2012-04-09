@@ -24,6 +24,8 @@
 
 package com.openmeap.admin.web.backing;
 
+import static com.openmeap.util.ParameterMapUtils.firstValue;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -111,6 +113,7 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 			
 			if( events.size()==0 ) {
 				try {
+					app.setLastModifier(firstValue("userPrincipalName",parameterMap));
 					app = modelManager.addModify(app,events);
 					events.add( new MessagesEvent("Application successfully created/modified!") );
 				} catch( InvalidPropertiesException ipe ) {

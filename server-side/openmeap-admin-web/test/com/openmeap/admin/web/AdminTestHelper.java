@@ -25,13 +25,11 @@
 package com.openmeap.admin.web;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
-import com.openmeap.util.HttpResponse;
 import org.junit.Assert;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -46,12 +44,26 @@ import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.util.FileHandlingHttpRequestExecuterImpl;
 import com.openmeap.util.HttpRequestException;
 import com.openmeap.util.HttpRequestExecuter;
+import com.openmeap.util.HttpResponse;
 import com.openmeap.web.form.ParameterMapBuilder;
 import com.openmeap.web.form.ParameterMapBuilderException;
 
 public class AdminTestHelper {
 	
-	private String adminUrl = "http://localhost:8080/openmeap-admin-web/interface/";
+	final static public String HOST = "localhost:7000";
+	
+	final static public String ADMIN_USER = "tomcat";
+	final static public String ADMIN_PASS = "tomcat";
+	final static public String ADMIN_WEB_STORAGE = "/tmp";
+	
+	final static public String SERVICES_WEB_URL = "http://"+HOST+"/openmeap-services-web";
+	final static public String SERVICES_WEB_AUTH_SALT = "auth-salt";
+	
+	final static public String NODE_01_SERVICES_URL = SERVICES_WEB_URL;
+	final static public String NODE_01_STORAGE = "/tmp/archs";
+	
+	private String adminUrl = "http://"+HOST+"/openmeap-admin-web/interface/";
+	
 	private HttpRequestExecuter requestExecuter;
 	private ParameterMapBuilder paramsBuilder;
 	private ClassPathXmlApplicationContext persistenceBeans;

@@ -40,6 +40,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.openmeap.Authorizer;
 import com.openmeap.admin.web.events.AddSubNavAnchorEvent;
 import com.openmeap.constants.FormConstants;
 import com.openmeap.event.MessagesEvent;
@@ -100,7 +101,8 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 			}			
 			
 			if( version!=null ) {
-				Deployment depl = createDeployment(version,deploymentType);
+				
+				Deployment depl = createDeployment(firstValue("userPrincipalName",parameterMap),version,deploymentType);
 				pushArchiveToClusterForDeployment(depl,events);
 				
 				try {
@@ -124,7 +126,7 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 		return events;
 	}
 	
-	private Deployment createDeployment(ApplicationVersion version, String deploymentType) {
+	private Deployment createDeployment(String creator, ApplicationVersion version, String deploymentType) {
 		GlobalSettings settings = modelManager.getGlobalSettings();
 		Deployment depl = new Deployment();
 		depl.setType( Deployment.Type.valueOf(deploymentType) );
@@ -133,6 +135,7 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 		depl.setHashAlgorithm(version.getArchive().getHashAlgorithm());
 		depl.setDownloadUrl(version.getArchive().getDirectDownloadUrl(settings));
 		depl.setCreateDate(new java.util.Date());
+		depl.setCreator(creator);
 		version.getApplication().addDeployment(depl);
 		return depl;
 	}

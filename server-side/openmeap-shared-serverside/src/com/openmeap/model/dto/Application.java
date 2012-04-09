@@ -62,6 +62,7 @@ public class Application extends AbstractModelEntity implements HasJSONPropertie
 	private String initialVersionIdentifier;
 	private List<Deployment> deployments;
 	private Integer deploymentHistoryLength = 10;
+	private String lastModifier;
 	
 	static final private JSONProperty[] jsonProperties = new JSONProperty[] {
 		new JSONProperty("getName"),
@@ -69,7 +70,8 @@ public class Application extends AbstractModelEntity implements HasJSONPropertie
 		new JSONProperty("getAdmins"),
 		new JSONProperty("getVersionAdmins"),
 		new JSONProperty("getDeploymentHistoryLength"),
-		new JSONProperty("getInitialVersionIdentifier")
+		new JSONProperty("getInitialVersionIdentifier"),
+		new JSONProperty("lastModifier")
 	};
 	@Override @Transient
 	public JSONProperty[] getJSONProperties() {
@@ -83,6 +85,14 @@ public class Application extends AbstractModelEntity implements HasJSONPropertie
 	}
 	public void setId(Long id) {
 		this.id = id;
+	}
+	
+	@Column(name="last_modifier")
+	public String getLastModifier() {
+		return lastModifier;
+	}
+	public void setLastModifier(String lastModifier) {
+		this.lastModifier = lastModifier;
 	}
 
 	@Override @Transient public Long getPk() { return getId(); }

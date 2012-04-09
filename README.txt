@@ -1,20 +1,11 @@
-OpenMEAP 1.1.x alpha
+In the spirit of friendship, we give to you, OpenMEAP 1.1.x alpha 
 
-Herein is the very first alpha release of OpenMEAP.  We
-understand well that the code is far from perfect and 
-that there are many things that need to be done in order
-for this to be a production-ready platform.
+Please see COPYING for license information.  =)
 
-That being said, we do believe that there is a bit
-of research and development value in what we have put 
-together thus far and that, humbly hopeful, someone may 
-find even further use from it.
+We continue to look forward to engaging the community 
+for feedback on the direction of the project.
 
-Beyond that, we are looking forward to engaging the 
-community and this alpha release is intended to inspire
-first-round feedback on the direction of the project.
+Please see changelog.txt for details about changes/enhancements.
 
-So, in the spirit of friendship, we give to you, 
 
-OpenMEAP 1.1.x alpha, 
-please see COPYING for license information.  =)
+

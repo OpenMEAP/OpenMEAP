@@ -28,9 +28,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.openmeap.util.HttpHeader;
-import com.openmeap.util.HttpResponse;
-import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,6 +42,8 @@ import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
+import com.openmeap.util.HttpHeader;
+import com.openmeap.util.HttpResponse;
 import com.openmeap.util.Utils;
 
 /**
@@ -56,18 +55,6 @@ import com.openmeap.util.Utils;
  * @author Schang
  */
 public class AdminTest {
-
-	final static private String HOST = "localhost:8080";
-	
-	final static private String ADMIN_USER = "tomcat";
-	final static private String ADMIN_PASS = "tomcat";
-	final static private String ADMIN_WEB_STORAGE = "/tmp";
-	
-	final static private String SERVICES_WEB_URL = "http://"+HOST+"/openmeap-services-web";
-	final static private String SERVICES_WEB_AUTH_SALT = "auth-salt";
-	
-	final static private String NODE_01_SERVICES_URL = SERVICES_WEB_URL;
-	final static private String NODE_01_STORAGE = "/tmp/archs";
 	
 	final static private String APP_NAME = "Integration Test Application";
 	final static private String APP_DESC = "This application has been created programmatically in order to test the functions of the administrative console";
@@ -104,7 +91,7 @@ public class AdminTest {
 		HttpResponse response = helper.getLogin();
 		Utils.consumeInputStream(response.getResponseBody());
 		
-		response = helper.postLogin(ADMIN_USER, ADMIN_PASS);
+		response = helper.postLogin(AdminTestHelper.ADMIN_USER, AdminTestHelper.ADMIN_PASS);
 		
 		Assert.assertTrue(response.getStatusCode()==302);
 		HttpHeader[] headers = response.getHeaders("Location");
@@ -122,16 +109,16 @@ public class AdminTest {
 		
 		// correct location of storage path prefix
 		GlobalSettings settings = new GlobalSettings();
-		settings.setExternalServiceUrlPrefix(SERVICES_WEB_URL);
+		settings.setExternalServiceUrlPrefix(AdminTestHelper.SERVICES_WEB_URL);
 		settings.setMaxFileUploadSize(1234550);
-		settings.setServiceManagementAuthSalt(SERVICES_WEB_AUTH_SALT);
-		settings.setTemporaryStoragePath(ADMIN_WEB_STORAGE);
+		settings.setServiceManagementAuthSalt(AdminTestHelper.SERVICES_WEB_AUTH_SALT);
+		settings.setTemporaryStoragePath(AdminTestHelper.ADMIN_WEB_STORAGE);
 		
 		// correct cluster node location and path prefix
 		Map<String,ClusterNode> clusterNodeMap = new HashMap<String,ClusterNode>();
 		ClusterNode node = new ClusterNode();
-		node.setServiceWebUrlPrefix(NODE_01_SERVICES_URL);
-		node.setFileSystemStoragePathPrefix(NODE_01_STORAGE);
+		node.setServiceWebUrlPrefix(AdminTestHelper.NODE_01_SERVICES_URL);
+		node.setFileSystemStoragePathPrefix(AdminTestHelper.NODE_01_STORAGE);
 		clusterNodeMap.put(node.getServiceWebUrlPrefix(), node);
 		settings.setClusterNodes(clusterNodeMap);
 		
@@ -297,13 +284,13 @@ public class AdminTest {
 	}
 	
 	private Boolean _isVersionArchiveInAdminLocation(String hash) {
-		File verAr = new File(ADMIN_WEB_STORAGE+"/"+hash);
-		File verAr2 = new File(ADMIN_WEB_STORAGE+"/"+hash+".zip");
+		File verAr = new File(AdminTestHelper.ADMIN_WEB_STORAGE+"/"+hash);
+		File verAr2 = new File(AdminTestHelper.ADMIN_WEB_STORAGE+"/"+hash+".zip");
 		return verAr2.exists() && verAr2.isFile() && verAr.exists() && verAr.isDirectory();
 	}
 	
 	private Boolean _isVersionArchiveInDeployedLocation(String hash) {
-		File verAr = new File(NODE_01_STORAGE+"/"+hash+".zip");
+		File verAr = new File(AdminTestHelper.NODE_01_STORAGE+"/"+hash+".zip");
 		return verAr.exists() && verAr.isFile();
 	}
 }

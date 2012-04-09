@@ -2,6 +2,7 @@
 [#if applications??]
 	<table class="application-list">
 		<tr>
+			<th>Last Modifier</th>
 			<th>Application</th>
 			<th>Version</th>
 			<th>Description</th>
@@ -9,6 +10,9 @@
 		</tr>
 		[#list applications as application]
 		<tr>
+			<td>
+				${(application.lastModifier)!}
+			</td>
 			<td>
 				<a title="Modify settings for ${application.name?html}" href="?bean=addModifyAppPage&applicationId=${application.id}">${application.name}</a>
 			</td>
