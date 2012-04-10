@@ -86,7 +86,18 @@ public class AdminTest {
 		modelManager = helper.getModelManager();
 	}
 	
-	@Test public void testLogin() throws Exception {
+	@Test public void adminTest() throws Exception {
+		testLogin();
+		testUpdateGlobalSettings();
+		testAddApplication();
+		testModifyApplication();
+		testCreateApplicationVersion();
+		testDeleteApplicationVersion();
+		testCreateDeployments();
+		testDeleteApplication();
+	}
+	
+	public void testLogin() throws Exception {
 		
 		HttpResponse response = helper.getLogin();
 		Utils.consumeInputStream(response.getResponseBody());
@@ -105,7 +116,7 @@ public class AdminTest {
 		Utils.consumeInputStream(response.getResponseBody());
 	}
 	
-	@Test public void testUpdateGlobalSettings() throws Exception {
+	public void testUpdateGlobalSettings() throws Exception {
 		
 		// correct location of storage path prefix
 		GlobalSettings settings = new GlobalSettings();
@@ -135,7 +146,7 @@ public class AdminTest {
 		Assert.assertEquals(insertedSettingsJSON,originalSettingsJSON);
 	}
 	
-	@Test public void testAddApplication() throws Exception {
+	public void testAddApplication() throws Exception {
 		
 		Application app = new Application();
 		app.setName(APP_NAME);
@@ -159,7 +170,7 @@ public class AdminTest {
 		Assert.assertTrue(dbApp.getProxyAuthSalt()!=null && dbApp.getProxyAuthSalt().length()==36);
 	}
 	
-	@Test public void testModifyApplication() throws Exception {
+	public void testModifyApplication() throws Exception {
 		
 		Application dbApp = modelManager.getModelService().findApplicationByName(APP_NAME);
 		Assert.assertTrue(dbApp!=null);
@@ -179,12 +190,12 @@ public class AdminTest {
 		// TODO: validate changes are reflected by services-web, from the refresh hit
 	}
 	
-	@Test public void testCreateApplicationVersion() throws Exception {
+	public void testCreateApplicationVersion() throws Exception {
 		_createApplicationVersion(VERSION_01,VERSION_01_NOTES,VERSION_01_ZIP,VERSION_01_HASH);
 		_createApplicationVersion(VERSION_02,VERSION_02_NOTES,VERSION_02_ZIP,VERSION_02_HASH);
 	}
 	
-	@Test public void testDeleteApplicationVersion() throws Exception {
+	public void testDeleteApplicationVersion() throws Exception {
 		
 		Assert.assertTrue("if no other version shares the archive, then the archive file should be deleted",_deleteApplicationVersion(VERSION_01));
 		
@@ -196,7 +207,7 @@ public class AdminTest {
 		_createApplicationVersion(VERSION_01,VERSION_01_NOTES,VERSION_01_ZIP,VERSION_01_HASH);
 	}
 	
-	@Test public void testCreateDeployments() throws Exception {
+	public void testCreateDeployments() throws Exception {
 		
 		_createDeployment(VERSION_01,Deployment.Type.IMMEDIATE);
 		_createDeployment(VERSION_02,Deployment.Type.REQUIRED);
@@ -215,7 +226,7 @@ public class AdminTest {
 		Assert.assertTrue(app.getDeployments().get(1).getApplicationVersion().getIdentifier().equals(VERSION_01));
 	}
 	
-	@Test public void testDeleteApplication() throws Exception {
+	public void testDeleteApplication() throws Exception {
 		
 		ModelManager modelManager = helper.getModelManager();
 		Application dbApp = modelManager.getModelService().findApplicationByName(APP_NAME);
