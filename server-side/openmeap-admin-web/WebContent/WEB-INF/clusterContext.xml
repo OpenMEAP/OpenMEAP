@@ -32,14 +32,14 @@
 	<bean id="modelServiceRefreshNotifier" class="com.openmeap.model.event.notifier.ModelServiceRefreshNotifier">
 		<property name="modelManager" ref="modelManager"/>
 		<property name="httpRequestExecuter">
-			<bean class="com.openmeap.util.HttpRequestExecuterFactory" factory-method="newDefault"/>
+			<bean class="com.openmeap.http.HttpRequestExecuterFactory" factory-method="newDefault"/>
 		</property>
 	</bean>
 	
 	<bean id="archiveUploadNotifier" class="com.openmeap.model.event.notifier.ArchiveFileUploadNotifier">
 		<property name="modelManager" ref="modelManager"/>
 		<property name="httpRequestExecuter">
-			<bean class="com.openmeap.util.HttpRequestExecuterFactory" factory-method="newDefault"/>
+			<bean class="com.openmeap.http.HttpRequestExecuterFactory" factory-method="newDefault"/>
 		</property>
 	</bean>
 	
@@ -51,7 +51,7 @@
 	<bean id="archiveDeleteNotifier" class="com.openmeap.model.event.notifier.ArchiveFileDeleteNotifier">
 		<property name="modelManager" ref="modelManager"/>
 		<property name="httpRequestExecuter">
-			<bean class="com.openmeap.util.HttpRequestExecuterFactory" factory-method="newDefault"/>
+			<bean class="com.openmeap.http.HttpRequestExecuterFactory" factory-method="newDefault"/>
 		</property>
 	</bean>
 	

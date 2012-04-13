@@ -24,11 +24,9 @@
 
 package com.openmeap.thinclient;
 
-import java.lang.reflect.Constructor;
-
+import com.openmeap.http.HttpRequestExecuterFactory;
 import com.openmeap.protocol.ApplicationManagementService;
-import com.openmeap.util.HttpRequestExecuter;
-import com.openmeap.util.HttpRequestExecuterFactory;
+import com.openmeap.util.GenericRuntimeException;
 
 public class AppMgmtClientFactory {
 	
@@ -46,10 +44,12 @@ public class AppMgmtClientFactory {
 	
 	static public ApplicationManagementService newDefault(String serviceUrl) {
 		try {
-			Constructor constructor = defaultClient.getConstructor(new Class[]{String.class, HttpRequestExecuter.class});
-			return (ApplicationManagementService)constructor.newInstance(new Object[]{serviceUrl, HttpRequestExecuterFactory.newDefault()});
+			ApplicationManagementService service = (ApplicationManagementService)defaultClient.newInstance();
+			service.setServiceUrl(serviceUrl);
+			service.setHttpRequestExecuter(HttpRequestExecuterFactory.newDefault());
+			return service;
 		} catch( Exception e ) {
-			throw new RuntimeException(e);
+			throw new GenericRuntimeException(e);
 		}
 	}
 }

@@ -25,6 +25,7 @@
 package com.openmeap.protocol.dto;
 
 import com.openmeap.json.HasJSONProperties;
+import com.openmeap.json.JSONGetterSetter;
 import com.openmeap.json.JSONProperty;
 
 public class ConnectionOpenRequest implements HasJSONProperties {
@@ -33,8 +34,24 @@ public class ConnectionOpenRequest implements HasJSONProperties {
     protected SLIC slic;
 
     private static JSONProperty[] jsonProperties = new JSONProperty[] {
-    	new JSONProperty("getApplication"),
-    	new JSONProperty("getSlic")
+    	new JSONProperty("application",Application.class,
+			new JSONGetterSetter(){
+				public Object getValue(Object src) {
+					return ((ConnectionOpenRequest)src).getApplication();
+				}
+				public void setValue(Object dest, Object value) {
+					((ConnectionOpenRequest)dest).setApplication((Application)value);
+				}
+			}),
+    	new JSONProperty("slic",SLIC.class,
+    		new JSONGetterSetter(){
+				public Object getValue(Object src) {
+					return ((ConnectionOpenRequest)src).getSlic();
+				}
+				public void setValue(Object dest, Object value) {
+					((ConnectionOpenRequest)dest).setSlic((SLIC)value);
+				}
+			}),
     };
     public JSONProperty[] getJSONProperties() {
 		return jsonProperties;

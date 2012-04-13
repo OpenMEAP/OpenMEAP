@@ -49,6 +49,7 @@ import org.springframework.context.ApplicationContextAware;
 
 import com.openmeap.AuthorizationException;
 import com.openmeap.Authorizer;
+import com.openmeap.digest.DigestException;
 import com.openmeap.event.Event;
 import com.openmeap.event.EventNotificationException;
 import com.openmeap.event.MessagesEvent;
@@ -252,7 +253,7 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 			try {
 				Map<String,String> servicesWebProperties = (Map<String,String>)context.getBean("openmeapServicesWebPropertiesMap");
 				String serviceUrl = (String)servicesWebProperties.get("clusterNodeUrlPrefix");
-				return this.getGlobalSettings().getClusterNodes().get(serviceUrl);
+				return this.getGlobalSettings().getClusterNode(serviceUrl);
 			} catch(Exception e) {
 				logger.warn("{}",e);
 			}
@@ -373,7 +374,7 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private ApplicationArchive processApplicationArchiveFileUpload(ApplicationArchive archive, List<ProcessingEvent> events) {
+	private ApplicationArchive processApplicationArchiveFileUpload(ApplicationArchive archive, List<ProcessingEvent> events) throws PersistenceException {
 		
 		GlobalSettings settings = getGlobalSettings();
 		File tempFile = new File(archive.getHash());
@@ -395,6 +396,8 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 			try {
 				is = new FileInputStream(tempFile);
 				hashValue = Utils.hashInputStream("MD5", is);
+			} catch (DigestException e) {
+				throw new PersistenceException(e);
 			} finally {
 				is.close();
 			}
@@ -442,9 +445,6 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 			}
 		} catch(IOException ioe) {
 			events.add(new MessagesEvent(ioe.getMessage()));
-			return null;
-		} catch(NoSuchAlgorithmException nsae) {
-			events.add(new MessagesEvent(nsae.getMessage()));
 			return null;
 		} 
 

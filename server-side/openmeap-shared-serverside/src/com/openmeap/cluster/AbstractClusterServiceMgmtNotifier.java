@@ -38,6 +38,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.openmeap.digest.DigestException;
 import com.openmeap.event.Event;
 import com.openmeap.event.ProcessingEvent;
 import com.openmeap.event.EventNotifier;
@@ -45,8 +46,9 @@ import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.util.AuthTokenProvider;
+import com.openmeap.util.GenericRuntimeException;
 import com.openmeap.util.ThrowableList;
-import com.openmeap.util.HttpRequestExecuter;
+import com.openmeap.http.HttpRequestExecuter;
 
 // TODO: separate this out into a ClusterNodesNotifierService and use delegate methods from the notifiers
 public abstract class AbstractClusterServiceMgmtNotifier<T> implements EventNotifier<T> {
@@ -74,14 +76,14 @@ public abstract class AbstractClusterServiceMgmtNotifier<T> implements EventNoti
 		
 		final Map<String,Boolean> urlRequestCompleteStatus = new HashMap<String,Boolean>();
 		GlobalSettings globalSettings = modelManager.getGlobalSettings();
-		Map<String,ClusterNode> clusterNodes = globalSettings.getClusterNodes();
-		for( final String thisUrlString : clusterNodes.keySet() ) {
+		List<ClusterNode> clusterNodes = globalSettings.getClusterNodes();
+		for( ClusterNode thisNode : clusterNodes ) {
 			
 			URL thisUrl = null;
 			try {
-				thisUrl = new URL(thisUrlString);
+				thisUrl = new URL(thisNode.getServiceWebUrlPrefix());
 			} catch (MalformedURLException e) {
-				logger.error("Could not create URL object from "+thisUrlString+": {}",e);
+				logger.error("Could not create URL object from "+thisNode.getServiceWebUrlPrefix()+": {}",e);
 				continue;
 			}
 			if( executorService!=null ) {
@@ -145,7 +147,11 @@ public abstract class AbstractClusterServiceMgmtNotifier<T> implements EventNoti
 	}
 	
 	protected String newAuthToken() {
-		return AuthTokenProvider.newAuthToken(modelManager.getGlobalSettings().getServiceManagementAuthSalt());
+		try {
+			return AuthTokenProvider.newAuthToken(modelManager.getGlobalSettings().getServiceManagementAuthSalt());
+		} catch(DigestException de) {
+			throw new GenericRuntimeException(de);
+		}
 	}
 	
 	/**

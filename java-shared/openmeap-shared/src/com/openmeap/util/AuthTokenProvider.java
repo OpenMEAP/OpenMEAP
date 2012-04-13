@@ -24,51 +24,51 @@
 
 package com.openmeap.util;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
+import java.io.ByteArrayInputStream;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.UUID;
+
+import com.openmeap.digest.DigestException;
+import com.openmeap.digest.DigestInputStream;
+import com.openmeap.digest.DigestInputStreamFactory;
+
+import com.openmeap.util.UUID;
 
 public class AuthTokenProvider {
 	
-	public static String newAuthToken(String authSalt) {
-		String authToken = UUID.randomUUID().toString() + "." + new Date().getTime();
+	private static String AUTH_PARTS_DELIM = ".";
+	
+	public static String newAuthToken(String authSalt) throws DigestException {
+		String authToken = UUID.randomUUID() + AUTH_PARTS_DELIM + new Date().getTime();
 		authToken = authToken + "." + getSha1( authSalt+authToken );
 		return authToken;
 	}
 	
-	public static boolean validateAuthToken(String authSalt, String authToken) {
+	public static boolean validateAuthToken(String authSalt, String authToken) throws DigestException {
 		if( authToken==null )
 			return false;
-		String[] parts = authToken.split("\\.");
+		String[] parts = StringUtils.split(authToken,AUTH_PARTS_DELIM);
 		if( parts.length!=3 )
 			return false;
 		
-		Iterator partsIter = Arrays.asList(parts).subList(0, parts.length-1).iterator();
-		StringBuilder sb = new StringBuilder();
+		String[] slice = (String[]) Utils.arraySlice(parts, new String[parts.length-1], 0);
+		StringBuffer sb = new StringBuffer();
 		boolean firstRun = true;
-		while(partsIter.hasNext()) {
+		for(int i=0; i<slice.length; i++) {
 			if( !firstRun ) {
 				sb.append(".");
 			} else {
 				firstRun = false;
 			}
-			sb.append((String)partsIter.next());
+			sb.append((String)slice[i]);
 		}
 		String prefix = sb.toString();
 		
 		return getSha1( authSalt+prefix ).compareTo(parts[parts.length-1])==0;
 	}
 	
-	private static String getSha1(String value) {
-		MessageDigest sha1;
-		try {
-			sha1 = MessageDigest.getInstance("SHA1");
-		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException(e);
-		}
-		return Utils.byteArray2Hex(sha1.digest(value.getBytes()));
+	private static String getSha1(String value) throws DigestException {
+		DigestInputStream sha1 = DigestInputStreamFactory.getDigestInputStream("SHA1");
+		sha1.setInputStream(new ByteArrayInputStream(value.getBytes()));
+		return Utils.byteArray2Hex(sha1.digest());
 	}
 }

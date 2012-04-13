@@ -24,19 +24,18 @@
 
 package com.openmeap.services;
 
-import java.util.Date;
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.openmeap.digest.DigestException;
+import com.openmeap.http.HttpRequestExecuter;
 import com.openmeap.model.ModelManager;
+import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
-import com.openmeap.model.dto.Application;
 import com.openmeap.protocol.ApplicationManagementService;
 import com.openmeap.protocol.WebServiceException;
 import com.openmeap.protocol.dto.ConnectionOpenRequest;
@@ -47,6 +46,7 @@ import com.openmeap.protocol.dto.UpdateHeader;
 import com.openmeap.protocol.dto.UpdateNotification;
 import com.openmeap.protocol.dto.UpdateType;
 import com.openmeap.util.AuthTokenProvider;
+import com.openmeap.util.GenericRuntimeException;
 
 /**
  * Server-side implementation of the ApplicationManagementService
@@ -88,7 +88,12 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 		Application application = getApplication(reqAppName,reqAppVerId);
 		
 		// Generate a new auth token for the device to present to the proxy
-		String authToken = AuthTokenProvider.newAuthToken(application.getProxyAuthSalt());
+		String authToken;
+		try {
+			authToken = AuthTokenProvider.newAuthToken(application.getProxyAuthSalt());
+		} catch (DigestException e) {
+			throw new GenericRuntimeException(e);
+		}
 		response.setAuthToken(authToken);
 		
 		// If there is a deployment, 
@@ -163,5 +168,16 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 		}
 		
 		return application;
+	}
+	
+	private HttpRequestExecuter executer = null;
+	private String serviceUrl = null;
+	@Override
+	public void setServiceUrl(String serviceUrl) {
+		this.serviceUrl = serviceUrl;
+	}
+	@Override
+	public void setHttpRequestExecuter(HttpRequestExecuter executer) {
+		this.executer = executer;
 	}	
 }

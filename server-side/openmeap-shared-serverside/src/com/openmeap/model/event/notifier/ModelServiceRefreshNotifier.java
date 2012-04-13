@@ -26,12 +26,12 @@ package com.openmeap.model.event.notifier;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.openmeap.util.HttpResponse;
 import com.openmeap.cluster.AbstractClusterServiceMgmtNotifier;
 import com.openmeap.cluster.ClusterNotificationException;
 import com.openmeap.constants.ServletNameConstants;
@@ -72,7 +72,7 @@ public class ModelServiceRefreshNotifier
 	@Override
 	protected void makeRequest(final URL url, final Event<ModelEntity> mesg) throws ClusterNotificationException {
 		
-		HttpResponse httpResponse = null;
+		com.openmeap.http.HttpResponse httpResponse = null;
 		String simpleName = null;
 		
 		String thisUrl = url.toString() + "/" + ServletNameConstants.SERVICE_MANAGEMENT + "/";
@@ -93,7 +93,7 @@ public class ModelServiceRefreshNotifier
 			simpleName = "GlobalSettings";
 		else return;
 		
-		Map<String,Object> parms = new HashMap<String,Object>();
+		Hashtable<String,Object> parms = new Hashtable<String,Object>();
 		parms.put(UrlParamConstants.ACTION, ModelEntityEventAction.MODEL_REFRESH.getActionName());
 		parms.put(UrlParamConstants.AUTH_TOKEN, newAuthToken());
 		parms.put(UrlParamConstants.REFRESH_TYPE, simpleName);

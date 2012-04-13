@@ -33,6 +33,7 @@ import org.apache.log4j.xml.DOMConfigurator;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import com.openmeap.util.Utils;
+import com.openmeap.util.XmlUtils;
 
 public class Log4JConfiguratorListener implements ServletContextListener {
 	
@@ -52,7 +53,7 @@ public class Log4JConfiguratorListener implements ServletContextListener {
 		}
 		try {
 			Resource res = new ClassPathResource(xmlLoc);
-			DOMConfigurator.configure( Utils.getDocument(res.getInputStream()).getDocumentElement() );
+			DOMConfigurator.configure( XmlUtils.getDocument(res.getInputStream()).getDocumentElement() );
 		} catch(Exception ioe) {
 			servletContext.log("The configuration failed.",ioe);
 		}

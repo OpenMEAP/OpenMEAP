@@ -25,6 +25,7 @@
 package com.openmeap.protocol.dto;
 
 import com.openmeap.json.HasJSONProperties;
+import com.openmeap.json.JSONGetterSetter;
 import com.openmeap.json.JSONProperty;
 
 public class ConnectionOpenResponse implements HasJSONProperties {
@@ -33,8 +34,24 @@ public class ConnectionOpenResponse implements HasJSONProperties {
     protected String authToken;
     
     private static JSONProperty[] jsonProperties = new JSONProperty[] {
-    	new JSONProperty("getUpdate"),
-    	new JSONProperty("getAuthToken")
+    	new JSONProperty("update",UpdateHeader.class,
+    		new JSONGetterSetter() {
+	    		public Object getValue(Object src) {
+					return ((ConnectionOpenResponse)src).getUpdate();
+				}
+				public void setValue(Object dest, Object value) {
+					((ConnectionOpenResponse)dest).setUpdate((UpdateHeader)value);
+				}
+    		}),
+    	new JSONProperty("authToken",String.class,
+    		new JSONGetterSetter() {
+	    		public Object getValue(Object src) {
+					return ((ConnectionOpenResponse)src).getAuthToken();
+				}
+				public void setValue(Object dest, Object value) {
+					((ConnectionOpenResponse)dest).setAuthToken((String)value);
+				}
+    		})
     };
     public JSONProperty[] getJSONProperties() {
 		return jsonProperties;

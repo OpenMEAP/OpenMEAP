@@ -25,7 +25,9 @@
 package com.openmeap.admin.web;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -35,6 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.openmeap.constants.FormConstants;
+import com.openmeap.http.HttpHeader;
+import com.openmeap.http.HttpResponse;
 import com.openmeap.json.JSONObjectBuilder;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.Application;
@@ -42,8 +46,6 @@ import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
-import com.openmeap.util.HttpHeader;
-import com.openmeap.util.HttpResponse;
 import com.openmeap.util.Utils;
 
 /**
@@ -126,11 +128,11 @@ public class AdminTest {
 		settings.setTemporaryStoragePath(AdminTestHelper.ADMIN_WEB_STORAGE);
 		
 		// correct cluster node location and path prefix
-		Map<String,ClusterNode> clusterNodeMap = new HashMap<String,ClusterNode>();
+		List<ClusterNode> clusterNodeMap = new ArrayList<ClusterNode>();
 		ClusterNode node = new ClusterNode();
 		node.setServiceWebUrlPrefix(AdminTestHelper.NODE_01_SERVICES_URL);
 		node.setFileSystemStoragePathPrefix(AdminTestHelper.NODE_01_STORAGE);
-		clusterNodeMap.put(node.getServiceWebUrlPrefix(), node);
+		clusterNodeMap.add(node);
 		settings.setClusterNodes(clusterNodeMap);
 		
 		// validate settings stored in database

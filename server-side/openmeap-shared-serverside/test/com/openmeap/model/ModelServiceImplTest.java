@@ -1,3 +1,27 @@
+/*
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011-2012 OpenMEAP, Inc.                                   #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the LGPLv3                                                #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU Lesser General Public License as published #
+ #    by the Free Software Foundation, either version 3 of the License, or     #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU Lesser General Public License for more details.                      #
+ #                                                                             #
+ #    You should have received a copy of the GNU Lesser General Public License #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+ */
+
 package com.openmeap.model;
 
 import java.util.*;
@@ -40,7 +64,16 @@ public class ModelServiceImplTest {
 		ModelTestUtils.resetTestDb();
 	}
 	
-	@Test public void testSaveOrUpdate() {
+	@Test public void testInSequence() {
+		testSaveOrUpdate();
+		testFind();
+		testFindAll();
+		testFindAppVersionByNameAndId();
+		testFindDeploymentsByNameAndId();
+		testDelete();
+	}
+	
+	public void testSaveOrUpdate() {
 		
 		/////////////////
 		// Verify that we can create and save an applicaiton
@@ -70,12 +103,12 @@ public class ModelServiceImplTest {
 		modelService.saveOrUpdate(app);
 	}
 	
-	@Test public void testFind() {
+	public void testFind() {
 		Application appFound = modelService.findByPrimaryKey(Application.class,1L);
 		Assert.assertTrue( appFound.getName()!=null && appFound.getName().compareTo("Application.name")==0 );
 	}
 	
-	@Test public void testFindAll() {
+	public void testFindAll() {
 		List<ApplicationVersion> dtl = modelService.findAll(ApplicationVersion.class);
 		Assert.assertTrue(dtl.size()==3);
 		for( String toFind : new String[] {"ApplicationVersion.identifier.1","ApplicationVersion.identifier.2","smacky id"} ) {
@@ -88,19 +121,19 @@ public class ModelServiceImplTest {
 		}
 	}
 	
-	@Test public void testFindAppVersionByNameAndId() {
+	public void testFindAppVersionByNameAndId() {
 		ApplicationVersion app = modelService.findAppVersionByNameAndId("Application.name","ApplicationVersion.identifier.2");
 		Assert.assertTrue(app!=null);
 	}
 	
-	@Test public void testFindDeploymentsByNameAndId() {
+	public void testFindDeploymentsByNameAndId() {
 		List<Deployment> deployments = modelService.findDeploymentsByNameAndId("Application.name","ApplicationVersion.identifier.1");
 		Assert.assertTrue(deployments!=null);
 		Assert.assertTrue(deployments.size()==2);
 	}
 	
 	// putting this last because it corrupts the model
-	@Test public void testDelete() {
+	public void testDelete() {
 		// verify that we 
 		Application app = modelService.findByPrimaryKey(Application.class, 1L);
 		ApplicationVersion appVer = modelService.findByPrimaryKey(ApplicationVersion.class, 1L);

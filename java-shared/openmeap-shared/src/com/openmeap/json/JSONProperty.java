@@ -25,11 +25,21 @@
 package com.openmeap.json;
 
 public class JSONProperty {
-	private String getterName;
-	public JSONProperty(String getterName) {
-		this.getterName=getterName;
+	private String propertyName;
+	private Class returnType;
+	private JSONGetterSetter getterSetter;
+	public JSONProperty(String propertyName, Class returnType, JSONGetterSetter getterSetter) {
+		this.propertyName=propertyName;
+		this.returnType=returnType;
+		this.getterSetter=getterSetter;
 	}
-	public String getGetterName() {
-		return getterName;
+	public String getPropertyName() {
+		return propertyName;
+	}
+	public Class getReturnType() {
+		return returnType;
+	}
+	public JSONGetterSetter getGetterSetter() {
+		return getterSetter;
 	}
 }

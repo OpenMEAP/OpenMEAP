@@ -1,3 +1,27 @@
+/*
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011-2012 OpenMEAP, Inc.                                   #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the LGPLv3                                                #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU Lesser General Public License as published #
+ #    by the Free Software Foundation, either version 3 of the License, or     #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU Lesser General Public License for more details.                      #
+ #                                                                             #
+ #    You should have received a copy of the GNU Lesser General Public License #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+ */
+
 package com.openmeap.model;
 
 import java.util.*;
@@ -93,16 +117,16 @@ public class ModelManagerImplTest {
 		settings = modelManager.getGlobalSettings();
 		Assert.assertTrue(settings.getId().equals(Long.valueOf(1)));
 		
-		Map<String,ClusterNode> nodes = settings.getClusterNodes();
-		nodes.put("http://test",new ClusterNode());
-		nodes.get("http://test").setServiceWebUrlPrefix("http://test");
-		nodes.get("http://test").setFileSystemStoragePathPrefix("/tmp2");
+		List<ClusterNode> nodes = settings.getClusterNodes();
+		nodes.add(new ClusterNode("http://test","/tmp"));
+		settings.getClusterNode("http://test").setServiceWebUrlPrefix("http://test");
+		settings.getClusterNode("http://test").setFileSystemStoragePathPrefix("/tmp2");
 		settings = modelManager.addModify(settings,null);
 		
 		modelManager.refresh(settings,null);
 		settings = modelManager.getGlobalSettings();
 		Assert.assertTrue(settings.getClusterNodes().size()==3);
-		Assert.assertTrue(settings.getClusterNodes().get("http://test")!=null);
+		Assert.assertTrue(settings.getClusterNode("http://test")!=null);
 	}
 	
 	@Test public void testAddModifyApplicationVersion() throws Exception {

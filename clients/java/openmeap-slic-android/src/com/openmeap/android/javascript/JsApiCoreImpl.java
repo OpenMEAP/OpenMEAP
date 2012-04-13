@@ -24,8 +24,8 @@
 
 package com.openmeap.android.javascript;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.me.JSONException;
+import org.json.me.JSONObject;
 
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;

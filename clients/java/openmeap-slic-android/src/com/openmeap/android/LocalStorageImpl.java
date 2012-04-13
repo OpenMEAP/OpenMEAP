@@ -27,12 +27,20 @@ package com.openmeap.android;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import android.app.Activity;
 
 import com.openmeap.thinclient.LocalStorage;
+import com.openmeap.thinclient.LocalStorageException;
+import com.openmeap.thinclient.update.UpdateException;
+import com.openmeap.thinclient.update.UpdateResult;
+import com.openmeap.thinclient.update.UpdateStatus;
+import com.openmeap.util.GenericRuntimeException;
 
 public class LocalStorageImpl implements LocalStorage {
 
@@ -77,25 +85,85 @@ public class LocalStorageImpl implements LocalStorage {
  		}
 	}
 
-	public FileOutputStream openFileOutputStream(String fileName) throws FileNotFoundException {
+	public OutputStream openFileOutputStream(String fileName) throws LocalStorageException {
 		String internalStorageName = FileContentProvider.getInternalStorageFileName(fileName);
-        return activity.openFileOutput(internalStorageName,Activity.MODE_PRIVATE);
+        try {
+			return activity.openFileOutput(internalStorageName,Activity.MODE_PRIVATE);
+		} catch (FileNotFoundException e) {
+			throw new LocalStorageException(e);
+		}
 	}
 	
-	public FileOutputStream openFileOutputStream(String prefix, String fileName) throws FileNotFoundException {
+	public OutputStream openFileOutputStream(String prefix, String fileName) throws LocalStorageException {
 		String internalStorageName = FileContentProvider.getInternalStorageFileName(prefix,fileName);
-        return activity.openFileOutput(internalStorageName,Activity.MODE_PRIVATE);
+        try {
+			return activity.openFileOutput(internalStorageName,Activity.MODE_PRIVATE);
+		} catch (FileNotFoundException e) {
+			throw new LocalStorageException(e);
+		}
 	}
 
 	public void deleteImportArchive() {
 		activity.deleteFile("import.zip");
 	}
 
-	public OutputStream getImportArchiveOutputStream() throws FileNotFoundException {
-		return activity.openFileOutput("import.zip", Activity.MODE_PRIVATE);
+	public OutputStream getImportArchiveOutputStream() throws LocalStorageException {
+		try {
+			return activity.openFileOutput("import.zip", Activity.MODE_PRIVATE);
+		} catch (FileNotFoundException e) {
+			throw new LocalStorageException(e);
+		}
 	}
 
-	public InputStream getImportArchiveInputStream() throws FileNotFoundException {
-		return activity.openFileInput("import.zip");
+	public InputStream getImportArchiveInputStream() throws LocalStorageException {
+		try {
+			return activity.openFileInput("import.zip");
+		} catch (FileNotFoundException e) {
+			throw new LocalStorageException(e);
+		}
+	}
+	
+	public void unzipImportArchive(UpdateStatus update) throws LocalStorageException {
+		// at this point, we've verified that:
+		//   1) we have enough space on the device
+		//   2) the archive downloaded is what was expected
+
+		ZipInputStream zis = null;
+		String newPrefix = "com.openmeap.storage."+update.getUpdateHeader().getHash().getValue();
+		try {
+			zis = new ZipInputStream( getImportArchiveInputStream() );
+		    ZipEntry ze;
+		    while ((ze = zis.getNextEntry()) != null) {
+		    	if( ze.isDirectory() )
+		    		continue;
+		        OutputStream baos = openFileOutputStream(newPrefix,ze.getName());
+		        try {
+		        	byte[] buffer = new byte[1024];
+		        	int count;
+		        	while ((count = zis.read(buffer)) != -1) {
+		        		baos.write(buffer, 0, count);
+		        	}
+		        }
+		        catch( Exception e ) {
+		        	;// TODO: something, for the love of god.
+		        }
+		        finally {
+		        	baos.close();
+		        }
+		    }
+		} catch( Exception e ) {
+			
+			// delete the recently unzipped assets
+			
+			throw new LocalStorageException(e);
+		} finally {
+			if( zis!=null ) {
+				try {
+					zis.close();
+				} catch (IOException e) {
+					throw new GenericRuntimeException(e);
+				}
+			}
+		}
 	}
 }

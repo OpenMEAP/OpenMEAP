@@ -1,9 +1,35 @@
+/*
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011-2012 OpenMEAP, Inc.                                   #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the LGPLv3                                                #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU Lesser General Public License as published #
+ #    by the Free Software Foundation, either version 3 of the License, or     #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU Lesser General Public License for more details.                      #
+ #                                                                             #
+ #    You should have received a copy of the GNU Lesser General Public License #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+ */
+
 package com.openmeap.json;
+
+import java.util.Hashtable;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.json.JSONObject;
+import org.json.me.JSONObject;
 
 public class JSONObjectBuilderTest extends TestCase {
 	
@@ -11,39 +37,114 @@ public class JSONObjectBuilderTest extends TestCase {
 
 		static final public Types ONE = new Types("ONE");
 		static final public Types TWO = new Types("TWO");
+		static final private Types[] constants = new Types[] {
+				ONE,
+				TWO
+			};
 	    private final String value;
 	    private Types(String v) {
 	        value = v;
+	    }
+	    public Enum[] getStaticConstants() {
+	    	return constants;
 	    }
 	    public String value() {
 	        return value;
 	    }
 	    static public Types[] values() {
-	    	return (Types[])EnumUtils.values(Types.class);
+	    	return (Types[])ONE.getStaticConstants();
 	    }
 	    static public Types fromValue(String v) {
-	    	return (Types)EnumUtils.fromValue(Types.class, v);
+	    	return (Types)EnumUtils.fromValue(ONE, v);
 	    }
 		
 	}
 	static public class RootClass implements HasJSONProperties {
-		private BranchClass child;
+		
+		private final static JSONProperty[] jsonProperties = new JSONProperty[] {
+	    	new JSONProperty("child",BranchClass.class,
+	    		new JSONGetterSetter(){
+	    			public Object getValue(Object src) {
+						return ((RootClass)src).getChild();
+					}
+					public void setValue(Object dest, Object value) {
+						((RootClass)dest).setChild((BranchClass)value);
+					}
+	    		}),
+	    	new JSONProperty("stringValue",String.class,
+	    		new JSONGetterSetter(){
+		    		public Object getValue(Object src) {
+						return ((RootClass)src).getStringValue();
+					}
+					public void setValue(Object dest, Object value) {
+						((RootClass)dest).setStringValue((String)value);
+					}
+	    		}),
+	    	new JSONProperty("stringArrayValue",String[].class,
+	    		new JSONGetterSetter(){
+		    		public Object getValue(Object src) {
+						return ((RootClass)src).getStringArrayValue();
+					}
+					public void setValue(Object dest, Object value) {
+						((RootClass)dest).setStringArrayValue((String[])value);
+					}
+	    		}),
+	    	new JSONProperty("longValue",Long.class,
+		    	new JSONGetterSetter(){
+		    		public Object getValue(Object src) {
+						return ((RootClass)src).getLongValue();
+					}
+					public void setValue(Object dest, Object value) {
+						((RootClass)dest).setLongValue((Long)value);
+					}
+	    		}),
+	    	new JSONProperty("integerValue",Integer.class,
+		    	new JSONGetterSetter(){
+		    		public Object getValue(Object src) {
+						return ((RootClass)src).getIntegerValue();
+					}
+					public void setValue(Object dest, Object value) {
+						((RootClass)dest).setIntegerValue((Integer)value);
+					}
+	    		}),
+	    	new JSONProperty("doubleValue",Double.class,
+	    		new JSONGetterSetter(){
+		    		public Object getValue(Object src) {
+						return ((RootClass)src).getDoubleValue();
+					}
+					public void setValue(Object dest, Object value) {
+						((RootClass)dest).setDoubleValue((Double)value);
+					}
+	    		}),
+	    	new JSONProperty("hashTable",Hashtable.class,
+	    		new JSONGetterSetter(){
+		    		public Object getValue(Object src) {
+						return ((RootClass)src).getHashTable();
+					}
+					public void setValue(Object dest, Object value) {
+						((RootClass)dest).setHashTable((Hashtable)value);
+					}
+	    		})
+	    };
+	    public JSONProperty[] getJSONProperties() {
+			return jsonProperties;
+		}
+	    
+	    private BranchClass child;
 		private String stringValue;
 		private String[] stringArrayValue;
 		private Long longValue;
 		private Integer integerValue;
 		private Double doubleValue;
-		private static JSONProperty[] jsonProperties = new JSONProperty[] {
-	    	new JSONProperty("getChild"),
-	    	new JSONProperty("getStringValue"),
-	    	new JSONProperty("getStringArrayValue"),
-	    	new JSONProperty("getLongValue"),
-	    	new JSONProperty("getIntegerValue"),
-	    	new JSONProperty("getDoubleValue")
-	    };
-	    public JSONProperty[] getJSONProperties() {
-			return jsonProperties;
+		private Hashtable hashTable;
+		
+		public Hashtable getHashTable() {
+			return hashTable;
 		}
+		public void setHashTable(Hashtable hashTable) {
+			this.hashTable = hashTable;
+		}
+	    
 		public BranchClass getChild() {
 			return child;
 		}
@@ -85,14 +186,40 @@ public class JSONObjectBuilderTest extends TestCase {
 		private String string;
 		private Types typeOne;
 		private Types typeTwo;
-		private static JSONProperty[] jsonProperties = new JSONProperty[] {
-	    	new JSONProperty("getString"),
-	    	new JSONProperty("getTypeOne"),
-	    	new JSONProperty("getTypeTwo")
+		
+		private final static JSONProperty[] jsonProperties = new JSONProperty[] {
+	    	new JSONProperty("string",String.class,
+	    		new JSONGetterSetter(){
+	    			public Object getValue(Object src) {
+						return ((BranchClass)src).getString();
+					}
+					public void setValue(Object dest, Object value) {
+						((BranchClass)dest).setString((String)value);
+					}
+	    		}),
+	    	new JSONProperty("typeOne",Types.class,
+	    		new JSONGetterSetter(){
+		    		public Object getValue(Object src) {
+						return ((BranchClass)src).getTypeOne();
+					}
+					public void setValue(Object dest, Object value) {
+						((BranchClass)dest).setTypeOne(Types.fromValue((String)value));
+					}
+	    		}),
+	    	new JSONProperty("typeTwo",Types.class,
+	    		new JSONGetterSetter(){
+		    		public Object getValue(Object src) {
+						return ((BranchClass)src).getTypeTwo();
+					}
+					public void setValue(Object dest, Object value) {
+						((BranchClass)dest).setTypeTwo(Types.fromValue((String)value));
+					}
+	    		})
 	    };
 	    public JSONProperty[] getJSONProperties() {
 			return jsonProperties;
 		}
+
 		public String getString() {
 			return string;
 		}
@@ -115,22 +242,29 @@ public class JSONObjectBuilderTest extends TestCase {
 	
 	public void testToJSON() throws Exception {
 		RootClass root = new RootClass();
-		root.setDoubleValue(Double.valueOf(3.14));
-		root.setLongValue(Long.valueOf(1000L));
-		root.setIntegerValue(Integer.valueOf(2000));
+		root.setDoubleValue(Double.valueOf("3.14"));
+		root.setLongValue(new Long(Long.parseLong("1000")));
+		root.setIntegerValue(new Integer(Integer.parseInt("2000")));
 		root.setStringValue("value");
 		root.setStringArrayValue(new String[]{"value1","value2"});
 		root.setChild(new BranchClass());
 		root.getChild().setTypeOne(Types.TWO);
 		root.getChild().setTypeTwo(Types.ONE);
 		root.getChild().setString("child_string");
+		Hashtable table = new Hashtable();
+		table.put("key1","value1");
+		table.put("key2",new Long(1000));
+		table.put("key3",new Integer(1000));
+		root.setHashTable(table);
 		
 		JSONObjectBuilder builder = new JSONObjectBuilder();
 		JSONObject jsonObj = builder.toJSON(root);
 		Assert.assertEquals(
-					"{\"child\":{\"typeTwo\":\"ONE\",\"typeOne\":\"TWO\",\"string\":\"child_string\"}"
-					+",\"longValue\":1000,\"integerValue\":2000,\"stringArrayValue\":[\"value1\",\"value2\"],"
-					+"\"stringValue\":\"value\",\"doubleValue\":3.14}",
+						"{\"stringValue\":\"value\",\"integerValue\":2000,"
+						+"\"stringArrayValue\":[\"value1\",\"value2\"],"
+						+"\"hashTable\":{\"key3\":1000,\"key2\":1000,\"key1\":\"value1\"},"
+						+"\"doubleValue\":\"3.14\",\"longValue\":1000,"
+						+"\"child\":{\"string\":\"child_string\",\"typeTwo\":\"ONE\",\"typeOne\":\"TWO\"}}",
 					jsonObj.toString()
 				);
 		RootClass afterRoundTrip = (RootClass)builder.fromJSON(jsonObj,new RootClass());

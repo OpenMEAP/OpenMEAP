@@ -3,6 +3,5 @@
     <wb-module deploy-name="build-tools">
         <wb-resource deploy-path="/" source-path="/src"/>
         <wb-resource deploy-path="/" source-path="/gen"/>
-        <wb-resource deploy-path="/" source-path="/test"/>
     </wb-module>
 </project-modules>

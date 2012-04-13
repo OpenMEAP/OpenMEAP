@@ -26,6 +26,7 @@ package com.openmeap.model.event.notifier;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -37,10 +38,10 @@ import com.openmeap.constants.FormConstants;
 import com.openmeap.constants.ServletNameConstants;
 import com.openmeap.constants.UrlParamConstants;
 import com.openmeap.event.Event;
+import com.openmeap.http.HttpResponse;
 import com.openmeap.model.ModelEntity;
 import com.openmeap.model.ModelServiceEventNotifier;
 import com.openmeap.model.event.ModelEntityEvent;
-import com.openmeap.util.HttpResponse;
 import com.openmeap.util.Utils;
 
 abstract public class AbstractEventNotifier<T extends ModelEntity> extends
@@ -71,7 +72,7 @@ abstract public class AbstractEventNotifier<T extends ModelEntity> extends
 	
 			String authToken = newAuthToken();
 			
-			Map<String,Object> parms = new HashMap<String,Object>();;
+			Hashtable<String,Object> parms = new Hashtable<String,Object>();;
 
 			parms.put(UrlParamConstants.CLUSTERNODE_KEY, url.toString());
 			

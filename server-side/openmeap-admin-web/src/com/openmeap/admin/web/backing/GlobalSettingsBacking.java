@@ -38,6 +38,10 @@ import java.util.Map;
 
 import javax.persistence.PersistenceException;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.openmeap.Authorizer.Action;
 import com.openmeap.constants.FormConstants;
 import com.openmeap.event.MessagesEvent;
@@ -52,6 +56,8 @@ import com.openmeap.web.ProcessingContext;
 
 public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 	private ModelManager modelManager;
+	
+	private final static Logger logger = LoggerFactory.getLogger(GlobalSettingsBacking.class); 
 	
 	private final static String PROCESS_TARGET_PARAM     = FormConstants.PROCESS_TARGET;
 	private final static String AUTH_SALT_PARAM          = "authSalt";
@@ -115,58 +121,65 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 				}
 			}
 			
-			// process the ClusterNode objects
-			if( parameterMap.get(CLUSTER_NODE_URLS_PARAM)!=null ) {
-				String[] clusterNodeUrls = (String[])parameterMap.get(CLUSTER_NODE_URLS_PARAM);
-				String[] clusterNodePaths = (String[])parameterMap.get(CLUSTER_NODE_PATHS_PARAM);
-				int end = clusterNodeUrls.length;
-				
-				// make sure there is a map in cluster nodes
-				Map<String,ClusterNode> clusterNodes = settings.getClusterNodes();
-				if( clusterNodes==null ) {
-					clusterNodes = new HashMap<String,ClusterNode>();
-					settings.setClusterNodes(clusterNodes);
-				} 
-				
-				// iterate over each node configuration, updating the clusterNodes as per input
-				for( int i=0; i<end; i++ ) {
-					String thisNodeUrl = clusterNodeUrls[i].trim();
-					String thisNodePath = clusterNodePaths[i].trim();
-					if( thisNodeUrl.length()==0 ) {
-						events.add(new MessagesEvent("A cluster node must specify a service url it is internally accessible via the admin service."));
-						continue;
-					}
-					if( thisNodePath.length()==0 ) {
-						events.add(new MessagesEvent("The cluster node with url "+thisNodeUrl+" should specify a path to store application archives at."));
-					}
-					if( clusterNodes.containsKey(thisNodeUrl) ) {
-						clusterNodes.get(thisNodeUrl).setFileSystemStoragePathPrefix(thisNodePath);
-					} else {
-						ClusterNode thisNode = new ClusterNode();
-						thisNode.setServiceWebUrlPrefix(thisNodeUrl);
-						thisNode.setFileSystemStoragePathPrefix(thisNodePath);
-						clusterNodes.put(thisNodeUrl, thisNode);
-					}
-				}
-				
-				// remove any nodes that no longer appear
-				List<String> urls = Arrays.asList(clusterNodeUrls);
-				List<String> toRemove = new ArrayList<String>();
-				for( String url : clusterNodes.keySet() ) {
-					if( !urls.contains(url) )
-						toRemove.add(url);
-				}
-				for( String url : toRemove ) {
-					clusterNodes.remove(url);
-				}
-			}
 			try {
+				// process the ClusterNode objects
+				if( parameterMap.get(CLUSTER_NODE_URLS_PARAM)!=null ) {
+					
+					String[] clusterNodeUrls = (String[])parameterMap.get(CLUSTER_NODE_URLS_PARAM);
+					String[] clusterNodePaths = (String[])parameterMap.get(CLUSTER_NODE_PATHS_PARAM);
+					int end = clusterNodeUrls.length;
+					
+					// make sure there is a map in cluster nodes
+					List<ClusterNode> clusterNodes = settings.getClusterNodes();
+					if( clusterNodes==null ) {
+						clusterNodes = new ArrayList<ClusterNode>();
+						settings.setClusterNodes(clusterNodes);
+					} 
+				
+					// remove any nodes that no longer appear
+					List<String> urls = Arrays.asList(clusterNodeUrls);
+					List<String> urlsToRemove = new ArrayList<String>();
+					for( ClusterNode node : clusterNodes ) {
+						if( !urls.contains(node.getServiceWebUrlPrefix()) ) {
+							urlsToRemove.add(node.getServiceWebUrlPrefix());
+						}
+					}
+					for( String url : urlsToRemove ) {
+						ClusterNode node = settings.getClusterNode(url);
+						clusterNodes.remove(node);
+						modelManager.delete(node,events);
+					}
+					
+					// iterate over each node configuration, updating the clusterNodes as per input
+					for( int i=0; i<end; i++ ) {
+						String thisNodeUrl = clusterNodeUrls[i].trim();
+						String thisNodePath = clusterNodePaths[i].trim();
+						if( thisNodeUrl.length()==0 ) {
+							events.add(new MessagesEvent("A cluster node must specify a service url it is internally accessible via the admin service."));
+							continue;
+						}
+						if( thisNodePath.length()==0 ) {
+							events.add(new MessagesEvent("The cluster node with url "+thisNodeUrl+" should specify a path to store application archives at."));
+						}
+						ClusterNode thisNode = settings.getClusterNode(thisNodeUrl);
+						if( thisNode!=null ) {
+							thisNode.setFileSystemStoragePathPrefix(thisNodePath);
+						} else {
+							thisNode = new ClusterNode();
+							thisNode.setServiceWebUrlPrefix(thisNodeUrl);
+							thisNode.setFileSystemStoragePathPrefix(thisNodePath);
+							clusterNodes.add(thisNode);
+						}
+					}
+				}
 				modelManager.addModify(settings,events);
 				events.add(new MessagesEvent("The settings were successfully modified."));
 			} catch( InvalidPropertiesException ipe ) {
-				events.add( new MessagesEvent(ipe.getMessage()) );
+				logger.error("An exception updating GlobalSettings: {}",ipe);
+				events.add( new MessagesEvent(ExceptionUtils.getRootCauseMessage(ipe)) );
 			} catch( PersistenceException ipe ) {
-				events.add( new MessagesEvent(ipe.getMessage()) );
+				logger.error("An exception updating GlobalSettings: {}",ipe);
+				events.add( new MessagesEvent(ExceptionUtils.getRootCauseMessage(ipe)) );
 			}
 		} 
 		

@@ -25,6 +25,7 @@
 package com.openmeap.protocol.dto;
 
 import com.openmeap.json.HasJSONProperties;
+import com.openmeap.json.JSONGetterSetter;
 import com.openmeap.json.JSONProperty;
 
 public class Hash implements HasJSONProperties {
@@ -33,8 +34,24 @@ public class Hash implements HasJSONProperties {
     protected String value;
     
     private static JSONProperty[] jsonProperties = new JSONProperty[] {
-    	new JSONProperty("getAlgorithm"),
-    	new JSONProperty("getValue")
+    	new JSONProperty("algorithm",HashAlgorithm.class,
+    		new JSONGetterSetter(){
+				public Object getValue(Object src) {
+					return ((Hash)src).getAlgorithm();
+				}
+				public void setValue(Object dest, Object value) {
+					((Hash)dest).setAlgorithm((HashAlgorithm)HashAlgorithm.fromValue((String)value));
+				}
+			}),
+    	new JSONProperty("value",String.class,
+    		new JSONGetterSetter(){
+				public Object getValue(Object src) {
+					return ((Hash)src).getValue();
+				}
+				public void setValue(Object dest, Object value) {
+					((Hash)dest).setValue((String)value);
+				}
+			})
     };
     public JSONProperty[] getJSONProperties() {
 		return jsonProperties;

@@ -33,6 +33,8 @@ import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -40,9 +42,9 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.StringUtils;
 
 import com.openmeap.json.HasJSONProperties;
+import com.openmeap.json.JSONGetterSetter;
 import com.openmeap.json.JSONProperty;
 import com.openmeap.model.AbstractModelEntity;
-import com.openmeap.model.ModelEntity;
 
 @Entity @Table(name="cluster_node")
 public class ClusterNode extends AbstractModelEntity implements HasJSONProperties {
@@ -54,20 +56,49 @@ public class ClusterNode extends AbstractModelEntity implements HasJSONPropertie
 	 */
 	private String serviceWebUrlPrefix;
 	private String fileSystemStoragePathPrefix;
+	private Long id;
+	
+	public ClusterNode() {}
+	public ClusterNode(String serviceUrl, String prefix) {
+		this.serviceWebUrlPrefix=serviceUrl;
+		this.fileSystemStoragePathPrefix=prefix;
+	}
 	
 	static final private JSONProperty[] jsonProperties = new JSONProperty[] {
-		new JSONProperty("getServiceWebUrlPrefix"),
-		new JSONProperty("getFileSystemStoragePathPrefix")
+		new JSONProperty("serviceWebUrlPrefix",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((ClusterNode)src).getServiceWebUrlPrefix();
+			}
+			public void setValue(Object dest, Object value) {
+				((ClusterNode)dest).setServiceWebUrlPrefix((String)value);
+			}
+		}),
+		new JSONProperty("fileSystemStoragePathPrefix",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((ClusterNode)src).getFileSystemStoragePathPrefix();
+			}
+			public void setValue(Object dest, Object value) {
+				((ClusterNode)dest).setFileSystemStoragePathPrefix((String)value);
+			}
+		})
 	};
 	@Override @Transient
 	public JSONProperty[] getJSONProperties() {
 		return jsonProperties;
 	}
 	
-	@Transient public String getPk() { return getServiceWebUrlPrefix(); }
-	public void setPk( Object pkValue ) { setServiceWebUrlPrefix((String)pkValue); }
+	@Transient public Long getPk() { return getId(); }
+	public void setPk( Object pkValue ) { setPk((Long)pkValue); }
+	 
+	@Id @GeneratedValue(strategy=GenerationType.AUTO)
+	public Long getId() {
+		return this.id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
 	
-	@Id @Column(name="svc_web_url_prfx",length=256)
+	@Column(name="svc_web_url_prfx",length=256,unique=true)
 	public String getServiceWebUrlPrefix() {
 		return serviceWebUrlPrefix;
 	}

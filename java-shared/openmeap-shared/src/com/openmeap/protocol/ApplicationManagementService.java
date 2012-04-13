@@ -24,12 +24,17 @@
 
 package com.openmeap.protocol;
 
-import com.openmeap.protocol.dto.*;
+import com.openmeap.http.HttpRequestExecuter;
+import com.openmeap.protocol.dto.ConnectionOpenRequest;
+import com.openmeap.protocol.dto.ConnectionOpenResponse;
+import com.openmeap.protocol.dto.UpdateNotification;
 
 /**
  * Interface for communication with the application management interface.
  */
 public interface ApplicationManagementService {
+	void setServiceUrl(String serviceUrl);
+	void setHttpRequestExecuter(HttpRequestExecuter executer);
 	ConnectionOpenResponse connectionOpen(ConnectionOpenRequest request) throws WebServiceException;
 	void notifyUpdateResult(UpdateNotification notification) throws WebServiceException;
 }

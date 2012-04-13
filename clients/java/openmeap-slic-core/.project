@@ -13,14 +13,8 @@
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.apache.ivyde.eclipse.ivynature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>JAVASCRIPT_SRC_LOC</name>
-			<type>2</type>
-			<locationURI>SHARED_LOC</locationURI>
-		</link>
-	</linkedResources>
 	<variableList>
 		<variable>
 			<name>SHARED_LOC</name>

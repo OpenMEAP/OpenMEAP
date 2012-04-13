@@ -24,9 +24,10 @@
 
 package com.openmeap.protocol.dto;
 
-import java.lang.reflect.Field;
+import com.openmeap.json.Enum;
+import com.openmeap.json.EnumUtils;
 
-public class ErrorCode {
+public class ErrorCode implements Enum {
 
 	static final public ErrorCode UNDEFINED = new ErrorCode("UNDEFINED");
 	static final public ErrorCode MISSING_PARAMETER = new ErrorCode("MISSING_PARAMETER");
@@ -34,32 +35,40 @@ public class ErrorCode {
 	static final public ErrorCode AUTHENTICATION_FAILURE = new ErrorCode("AUTHENTICATION_FAILURE");
 	static final public ErrorCode APPLICATION_NOTFOUND = new ErrorCode("APPLICATION_NOTFOUND");
 	static final public ErrorCode APPLICATION_VERSION_NOTFOUND = new ErrorCode("APPLICATION_VERSION_NOTFOUND");
+	static final private ErrorCode[] constants = new ErrorCode[]{
+		UNDEFINED,
+		MISSING_PARAMETER,
+		DATABASE_ERROR,
+		AUTHENTICATION_FAILURE,
+		APPLICATION_NOTFOUND,
+		APPLICATION_VERSION_NOTFOUND
+	};
+	public Enum[] getStaticConstants() {
+		return constants;
+	}
 	
-	private String name;
+	private String value;
 	private ErrorCode(String name) {
-		this.name = name;
+		this.value = name;
 	}
     
+	public boolean equals(Object o) {
+		return this.hashCode()==o.hashCode();
+	}
+	
+	public int hashCode() {
+		return this.value.hashCode();
+	}
+	
     public String value() {
-        return name;
+        return value;
     }
 
-    public static ErrorCode fromValue(String v) {
-        return valueOf(v);
+    public static ErrorCode valueOf(String v) {
+        return fromValue(v);
     }
     
-    public static ErrorCode valueOf(String v) {
-    	Field[] fields = ErrorCode.class.getDeclaredFields();
-    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
-    		Field field = fields[fieldIdx];
-    		if( field.getName().equals(v) ) {
-    			try {
-					return (ErrorCode)field.get(null);
-				} catch (Exception e) {
-					throw new IllegalArgumentException(v);
-				}
-    		}
-    	}
-    	throw new IllegalArgumentException(v);
+    public static ErrorCode fromValue(String v) {
+    	return (ErrorCode)EnumUtils.fromValue((Enum)UNDEFINED, v);
     }
 }

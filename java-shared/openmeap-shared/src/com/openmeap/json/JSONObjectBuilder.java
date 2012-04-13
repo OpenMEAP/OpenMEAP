@@ -24,26 +24,21 @@
 
 package com.openmeap.json;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
 import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.Enum;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.openmeap.util.PropertyUtils;
+import org.json.me.JSONArray;
+import org.json.me.JSONException;
+import org.json.me.JSONObject;
 
 /**
  * Converts an object hierarchy into a JSON representation.
  * Only looks at the JSONProperty annotated getter-methods.
- * Does not support collections, only statically-typed arrays.
+ * Limited Hashtable support, but statically-typed arrays are good.
  * Assumes camel-case is desired.
  * Assumes the objects are instantiable without constructor arguments.
  * 
@@ -61,70 +56,72 @@ public class JSONObjectBuilder {
 		}		
 		JSONProperty[] properties = ((HasJSONProperties)rootObject).getJSONProperties();
 		for( int jsonPropertyIdx=0; jsonPropertyIdx<properties.length; jsonPropertyIdx++ ) {
+			
 			JSONProperty property = properties[jsonPropertyIdx];
-			Method getterMethod;
+			
+			Class returnType = property.getReturnType();
+			
+			String propertyName = property.getPropertyName();
+			
 			try {
-				getterMethod = rootObject.getClass().getMethod(property.getGetterName(),null);
-			} catch (Exception e1) {
-				throw new JSONException(e1);
-			} 
-			Class returnType = getterMethod.getReturnType();
-			Method setterMethod = PropertyUtils.setterForGetterMethod(getterMethod);
-			String propertyName = PropertyUtils.propertyForGetterMethodName(getterMethod.getName());
-			try {
-				if( setterMethod!=null ) {
 					
+					// get the unparsed value from the JSONObject
 					Object value = null;
 					try {
-						
 						value = jsonObj.get(propertyName);
 					} catch( JSONException e ) {
-						
 						continue;
 					}
 					if( value == JSONObject.NULL ) {
-						
 						continue;
 					}
+					
 					if( Enum.class.isAssignableFrom(returnType) ) {
 						
-						Class e = (Class)returnType; 
-						try {
-							setterMethod.invoke(rootObject,new Object[]{returnType.getDeclaredField((String)value).get(null)});
-						} catch (Exception p) {
-							throw new JSONException(p);
-						}
+						property.getGetterSetter().setValue(rootObject,value);
 					} else if( value instanceof JSONArray ) {
 						
 						JSONArray array = (JSONArray)value;
-						List list = new ArrayList();
+						Vector list = new Vector();
 						for( int i=0; i<array.length(); i++ ) {
 							Object obj = array.get(i);
 							if( obj instanceof JSONObject ) {
 								Object newObj = (Object)returnType.newInstance();
-								list.add(fromJSON((JSONObject)obj,newObj));
+								list.addElement(fromJSON((JSONObject)obj,newObj));
 							} else {
-								list.add(obj);
+								list.addElement(obj);
 							}
 						}
-						setterMethod.invoke(rootObject,new Object[] {toTypedArray(list)});
+						property.getGetterSetter().setValue(rootObject,toTypedArray(list));
+						
 					} else if( value instanceof JSONObject ) {
 						
-						// instantiate a new object, of the type correct for the
 						Object obj = (Object)returnType.newInstance();
-						setterMethod.invoke(rootObject, new Object[]{fromJSON((JSONObject)value,obj)});
-					} else if( PropertyUtils.isSimpleType(returnType) ) {
+						if( Hashtable.class.isAssignableFrom(returnType) ) {
+							Hashtable table = (Hashtable)obj;
+							JSONObject jsonMap = (JSONObject)value;
+							Enumeration keysEnum = jsonMap.keys();
+							while(keysEnum.hasMoreElements()){
+								String key = (String)keysEnum.nextElement();
+								Object thisValue = jsonMap.get(key);
+								if( thisValue instanceof JSONObject ) {
+									Object newObj = (Object)returnType.newInstance();
+									table.put(key,fromJSON((JSONObject)thisValue,newObj));
+								} else {
+									table.put(key,thisValue);
+								}
+							}
+							property.getGetterSetter().setValue(rootObject, table);
+						} else {
+							// of the type correct for the
+							property.getGetterSetter().setValue(rootObject, fromJSON((JSONObject)value,obj));
+						}
+					} else if( isSimpleType(returnType) ) {
 						
-						setterMethod.invoke(rootObject, new Object[]{PropertyUtils.correctCasting(returnType,value)});
+						property.getGetterSetter().setValue(rootObject, correctCasting(returnType,value));
 					} 
-				}
-			} catch( InstantiationException e ) {
-				throw new JSONException(e);
-			} catch (InvocationTargetException e) {
-				throw new JSONException(e);
-			} catch( IllegalAccessException ite ) {
-				throw new JSONException(ite);
-			} catch (JSONException e) {
+
+			} catch( Exception e ) {
 				throw new JSONException(e);
 			}
 		}
@@ -144,66 +141,61 @@ public class JSONObjectBuilder {
 		
 		// iterate over each JSONProperty annotated method
 		for( int jsonPropertyIdx=0; jsonPropertyIdx<properties.length; jsonPropertyIdx++ ) {
+			
 			JSONProperty property = properties[jsonPropertyIdx];
 			
-			Method method;
-			try {
-				method = obj.getClass().getMethod(property.getGetterName(),null);
-			} catch (Exception e1) {
-				throw new JSONException(e1);
-			}
-			
 			// determine the method return type
-			Class returnType = method.getReturnType();
+			Class returnType = property.getReturnType();
+			
+			Object value = property.getGetterSetter().getValue(obj);
+			if(value==null) {
+				continue;
+			}
 			
 			if( returnType==null ) {
 				throw new JSONException(
-						obj.getClass().getSimpleName()+"::"+method.getName()
+						obj.getClass().getName()+"."+property.getPropertyName()
 						+" is annotated with JSONProperty, but has no return type."
 						+"  I can't work with this.");
 			}
 			
 			// strip "get" off the front
-			String propertyName = PropertyUtils.propertyForGetterMethodName(method.getName());
-			
+			String propertyName = property.getPropertyName();
+
 			try {
 				if( Enum.class.isAssignableFrom(returnType) ) {
-					Enum ret = (Enum)method.invoke(obj,null);
+					Enum ret = (Enum)value;
 					jsonObj.put(propertyName, ret.value());
-				} else if( PropertyUtils.isSimpleType(returnType) ) {
-					jsonObj.put(propertyName, handleSimpleType(returnType,method.invoke(obj,null)) );
+				} else if( isSimpleType(returnType) ) {
+					jsonObj.put(propertyName, handleSimpleType(returnType,property.getGetterSetter().getValue(obj)) );
 				} else {
 					if( returnType.isArray() ) {
-						Object[] returnValues = (Object[])method.invoke(obj,null);
+						Object[] returnValues = (Object[])value;
 						JSONArray jsonArray = new JSONArray();
 						for( int returnValueIdx=0; returnValueIdx<returnValues.length; returnValueIdx++ ) {
-							Object value = returnValues[returnValueIdx];
-							jsonArray.put(toJSON(value));
+							Object thisValue = returnValues[returnValueIdx];
+							jsonArray.put(toJSON(thisValue));
 						}
 						jsonObj.put(propertyName, jsonArray);
-					} else if( Map.class.isAssignableFrom(returnType) ) {
-						Map map = (Map)method.invoke(obj,null);
+					} else if( Hashtable.class.isAssignableFrom(returnType) ) {
+						Hashtable map = (Hashtable)value;
 						JSONObject jsonMap = new JSONObject();
-						Iterator iterator = map.entrySet().iterator();
-						while( iterator.hasNext() ) {
-							Object o = iterator.next();
-							Map.Entry entry = (Map.Entry)o; 
-							if(PropertyUtils.isSimpleType(entry.getValue().getClass())) {
-								jsonMap.put(entry.getKey().toString(), handleSimpleType(returnType,entry.getValue()));
+						Enumeration enumer = map.keys();
+						while( enumer.hasMoreElements() ) {
+							Object key = (String)enumer.nextElement();
+							Object thisValue = (Object)map.get(key); 
+							if(isSimpleType(thisValue.getClass())) {
+								jsonMap.put(key.toString(), handleSimpleType(returnType,thisValue));
 							} else {
-								jsonMap.put(entry.getKey().toString(), toJSON(entry.getValue()));
+								jsonMap.put(key.toString(), toJSON(thisValue));
 							}
 						}
 						jsonObj.put(propertyName, jsonMap);
 					} else {
-						jsonObj.put(propertyName, toJSON(method.invoke(obj,null)));
+						jsonObj.put(propertyName, toJSON(value));
 					}
 				}
-			} catch( InvocationTargetException ite ) {
-				throw new JSONException(ite);
-			} catch( IllegalAccessException ite ) {
-				throw new JSONException(ite);
-			} catch( JSONException ite ) {
+			} catch( Exception ite ) {
 				throw new JSONException(ite);
 			}
 			
@@ -225,11 +217,11 @@ public class JSONObjectBuilder {
 		}
 	}
 	
-	private Object[] toTypedArray(List list) {
+	private Object[] toTypedArray(Vector list) {
 		if( list.isEmpty() ) {
 			return null;
 		}
-		Object first = list.get(0);
+		Object first = list.elementAt(0);
 		Object[] ret = null;
 		if( first instanceof String ) {
 			ret = new String[list.size()];
@@ -242,6 +234,34 @@ public class JSONObjectBuilder {
 		} else if( first instanceof Boolean ) {
 			ret = new Boolean[list.size()];
 		}
-		return list.toArray(ret);
+		list.copyInto(ret);
+		return (Object[])ret;
+	}
+	
+	private Object correctCasting(Class type, Object obj) {
+		
+		if( type.equals(Long.class) ) {
+			return new Long(Long.parseLong(obj.toString()));
+		} else if( type.equals(Double.class) ) {
+			return Double.valueOf(obj.toString());
+		} else if( type.equals(Integer.class) ) {
+			return Integer.valueOf(obj.toString());
+		} else return obj;
+	}
+	
+	private boolean isSimpleType(Class returnType) {
+		if(returnType.isArray()) {
+			return Boolean[].class.isAssignableFrom(returnType) 
+				|| Long[].class.isAssignableFrom(returnType) 
+				|| Double[].class.isAssignableFrom(returnType)
+				|| Integer[].class.isAssignableFrom(returnType)
+				|| String[].class.isAssignableFrom(returnType);
+		} else {
+			return Boolean.class.isAssignableFrom(returnType) 
+				|| Long.class.isAssignableFrom(returnType) 
+				|| Double.class.isAssignableFrom(returnType)
+				|| Integer.class.isAssignableFrom(returnType)
+				|| String.class.isAssignableFrom(returnType);
+		}
 	}
 }

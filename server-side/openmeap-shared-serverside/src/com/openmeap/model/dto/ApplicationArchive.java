@@ -39,8 +39,10 @@ import org.slf4j.LoggerFactory;
 import com.openmeap.constants.FormConstants;
 import com.openmeap.constants.ServletNameConstants;
 import com.openmeap.constants.UrlParamConstants;
+import com.openmeap.digest.DigestException;
 import com.openmeap.model.AbstractModelEntity;
 import com.openmeap.util.AuthTokenProvider;
+import com.openmeap.util.GenericRuntimeException;
 import com.openmeap.web.form.Parameter;
 
 @Entity @Table(name="application_archive")
@@ -50,7 +52,6 @@ public class ApplicationArchive extends AbstractModelEntity {
 	
 	private Long id;
 	private String fileDataUrl;
-	private String mimeType;
 	private String hash;
 	private String hashAlgorithm;
 	private ApplicationVersion version;
@@ -127,7 +128,12 @@ public class ApplicationArchive extends AbstractModelEntity {
 		
 		String externalServiceUrlPrefix = settings.getExternalServiceUrlPrefix();
 		String authSalt = this.getVersion().getApplication().getProxyAuthSalt();
-		String newAuthToken = AuthTokenProvider.newAuthToken(authSalt!=null?authSalt:"");
+		String newAuthToken;
+		try {
+			newAuthToken = AuthTokenProvider.newAuthToken(authSalt!=null?authSalt:"");
+		} catch (DigestException e) {
+			throw new GenericRuntimeException(e);
+		}
 		
 		String replUrl = url;
 		try {

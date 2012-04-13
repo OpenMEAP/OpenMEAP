@@ -3,9 +3,9 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/openmeap-shared"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/openmeap-slic-core"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/openmeap-shared"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/openmeap-slic-core"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/openmeap-shared-jdk5"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/openmeap-shared-jdk5"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

@@ -46,6 +46,7 @@ import javax.persistence.Transient;
 import com.openmeap.constants.FormConstants;
 import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
+import com.openmeap.json.JSONGetterSetter;
 import com.openmeap.model.AbstractModelEntity;
 import com.openmeap.web.form.Parameter;
 
@@ -65,15 +66,64 @@ public class Application extends AbstractModelEntity implements HasJSONPropertie
 	private String lastModifier;
 	
 	static final private JSONProperty[] jsonProperties = new JSONProperty[] {
-		new JSONProperty("getName"),
-		new JSONProperty("getDescription"),
-		new JSONProperty("getAdmins"),
-		new JSONProperty("getVersionAdmins"),
-		new JSONProperty("getDeploymentHistoryLength"),
-		new JSONProperty("getInitialVersionIdentifier"),
-		new JSONProperty("lastModifier")
+		new JSONProperty("name",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((Application)src).getName();
+			}
+			public void setValue(Object dest, Object value) {
+				((Application)dest).setName((String)value);
+			}
+		}),
+		new JSONProperty("description",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((Application)src).getDescription();
+			}
+			public void setValue(Object dest, Object value) {
+				((Application)dest).setDescription((String)value);
+			}
+		}),
+		new JSONProperty("admins",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((Application)src).getAdmins();
+			}
+			public void setValue(Object dest, Object value) {
+				((Application)dest).setAdmins((String)value);
+			}
+		}),
+		new JSONProperty("versionAdmins",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((Application)src).getVersionAdmins();
+			}
+			public void setValue(Object dest, Object value) {
+				((Application)dest).setVersionAdmins((String)value);
+			}
+		}),
+		new JSONProperty("deploymentHistoryLength",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((Application)src).getDeploymentHistoryLength();
+			}
+			public void setValue(Object dest, Object value) {
+				((Application)dest).setDeploymentHistoryLength((Integer)value);
+			}
+		}),
+		new JSONProperty("initialVersionIdentifier",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((Application)src).getInitialVersionIdentifier();
+			}
+			public void setValue(Object dest, Object value) {
+				((Application)dest).setInitialVersionIdentifier((String)value);
+			}
+		}),
+		new JSONProperty("lastModifier",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((Application)src).getLastModifier();
+			}
+			public void setValue(Object dest, Object value) {
+				((Application)dest).setLastModifier((String)value);
+			}
+		})
 	};
-	@Override @Transient
+	@Transient @Override
 	public JSONProperty[] getJSONProperties() {
 		return jsonProperties;
 	}

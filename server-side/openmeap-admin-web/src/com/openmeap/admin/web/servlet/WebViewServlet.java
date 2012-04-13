@@ -46,10 +46,12 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.openmeap.constants.FormConstants;
+import com.openmeap.digest.DigestException;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.util.AuthTokenProvider;
+import com.openmeap.util.GenericRuntimeException;
 import com.openmeap.util.Utils;
 
 public class WebViewServlet extends HttpServlet {
@@ -96,8 +98,12 @@ public class WebViewServlet extends HttpServlet {
 		String authSalt = ver.getApplication().getProxyAuthSalt();
 		String authToken = URLDecoder.decode(pathParts[AUTH_TOKEN_INDEX],FormConstants.CHAR_ENC_DEFAULT);
 		
-		if( ! AuthTokenProvider.validateAuthToken(authSalt, authToken) ) {
-			response.sendError(HttpServletResponse.SC_FORBIDDEN);
+		try {
+			if( ! AuthTokenProvider.validateAuthToken(authSalt, authToken) ) {
+				response.sendError(HttpServletResponse.SC_FORBIDDEN);
+			}
+		} catch (DigestException e1) {
+			throw new GenericRuntimeException(e1);
 		}
 		
 		File fileFull = new File( ver.getArchive().getExplodedPath(settings.getTemporaryStoragePath()).getAbsolutePath() + "/" + fileRelative );

@@ -27,6 +27,7 @@ package com.openmeap.admin.web;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -35,22 +36,22 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.openmeap.constants.FormConstants;
 import com.openmeap.event.ProcessingTargets;
+import com.openmeap.http.FileHandlingHttpRequestExecuterImpl;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
-import com.openmeap.util.FileHandlingHttpRequestExecuterImpl;
-import com.openmeap.util.HttpRequestException;
-import com.openmeap.util.HttpRequestExecuter;
-import com.openmeap.util.HttpResponse;
+import com.openmeap.http.HttpRequestException;
+import com.openmeap.http.HttpRequestExecuter;
+import com.openmeap.http.HttpResponse;
 import com.openmeap.web.form.ParameterMapBuilder;
 import com.openmeap.web.form.ParameterMapBuilderException;
 
 public class AdminTestHelper {
 	
-	final static public String HOST = "localhost:7000";
+	final static public String HOST = "10.0.2.15:8080";
 	
 	final static public String ADMIN_USER = "tomcat";
 	final static public String ADMIN_PASS = "tomcat";
@@ -103,7 +104,7 @@ public class AdminTestHelper {
 	}
 	
 	public HttpResponse postLogin(String userName, String password) throws HttpRequestException {
-		Map<String,Object> postData = new HashMap<String,Object>();
+		Hashtable<String,Object> postData = new Hashtable<String,Object>();
 		postData.put("j_username", userName);
 		postData.put("j_password", password);
 		return requestExecuter.postData(adminUrl+"j_security_check", postData);
@@ -114,7 +115,7 @@ public class AdminTestHelper {
 	 */
 	
 	public HttpResponse getAddModifyAppPage(Application application) throws HttpRequestException {
-		Map<String,Object> getData = new HashMap<String,Object>();
+		Hashtable<String,Object> getData = new Hashtable<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_APP_ADDMODIFY);
 		if(application!=null && application.getPk()!=null) {
 			getData.put(FormConstants.APP_ID, application.getPk().toString());
@@ -124,13 +125,13 @@ public class AdminTestHelper {
 	
 	public HttpResponse postAddModifyApp(Application application) throws HttpRequestException, ParameterMapBuilderException {
 		
-		Map<String,Object> getData = new HashMap<String,Object>();
+		Hashtable<String,Object> getData = new Hashtable<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_APP_ADDMODIFY);
 		if( application.getPk()!=null ) {
 			getData.put(FormConstants.APP_ID, application.getPk().toString());
 		}
 		
-		Map<String,Object> postData = new HashMap<String,Object>();
+		Hashtable<String,Object> postData = new Hashtable<String,Object>();
 		postData.put(FormConstants.PROCESS_TARGET, ProcessingTargets.ADDMODIFY_APP);
 		postData.put("submit","Submit!");
 		
@@ -141,13 +142,13 @@ public class AdminTestHelper {
 	
 	public HttpResponse postAddModifyApp_delete(Application application) throws HttpRequestException, ParameterMapBuilderException {
 		
-		Map<String,Object> getData = new HashMap<String,Object>();
+		Hashtable<String,Object> getData = new Hashtable<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_APP_ADDMODIFY);
 		if( application.getPk()!=null ) {
 			getData.put(FormConstants.APP_ID, application.getPk().toString());
 		}
 		
-		Map<String,Object> postData = new HashMap<String,Object>();
+		Hashtable<String,Object> postData = new Hashtable<String,Object>();
 		postData.put(FormConstants.PROCESS_TARGET, ProcessingTargets.ADDMODIFY_APP);
 		postData.put("deleteConfirm",FormConstants.APP_DELETE_CONFIRM_TEXT);
 		postData.put(FormConstants.DELETE,"Delete!");
@@ -164,7 +165,7 @@ public class AdminTestHelper {
 	
 	public HttpResponse getAddModifyAppVer(Application application) throws HttpRequestException {
 		
-		Map<String,Object> getData = new HashMap<String,Object>();
+		Hashtable<String,Object> getData = new Hashtable<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_APPVER_ADDMODIFY);
 		getData.put(FormConstants.APP_ID, application.getPk().toString());
 		return requestExecuter.get(adminUrl,getData);
@@ -172,14 +173,14 @@ public class AdminTestHelper {
 	
 	public HttpResponse postAddModifyAppVer(ApplicationVersion appVer, File uploadArchive) throws HttpRequestException, ParameterMapBuilderException {
 		
-		Map<String,Object> getData = new HashMap<String,Object>();
+		Hashtable<String,Object> getData = new Hashtable<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_APPVER_ADDMODIFY);
 		getData.put(FormConstants.APP_ID, appVer.getApplication().getPk().toString());
 		if( appVer.getPk()!=null ) {
 			getData.put(FormConstants.APPVER_ID, appVer.getPk().toString());
 		}
 		
-		Map<String,Object> postData = new HashMap<String,Object>();
+		Hashtable<String,Object> postData = new Hashtable<String,Object>();
 		postData.put(FormConstants.PROCESS_TARGET, ProcessingTargets.ADDMODIFY_APPVER);
 		postData.put(FormConstants.APP_ID, appVer.getApplication().getPk().toString());
 		postData.put(FormConstants.UPLOAD_ARCHIVE, uploadArchive);
@@ -190,14 +191,14 @@ public class AdminTestHelper {
 	
 	public HttpResponse postAddModifyAppVer_delete(ApplicationVersion appVer) throws HttpRequestException, ParameterMapBuilderException {
 		
-		Map<String,Object> getData = new HashMap<String,Object>();
+		Hashtable<String,Object> getData = new Hashtable<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_APPVER_ADDMODIFY);
 		getData.put(FormConstants.APP_ID, appVer.getApplication().getPk().toString());
 		if( appVer.getPk()!=null ) {
 			getData.put(FormConstants.APPVER_ID, appVer.getPk().toString());
 		}
 		
-		Map<String,Object> postData = new HashMap<String,Object>();
+		Hashtable<String,Object> postData = new Hashtable<String,Object>();
 		postData.put(FormConstants.PROCESS_TARGET, ProcessingTargets.ADDMODIFY_APPVER);
 		postData.put(FormConstants.APP_ID, appVer.getApplication().getPk().toString());
 		if( appVer.getPk()!=null ) {
@@ -217,11 +218,11 @@ public class AdminTestHelper {
 	
 	public HttpResponse postCreateDeployment(ApplicationVersion appVer, Deployment.Type deplType) throws HttpRequestException {
 		
-		Map<String,Object> getData = new HashMap<String,Object>();
+		Hashtable<String,Object> getData = new Hashtable<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_DEPLOYMENTS);
 		getData.put(FormConstants.APP_ID, appVer.getApplication().getPk().toString());
 		
-		Map<String,Object> postData = new HashMap<String,Object>();
+		Hashtable<String,Object> postData = new Hashtable<String,Object>();
 		postData.put(FormConstants.PROCESS_TARGET, ProcessingTargets.DEPLOYMENTS);
 		postData.put(FormConstants.APPVER_ID, appVer.getPk().toString());
 		postData.put(FormConstants.DEPLOYMENT_TYPE, deplType.toString());
@@ -234,23 +235,23 @@ public class AdminTestHelper {
 	 */
 	
 	public HttpResponse getGlobalSettings() throws HttpRequestException {
-		Map<String,Object> getData = new HashMap<String,Object>();
+		Hashtable<String,Object> getData = new Hashtable<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_GLOBAL_SETTINGS);
 		return requestExecuter.get(adminUrl,getData);
 	}
 	
 	public HttpResponse postGlobalSettings(GlobalSettings settings) throws HttpRequestException, ParameterMapBuilderException {
 		
-		Map<String,Object> getData = new HashMap<String,Object>();
+		Hashtable<String,Object> getData = new Hashtable<String,Object>();
 		getData.put(FormConstants.PAGE_BEAN, FormConstants.PAGE_BEAN_GLOBAL_SETTINGS);
 		
-		Map<String,Object> postData = new HashMap<String,Object>();
+		Hashtable<String,Object> postData = new Hashtable<String,Object>();
 		postData.put(FormConstants.PROCESS_TARGET, ProcessingTargets.GLOBAL_SETTINGS);
 		paramsBuilder.toParameters(postData, settings);
 		if(settings.getClusterNodes()!=null && !settings.getClusterNodes().isEmpty()) {
 			List<String> nodeUrls = new ArrayList<String>();
 			List<String> nodePaths = new ArrayList<String>();
-			for( ClusterNode clusterNode : settings.getClusterNodes().values() ) {
+			for( ClusterNode clusterNode : settings.getClusterNodes() ) {
 				nodeUrls.add(clusterNode.getServiceWebUrlPrefix());
 				nodePaths.add(clusterNode.getFileSystemStoragePathPrefix());
 			}

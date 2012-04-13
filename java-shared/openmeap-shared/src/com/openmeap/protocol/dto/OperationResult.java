@@ -24,37 +24,37 @@
 
 package com.openmeap.protocol.dto;
 
-import java.lang.reflect.Field;
+import com.openmeap.json.Enum;
+import com.openmeap.json.EnumUtils;
 
-public class OperationResult {
+public class OperationResult implements Enum {
 
 	static final public OperationResult SUCCESS = new OperationResult("success");
 	static final public OperationResult FAILURE = new OperationResult("failure");
+	static final private OperationResult[] constants = new OperationResult[] {SUCCESS,FAILURE};    
     private final String value;
-
+    
     OperationResult(String v) {
         value = v;
     }
 
+    public boolean equals(Object o) {
+    	return o.hashCode()==this.hashCode();
+    }
+    
+    public int hashCode() {
+    	return value.hashCode();
+    }
+    
     public String value() {
         return value;
     }
+    
+    public Enum[] getStaticConstants() {
+		return constants;
+	}
 
     public static OperationResult fromValue(String v) {
-    	Field[] fields = OperationResult.class.getDeclaredFields();
-    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
-    		Field field = fields[fieldIdx];
-    		try {
-	    		if( ((OperationResult)field.get(null)).value().equals(v) ) {
-	    			return (OperationResult)field.get(null);
-					
-	    		}
-    		} catch(Exception e) {
-    			throw new IllegalArgumentException(v);
-    		}
-    	}
-    	throw new IllegalArgumentException(v);
+    	return (OperationResult)EnumUtils.fromValue(SUCCESS,v);
     }
-
-
 }

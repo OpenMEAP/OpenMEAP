@@ -24,6 +24,14 @@
 
 package com.openmeap.model.dto;
 
+import java.io.File;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Arrays;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -41,18 +49,11 @@ import org.apache.commons.lang.StringUtils;
 
 import com.openmeap.constants.FormConstants;
 import com.openmeap.json.HasJSONProperties;
+import com.openmeap.json.JSONGetterSetter;
 import com.openmeap.json.JSONProperty;
 import com.openmeap.model.AbstractModelEntity;
-import com.openmeap.model.ModelEntity;
 import com.openmeap.web.form.Parameter;
 import com.openmeap.web.form.Validation;
-
-import java.io.File;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Do not instantiate this, get it from the ModelManager
@@ -61,17 +62,57 @@ import java.util.Map;
 @Entity @Table(name="global_settings")
 public class GlobalSettings extends AbstractModelEntity implements HasJSONProperties {
 	private Long id = null;
-	private Map<String,ClusterNode> clusterNodes = null;
+	private List<ClusterNode> clusterNodes = null;
 	private String temporaryStoragePath = null;
 	private String serviceManagementAuthSalt = null;
 	private Integer maxFileUploadSize = 1000000;
 	
 	static final private JSONProperty[] jsonProperties = new JSONProperty[] {
-		new JSONProperty("getExternalServiceUrlPrefix"),
-		new JSONProperty("getMaxFileUploadSize"),
-		new JSONProperty("getServiceManagementAuthSalt"),
-		new JSONProperty("getTemporaryStoragePath"),
-		new JSONProperty("getClusterNodes")
+		new JSONProperty("externalServiceUrlPrefix",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((GlobalSettings)src).getExternalServiceUrlPrefix();
+			}
+			public void setValue(Object dest, Object value) {
+				((GlobalSettings)dest).setExternalServiceUrlPrefix((String)value);
+			}
+		}),
+		new JSONProperty("maxFileUploadSize",Integer.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((GlobalSettings)src).getMaxFileUploadSize();
+			}
+			public void setValue(Object dest, Object value) {
+				((GlobalSettings)dest).setMaxFileUploadSize((Integer)value);
+			}
+		}),
+		new JSONProperty("serviceManagementAuthSalt",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((GlobalSettings)src).getServiceManagementAuthSalt();
+			}
+			public void setValue(Object dest, Object value) {
+				((GlobalSettings)dest).setServiceManagementAuthSalt((String)value);
+			}
+		}),
+		new JSONProperty("temporaryStoragePath",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((GlobalSettings)src).getTemporaryStoragePath();
+			}
+			public void setValue(Object dest, Object value) {
+				((GlobalSettings)dest).setTemporaryStoragePath((String)value);
+			}
+		}),
+		new JSONProperty("clusterNodes",ClusterNode[].class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				List<ClusterNode> nodes = ((GlobalSettings)src).getClusterNodes();
+				if(nodes==null) {
+					return null;
+				} else {
+					return nodes.toArray(new ClusterNode[1]);
+				}
+			}
+			public void setValue(Object dest, Object value) {
+				((GlobalSettings)dest).setClusterNodes(Arrays.asList((ClusterNode[])value));
+			}
+		}),
 	};
 	@Override @Transient
 	public JSONProperty[] getJSONProperties() {
@@ -162,11 +203,23 @@ public class GlobalSettings extends AbstractModelEntity implements HasJSONProper
 	@OneToMany(fetch=FetchType.EAGER,cascade={CascadeType.ALL},targetEntity=ClusterNode.class)
 	@MapKey(name="serviceWebUrlPrefix")
 	@Lob
-	public Map<String,ClusterNode> getClusterNodes() {
+	public List<ClusterNode> getClusterNodes() {
 		return clusterNodes;
 	}
-	public void setClusterNodes(Map<String,ClusterNode> clusterNodes) {
+	public void setClusterNodes(List<ClusterNode> clusterNodes) {
 		this.clusterNodes = clusterNodes;
+	}
+	public ClusterNode getClusterNode(String url) {
+		if(clusterNodes==null) {
+			return null;
+		}
+		for(int i=0; i<clusterNodes.size(); i++) {
+			ClusterNode thisNode = clusterNodes.get(i);
+			if( thisNode.getServiceWebUrlPrefix().equals(url) ) {
+				return clusterNodes.get(i);
+			}
+		}
+		return null;
 	}
 	
 	public Map<Method,String> validate() {

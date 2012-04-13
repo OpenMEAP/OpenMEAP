@@ -43,7 +43,6 @@ public class ApplicationInstallation extends AbstractModelEntity {
 	private String uuid;
 	private ApplicationVersion applicationVersion; 
 	private Date deploymentDate;
-	private String authToken;
 	private Date authDate;
 	
 	/**

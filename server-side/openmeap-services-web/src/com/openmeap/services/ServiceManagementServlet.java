@@ -36,8 +36,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.me.JSONException;
+import org.json.me.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -45,6 +45,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.openmeap.constants.UrlParamConstants;
+import com.openmeap.digest.DigestException;
 import com.openmeap.event.Event;
 import com.openmeap.event.EventHandler;
 import com.openmeap.event.EventHandlingException;
@@ -62,6 +63,7 @@ import com.openmeap.model.event.handler.ArchiveFileUploadHandler;
 import com.openmeap.model.event.handler.ModelServiceRefreshHandler;
 import com.openmeap.services.dto.Result;
 import com.openmeap.util.AuthTokenProvider;
+import com.openmeap.util.GenericRuntimeException;
 import com.openmeap.util.ParameterMapUtils;
 import com.openmeap.util.ServletUtils;
 
@@ -99,16 +101,14 @@ public class ServiceManagementServlet extends HttpServlet {
 		modelServiceRefreshHandler = (ModelServiceRefreshHandler)context.getBean("modelServiceRefreshHandler");
 		
 		archiveUploadHandler = (ArchiveFileUploadHandler)context.getBean("archiveUploadHandler");
-		archiveUploadHandler.setFileSystemStoragePathPrefix(modelManager.getClusterNode().getFileSystemStoragePathPrefix());
-		
 		archiveDeleteHandler = (ArchiveFileDeleteHandler)context.getBean("archiveDeleteHandler");
-		archiveDeleteHandler.setFileSystemStoragePathPrefix(modelManager.getClusterNode().getFileSystemStoragePathPrefix());
 	}
 	
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
 		Result result = null;
+		PrintWriter os = new PrintWriter(response.getOutputStream());
 		
 		logger.debug("Request uri: {}",request.getRequestURI());
 		logger.debug("Request url: {}",request.getRequestURL());
@@ -122,46 +122,56 @@ public class ServiceManagementServlet extends HttpServlet {
 			action="";
 		}
 		
-		PrintWriter os = new PrintWriter(response.getOutputStream());
-		GlobalSettings settings = modelManager.getGlobalSettings();
-		ClusterNode node = modelManager.getClusterNode();
-		if( node==null ) {
-			throw new RuntimeException("openmeap-services-web needs to be configured as a cluster node in the settings of the admin interface.");
-		}
-		Map<Method,String> validationErrors = node.validate();
-		if( validationErrors != null ) {
-			throw new RuntimeException(new InvalidPropertiesException(node,validationErrors));
-		}
-		
 		if( ! authenticates(request) ) {
 			
 			logger.error("Request failed to authenticate ",request);
 			result = new Result(Result.Status.FAILURE,"Authentication failed");
 			
-		} else if( request.getParameter("clearPersistenceContext")!=null && context instanceof AbstractApplicationContext ) {
+		}
+		
+		if( action.equals(ModelEntityEventAction.MODEL_REFRESH.getActionName()) ) {
+			
+			logger.trace("Processing refresh");
+			result = refresh(request,response);
+			sendResult(response,os,result);
+			return;
+		}
+		
+		GlobalSettings settings = modelManager.getGlobalSettings();
+		ClusterNode clusterNode = modelManager.getClusterNode();
+		if( clusterNode==null ) {
+			throw new RuntimeException("openmeap-services-web needs to be configured as a cluster node in the settings of the admin interface.");
+		}
+		Map<Method,String> validationErrors = clusterNode.validate();
+		if( validationErrors != null ) {
+			throw new RuntimeException(new InvalidPropertiesException(clusterNode,validationErrors));
+		}
+		
+		if( request.getParameter("clearPersistenceContext")!=null && context instanceof AbstractApplicationContext ) {
 			
 			logger.trace("Clearing persistence context");
 			clearPersistenceContext();
 			
 		} else if( action.equals(ModelEntityEventAction.ARCHIVE_UPLOAD.getActionName()) ) {
 
-			logger.trace("Processing archive upload - max file size: {}, storage path prefix: {}",settings.getMaxFileUploadSize(),node.getFileSystemStoragePathPrefix());
-			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings.getMaxFileUploadSize(),node.getFileSystemStoragePathPrefix(),request);
+			logger.trace("Processing archive upload - max file size: {}, storage path prefix: {}",settings.getMaxFileUploadSize(),clusterNode.getFileSystemStoragePathPrefix());
+			archiveUploadHandler.setFileSystemStoragePathPrefix(clusterNode.getFileSystemStoragePathPrefix());
+			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings.getMaxFileUploadSize(),clusterNode.getFileSystemStoragePathPrefix(),request);
 			result = handleArchiveEvent(archiveUploadHandler, new MapPayloadEvent(paramMap), paramMap);
 			
 		} else if( action.equals(ModelEntityEventAction.ARCHIVE_DELETE.getActionName()) ) {
 			
-			logger.trace("Processing archive delete - max file size: {}, storage path prefix: {}",settings.getMaxFileUploadSize(),node.getFileSystemStoragePathPrefix());
-			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings.getMaxFileUploadSize(),node.getFileSystemStoragePathPrefix(), request);
+			logger.trace("Processing archive delete - max file size: {}, storage path prefix: {}",settings.getMaxFileUploadSize(),clusterNode.getFileSystemStoragePathPrefix());
+			archiveDeleteHandler.setFileSystemStoragePathPrefix(clusterNode.getFileSystemStoragePathPrefix());
+			Map<Object,Object> paramMap = ServletUtils.cloneParameterMap(settings.getMaxFileUploadSize(),clusterNode.getFileSystemStoragePathPrefix(), request);
 			result = handleArchiveEvent(archiveDeleteHandler, new MapPayloadEvent(paramMap), paramMap);
 			
-		} else if( action.equals(ModelEntityEventAction.MODEL_REFRESH.getActionName()) ) {
-			
-			logger.trace("Processing refresh");
-			result = refresh(request,response);
-			
-		}
+		} 
 		
+		sendResult(response,os,result);
+	}
+	
+	private void sendResult(HttpServletResponse response, PrintWriter os, Result result) throws IOException {
 		try {
 			if( result.getStatus()!=Result.Status.SUCCESS ) {
 				response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -258,7 +268,12 @@ public class ServiceManagementServlet extends HttpServlet {
 	private Boolean authenticates(HttpServletRequest arg0) {
 		String authSalt = getAuthSalt();
 		String auth = (String)arg0.getParameter(UrlParamConstants.AUTH_TOKEN);
-		Boolean isGood = AuthTokenProvider.validateAuthToken(authSalt, auth);
+		Boolean isGood;
+		try {
+			isGood = AuthTokenProvider.validateAuthToken(authSalt, auth);
+		} catch (DigestException e) {
+			throw new GenericRuntimeException(e);
+		}
 		logger.debug("Authentication of token \"{}\" with salt \"{}\" returned {}",new Object[]{authSalt,auth,isGood});
 		return (auth!=null && isGood);
 	}

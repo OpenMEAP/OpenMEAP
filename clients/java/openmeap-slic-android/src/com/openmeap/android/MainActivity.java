@@ -55,6 +55,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.openmeap.android.javascript.JsApiCoreImpl;
+import com.openmeap.digest.DigestInputStreamFactory;
+import com.openmeap.digest.Md5DigestInputStream;
+import com.openmeap.digest.Sha1DigestInputStream;
+import com.openmeap.http.CredentialsProviderFactory;
+import com.openmeap.http.HttpRequestExecuterImpl;
 import com.openmeap.protocol.WebServiceException;
 import com.openmeap.protocol.dto.UpdateHeader;
 import com.openmeap.protocol.dto.UpdateType;
@@ -64,10 +69,8 @@ import com.openmeap.thinclient.LoginFormLauncher;
 import com.openmeap.thinclient.Preferences;
 import com.openmeap.thinclient.SLICConfig;
 import com.openmeap.thinclient.update.UpdateHandler;
-import com.openmeap.util.CredentialsProviderFactory;
-import com.openmeap.util.HttpRequestExecuter;
-import com.openmeap.util.HttpRequestExecuterFactory;
-import com.openmeap.util.HttpRequestExecuterImpl;
+import com.openmeap.http.HttpRequestExecuter;
+import com.openmeap.http.HttpRequestExecuterFactory;
 import com.openmeap.util.Utils;
 
 public class MainActivity extends Activity implements LoginFormLauncher {
@@ -92,6 +95,8 @@ public class MainActivity extends Activity implements LoginFormLauncher {
         
         CredentialsProviderFactory.setDefaultCredentialsProviderFactory(new OmSlicCredentialsProvider.Factory(this));
         HttpRequestExecuterFactory.setDefaultType(HttpRequestExecuterImpl.class);
+        DigestInputStreamFactory.setDigestInputStreamForName("md5", Md5DigestInputStream.class);
+        DigestInputStreamFactory.setDigestInputStreamForName("sha1", Sha1DigestInputStream.class);
         
         // setup the SLICConfig instance 
         Preferences prefs = new SharedPreferencesImpl(getSharedPreferences(SLICConfig.PREFERENCES_FILE,MODE_PRIVATE));
@@ -110,7 +115,7 @@ public class MainActivity extends Activity implements LoginFormLauncher {
 	        WifiManager wifiManager = (WifiManager)o;
 	        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 	        if( wifiInfo!=null && wifiInfo.getMacAddress()!=null ) {
-	        	Runnable firstRunCheck = new FirstRunCheck(config,wifiInfo.getMacAddress());
+	        	Runnable firstRunCheck = new FirstRunCheck(config,wifiInfo.getMacAddress(),HttpRequestExecuterFactory.newDefault());
 	        	new Thread(firstRunCheck).start();
 	        }
         }
