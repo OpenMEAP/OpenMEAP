@@ -57,6 +57,9 @@ public class WebServiceException extends GenericException {
 			DATABASE_ERROR,
 			UNDEFINED
 		};
+		public String toString() {
+			return value();
+		}
 		public Enum[] getStaticConstants() {
 			return constants;
 		}

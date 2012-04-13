@@ -27,7 +27,6 @@ package com.openmeap.protocol.dto;
 import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONGetterSetter;
 import com.openmeap.json.JSONProperty;
-import com.openmeap.json.JSONObjectBuilderTest.Types;
 
 public class Error implements HasJSONProperties {
 

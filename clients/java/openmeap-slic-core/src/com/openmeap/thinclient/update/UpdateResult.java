@@ -44,6 +44,9 @@ public class UpdateResult implements Enum {
 	public Enum[] getStaticConstants() {
 		return (Enum[])this.constants;
 	}
+	public String toString() {
+		return value();
+	}
     private final String value;
     private UpdateResult(String v) {
         value = v;
