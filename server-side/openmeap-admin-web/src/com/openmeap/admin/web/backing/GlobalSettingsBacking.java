@@ -121,20 +121,20 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 				}
 			}
 			
-			try {
-				// process the ClusterNode objects
-				if( parameterMap.get(CLUSTER_NODE_URLS_PARAM)!=null ) {
-					
-					String[] clusterNodeUrls = (String[])parameterMap.get(CLUSTER_NODE_URLS_PARAM);
-					String[] clusterNodePaths = (String[])parameterMap.get(CLUSTER_NODE_PATHS_PARAM);
-					int end = clusterNodeUrls.length;
-					
-					// make sure there is a map in cluster nodes
-					List<ClusterNode> clusterNodes = settings.getClusterNodes();
-					if( clusterNodes==null ) {
-						clusterNodes = new ArrayList<ClusterNode>();
-						settings.setClusterNodes(clusterNodes);
-					} 
+			List<ClusterNode> toDelete = new ArrayList<ClusterNode>();
+			
+			// process the ClusterNode objects
+			if( parameterMap.get(CLUSTER_NODE_URLS_PARAM)!=null ) {
+				String[] clusterNodeUrls = (String[])parameterMap.get(CLUSTER_NODE_URLS_PARAM);
+				String[] clusterNodePaths = (String[])parameterMap.get(CLUSTER_NODE_PATHS_PARAM);
+				int end = clusterNodeUrls.length;
+				
+				// make sure there is a map in cluster nodes
+				List<ClusterNode> clusterNodes = settings.getClusterNodes();
+				if( clusterNodes==null ) {
+					clusterNodes = new ArrayList<ClusterNode>();
+					settings.setClusterNodes(clusterNodes);
+				} 
 				
 					// remove any nodes that no longer appear
 					List<String> urls = Arrays.asList(clusterNodeUrls);
@@ -149,27 +149,30 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 						clusterNodes.remove(node);
 						modelManager.delete(node,events);
 					}
-					
-					// iterate over each node configuration, updating the clusterNodes as per input
-					for( int i=0; i<end; i++ ) {
-						String thisNodeUrl = clusterNodeUrls[i].trim();
-						String thisNodePath = clusterNodePaths[i].trim();
-						if( thisNodeUrl.length()==0 ) {
-							events.add(new MessagesEvent("A cluster node must specify a service url it is internally accessible via the admin service."));
-							continue;
-						}
-						if( thisNodePath.length()==0 ) {
-							events.add(new MessagesEvent("The cluster node with url "+thisNodeUrl+" should specify a path to store application archives at."));
-						}
-						ClusterNode thisNode = settings.getClusterNode(thisNodeUrl);
-						if( thisNode!=null ) {
-							thisNode.setFileSystemStoragePathPrefix(thisNodePath);
-						} else {
-							thisNode = new ClusterNode();
-							thisNode.setServiceWebUrlPrefix(thisNodeUrl);
-							thisNode.setFileSystemStoragePathPrefix(thisNodePath);
-							clusterNodes.add(thisNode);
-						}
+					if( settings.getClusterNode(thisNodeUrl)!=null ) {
+						settings.getClusterNode(thisNodeUrl).setFileSystemStoragePathPrefix(thisNodePath);
+					} else {
+						ClusterNode thisNode = new ClusterNode();
+						thisNode.setServiceWebUrlPrefix(thisNodeUrl);
+						thisNode.setFileSystemStoragePathPrefix(thisNodePath);
+						settings.addClusterNode(thisNode);
+					}
+				}
+				
+				// remove any nodes that no longer appear
+				List<String> urls = Arrays.asList(clusterNodeUrls);
+				for( ClusterNode node : settings.getClusterNodes() ) {
+					if( !urls.contains(node.getServiceWebUrlPrefix()) ) {
+						toDelete.add(node);
+					}
+				}
+			}
+		
+			try {
+				if(toDelete!=null) {
+					for(ClusterNode node : toDelete) {
+						settings.removeClusterNode(node);
+						modelManager.delete(node,events);
 					}
 				}
 				modelManager.addModify(settings,events);

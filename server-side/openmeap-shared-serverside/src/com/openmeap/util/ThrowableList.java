@@ -34,6 +34,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 
 public class ThrowableList extends ArrayList<Throwable> {
 	
+	private static String SEPARATOR = ", ";
 	private Logger logger = LoggerFactory.getLogger(ThrowableList.class);
 	
 	public ThrowableList() {}
@@ -60,6 +61,22 @@ public class ThrowableList extends ArrayList<Throwable> {
 			result.append("\n");
 			result.append(stackTrace);
 			result.append("\n");
+			i++;
+		}
+		return result.toString();
+	}
+	
+	public String getMessages() {
+		StringBuilder result = new StringBuilder();
+		Integer i = 0;
+		for( Throwable t : this ) {
+			// get root cause
+			Exception rootCause = (Exception)ExceptionUtils.getRootCause(t);
+			String stackTrace = ExceptionUtils.getStackTrace(rootCause);
+			if(i!=0) {
+				result.append(SEPARATOR);
+			}
+			result.append("\""+rootCause.getMessage()+"\"");
 			i++;
 		}
 		return result.toString();

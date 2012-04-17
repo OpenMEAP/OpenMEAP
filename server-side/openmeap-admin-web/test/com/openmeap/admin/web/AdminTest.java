@@ -128,12 +128,10 @@ public class AdminTest {
 		settings.setTemporaryStoragePath(AdminTestHelper.ADMIN_WEB_STORAGE);
 		
 		// correct cluster node location and path prefix
-		List<ClusterNode> clusterNodeMap = new ArrayList<ClusterNode>();
 		ClusterNode node = new ClusterNode();
 		node.setServiceWebUrlPrefix(AdminTestHelper.NODE_01_SERVICES_URL);
 		node.setFileSystemStoragePathPrefix(AdminTestHelper.NODE_01_STORAGE);
-		clusterNodeMap.add(node);
-		settings.setClusterNodes(clusterNodeMap);
+		settings.addClusterNode(node);
 		
 		// validate settings stored in database
 		Utils.consumeInputStream(helper.postGlobalSettings(settings).getResponseBody());

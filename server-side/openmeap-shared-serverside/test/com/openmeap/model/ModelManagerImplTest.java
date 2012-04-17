@@ -117,10 +117,10 @@ public class ModelManagerImplTest {
 		settings = modelManager.getGlobalSettings();
 		Assert.assertTrue(settings.getId().equals(Long.valueOf(1)));
 		
-		List<ClusterNode> nodes = settings.getClusterNodes();
-		nodes.add(new ClusterNode("http://test","/tmp"));
-		settings.getClusterNode("http://test").setServiceWebUrlPrefix("http://test");
-		settings.getClusterNode("http://test").setFileSystemStoragePathPrefix("/tmp2");
+		ClusterNode node = new ClusterNode();
+		node.setServiceWebUrlPrefix("http://test");
+		node.setFileSystemStoragePathPrefix("/tmp2");
+		settings.addClusterNode(node);
 		settings = modelManager.addModify(settings,null);
 		
 		modelManager.refresh(settings,null);

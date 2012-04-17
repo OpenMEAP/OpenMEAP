@@ -74,11 +74,10 @@ public class ModelServiceRefreshNotifierTest {
 		final ModelManager modelManager = new MockModelManager();
 		final GlobalSettings globalSettings = new GlobalSettings();
 		globalSettings.setServiceManagementAuthSalt(UUID.randomUUID().toString());
-		List<ClusterNode> clusterNodes = new ArrayList<ClusterNode>();
+
 		ClusterNode clusterNode = new ClusterNode();
-		clusterNodes.add(clusterNode);
 		clusterNode.setServiceWebUrlPrefix("http://www.openmeap.com/openmeap-services-web");
-		globalSettings.setClusterNodes(clusterNodes);
+		globalSettings.addClusterNode(clusterNode);
 		new NonStrictExpectations(globalSettings,modelManager) {{
 			modelManager.getGlobalSettings(); result = globalSettings;
 		}};

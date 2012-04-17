@@ -128,7 +128,7 @@ public abstract class AbstractClusterServiceMgmtNotifier<T> implements EventNoti
 				throw new ClusterNotificationException(ie);
 			}
 		} else if(exceptions.size()>0){
-			throw new ClusterNotificationException( String.format("The following exceptions were thrown: %s",exceptions.toString()) );
+			throw new ClusterNotificationException( String.format("The following exceptions were thrown: %s",exceptions.getMessages()) );
 		}
 		
 		onAfterNotify(event);

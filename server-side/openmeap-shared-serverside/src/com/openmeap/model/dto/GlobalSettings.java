@@ -201,7 +201,6 @@ public class GlobalSettings extends AbstractModelEntity implements HasJSONProper
 	}
 	
 	@OneToMany(fetch=FetchType.EAGER,cascade={CascadeType.ALL},targetEntity=ClusterNode.class)
-	@MapKey(name="serviceWebUrlPrefix")
 	@Lob
 	public List<ClusterNode> getClusterNodes() {
 		return clusterNodes;
@@ -209,17 +208,34 @@ public class GlobalSettings extends AbstractModelEntity implements HasJSONProper
 	public void setClusterNodes(List<ClusterNode> clusterNodes) {
 		this.clusterNodes = clusterNodes;
 	}
-	public ClusterNode getClusterNode(String url) {
-		if(clusterNodes==null) {
-			return null;
-		}
-		for(int i=0; i<clusterNodes.size(); i++) {
-			ClusterNode thisNode = clusterNodes.get(i);
-			if( thisNode.getServiceWebUrlPrefix().equals(url) ) {
-				return clusterNodes.get(i);
+	public ClusterNode getClusterNode(String serviceUrlPrefix) {
+		for(ClusterNode node : clusterNodes) {
+			if( node.getServiceWebUrlPrefix().equals(serviceUrlPrefix)){
+				return node;
 			}
 		}
 		return null;
+	}
+	public Boolean addClusterNode(ClusterNode node){
+		
+		if(clusterNodes==null) {
+			clusterNodes = new ArrayList<ClusterNode>();
+		}
+		if(!clusterNodes.contains(node)) {
+			clusterNodes.add(node);
+			return true;
+		} 
+		return false;
+	}
+	public Boolean removeClusterNode(ClusterNode node){
+		
+		if(clusterNodes==null) {
+			clusterNodes = new ArrayList<ClusterNode>();
+		}
+		if(clusterNodes.contains(node)) {
+			return clusterNodes.remove(node);
+		} 
+		return false;
 	}
 	
 	public Map<Method,String> validate() {

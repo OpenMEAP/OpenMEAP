@@ -88,14 +88,14 @@ public class ClusterNode extends AbstractModelEntity implements HasJSONPropertie
 	}
 	
 	@Transient public Long getPk() { return getId(); }
-	public void setPk( Object pkValue ) { setPk((Long)pkValue); }
-	 
-	@Id @GeneratedValue(strategy=GenerationType.AUTO)
+	public void setPk( Object pkValue ) { setId((Long)pkValue); }
+	
+	@Id @GeneratedValue(strategy=GenerationType.AUTO) 
 	public Long getId() {
-		return this.id;
+		return id;
 	}
 	public void setId(Long id) {
-		this.id = id;
+		this.id=id;
 	}
 	
 	@Column(name="svc_web_url_prfx",length=256,unique=true)
