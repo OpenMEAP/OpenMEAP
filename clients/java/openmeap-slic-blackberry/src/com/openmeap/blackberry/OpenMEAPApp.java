@@ -22,22 +22,29 @@
  ###############################################################################
  */
 
-package mypackage;
+package com.openmeap.blackberry;
 
-import net.rim.device.api.ui.container.MainScreen;
+import com.openmeap.digest.DigestInputStreamFactory;
+
+import net.rim.device.api.ui.UiApplication;
+
+import com.openmeap.blackberry.digest.Md5DigestInputStream;
+import com.openmeap.blackberry.digest.Sha1DigestInputStream;
 
 /**
- * A class extending the MainScreen class, which provides default standard
- * behavior for BlackBerry GUI applications.
+ * This class extends the UiApplication class, providing a
+ * graphical user interface.
  */
-public final class MyScreen extends MainScreen
+public class OpenMEAPApp extends UiApplication
 {
     /**
-     * Creates a new MyScreen object
+     * Creates a new MyApp object
      */
-    public MyScreen()
-    {        
-        // Set the displayed title of the screen       
-        setTitle("MyTitle");
-    }
+    public OpenMEAPApp()
+    {    
+    	DigestInputStreamFactory.setDigestInputStreamForName("MD5", Md5DigestInputStream.class);
+    	DigestInputStreamFactory.setDigestInputStreamForName("SHA1", Sha1DigestInputStream.class);
+    	
+        pushScreen(new OpenMEAPScreen());
+    }    
 }

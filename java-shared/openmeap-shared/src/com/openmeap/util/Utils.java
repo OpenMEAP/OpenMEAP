@@ -72,6 +72,29 @@ final public class Utils {
 		}
 		return text.toString();
     }
+	
+	public static String readLine(InputStream is, String encoding) throws IOException {
+		StringBuffer text = new StringBuffer();
+		int read, lastRead;
+		while( (read=is.read())!=(-1) ) {
+			if(read=='\r') {
+				lastRead = read;
+				read=is.read();
+				if(read==(-1)) {
+					text.append((char)lastRead);
+				} else if(read=='\n') {
+					break;
+				} else {
+					text.append((char)lastRead);
+					text.append((char)read);
+				}
+			} else {
+				text.append((char)read);
+			}
+			lastRead = read;
+		} 
+		return text.toString();
+	}
     
     public static void pipeInputStreamIntoOutputStream(InputStream inputStream, OutputStream outputStream) throws IOException {
     	byte[] bytes = new byte[1024];

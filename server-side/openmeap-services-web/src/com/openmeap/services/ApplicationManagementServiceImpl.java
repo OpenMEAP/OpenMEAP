@@ -110,8 +110,6 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 		//   the app hash value is different than reported
 		if( reqAppVerDiffers || reqAppArchHashValDiffers ) {
 			
-			// TODO: I'm not happy with the discrepancies between the model and schema
-			// ...besides, this update header should be encapsulated somewhere else
 			ApplicationVersion currentVersion = lastDeployment.getApplicationVersion();
 			ApplicationArchive currentVersionArchive = currentVersion.getArchive();
 			UpdateHeader uh = new UpdateHeader();

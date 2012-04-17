@@ -22,40 +22,41 @@
  ###############################################################################
  */
 
-package com.openmeap.util;
+package com.openmeap.blackberry.digest;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Hashtable;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import net.rim.device.api.crypto.AbstractDigest;
 
-import com.openmeap.constants.FormConstants;
+import com.openmeap.digest.DigestException;
+import com.openmeap.digest.DigestInputStream;
+import com.openmeap.util.GenericRuntimeException;
 
+public class AbstractDigestInputStream  implements DigestInputStream {
 
-public class UtilsTest extends TestCase {
-	public void testReadInputStream() throws Exception {
-		String testXml = "<?xml version=\"1.0\"?><rootNode><childNode attribute=\"one\"/></rootNode>";
-		InputStream is = new ByteArrayInputStream(testXml.getBytes());
-		String result = Utils.readInputStream(is,FormConstants.CHAR_ENC_DEFAULT);
-		Assert.assertTrue(result.compareTo(testXml)==0);
+	private InputStream inputStream;
+	protected AbstractDigest digest = null;
+	
+	public void setInputStream(InputStream inputStream) {
+		this.inputStream = inputStream;
 	}
-	public void testReplaceFields() {
-		String template = "${TEST} and ${ANOTHER_TEST} making sure that ${TEST} gets replace.";
-		String expected = "test and test making sure that test gets replace.";
-		Hashtable parms = new Hashtable();
-		parms.put("TEST", "test");
-		parms.put("ANOTHER_TEST", "test");
-		String result = Utils.replaceFields(parms,template);
-		Assert.assertEquals(expected,result);
-	}
-	public void testReadLine() throws Exception {
-		String lines = "One\r\n2\r\n\r\n";
-		InputStream is = new ByteArrayInputStream(lines.getBytes());
-		Assert.assertEquals("One",Utils.readLine(is, "utf-8"));
-		Assert.assertEquals("2",Utils.readLine(is, "utf-8"));
-		Assert.assertEquals("",Utils.readLine(is, "utf-8"));
-		is.close();
+
+	public byte[] digest() throws DigestException {
+		try {
+			byte[] bytes = new byte[1024];
+			int read = 0;
+			while( (read=inputStream.read(bytes))==1024 ) {
+				digest.update(bytes,0,read);
+			}
+		} catch(Exception e) {
+			throw new DigestException(e);
+		} finally {
+			try{
+				inputStream.close();
+			} catch(Exception e) {
+				throw new GenericRuntimeException(e);
+			}
+		}
+		return digest.getDigest();
 	}
 }

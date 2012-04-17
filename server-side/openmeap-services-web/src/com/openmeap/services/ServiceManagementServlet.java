@@ -126,7 +126,8 @@ public class ServiceManagementServlet extends HttpServlet {
 			
 			logger.error("Request failed to authenticate ",request);
 			result = new Result(Result.Status.FAILURE,"Authentication failed");
-			
+			sendResult(response,os,result);
+			return;
 		}
 		
 		if( action.equals(ModelEntityEventAction.MODEL_REFRESH.getActionName()) ) {

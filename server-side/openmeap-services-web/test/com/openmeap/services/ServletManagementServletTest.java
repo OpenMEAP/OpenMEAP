@@ -37,6 +37,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.openmeap.constants.UrlParamConstants;
+import com.openmeap.digest.DigestInputStreamFactory;
 import com.openmeap.json.JSONObjectBuilder;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.ModelTestUtils;

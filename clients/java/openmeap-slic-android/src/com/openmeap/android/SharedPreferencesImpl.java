@@ -24,8 +24,9 @@
 
 package com.openmeap.android;
 
-import android.content.*;
-import com.openmeap.thinclient.*;
+import android.content.SharedPreferences;
+
+import com.openmeap.thinclient.Preferences;
 
 public class SharedPreferencesImpl implements Preferences {
 	SharedPreferences preferences = null;

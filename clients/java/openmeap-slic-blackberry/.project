@@ -33,11 +33,6 @@
 			<locationURI>OPENMEAP_HOME/java-shared/openmeap-shared/src</locationURI>
 		</link>
 		<link>
-			<name>openmeap-shared-test</name>
-			<type>2</type>
-			<locationURI>OPENMEAP_HOME/java-shared/openmeap-shared/test</locationURI>
-		</link>
-		<link>
 			<name>openmeap-slic-core</name>
 			<type>2</type>
 			<locationURI>OPENMEAP_HOME/clients/java/openmeap-slic-core/src</locationURI>

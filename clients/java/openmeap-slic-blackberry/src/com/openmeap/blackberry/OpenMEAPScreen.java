@@ -22,35 +22,43 @@
  ###############################################################################
  */
 
-package mypackage;
+package com.openmeap.blackberry;
 
-import net.rim.device.api.ui.UiApplication;
+import java.io.IOException;
+import java.io.InputStream;
+
+import com.openmeap.constants.FormConstants;
+import com.openmeap.util.Utils;
+
+import net.rim.device.api.browser.field2.BrowserField;
+import net.rim.device.api.ui.container.MainScreen;
 
 /**
- * This class extends the UiApplication class, providing a
- * graphical user interface.
+ * A class extending the MainScreen class, which provides default standard
+ * behavior for BlackBerry GUI applications.
  */
-public class MyApp extends UiApplication
+public final class OpenMEAPScreen extends MainScreen
 {
     /**
-     * Entry point for application
-     * @param args Command line arguments (not used)
-     */ 
-    public static void main(String[] args)
-    {
-        // Create a new instance of the application and make the currently
-        // running thread the application's event dispatch thread.
-        MyApp theApp = new MyApp();       
-        theApp.enterEventDispatcher();
+     * Creates a new OpenMEAPScreen object
+     */
+    public OpenMEAPScreen()
+    {        
+        // Set the displayed title of the screen       
+        setTitle("MyTitle");
+		try {
+			createBrowserField();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
-
-    /**
-     * Creates a new MyApp object
-     */
-    public MyApp()
-    {        
-        // Push a screen onto the UI stack for rendering.
-        pushScreen(new MyScreen());
-    }    
+    public BrowserField createBrowserField() throws IOException {
+    	BrowserField browserField = new BrowserField();
+    	add(browserField);
+    	InputStream stream = OpenMEAPScreen.class.getResourceAsStream("test.html");
+    	browserField.displayContent(Utils.readInputStream(stream, FormConstants.CHAR_ENC_DEFAULT),"file:///Store");
+    	return browserField;
+    }
 }

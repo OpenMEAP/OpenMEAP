@@ -22,40 +22,64 @@
  ###############################################################################
  */
 
-package com.openmeap.util;
+package com.openmeap.blackberry;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Hashtable;
+import java.io.OutputStream;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import com.openmeap.thinclient.LocalStorage;
+import com.openmeap.thinclient.LocalStorageException;
+import com.openmeap.thinclient.update.UpdateStatus;
 
-import com.openmeap.constants.FormConstants;
+public class LocalStorageImpl implements LocalStorage {
 
-
-public class UtilsTest extends TestCase {
-	public void testReadInputStream() throws Exception {
-		String testXml = "<?xml version=\"1.0\"?><rootNode><childNode attribute=\"one\"/></rootNode>";
-		InputStream is = new ByteArrayInputStream(testXml.getBytes());
-		String result = Utils.readInputStream(is,FormConstants.CHAR_ENC_DEFAULT);
-		Assert.assertTrue(result.compareTo(testXml)==0);
+	public void deleteImportArchive() {
+		// TODO Auto-generated method stub
+		
 	}
-	public void testReplaceFields() {
-		String template = "${TEST} and ${ANOTHER_TEST} making sure that ${TEST} gets replace.";
-		String expected = "test and test making sure that test gets replace.";
-		Hashtable parms = new Hashtable();
-		parms.put("TEST", "test");
-		parms.put("ANOTHER_TEST", "test");
-		String result = Utils.replaceFields(parms,template);
-		Assert.assertEquals(expected,result);
+
+	public void unzipImportArchive(UpdateStatus status)
+			throws LocalStorageException {
+		// TODO Auto-generated method stub
+		
 	}
-	public void testReadLine() throws Exception {
-		String lines = "One\r\n2\r\n\r\n";
-		InputStream is = new ByteArrayInputStream(lines.getBytes());
-		Assert.assertEquals("One",Utils.readLine(is, "utf-8"));
-		Assert.assertEquals("2",Utils.readLine(is, "utf-8"));
-		Assert.assertEquals("",Utils.readLine(is, "utf-8"));
-		is.close();
+
+	public OutputStream getImportArchiveOutputStream()
+			throws LocalStorageException {
+		// TODO Auto-generated method stub
+		return null;
 	}
+
+	public InputStream getImportArchiveInputStream()
+			throws LocalStorageException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public OutputStream openFileOutputStream(String fileName)
+			throws LocalStorageException {
+		return null;
+	}
+
+	public OutputStream openFileOutputStream(String prefix, String fileName)
+			throws LocalStorageException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void resetStorage() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void resetStorage(String prefix) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public Long getBytesFree() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

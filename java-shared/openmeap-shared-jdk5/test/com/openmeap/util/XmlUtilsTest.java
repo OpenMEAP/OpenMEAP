@@ -22,33 +22,28 @@
  ###############################################################################
  */
 
-package com.openmeap.admin.web.backing;
+package com.openmeap.util;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
+import org.junit.Assert;
 import org.junit.Test;
 
-public class ThisTest {
-	
-	interface I {
-		<T extends Object> T v(T o);
-	}
-	class T implements I {
-		public String v(Integer i) {
-			System.out.println("In override integer method");
-			return i.toString();
-		}
-		public String v(String i) {
-			System.out.println("In override string method");
-			return i.toString();
-		}
-		public Object v(Object o) {
-			System.out.println("In interface method");
-			return o;
-		}
-	}
-	
-	@Test public void testing() {
-		I t = new T();
-		t.v(100);
-		t.v("alkhasdf");
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
+public class XmlUtilsTest {
+	@Test public void testGetDocument() throws Exception {
+		// just validate that we can parse an xml document
+		String testXml = "<?xml version=\"1.0\"?><rootNode><childNode attribute=\"one\"/></rootNode>";
+		InputStream is = new BufferedInputStream(new ByteArrayInputStream(testXml.getBytes()));
+		Document d = XmlUtils.getDocument(is);
+		Node rootNode = d.getFirstChild();
+		Node childNode = rootNode.getFirstChild();
+		Assert.assertTrue(rootNode.getNodeName().compareTo("rootNode")==0);
+		Assert.assertTrue(childNode.getNodeName().compareTo("childNode")==0);
+		Assert.assertTrue(childNode.getAttributes().getNamedItem("attribute").getNodeValue().compareTo("one")==0);
 	}
 }

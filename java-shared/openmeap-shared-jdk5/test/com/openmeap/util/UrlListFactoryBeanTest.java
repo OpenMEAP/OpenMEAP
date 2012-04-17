@@ -24,38 +24,24 @@
 
 package com.openmeap.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.Hashtable;
-
-import junit.framework.Assert;
 import junit.framework.TestCase;
+import junit.framework.Assert;
+import java.net.*;
 
-import com.openmeap.constants.FormConstants;
-
-
-public class UtilsTest extends TestCase {
-	public void testReadInputStream() throws Exception {
-		String testXml = "<?xml version=\"1.0\"?><rootNode><childNode attribute=\"one\"/></rootNode>";
-		InputStream is = new ByteArrayInputStream(testXml.getBytes());
-		String result = Utils.readInputStream(is,FormConstants.CHAR_ENC_DEFAULT);
-		Assert.assertTrue(result.compareTo(testXml)==0);
-	}
-	public void testReplaceFields() {
-		String template = "${TEST} and ${ANOTHER_TEST} making sure that ${TEST} gets replace.";
-		String expected = "test and test making sure that test gets replace.";
-		Hashtable parms = new Hashtable();
-		parms.put("TEST", "test");
-		parms.put("ANOTHER_TEST", "test");
-		String result = Utils.replaceFields(parms,template);
-		Assert.assertEquals(expected,result);
-	}
-	public void testReadLine() throws Exception {
-		String lines = "One\r\n2\r\n\r\n";
-		InputStream is = new ByteArrayInputStream(lines.getBytes());
-		Assert.assertEquals("One",Utils.readLine(is, "utf-8"));
-		Assert.assertEquals("2",Utils.readLine(is, "utf-8"));
-		Assert.assertEquals("",Utils.readLine(is, "utf-8"));
-		is.close();
+public class UrlListFactoryBeanTest extends TestCase {
+	public void testSetListValues() throws Exception {
+		String validUrls = "http://www.validurl.com,https://another.valid.url";
+		String invalidUrls = "http_invalidurl,https:/another.invalid.url";
+		UrlListFactoryBean b = new UrlListFactoryBean();
+		b.setListValues(validUrls);
+		Assert.assertTrue(b.getListValues().equals(validUrls));
+		
+		boolean thrown = false;
+		try {
+			b.setListValues(invalidUrls);
+		} catch( MalformedURLException mue ) {
+			thrown = true;
+		}
+		Assert.assertTrue(thrown);
 	}
 }

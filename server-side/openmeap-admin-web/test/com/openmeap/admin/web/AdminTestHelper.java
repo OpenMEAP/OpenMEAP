@@ -51,19 +51,20 @@ import com.openmeap.web.form.ParameterMapBuilderException;
 
 public class AdminTestHelper {
 	
-	final static public String HOST = "10.0.2.15:8080";
+	final static public String ADMIN_HOST = "10.0.2.15:8080";
+	final static public String NODE_HOST = "localhost:8080";
 	
 	final static public String ADMIN_USER = "tomcat";
 	final static public String ADMIN_PASS = "tomcat";
 	final static public String ADMIN_WEB_STORAGE = "/tmp";
 	
-	final static public String SERVICES_WEB_URL = "http://"+HOST+"/openmeap-services-web";
+	final static public String SERVICES_WEB_URL = "http://"+NODE_HOST+"/openmeap-services-web";
 	final static public String SERVICES_WEB_AUTH_SALT = "auth-salt";
 	
 	final static public String NODE_01_SERVICES_URL = SERVICES_WEB_URL;
 	final static public String NODE_01_STORAGE = "/tmp/archs";
 	
-	private String adminUrl = "http://"+HOST+"/openmeap-admin-web/interface/";
+	private String adminUrl = "http://"+ADMIN_HOST+"/openmeap-admin-web/interface/";
 	
 	private HttpRequestExecuter requestExecuter;
 	private ParameterMapBuilder paramsBuilder;

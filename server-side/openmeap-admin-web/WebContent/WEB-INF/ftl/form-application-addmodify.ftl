@@ -24,15 +24,37 @@ Parameter Values / Outputs:
 		<legend>Application[#if (application.name)??] - ${application.name}[/#if]</legend>
 		<dl>
 				<dt>Name:</dt>
-				<dd><input type="text" name="name" value="${(application.name?html)!}"/></dd>
+				<dd>
+				<div>
+					This is used by SLIC to identify which application it is requesting updates for.
+					It is important that it does not change after initial deployment (through independent device app stores) of SLIC.
+				</div> 
+				<input type="text" name="name" value="${(application.name?html)!}"/>
+				</dd>
 				<dt>Admins (may modify version admins as well):</dt>
-				<dd><textarea cols="60" rows="3" name="admins">${(application.admins?html)!}</textarea></dd>
+				<dd>
+				<div>
+					Application admins may modify any aspect of the application, including deleting it.
+					The only thing an application admin may not do is remove their own admin privileges.
+				</div>
+				<textarea cols="60" rows="3" name="admins">${(application.admins?html)!}</textarea>
+				</dd>
 				<dt>Version Admins:</dt>
-				<dd><textarea cols="60" rows="3" name="versionAdmins">${(application.versionAdmins?html)!}</textarea></dd>
+				<dd>
+				<div>
+					Version admins may create, modify, and delete application versions.  They may not make deployments.
+				</div>
+					<textarea cols="60" rows="3" name="versionAdmins">${(application.versionAdmins?html)!}</textarea>
+				</dd>
 				<dt>Description:</dt>
 				<dd><textarea cols="60" rows="5" name="description">${(application.description?html)!}</textarea></dd>
 				<dt>Initial Version Identifier:</dt>
-				<dd><input type="text" name="initialVersionIdentifier" value="${(application.initialVersionIdentifier?html)!}"/></dd>
+				<dd>
+				<div>
+					Must be the original version identifier bundled into the SLIC.
+				</div>
+				<input type="text" name="initialVersionIdentifier" value="${(application.initialVersionIdentifier?html)!}"/>
+				</dd>
 				<dt>Deployment History Length:</dt>
 				<dd><input type="text" name="deploymentHistoryLength" value="${(application.deploymentHistoryLength?string.computer)!}"/></dd>
 				[#if willProcess]

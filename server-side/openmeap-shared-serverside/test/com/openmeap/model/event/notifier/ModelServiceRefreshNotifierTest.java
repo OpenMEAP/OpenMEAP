@@ -77,6 +77,7 @@ public class ModelServiceRefreshNotifierTest {
 		List<ClusterNode> clusterNodes = new ArrayList<ClusterNode>();
 		ClusterNode clusterNode = new ClusterNode();
 		clusterNodes.add(clusterNode);
+		clusterNode.setServiceWebUrlPrefix("http://www.openmeap.com/openmeap-services-web");
 		globalSettings.setClusterNodes(clusterNodes);
 		new NonStrictExpectations(globalSettings,modelManager) {{
 			modelManager.getGlobalSettings(); result = globalSettings;

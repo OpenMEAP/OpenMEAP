@@ -4,8 +4,6 @@
 	<classpathentry kind="src" path="res"/>
 	<classpathentry kind="src" path="openmeap-slic-core"/>
 	<classpathentry kind="src" path="openmeap-shared"/>
-	<classpathentry kind="src" path="openmeap-shared-test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/net.rim.ejde.BlackBerryVMInstallType/BlackBerry JRE 5.0.0"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

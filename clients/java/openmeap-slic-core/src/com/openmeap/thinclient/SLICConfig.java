@@ -40,7 +40,6 @@ public class SLICConfig {
 	public static String PROPERTIES_FILE = "slic-config.properties";
 	public static String PREFERENCES_FILE = "slic-config.preferences";
 	public static String SLIC_VERSION = "0.0.1a";
-	public static String DEVICE_TYPE = "Android";
 	
 	protected Hashtable properties = null;
 	protected Preferences preferences = null;

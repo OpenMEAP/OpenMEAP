@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
   http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services-2.0.xsd
   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
-
+    
 	<!--
 	This is the source of all test ModelEntity's, regardless
 	of whether they are put in the SQLite DB or whether they
@@ -34,20 +34,16 @@
 		<property name="serviceManagementAuthSalt" value="PuppyScrumMaster12345"/>
 		<property name="externalServiceUrlPrefix" value="http://localhost:8080/openmeap-service-web"/>
 		<property name="clusterNodes">
-			<map>
-				<entry key="http://localhost:8080/openmeap-service-web">
-					<bean class="com.openmeap.model.dto.ClusterNode">
-						<property name="serviceWebUrlPrefix" value="http://localhost:8080/openmeap-service-web"/>
-						<property name="fileSystemStoragePathPrefix" value="/tmp"/>
-					</bean>
-				</entry>
-				<entry key="http://localhost:8080/openmeap-service-web2">
-					<bean class="com.openmeap.model.dto.ClusterNode">
-						<property name="serviceWebUrlPrefix" value="http://localhost:8080/openmeap-service-web2"/>
-						<property name="fileSystemStoragePathPrefix" value="/tmp"/>
-					</bean>
-				</entry>
-			</map>
+			<list>
+				<bean class="com.openmeap.model.dto.ClusterNode">
+					<property name="serviceWebUrlPrefix" value="http://localhost:8080/openmeap-service-web"/>
+					<property name="fileSystemStoragePathPrefix" value="/tmp"/>
+				</bean>
+				<bean class="com.openmeap.model.dto.ClusterNode">
+					<property name="serviceWebUrlPrefix" value="http://localhost:8080/openmeap-service-web2"/>
+					<property name="fileSystemStoragePathPrefix" value="/tmp"/>
+				</bean>
+			</list>
 		</property>
 	</bean>
 
