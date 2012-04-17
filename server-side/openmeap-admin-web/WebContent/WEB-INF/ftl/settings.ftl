@@ -6,6 +6,9 @@
 		<dl>
 			<dt>External Service Url:</dt>
 			<dd>
+				<div>
+					This is used to notify SLIC of where to pull update archives from. 
+				</div>
 				<input type="text" name="externalServiceUrlPrefix" value="${(externalServiceUrlPrefix?html)!}"/><br/>
 			</dd>
 		
@@ -17,6 +20,9 @@
 			
 			<dt>Authentication Salt:</dt>
 			<dd>
+				<div>
+					This is used to authenticate requests between administrative and cluster nodes.
+				</div>
 				<input type="password" name="authSalt" value="${(authSalt?html)!}"/><br/>
 				<input type="password" name="authSaltVerify" value="${(authSaltVerify?html)!}"/>
 			</dd>
@@ -24,7 +30,13 @@
 	</fieldset>
 	<fieldset>
 		<legend>Cluster Nodes</legend>
-			
+		<div style="margin-top:10px;">
+			Note: The service url prefix for each node must:
+			<ul>
+				<li>match that node's configured system property "OPENMEAP_CLUSTER_NODE_URL_PREFIX"</li>
+				<li>OPENMEAP_CLUSTER_NODE_URL_PREFIX should point at the openmeap-services-web context and defaults to http://localhost:8080/openmeap-services-web</li>
+			</ul>
+		</div>
 		<div id="clusterNodesPlaceholderId">
 		</div>
 	</fieldset>
