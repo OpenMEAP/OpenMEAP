@@ -51,7 +51,7 @@ import com.openmeap.web.form.ParameterMapBuilderException;
 
 public class AdminTestHelper {
 	
-	final static public String ADMIN_HOST = "10.0.2.15:8080";
+	final static public String ADMIN_HOST = "localhost:8080";
 	final static public String NODE_HOST = "localhost:8080";
 	
 	final static public String ADMIN_USER = "tomcat";
