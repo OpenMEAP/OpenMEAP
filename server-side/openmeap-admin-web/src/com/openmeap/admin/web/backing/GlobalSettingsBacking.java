@@ -136,6 +136,17 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 					settings.setClusterNodes(clusterNodes);
 				} 
 				
+				// iterate over each node configuration, updating the clusterNodes as per input
+				for( int i=0; i<end; i++ ) {
+					
+					String thisNodeUrl = clusterNodeUrls[i].trim();
+					String thisNodePath = clusterNodePaths[i].trim();
+					
+					if( thisNodeUrl.length()==0 ) {
+						events.add(new MessagesEvent("A cluster node must specify a service url it is internally accessible via the admin service."));
+						continue;
+					}
+				
 					// remove any nodes that no longer appear
 					List<String> urls = Arrays.asList(clusterNodeUrls);
 					List<String> urlsToRemove = new ArrayList<String>();
