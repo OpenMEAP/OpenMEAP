@@ -24,61 +24,33 @@
 
 package com.openmeap.util;
 
-import java.util.ArrayList;
-import java.util.Collection;
+public class GenericRuntimeException extends RuntimeException {
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+	private Throwable cause;
+	
+	public GenericRuntimeException() {
+	}
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+	public GenericRuntimeException(String arg0) {
+		super(arg0);
+	}
 
-public class ThrowableList extends ArrayList<Throwable> {
-	
-	private static String SEPARATOR = ", ";
-	private Logger logger = LoggerFactory.getLogger(ThrowableList.class);
-	
-	public ThrowableList() {}
-	public ThrowableList(int arg0) {super(arg0);}
-	public ThrowableList(Collection arg0) {super(arg0);}
-	public ThrowableList(Logger logger) {
-		this.logger = logger;
+	public GenericRuntimeException(Throwable arg0) {
+		this.cause=arg0;
+	}
+
+	public GenericRuntimeException(String arg0, Throwable arg1) {
+		super(arg0);
+		this.cause=arg1;
+	}
+
+	public GenericRuntimeException(String arg0, Throwable arg1, boolean arg2, boolean arg3) {
+		super(arg0);
+		this.cause=arg1;
 	}
 	
-	public void log() {
-		logger.error(this.toString());
+	public Throwable getCause() {
+		return this.cause;
 	}
-	
-	@Override
-	public String toString() {
-		StringBuilder result = new StringBuilder();
-		Integer i = 0;
-		for( Throwable t : this ) {
-			// get root cause
-			Exception rootCause = (Exception)ExceptionUtils.getRootCause(t);
-			String stackTrace = ExceptionUtils.getStackTrace(rootCause);
-			result.append("+= Throwable "+i+" ==================\n");
-			result.append(rootCause.getMessage());
-			result.append("\n");
-			result.append(stackTrace);
-			result.append("\n");
-			i++;
-		}
-		return result.toString();
-	}
-	
-	public String getMessages() {
-		StringBuilder result = new StringBuilder();
-		Integer i = 0;
-		for( Throwable t : this ) {
-			// get root cause
-			Exception rootCause = (Exception)ExceptionUtils.getRootCause(t);
-			String stackTrace = ExceptionUtils.getStackTrace(rootCause);
-			if(i!=0) {
-				result.append(SEPARATOR);
-			}
-			result.append("\""+rootCause.getMessage()+"\"");
-			i++;
-		}
-		return result.toString();
-	}
+
 }

@@ -50,7 +50,7 @@ import com.openmeap.web.form.ParameterMapBuilderException;
 
 public class AdminTestHelper {
 	
-	final static public String HOST = "localhost:7000";
+	final static public String HOST = "localhost:8080";
 	
 	final static public String ADMIN_USER = "tomcat";
 	final static public String ADMIN_PASS = "tomcat";
@@ -250,7 +250,7 @@ public class AdminTestHelper {
 		if(settings.getClusterNodes()!=null && !settings.getClusterNodes().isEmpty()) {
 			List<String> nodeUrls = new ArrayList<String>();
 			List<String> nodePaths = new ArrayList<String>();
-			for( ClusterNode clusterNode : settings.getClusterNodes().values() ) {
+			for( ClusterNode clusterNode : settings.getClusterNodes() ) {
 				nodeUrls.add(clusterNode.getServiceWebUrlPrefix());
 				nodePaths.add(clusterNode.getFileSystemStoragePathPrefix());
 			}

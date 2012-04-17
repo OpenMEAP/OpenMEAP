@@ -61,7 +61,7 @@ import java.util.Map;
 @Entity @Table(name="global_settings")
 public class GlobalSettings extends AbstractModelEntity implements HasJSONProperties {
 	private Long id = null;
-	private Map<String,ClusterNode> clusterNodes = null;
+	private List<ClusterNode> clusterNodes = null;
 	private String temporaryStoragePath = null;
 	private String serviceManagementAuthSalt = null;
 	private Integer maxFileUploadSize = 1000000;
@@ -160,13 +160,41 @@ public class GlobalSettings extends AbstractModelEntity implements HasJSONProper
 	}
 	
 	@OneToMany(fetch=FetchType.EAGER,cascade={CascadeType.ALL},targetEntity=ClusterNode.class)
-	@MapKey(name="serviceWebUrlPrefix")
 	@Lob
-	public Map<String,ClusterNode> getClusterNodes() {
+	public List<ClusterNode> getClusterNodes() {
 		return clusterNodes;
 	}
-	public void setClusterNodes(Map<String,ClusterNode> clusterNodes) {
+	public void setClusterNodes(List<ClusterNode> clusterNodes) {
 		this.clusterNodes = clusterNodes;
+	}
+	public ClusterNode getClusterNode(String serviceUrlPrefix) {
+		for(ClusterNode node : clusterNodes) {
+			if( node.getServiceWebUrlPrefix().equals(serviceUrlPrefix)){
+				return node;
+			}
+		}
+		return null;
+	}
+	public Boolean addClusterNode(ClusterNode node){
+		
+		if(clusterNodes==null) {
+			clusterNodes = new ArrayList<ClusterNode>();
+		}
+		if(!clusterNodes.contains(node)) {
+			clusterNodes.add(node);
+			return true;
+		} 
+		return false;
+	}
+	public Boolean removeClusterNode(ClusterNode node){
+		
+		if(clusterNodes==null) {
+			clusterNodes = new ArrayList<ClusterNode>();
+		}
+		if(clusterNodes.contains(node)) {
+			return clusterNodes.remove(node);
+		} 
+		return false;
 	}
 	
 	public Map<Method,String> validate() {

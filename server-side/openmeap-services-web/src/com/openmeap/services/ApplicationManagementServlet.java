@@ -127,7 +127,7 @@ public class ApplicationManagementServlet extends HttpServlet {
 		GlobalSettings settings = modelManager.getGlobalSettings();
 		Map properties = this.getServicesWebProperties();
 		String nodeKey = (String)properties.get("clusterNodeUrlPrefix");
-		ClusterNode clusterNode = settings.getClusterNodes().get(nodeKey);
+		ClusterNode clusterNode = settings.getClusterNode(nodeKey);
 		if( nodeKey==null || clusterNode==null ) {
 			// TODO: create a configuration error code
 			err.setCode(ErrorCode.UNDEFINED);

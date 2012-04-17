@@ -115,6 +115,8 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 				}
 			}
 			
+			List<ClusterNode> toDelete = new ArrayList<ClusterNode>();
+			
 			// process the ClusterNode objects
 			if( parameterMap.get(CLUSTER_NODE_URLS_PARAM)!=null ) {
 				String[] clusterNodeUrls = (String[])parameterMap.get(CLUSTER_NODE_URLS_PARAM);
@@ -122,9 +124,9 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 				int end = clusterNodeUrls.length;
 				
 				// make sure there is a map in cluster nodes
-				Map<String,ClusterNode> clusterNodes = settings.getClusterNodes();
+				List<ClusterNode> clusterNodes = settings.getClusterNodes();
 				if( clusterNodes==null ) {
-					clusterNodes = new HashMap<String,ClusterNode>();
+					clusterNodes = new ArrayList<ClusterNode>();
 					settings.setClusterNodes(clusterNodes);
 				} 
 				
@@ -139,28 +141,32 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 					if( thisNodePath.length()==0 ) {
 						events.add(new MessagesEvent("The cluster node with url "+thisNodeUrl+" should specify a path to store application archives at."));
 					}
-					if( clusterNodes.containsKey(thisNodeUrl) ) {
-						clusterNodes.get(thisNodeUrl).setFileSystemStoragePathPrefix(thisNodePath);
+					if( settings.getClusterNode(thisNodeUrl)!=null ) {
+						settings.getClusterNode(thisNodeUrl).setFileSystemStoragePathPrefix(thisNodePath);
 					} else {
 						ClusterNode thisNode = new ClusterNode();
 						thisNode.setServiceWebUrlPrefix(thisNodeUrl);
 						thisNode.setFileSystemStoragePathPrefix(thisNodePath);
-						clusterNodes.put(thisNodeUrl, thisNode);
+						settings.addClusterNode(thisNode);
 					}
 				}
 				
 				// remove any nodes that no longer appear
 				List<String> urls = Arrays.asList(clusterNodeUrls);
-				List<String> toRemove = new ArrayList<String>();
-				for( String url : clusterNodes.keySet() ) {
-					if( !urls.contains(url) )
-						toRemove.add(url);
-				}
-				for( String url : toRemove ) {
-					clusterNodes.remove(url);
+				for( ClusterNode node : settings.getClusterNodes() ) {
+					if( !urls.contains(node.getServiceWebUrlPrefix()) ) {
+						toDelete.add(node);
+					}
 				}
 			}
+		
 			try {
+				if(toDelete!=null) {
+					for(ClusterNode node : toDelete) {
+						settings.removeClusterNode(node);
+						modelManager.delete(node,events);
+					}
+				}
 				modelManager.addModify(settings,events);
 				events.add(new MessagesEvent("The settings were successfully modified."));
 			} catch( InvalidPropertiesException ipe ) {

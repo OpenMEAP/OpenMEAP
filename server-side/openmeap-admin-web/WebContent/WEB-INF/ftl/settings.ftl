@@ -66,7 +66,7 @@ var createClusterNodeTemplate = function(url,path) {
 
 var clusterNodes = [];
 [#if clusterNodes??]
-	[#list clusterNodes?values as node]
+	[#list clusterNodes as node]
 		clusterNodes.push({url:"${node.serviceWebUrlPrefix!}",path:"${node.fileSystemStoragePathPrefix!}"});
 	[/#list]
 [/#if]

@@ -74,9 +74,9 @@ public abstract class AbstractClusterServiceMgmtNotifier<T> implements EventNoti
 		
 		final Map<String,Boolean> urlRequestCompleteStatus = new HashMap<String,Boolean>();
 		GlobalSettings globalSettings = modelManager.getGlobalSettings();
-		Map<String,ClusterNode> clusterNodes = globalSettings.getClusterNodes();
-		for( final String thisUrlString : clusterNodes.keySet() ) {
-			
+		List<ClusterNode> clusterNodes = globalSettings.getClusterNodes();
+		for( final ClusterNode node : clusterNodes ) {
+			String thisUrlString = node.getServiceWebUrlPrefix();
 			URL thisUrl = null;
 			try {
 				thisUrl = new URL(thisUrlString);
@@ -126,7 +126,7 @@ public abstract class AbstractClusterServiceMgmtNotifier<T> implements EventNoti
 				throw new ClusterNotificationException(ie);
 			}
 		} else if(exceptions.size()>0){
-			throw new ClusterNotificationException( String.format("The following exceptions were thrown: %s",exceptions.toString()) );
+			throw new ClusterNotificationException( String.format("The following exceptions were thrown: %s",exceptions.getMessages()) );
 		}
 		
 		onAfterNotify(event);

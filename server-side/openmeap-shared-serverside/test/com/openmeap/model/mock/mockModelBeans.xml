@@ -34,20 +34,16 @@
 		<property name="serviceManagementAuthSalt" value="PuppyScrumMaster12345"/>
 		<property name="externalServiceUrlPrefix" value="http://localhost:8080/openmeap-service-web"/>
 		<property name="clusterNodes">
-			<map>
-				<entry key="http://localhost:8080/openmeap-service-web">
-					<bean class="com.openmeap.model.dto.ClusterNode">
-						<property name="serviceWebUrlPrefix" value="http://localhost:8080/openmeap-service-web"/>
-						<property name="fileSystemStoragePathPrefix" value="/tmp"/>
-					</bean>
-				</entry>
-				<entry key="http://localhost:8080/openmeap-service-web2">
-					<bean class="com.openmeap.model.dto.ClusterNode">
-						<property name="serviceWebUrlPrefix" value="http://localhost:8080/openmeap-service-web2"/>
-						<property name="fileSystemStoragePathPrefix" value="/tmp"/>
-					</bean>
-				</entry>
-			</map>
+			<list>
+				<bean class="com.openmeap.model.dto.ClusterNode">
+					<property name="serviceWebUrlPrefix" value="http://localhost:8080/openmeap-service-web"/>
+					<property name="fileSystemStoragePathPrefix" value="/tmp"/>
+				</bean>
+				<bean class="com.openmeap.model.dto.ClusterNode">
+					<property name="serviceWebUrlPrefix" value="http://localhost:8080/openmeap-service-web2"/>
+					<property name="fileSystemStoragePathPrefix" value="/tmp"/>
+				</bean>
+			</list>
 		</property>
 	</bean>
 

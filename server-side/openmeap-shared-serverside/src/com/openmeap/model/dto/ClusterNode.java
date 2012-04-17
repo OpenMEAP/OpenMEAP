@@ -33,6 +33,8 @@ import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -54,6 +56,7 @@ public class ClusterNode extends AbstractModelEntity implements HasJSONPropertie
 	 */
 	private String serviceWebUrlPrefix;
 	private String fileSystemStoragePathPrefix;
+	private Long id;
 	
 	static final private JSONProperty[] jsonProperties = new JSONProperty[] {
 		new JSONProperty("getServiceWebUrlPrefix"),
@@ -64,10 +67,18 @@ public class ClusterNode extends AbstractModelEntity implements HasJSONPropertie
 		return jsonProperties;
 	}
 	
-	@Transient public String getPk() { return getServiceWebUrlPrefix(); }
-	public void setPk( Object pkValue ) { setServiceWebUrlPrefix((String)pkValue); }
+	@Transient public Long getPk() { return getId(); }
+	public void setPk( Object pkValue ) { setId((Long)pkValue); }
 	
-	@Id @Column(name="svc_web_url_prfx",length=256)
+	@Id @GeneratedValue(strategy=GenerationType.AUTO) 
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id=id;
+	}
+	
+	@Column(name="svc_web_url_prfx",length=256,unique=true)
 	public String getServiceWebUrlPrefix() {
 		return serviceWebUrlPrefix;
 	}

@@ -93,16 +93,16 @@ public class ModelManagerImplTest {
 		settings = modelManager.getGlobalSettings();
 		Assert.assertTrue(settings.getId().equals(Long.valueOf(1)));
 		
-		Map<String,ClusterNode> nodes = settings.getClusterNodes();
-		nodes.put("http://test",new ClusterNode());
-		nodes.get("http://test").setServiceWebUrlPrefix("http://test");
-		nodes.get("http://test").setFileSystemStoragePathPrefix("/tmp2");
+		ClusterNode node = new ClusterNode();
+		node.setServiceWebUrlPrefix("http://test");
+		node.setFileSystemStoragePathPrefix("/tmp2");
+		settings.addClusterNode(node);
 		settings = modelManager.addModify(settings,null);
 		
 		modelManager.refresh(settings,null);
 		settings = modelManager.getGlobalSettings();
 		Assert.assertTrue(settings.getClusterNodes().size()==3);
-		Assert.assertTrue(settings.getClusterNodes().get("http://test")!=null);
+		Assert.assertTrue(settings.getClusterNode("http://test")!=null);
 	}
 	
 	@Test public void testAddModifyApplicationVersion() throws Exception {
