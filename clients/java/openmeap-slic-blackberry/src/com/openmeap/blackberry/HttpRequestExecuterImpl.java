@@ -1,3 +1,27 @@
+/*
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011-2012 OpenMEAP, Inc.                                   #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the LGPLv3                                                #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU Lesser General Public License as published #
+ #    by the Free Software Foundation, either version 3 of the License, or     #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU Lesser General Public License for more details.                      #
+ #                                                                             #
+ #    You should have received a copy of the GNU Lesser General Public License #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+ */
+
 package com.openmeap.blackberry;
 
 import java.io.ByteArrayInputStream;
@@ -6,23 +30,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Hashtable;
-import java.util.Vector;
 
-import javax.microedition.io.Connection;
+import javax.microedition.io.HttpConnection;
 import javax.microedition.io.InputConnection;
 import javax.microedition.io.OutputConnection;
 
-import org.w3c.dom.Document;
-
-import me.regexp.RE;
-import net.rim.device.api.browser.field2.BrowserField;
-import net.rim.device.api.browser.field2.BrowserFieldListener;
-import net.rim.device.api.browser.field2.BrowserFieldRequest;
 import net.rim.device.api.io.Base64OutputStream;
-import net.rim.device.api.io.transport.*;
-import net.rim.device.api.io.transport.options.*;
+import net.rim.device.api.io.transport.ConnectionDescriptor;
+import net.rim.device.api.io.transport.ConnectionFactory;
 import net.rim.device.api.io.transport.TransportInfo;
-import net.rim.device.api.ui.UiApplication;
+import net.rim.device.api.io.transport.options.TcpCellularOptions;
+import net.rim.device.api.util.Arrays;
 
 import com.openmeap.constants.FormConstants;
 import com.openmeap.digest.DigestException;
@@ -36,19 +54,25 @@ import com.openmeap.http.HttpResponseImpl;
 import com.openmeap.util.GenericRuntimeException;
 import com.openmeap.util.Utils;
 
+/**
+ * 
+ * @author Schang
+ */
 public class HttpRequestExecuterImpl implements HttpRequestExecuter {
-	
-	private final static String STATUS_LINE_PATTERN = "([^\\s]*)\\s([^\\s]*)\\s(.*)";
 	
 	public HttpResponse postXml(String url, String xmlData) throws HttpRequestException {
 		
-		return makeRequest(url,xmlData.getBytes(),new HttpHeader[]{new HttpHeader("content-type","text/xml")});
+		try {
+			return makeRequest(url,xmlData.getBytes(FormConstants.CHAR_ENC_DEFAULT),new HttpHeader[]{new HttpHeader(FormConstants.CONTENT_TYPE,FormConstants.CONT_TYPE_XML)});
+		} catch (UnsupportedEncodingException e) {
+			throw new HttpRequestException(e);
+		}
 	}
 
 	public HttpResponse postData(String url, Hashtable params) throws HttpRequestException {
 		
 		try {
-			return makeRequest(url,Utils.createParamsString(params).getBytes(),null);
+			return makeRequest(url,Utils.createParamsString(params).getBytes(FormConstants.CHAR_ENC_DEFAULT),null);
 		} catch (UnsupportedEncodingException e) {
 			throw new HttpRequestException(e);
 		}
@@ -57,7 +81,7 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 	public HttpResponse postData(String url, Hashtable urlParams, Hashtable postParams) throws HttpRequestException {
 		
 		try {
-			return postData(url+"?"+Utils.createParamsString(urlParams),postParams);
+			return postData(url+FormConstants.QUERY_STRING_DELIM+Utils.createParamsString(urlParams),postParams);
 		} catch (UnsupportedEncodingException e) {
 			throw new HttpRequestException(e);
 		}
@@ -70,7 +94,7 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 	public HttpResponse get(String url, Hashtable params) throws HttpRequestException {
 		
 		try {
-			return makeRequest(url,Utils.createParamsString(params).getBytes(),null);
+			return makeRequest(url,Utils.createParamsString(params).getBytes(FormConstants.CHAR_ENC_DEFAULT),null);
 		} catch (UnsupportedEncodingException e) {
 			throw new HttpRequestException(e);
 		}
@@ -90,9 +114,23 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 				TransportInfo.TRANSPORT_TCP_CELLULAR
 			};
 		
+		// Remove any transports that are not currently available.
+        for(int i = 0; i < intTransports.length ; i++)
+        {
+            int transport = intTransports[i];
+            if(!TransportInfo.isTransportTypeAvailable(transport)
+                  || !TransportInfo.hasSufficientCoverage(transport))
+            {
+                Arrays.removeAt(intTransports, i);
+            }
+        }
+		
 		TcpCellularOptions tcpOptions = new TcpCellularOptions();
 		
 		final ConnectionFactory factory = new ConnectionFactory();
+		if(intTransports.length > 0) {
+            factory.setPreferredTransportTypes(intTransports);
+        }
 		factory.setTransportTypeOptions(TransportInfo.TRANSPORT_TCP_CELLULAR, tcpOptions);
 		factory.setAttemptsLimit(5);
 		
@@ -100,7 +138,8 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
         ConnectionDescriptor cd = factory.getConnection(url);
         if(cd != null) 
         {
-            Connection c = cd.getConnection();
+        	HttpConnection c = (HttpConnection)cd.getConnection();
+
             OutputConnection oc = (OutputConnection) c;
             InputConnection ic = (InputConnection) c;
             
@@ -116,15 +155,25 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 	            }
 	            
 	            is = ic.openInputStream();
-	            int statusCode = readStatusLine(is);
-	            HttpHeader[] responseHeaders = readHeaders(is);
-	            response.setStatusCode(statusCode);
+	            int i=0;
+	            HttpHeader[] responseHeaders = new HttpHeader[0];
+	            while(true) {
+            		String key = c.getHeaderFieldKey(i);
+            		if(key==null) {
+            			break;
+            		}
+            		String value = c.getHeaderField(i);
+            		Arrays.add(responseHeaders, new HttpHeader(key,value));
+	            	i++;
+	            }
+	            response.setStatusCode(c.getResponseCode());
 	            response.setHeaders(responseHeaders);
 	            response.setResponseBody(is);
+	            response.setContentLength(c.getLength());
 	            
 	            // see if we need to handle a redirect
 	            if(response.getStatusCode()==301 || response.getStatusCode()==303) {
-	            	for(int i=0;i<responseHeaders.length;i++) {
+	            	for(i=0;i<responseHeaders.length;i++) {
 	            		HttpHeader header = responseHeaders[i];
 	            		if( header.getKey().equalsIgnoreCase("location") ) {
 	            			forwardUrl = header.getValue();
@@ -159,18 +208,30 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 	
 	private void makePOSTRequest(String url, HttpHeader[] headers, byte[] postData, OutputStream os) throws IOException, DigestException, HttpRequestException {
 		
-		os.write(("POST "+url+" HTTP/1.0\r\n").getBytes());
-		os.write(("Content-length: "+postData.length+"\r\n").getBytes());
-		os.write(("Content-MD5: "+getMd5OfPostData(postData)+"\r\n").getBytes());
+		writeString(("POST "+url+" HTTP/1.0"+FormConstants.HTTP_EOL),os);
+		writeString((FormConstants.CONTENT_LENGTH+": "+postData.length+FormConstants.HTTP_EOL),os);
+		writeString((FormConstants.CONTENT_MD5+": "+getMd5OfPostData(postData)+FormConstants.HTTP_EOL),os);
+		writeHeaders(headers,os);
+        writeString(FormConstants.HTTP_EOL,os);
+        os.write(postData);
+        os.flush();
+	}
+	
+	private void makeGETRequest(String url, HttpHeader[] headers, OutputStream os) throws IOException {
+		
+		writeString(("GET "+url+" HTTP/1.0"+FormConstants.HTTP_EOL),os);
+		writeHeaders(headers,os);
+        writeString(FormConstants.HTTP_EOL,os);
+        os.flush();
+	}
+	
+	private void writeHeaders(HttpHeader[] headers, OutputStream os) throws IOException {
 		if(headers!=null) {
 	        for(int i=0; i<headers.length; i++) {
 	        	HttpHeader header = headers[i];
-	        	os.write((header.getKey()+": "+header.getValue()+"\r\n").getBytes());
+	        	writeString((header.getKey()+": "+header.getValue()+FormConstants.HTTP_EOL),os);
 	        }	           
 		}
-        os.write("\r\n".getBytes());
-        os.write(postData);
-        os.flush();
 	}
 	
 	private String getMd5OfPostData(byte[] postData) throws HttpRequestException {
@@ -187,81 +248,7 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 		}
 	}
 	
-	private void makeGETRequest(String url, HttpHeader[] headers, OutputStream os) throws IOException {
-		
-		os.write(("GET "+url+" HTTP/1.0\r\n").getBytes());
-		if(headers!=null) {
-	        for(int i=0; i<headers.length; i++) {
-	        	HttpHeader header = headers[i];
-	        	os.write((header.getKey()+": "+header.getValue()+"\r\n").getBytes());
-	        }	           
-		}
-        os.write("\r\n".getBytes());
-        os.flush();
+	private void writeString(String string, OutputStream os) throws UnsupportedEncodingException, IOException {
+		os.write(string.getBytes(FormConstants.CHAR_ENC_DEFAULT));
 	}
-	
-	private int readStatusLine(InputStream is) throws IOException {
-		
-		String statusLine;
-		statusLine = Utils.readLine(is,FormConstants.CHAR_ENC_DEFAULT);
-		RE r = new RE(STATUS_LINE_PATTERN);
-		int code = (-1);
-		if(r.match(statusLine)) {
-			code = Integer.parseInt(r.getParen(2));
-		}
-		return code;
-	}
-	
-	private HttpHeader[] readHeaders(InputStream is) throws IOException, HttpRequestException {
-		
-		Vector headers = new Vector();
-		String line;
-		while(true) {
-			line = Utils.readLine(is, FormConstants.CHAR_ENC_DEFAULT);
-			if(line.length()==0) {
-				break;
-			}
-			RE m = new RE("([^:]*):(.*)");
-			if(m.match(line)) {
-				HttpHeader header = new HttpHeader();
-				header.setKey(m.getParen(1).trim());
-				header.setValue(m.getParen(2).trim());
-				headers.addElement(header);
-			} else {
-				throw new HttpRequestException("Expecting a header line.");
-			}
-		}
-		HttpHeader[] retVals = new HttpHeader[headers.size()];
-		for(int i=0;i<headers.size();i++) {
-			retVals[i]=(HttpHeader) headers.elementAt(i);
-		}
-		return retVals;
-	}
-	
-	private static class Listener extends BrowserFieldListener {
-		
-		private Thread caller;
-		private HttpResponseImpl response = new HttpResponseImpl();
-		
-		public HttpResponse getResponse() {
-			return response;
-		}
-		
-		public Listener setCallingThread(Thread caller) {
-			this.caller = caller;
-			return this;
-		}
-		
-		public void documentLoaded(BrowserField browserField, Document document) {
-			response.setStatusCode(200);
-			response.setResponseBody(new ByteArrayInputStream(document.getTextContent().getBytes()));
-			caller.notifyAll();
-		}
-		
-		public void documentError(BrowserField browserField, Document document) {
-			response.setStatusCode(500);
-			response.setResponseBody(new ByteArrayInputStream(document.getTextContent().getBytes()));
-			caller.notifyAll();
-		}
-	}	
 }

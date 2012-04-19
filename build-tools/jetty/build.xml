@@ -23,18 +23,23 @@
  ###############################################################################
 -->
 <project basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" default="help">
-
-	<import file="./shared.xml"/>
-	
+    
 	<property environment="env"/>
 	
-	<property name="openmeap.project.current.file.ivy" value="${jetty.home}/ivy.xml"/>
-	<property name="openmeap.ivy.retrieve.path" value="${jetty.libs}"/>
-	<mkdir dir="${jetty.libs}"/>
+	<import file="../ant_scripts/shared.xml"/>
 	
+	<property name="openmeap.project.current.file.ivy" value="${jetty.home}/ivy.xml"/>
+	<property name="ivy.retrieve.pattern" value="${jetty.libs}/${openmeap.ivy.retrieve.pattern}"/>
+	
+	<delete dir="${jetty.runRoot}" quiet="true" deleteonexit="true"/>
+	<copy todir="${jetty.runRoot}" includeEmptyDirs="true">
+	    <fileset dir="${jetty.source}"/>
+	</copy>
+	<mkdir dir="${jetty.libs}"/>
 	<ivy-resolve/>
 	
-	<taskdef classpathref="openmeap.classpath" 
+	<taskdef loaderref="openmeap.classpath.loader"
+	    	classpathref="openmeap.classpath" 
 			classname="org.mortbay.jetty.ant.JettyRunTask" 
 			name="jetty" />
 	
@@ -49,21 +54,27 @@
 		
 		<mkdir dir="${jetty.logs}"/>
 		<mkdir dir="${jetty.webapps}"/>
-		
-		<copy file="${openmeap.project.admin-web.dist.war}" tofile="${jetty.webapps}/${openmeap.project.admin-web.name}.war"/>
-		<copy file="${openmeap.project.services-web.dist.war}" tofile="${jetty.webapps}/${openmeap.project.services-web.name}.war"/>
-		
+		<mkdir dir="${jetty.openmeap.archivesRoot}"/>
+				
 		<jetty jettyXml="${jetty.xml}">
 			<systemProperties>
 				<systemProperty name="jetty.home" value="${jetty.home}"/>
 				<systemProperty name="jetty.logs" value="${jetty.logs}"/>
-				<systemProperty name="jetty.libs" value="../gen/META-INF/lib"/>
+				<systemProperty name="jetty.libs" value="${jetty.libs}"/>
 				<systemProperty name="jetty.port" value="${jetty.port}"/>
 				<systemProperty name="jetty.webapps" value="${jetty.webapps}"/>
 				<systemProperty name="jetty.webDefault" value="${jetty.webDefault}"/>
 				<systemProperty name="jetty.realmConfig" value="${jetty.realmConfig}"/>
 				<systemProperty name="jetty.runRoot" value="${jetty.runRoot}"/>
+				<systemProperty name="OPENMEAP_JDBC_URL" value="jdbc:sqlite:/${jetty.runRoot}/openmeap.db"/>
+				<systemProperty name="OPENMEAP_CLUSTER_NODE_URL_PREFIX" value="http://${jetty.host}:${jetty.port}/openmeap-services-web"/>
 			</systemProperties>
+			<webApp name="openmeap-admin-web" warfile="${openmeap.project.admin-web.dist.war}" contextpath="/openmeap-admin-web">
+				<lib dir="${jetty.libs}" includes="*.jar"/>
+			</webApp>
+			<webApp name="openmeap-services-web" warfile="${openmeap.project.services-web.dist.war}" contextpath="/openmeap-services-web">
+			    <lib dir="${jetty.libs}" includes="*.jar"/>
+			</webApp> 
 		</jetty>
 		
 	</target>

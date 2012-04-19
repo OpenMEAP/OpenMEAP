@@ -24,7 +24,14 @@
 
 package com.openmeap.blackberry;
 
+import java.io.IOException;
+import java.util.Hashtable;
+
+import org.json.me.JSONException;
+
 import com.openmeap.digest.DigestInputStreamFactory;
+import com.openmeap.thinclient.SLICConfig;
+import com.openmeap.util.GenericRuntimeException;
 
 import net.rim.device.api.ui.UiApplication;
 
@@ -37,13 +44,28 @@ import com.openmeap.blackberry.digest.Sha1DigestInputStream;
  */
 public class OpenMEAPApp extends UiApplication
 {
+	private SLICConfig config;
+	
     /**
      * Creates a new MyApp object
+     * @throws JSONException 
+     * @throws IOException 
      */
-    public OpenMEAPApp()
-    {    
+    public OpenMEAPApp() {
+    	
     	DigestInputStreamFactory.setDigestInputStreamForName("MD5", Md5DigestInputStream.class);
     	DigestInputStreamFactory.setDigestInputStreamForName("SHA1", Sha1DigestInputStream.class);
+    	
+    	try {
+	    	config = new SLICConfig(
+	    			new SharedPreferencesImpl("slic-config"),
+	    			new Hashtable()
+	    		);
+	    } catch(JSONException jse) {
+	    	throw new GenericRuntimeException(jse);
+	    } catch(IOException ioe) {
+	    	throw new GenericRuntimeException(ioe);
+	    }
     	
         pushScreen(new OpenMEAPScreen());
     }    

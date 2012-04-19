@@ -34,10 +34,17 @@ public class FormConstants {
 	final static public String CONT_TYPE_XML = "text/xml";
 	final static public String CONT_TYPE_HTML = "text/html";
 	
+	final static public String CONTENT_LENGTH = "Content-Length";
+	final static public String CONTENT_MD5 = "Content-MD5";
+	
 	final static public String ENCODING_TYPE = "encodingType";
 	final static public String ENCTYPE_MULTIPART_FORMDATA = "multipart/form-data";
 	
 	final static public String CHAR_ENC_DEFAULT = "utf-8";
+	
+	final static public String QUERY_STRING_DELIM = "?";
+	
+	final static public String HTTP_EOL = "\r\n";
 	
 	/*
 	 * Page bean names

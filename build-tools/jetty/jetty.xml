@@ -173,10 +173,10 @@
           <!-- this realm uses a properties file to store/read the user/password/roles -->
           <New class="org.mortbay.jetty.security.HashUserRealm">
             <!-- the name of the realm -->
-            <Set name="name">Test Realm</Set>
+            <Set name="name">default</Set>
  
             <!-- the location of the property file to load from -->
-            <Set name="config"><SystemProperty name="jetty.realmConfig" default="./etc/realm.properties"/></Set>
+            <Set name="config"><SystemProperty name="jetty.realmConfig" default="./realmConfig.properties"/></Set>
  
             <!-- the interval in seconds to periodically scan for any changes and refresh/reload if changed -->
             <Set name="refreshInterval">0</Set>
