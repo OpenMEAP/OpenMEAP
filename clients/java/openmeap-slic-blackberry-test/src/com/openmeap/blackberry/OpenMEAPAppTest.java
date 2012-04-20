@@ -22,42 +22,54 @@
  ###############################################################################
  */
 
-package com.openmeap.blackberry.digest;
+package com.openmeap.blackberry;
 
-import java.io.InputStream;
+import com.openmeap.blackberry.digest.Md5DigestInputStream;
+import com.openmeap.blackberry.digest.Sha1DigestInputStream;
+import com.openmeap.digest.DigestInputStreamFactory;
 
-import net.rim.device.api.crypto.AbstractDigest;
+import net.rim.device.api.ui.Screen;
+import net.rim.device.api.ui.ScreenUiEngineAttachedListener;
+import net.rim.device.api.ui.UiApplication;
 
-import com.openmeap.digest.DigestException;
-import com.openmeap.digest.DigestInputStream;
-import com.openmeap.util.GenericRuntimeException;
-
-public class AbstractDigestInputStream  implements DigestInputStream {
-
-	private InputStream inputStream;
-	protected AbstractDigest digest = null;
+/**
+ * This is the set of unit-tests for blackberry
+ */
+public class OpenMEAPAppTest extends UiApplication implements ScreenUiEngineAttachedListener
+{
+	public static final String HTTP_HOST  = "10.0.2.15:8080";
 	
-	public void setInputStream(InputStream inputStream) {
-		this.inputStream = inputStream;
+	OpenMEAPAppTestScreen screen;
+	
+	public OpenMEAPAppTest() {
+		super();
+		
+		DigestInputStreamFactory.setDigestInputStreamForName("MD5", Md5DigestInputStream.class);
+    	DigestInputStreamFactory.setDigestInputStreamForName("SHA1", Sha1DigestInputStream.class);
+		
+		screen = new OpenMEAPAppTestScreen();
+		screen.addScreenUiEngineAttachedListener(this);
+		pushScreen(screen);
 	}
+	
+    /**
+     * Entry point for application
+     * @param args Command line arguments (not used)
+     */ 
+    public static void main(String[] args)
+    {
+        // Create a new instance of the application and make the currently
+        // running thread the application's event dispatch thread.
+        OpenMEAPAppTest theApp = new OpenMEAPAppTest();
+        theApp.enterEventDispatcher();
+    }
 
-	public byte[] digest() throws DigestException {
-		try {
-			byte[] bytes = new byte[1];
-			int read = 0;
-			digest.reset();
-			while( (read=inputStream.read(bytes))!=(-1) ) {
-				digest.update(bytes[0]);
-			}
-		} catch(Exception e) {
-			throw new DigestException(e);
-		} finally {
-			try{
-				inputStream.close();
-			} catch(Exception e) {
-				throw new GenericRuntimeException(e);
-			}
+	public void onScreenUiEngineAttached(Screen screen, boolean attached) {
+		if(attached) {
+			this.screen.append("<div style='width:100%;height:100%;overflow:scroll;'>");
+			invokeLater(new DigestInputStreamTest(this.screen));
+			invokeLater(new HttpRequestExecuterImplTest(this.screen));
+			this.screen.append("</div>");
 		}
-		return digest.getDigest();
-	}
+	}    
 }

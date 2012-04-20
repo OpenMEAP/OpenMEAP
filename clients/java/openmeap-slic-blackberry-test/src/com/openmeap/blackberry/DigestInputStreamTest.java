@@ -22,42 +22,48 @@
  ###############################################################################
  */
 
-package com.openmeap.blackberry.digest;
+package com.openmeap.blackberry;
 
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.util.Hashtable;
 
-import net.rim.device.api.crypto.AbstractDigest;
-
-import com.openmeap.digest.DigestException;
-import com.openmeap.digest.DigestInputStream;
+import com.openmeap.blackberry.HttpRequestExecuterImpl;
+import com.openmeap.constants.FormConstants;
+import com.openmeap.constants.UrlParamConstants;
+import com.openmeap.http.HttpRequestExecuter;
+import com.openmeap.http.HttpResponse;
+import com.openmeap.util.AuthTokenProvider;
 import com.openmeap.util.GenericRuntimeException;
+import com.openmeap.util.Utils;
 
-public class AbstractDigestInputStream  implements DigestInputStream {
-
-	private InputStream inputStream;
-	protected AbstractDigest digest = null;
+public class DigestInputStreamTest implements Runnable {
 	
-	public void setInputStream(InputStream inputStream) {
-		this.inputStream = inputStream;
+	private static String TEST_STRING = "The quick brown fox jumps over the lazy dog.";
+			
+	OpenMEAPAppTestScreen screen;
+	
+	public DigestInputStreamTest(OpenMEAPAppTestScreen screen) {
+		this.screen=screen;
 	}
-
-	public byte[] digest() throws DigestException {
+	
+	public void run() {
 		try {
-			byte[] bytes = new byte[1];
-			int read = 0;
-			digest.reset();
-			while( (read=inputStream.read(bytes))!=(-1) ) {
-				digest.update(bytes[0]);
-			}
+			screen.append("<h3>DigestInputStreamTest</h3><br/>");
+			screen.append("Test string: \""+TEST_STRING+"\"<br/>");
+			// test MD5
+			screen.append("Testing MD5: ");
+			String expectedHash = "e4d909c290d0fb1ca068ffaddf22cbd0";
+			String hash = Utils.hashInputStream("md5", new ByteArrayInputStream(TEST_STRING.getBytes(FormConstants.CHAR_ENC_DEFAULT)));
+			screen.assertTrue(hash, hash.equals(expectedHash));
+			
+			// test SHA-1
+			screen.append("Testing SHA-1: ");
+			expectedHash = "408d94384216f890ff7a0c3528e8bed1e0b01621";
+			hash = Utils.hashInputStream("sha1", new ByteArrayInputStream(TEST_STRING.getBytes(FormConstants.CHAR_ENC_DEFAULT)));
+			screen.assertTrue(hash, hash.equals(expectedHash));
+			
 		} catch(Exception e) {
-			throw new DigestException(e);
-		} finally {
-			try{
-				inputStream.close();
-			} catch(Exception e) {
-				throw new GenericRuntimeException(e);
-			}
+			throw new GenericRuntimeException(e);
 		}
-		return digest.getDigest();
 	}
 }

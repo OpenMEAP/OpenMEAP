@@ -139,7 +139,7 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
         if(cd != null) 
         {
         	HttpConnection c = (HttpConnection)cd.getConnection();
-
+        	
             OutputConnection oc = (OutputConnection) c;
             InputConnection ic = (InputConnection) c;
             
@@ -147,11 +147,11 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
             InputStream is = null;
             
             try {
-	            os = oc.openOutputStream();
+            		            
 	            if(postData==null) {
-	            	makeGETRequest(url,headers,os);
+	            	os = makeGETRequest(url,headers,c);
 	            } else {
-	            	makePOSTRequest(url,headers,postData,os);
+	            	os = makePOSTRequest(url,headers,postData,c);
 	            }
 	            
 	            is = ic.openInputStream();
@@ -206,30 +206,32 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
         }        
 	}
 	
-	private void makePOSTRequest(String url, HttpHeader[] headers, byte[] postData, OutputStream os) throws IOException, DigestException, HttpRequestException {
+	private OutputStream makePOSTRequest(String url, HttpHeader[] headers, byte[] postData, HttpConnection c) throws IOException, DigestException, HttpRequestException {
 		
-		writeString(("POST "+url+" HTTP/1.0"+FormConstants.HTTP_EOL),os);
-		writeString((FormConstants.CONTENT_LENGTH+": "+postData.length+FormConstants.HTTP_EOL),os);
-		writeString((FormConstants.CONTENT_MD5+": "+getMd5OfPostData(postData)+FormConstants.HTTP_EOL),os);
-		writeHeaders(headers,os);
-        writeString(FormConstants.HTTP_EOL,os);
+		c.setRequestMethod(HttpConnection.POST);
+    	writeHeaders(headers,c);
+		c.setRequestProperty(FormConstants.CONTENT_LENGTH,String.valueOf(postData.length));
+		c.setRequestProperty(FormConstants.CONTENT_MD5,getMd5OfPostData(postData));
+		c.setRequestProperty(FormConstants.CONTENT_TYPE, FormConstants.CONT_TYPE_DEFAULT);
+		OutputStream os = c.openOutputStream();
         os.write(postData);
         os.flush();
+        return os;
 	}
 	
-	private void makeGETRequest(String url, HttpHeader[] headers, OutputStream os) throws IOException {
+	private OutputStream makeGETRequest(String url, HttpHeader[] headers, HttpConnection c) throws IOException {
 		
-		writeString(("GET "+url+" HTTP/1.0"+FormConstants.HTTP_EOL),os);
-		writeHeaders(headers,os);
-        writeString(FormConstants.HTTP_EOL,os);
+		c.setRequestMethod(HttpConnection.GET);
+		OutputStream os = c.openOutputStream();
         os.flush();
+        return os;
 	}
 	
-	private void writeHeaders(HttpHeader[] headers, OutputStream os) throws IOException {
+	private void writeHeaders(HttpHeader[] headers, HttpConnection c) throws IOException {
 		if(headers!=null) {
 	        for(int i=0; i<headers.length; i++) {
 	        	HttpHeader header = headers[i];
-	        	writeString((header.getKey()+": "+header.getValue()+FormConstants.HTTP_EOL),os);
+	        	c.setRequestProperty(header.getKey(),header.getValue());
 	        }	           
 		}
 	}

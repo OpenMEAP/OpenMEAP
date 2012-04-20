@@ -22,42 +22,46 @@
  ###############################################################################
  */
 
-package com.openmeap.blackberry.digest;
+package com.openmeap.blackberry;
 
-import java.io.InputStream;
+import net.rim.device.api.browser.field2.BrowserField;
+import net.rim.device.api.ui.container.MainScreen;
 
-import net.rim.device.api.crypto.AbstractDigest;
+import com.openmeap.util.StringUtils;
 
-import com.openmeap.digest.DigestException;
-import com.openmeap.digest.DigestInputStream;
-import com.openmeap.util.GenericRuntimeException;
-
-public class AbstractDigestInputStream  implements DigestInputStream {
-
-	private InputStream inputStream;
-	protected AbstractDigest digest = null;
+public class OpenMEAPAppTestScreen extends MainScreen {
 	
-	public void setInputStream(InputStream inputStream) {
-		this.inputStream = inputStream;
-	}
+	BrowserField browserField;
+	private static String PASS = "<span style='color:#0b0;'>PASS";
+	private static String FAIL = "<span style='color:#b00;'>FAIL";
+	private static String CLOSE = "</span><br/>";
+	
+	public OpenMEAPAppTestScreen()
+    {        
+		setTitle("MyTitle");
+		browserField = new BrowserField();
+    	add(browserField);
+    	browserField.displayContent("<html><body></body></html>", "file:///Store");
+    }
 
-	public byte[] digest() throws DigestException {
-		try {
-			byte[] bytes = new byte[1];
-			int read = 0;
-			digest.reset();
-			while( (read=inputStream.read(bytes))!=(-1) ) {
-				digest.update(bytes[0]);
+	public void assertTrue(final String mesg, final boolean testResult) {
+		String prnt=testResult?"PASS":"FAIL";
+		append(
+				(testResult?PASS:FAIL)
+				+(mesg!=null?" "+mesg:"")
+				+CLOSE
+			);
+	}
+	
+	public void append(final String html) {
+		getApplication().invokeLater(new Runnable() {
+			public void run() {
+				browserField.executeScript("document.body.innerHTML=document.body.innerHTML+\""+escape(html)+"\"");
 			}
-		} catch(Exception e) {
-			throw new DigestException(e);
-		} finally {
-			try{
-				inputStream.close();
-			} catch(Exception e) {
-				throw new GenericRuntimeException(e);
-			}
-		}
-		return digest.getDigest();
+		});
+	}
+	
+	private String escape(String html) {
+		return StringUtils.replaceAll(html, "\"", "\\\"");
 	}
 }
