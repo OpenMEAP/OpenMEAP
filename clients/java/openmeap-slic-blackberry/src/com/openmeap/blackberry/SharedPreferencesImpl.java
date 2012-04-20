@@ -42,7 +42,7 @@ import com.openmeap.util.Utils;
 
 public class SharedPreferencesImpl implements Preferences {
 
-	private final static String CONNECTION = "file:///Store/";
+	private final static String CONNECTION = "file:///store/";
 	private final static String EXTENSION = ".prefs";
 	
 	private JSONObject values;
@@ -57,7 +57,7 @@ public class SharedPreferencesImpl implements Preferences {
 		try {
 			return values.getString(key);
 		} catch (JSONException e) {
-			throw new GenericRuntimeException(e);
+			return null;
 		}
 	}
 
@@ -78,11 +78,17 @@ public class SharedPreferencesImpl implements Preferences {
 	public Boolean clear() {
 		try {
 			FileConnection fc = (FileConnection)Connector.open(CONNECTION+name+EXTENSION);
-			if( fc.exists() ) {
-				try {
-					fc.delete();
-				} catch (IOException e) {
-					return Boolean.FALSE;
+			try {
+				if( fc.exists() ) {
+					try {
+						fc.delete();
+					} catch (IOException e) {
+						return Boolean.FALSE;
+					}
+				}
+			} finally {
+				if(fc!=null) {
+					fc.close();
 				}
 			}
 		} catch(IOException e) {
@@ -93,28 +99,40 @@ public class SharedPreferencesImpl implements Preferences {
 
 	private void load() throws IOException, JSONException {
 		FileConnection fc = (FileConnection)Connector.open(CONNECTION+name+EXTENSION);
-		if(fc.exists()) {
-			InputStream is = fc.openInputStream();
-			String json = "";
-			try {
-				json = Utils.readInputStream(is,FormConstants.ENCODING_TYPE);
-			} finally {
-				is.close();
+		try {
+			if(fc.exists()) {
+				InputStream is = fc.openInputStream();
+				String json = "";
+				try {
+					json = Utils.readInputStream(is,FormConstants.ENCODING_TYPE);
+				} finally {
+					is.close();
+				}
+				JSONObject obj = new JSONObject(json);
+			} else {
+				values = new JSONObject();
 			}
-			JSONObject obj = new JSONObject(json);
-		} else {
-			values = new JSONObject();
+		} finally {
+			if(fc!=null) {
+				fc.close();
+			}
 		}
 	}
 	
 	private Boolean write() {
 		try {
 			FileConnection fc = (FileConnection)Connector.open(CONNECTION+name+EXTENSION);
-			OutputStream os = fc.openOutputStream();
 			try {
-				Utils.pipeInputStreamIntoOutputStream(new ByteArrayInputStream(values.toString().getBytes()), os);
+				OutputStream os = fc.openOutputStream();
+				try {
+					Utils.pipeInputStreamIntoOutputStream(new ByteArrayInputStream(values.toString().getBytes()), os);
+				} finally {
+					os.close();
+				}
 			} finally {
-				os.close();
+				if(fc!=null) {
+					fc.close();
+				}
 			}
 		} catch(IOException e) {
 			return Boolean.FALSE;

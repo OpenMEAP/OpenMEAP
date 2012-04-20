@@ -25,6 +25,7 @@
 package com.openmeap.blackberry;
 
 import net.rim.device.api.browser.field2.BrowserField;
+import net.rim.device.api.browser.field2.BrowserFieldConfig;
 import net.rim.device.api.ui.container.MainScreen;
 
 import com.openmeap.util.StringUtils;
@@ -39,7 +40,9 @@ public class OpenMEAPAppTestScreen extends MainScreen {
 	public OpenMEAPAppTestScreen()
     {        
 		setTitle("MyTitle");
-		browserField = new BrowserField();
+		BrowserFieldConfig config = new BrowserFieldConfig();
+		config.setProperty(BrowserFieldConfig.JAVASCRIPT_ENABLED, Boolean.TRUE);
+		browserField = new BrowserField(config);
     	add(browserField);
     	browserField.displayContent("<html><body></body></html>", "file:///Store");
     }
@@ -57,6 +60,14 @@ public class OpenMEAPAppTestScreen extends MainScreen {
 		getApplication().invokeLater(new Runnable() {
 			public void run() {
 				browserField.executeScript("document.body.innerHTML=document.body.innerHTML+\""+escape(html)+"\"");
+			}
+		});
+	}
+	
+	public void wrap(final String start, final String end) {
+		getApplication().invokeLater(new Runnable() {
+			public void run() {
+				browserField.executeScript("document.body.innerHTML=\""+escape(start)+"\"+document.body.innerHTML+\""+escape(end)+"\"");
 			}
 		});
 	}

@@ -202,7 +202,11 @@ public class UpdateHandler {
 		if( config.isVersionOriginal(versionId).booleanValue() ) {
 			config.setApplicationVersion(versionId);
 			config.setArchiveHash(updateHeader.getHash().getValue());
-     		storage.resetStorage();
+			try {
+				storage.resetStorage();
+			} catch(LocalStorageException lse) {
+				throw new UpdateException(UpdateResult.IO_EXCEPTION,"Could not reset storage",lse);
+			}
      		config.setLastUpdateResult(UpdateResult.SUCCESS.toString());
      		return;
 		}
@@ -232,14 +236,22 @@ public class UpdateHandler {
 		config.setLastUpdateResult(UpdateResult.SUCCESS.toString());
 		
 		// at this point, the archive should be of no use to us
-		storage.deleteImportArchive();
+		try {
+			storage.deleteImportArchive();
+		} catch(LocalStorageException lse) {
+			throw new UpdateException(UpdateResult.IO_EXCEPTION,"Could not delete import archive",lse);
+		}
 		
 		// delete the content at the old internal storage prefix
 		// TODO: decide whether this should be done pending notifying of the update or not
 		config.setApplicationVersion(update.getUpdateHeader().getVersionIdentifier());
 		config.setArchiveHash(update.getUpdateHeader().getHash().getValue());
 		
-		storage.resetStorage();
+		try {
+			storage.resetStorage();
+		} catch(LocalStorageException lse) {
+			throw new UpdateException(UpdateResult.IO_EXCEPTION,"Could not reset storage",lse);
+		}
 		
 		String newPrefix = "com.openmeap.storage."+update.getUpdateHeader().getHash().getValue();
 		config.setStorageLocation(newPrefix);
@@ -252,9 +264,14 @@ public class UpdateHandler {
         }
 	}
 	
-	public Boolean deviceHasEnoughSpace(UpdateStatus update) {
+	public Boolean deviceHasEnoughSpace(UpdateStatus update) throws UpdateException {
 		// test to make sure the device has enough space for the installation
-		Long avail = storage.getBytesFree();
+		Long avail;
+		try {
+			avail = storage.getBytesFree();
+		} catch (LocalStorageException e) {
+			throw new UpdateException(UpdateResult.IO_EXCEPTION,"Could not determine the number of bytes available",e);
+		}
 		return new Boolean(avail.equals(update.getUpdateHeader().getInstallNeeds())); 
 	}
 	
@@ -312,9 +329,9 @@ public class UpdateHandler {
 			throw new UpdateException(UpdateResult.IO_EXCEPTION,"",lse);
 		} finally {
 			try {
-				os.close();
-				is.close();
-			} catch (IOException e) {
+				storage.closeOutputStream(os);
+				storage.closeInputStream(is);
+			} catch (LocalStorageException e) {
 				throw new UpdateException(UpdateResult.IO_EXCEPTION,"",e);
 			}
 			

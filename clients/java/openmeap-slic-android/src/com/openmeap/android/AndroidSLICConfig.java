@@ -47,10 +47,6 @@ public class AndroidSLICConfig extends SLICConfig {
 		return this.getProperty("com.openmeap.slic.providerAuthority");
 	}
 	
-	public String getPackagedAppRoot() {
-		return this.getProperty("com.openmeap.slic.packagedAppRoot");
-	}
-	
 	public String getAssetsRootPath() {
 		// storage location will be null until the first successful update
     	if( shouldUseAssetsOrSdCard() ) {
@@ -87,9 +83,5 @@ public class AndroidSLICConfig extends SLICConfig {
     public Boolean assetsOnExternalStorage() {
     	String root = this.getPackagedAppRoot();
     	return root.startsWith(SD_CARD_PREFIX); 
-    }
-    
-    public Boolean shouldUseAssetsOrSdCard() {
-    	return getStorageLocation()==null || isVersionOriginal(getApplicationVersion());
     }
 }

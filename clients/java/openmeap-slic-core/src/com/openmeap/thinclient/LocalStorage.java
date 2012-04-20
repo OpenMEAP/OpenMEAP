@@ -31,7 +31,7 @@ import com.openmeap.thinclient.update.UpdateStatus;
 
 public interface LocalStorage {
 	
-	public void deleteImportArchive();
+	public void deleteImportArchive() throws LocalStorageException;
 	
 	public void unzipImportArchive(UpdateStatus status) throws LocalStorageException;
 	
@@ -49,11 +49,14 @@ public interface LocalStorage {
 	/**
 	 * Deletes all files from the current location
 	 */
-	public void resetStorage();
-	public void resetStorage(String prefix);
+	public void resetStorage() throws LocalStorageException;
+	public void resetStorage(String prefix) throws LocalStorageException;
+	
+	public void closeOutputStream(OutputStream outputStream) throws LocalStorageException;
+	public void closeInputStream(InputStream inputStream) throws LocalStorageException;
 	
 	/**
 	 * @return The number of bytes of storage that are free
 	 */
-	public Long getBytesFree();
+	public Long getBytesFree() throws LocalStorageException;
 }

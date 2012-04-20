@@ -166,4 +166,26 @@ public class LocalStorageImpl implements LocalStorage {
 			}
 		}
 	}
+
+	public void closeOutputStream(OutputStream outputStream) throws LocalStorageException {
+		try {
+			if(outputStream==null) {
+				return;
+			}
+			outputStream.close();
+		} catch(IOException ioe) {
+			throw new LocalStorageException(ioe);
+		}
+	}
+
+	public void closeInputStream(InputStream inputStream) throws LocalStorageException {
+		try {
+			if(inputStream==null) {
+				return;
+			}
+			inputStream.close();
+		} catch(IOException ioe) {
+			throw new LocalStorageException(ioe);
+		}
+	}
 }

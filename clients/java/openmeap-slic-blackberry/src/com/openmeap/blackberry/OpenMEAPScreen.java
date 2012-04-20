@@ -28,9 +28,16 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import com.openmeap.constants.FormConstants;
+import com.openmeap.thinclient.LocalStorage;
+import com.openmeap.thinclient.SLICConfig;
+import com.openmeap.util.GenericRuntimeException;
 import com.openmeap.util.Utils;
 
 import net.rim.device.api.browser.field2.BrowserField;
+import net.rim.device.api.browser.field2.BrowserFieldConfig;
+import net.rim.device.api.browser.field2.BrowserFieldConnectionManager;
+import net.rim.device.api.browser.field2.BrowserFieldController;
+import net.rim.device.api.browser.field2.ProtocolController;
 import net.rim.device.api.ui.container.MainScreen;
 
 /**
@@ -39,26 +46,56 @@ import net.rim.device.api.ui.container.MainScreen;
  */
 public final class OpenMEAPScreen extends MainScreen
 {
+	private SLICConfig config;
+	private LocalStorage localStorage;
+	private String DIRECTORY_INDEX = "index.html";
+	
     /**
      * Creates a new OpenMEAPScreen object
      */
-    public OpenMEAPScreen()
+    public OpenMEAPScreen(SLICConfig config, LocalStorage localStorage)
     {        
-        // Set the displayed title of the screen       
-        setTitle("MyTitle");
+    	this.config = config;
+    	this.localStorage = localStorage;
+    	
+        // Set the displayed title of the screen
+        setTitle(config.getApplicationTitle());
+        
 		try {
 			createBrowserField();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new GenericRuntimeException(e);
 		}
     }
     
     public BrowserField createBrowserField() throws IOException {
+    	
+    	String baseUrl = getBaseUrl();
+    	
     	BrowserField browserField = new BrowserField();
+
+    	AssetsRequestHandler handler = new AssetsRequestHandler(browserField,baseUrl);
+    	ProtocolController controller = (ProtocolController)browserField.getController();
+    	controller.setNavigationRequestHandler("assets", handler);
+    	controller.setResourceRequestHandler("assets", handler);
+    	
     	add(browserField);
-    	InputStream stream = OpenMEAPScreen.class.getResourceAsStream("test.html");
-    	browserField.displayContent(Utils.readInputStream(stream, FormConstants.CHAR_ENC_DEFAULT),"file:///Store");
+    	browserField.requestContent(baseUrl+DIRECTORY_INDEX);
     	return browserField;
+    }
+    
+    /**
+     * Loads in the content of the index document page to load into the WebView
+     * 
+     * @return The url of the index document
+     * @throws IOException
+     */
+    protected String getBaseUrl() throws IOException {
+    	// storage location will be null until the first successful update
+    	if( config.shouldUseAssetsOrSdCard().booleanValue() ) {
+   			return config.getPackagedAppRoot();
+    	} else {
+    		return config.getStorageLocation();
+    	}
     }
 }

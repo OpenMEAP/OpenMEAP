@@ -179,6 +179,14 @@ public class SLICConfig {
 		setProperty("com.openmeap.slic.storageLocation",locationPrefix);
 	}
 	
+	public Boolean shouldUseAssetsOrSdCard() {
+    	return new Boolean( getStorageLocation()==null || isVersionOriginal(getApplicationVersion()).booleanValue() );
+    }
+	
+	public String getPackagedAppRoot() {
+		return this.getProperty("com.openmeap.slic.packagedAppRoot");
+	}
+	
 	/*
 	 * PRIVATE METHODS
 	 */
@@ -201,4 +209,6 @@ public class SLICConfig {
 	protected void setProperty(String name, String value) {
 		preferences.put(name, value);
 	}
+	
+	
 }

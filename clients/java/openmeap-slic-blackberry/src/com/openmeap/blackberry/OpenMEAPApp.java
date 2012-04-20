@@ -25,18 +25,20 @@
 package com.openmeap.blackberry;
 
 import java.io.IOException;
-import java.util.Hashtable;
-
-import org.json.me.JSONException;
-
-import com.openmeap.digest.DigestInputStreamFactory;
-import com.openmeap.thinclient.SLICConfig;
-import com.openmeap.util.GenericRuntimeException;
+import java.io.InputStream;
 
 import net.rim.device.api.ui.UiApplication;
 
+import org.json.me.JSONException;
+
 import com.openmeap.blackberry.digest.Md5DigestInputStream;
 import com.openmeap.blackberry.digest.Sha1DigestInputStream;
+import com.openmeap.digest.DigestInputStreamFactory;
+import com.openmeap.thinclient.LocalStorage;
+import com.openmeap.thinclient.SLICConfig;
+import com.openmeap.util.GenericRuntimeException;
+
+import fr.free.ichir.mahieddine.Properties;
 
 /**
  * This class extends the UiApplication class, providing a
@@ -45,6 +47,7 @@ import com.openmeap.blackberry.digest.Sha1DigestInputStream;
 public class OpenMEAPApp extends UiApplication
 {
 	private SLICConfig config;
+	private LocalStorage localStorage;
 	
     /**
      * Creates a new MyApp object
@@ -57,9 +60,12 @@ public class OpenMEAPApp extends UiApplication
     	DigestInputStreamFactory.setDigestInputStreamForName("SHA1", Sha1DigestInputStream.class);
     	
     	try {
+    		InputStream stream = System.class.getResourceAsStream('/'+SLICConfig.PROPERTIES_FILE);
+    		Properties properties = new Properties();
+    		properties.load(stream);
 	    	config = new SLICConfig(
 	    			new SharedPreferencesImpl("slic-config"),
-	    			new Hashtable()
+	    			properties.getProperties()
 	    		);
 	    } catch(JSONException jse) {
 	    	throw new GenericRuntimeException(jse);
@@ -67,6 +73,8 @@ public class OpenMEAPApp extends UiApplication
 	    	throw new GenericRuntimeException(ioe);
 	    }
     	
-        pushScreen(new OpenMEAPScreen());
+    	localStorage = new LocalStorageImpl(config);
+    	
+        pushScreen(new OpenMEAPScreen(config,localStorage));
     }    
 }
