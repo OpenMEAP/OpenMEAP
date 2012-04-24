@@ -261,7 +261,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		// then create a new archive for it.
 		if( version.getPk()==null ) {
 			version.setArchive(new ApplicationArchive());
-			version.getArchive().setVersion(version);
+			version.getArchive().setApplication(app);
 			version.setApplication(app);
 		}
 		
@@ -272,7 +272,10 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		} else {
 			try {
 				version.setLastModifier(firstValue("userPrincipalName",parameterMap));
+				version.setArchive(modelManager.addModify(version.getArchive(), events));
 				version = modelManager.addModify(version,events);
+				app.addVersion(version);
+				app = modelManager.addModify(app,events);
 				modelManager.refresh(app,events);
 				events.add( new MessagesEvent("Application version successfully created/modified!") );
 			} catch( InvalidPropertiesException ipe ) {
@@ -288,7 +291,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		version.setIdentifier(firstValue("identifier",parameterMap));
 		if( version.getArchive()==null ) {
 			version.setArchive(new ApplicationArchive());
-			version.getArchive().setVersion(version);
+			version.getArchive().setApplication(app);
 		}
 		
 		version.setApplication(app);
@@ -316,7 +319,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 						ApplicationArchive archive = new ApplicationArchive();
 						archive.setNewFileUploaded(true);
 						archive.setHash(tempFile.getAbsolutePath());
-						archive.setVersion(version);
+						archive.setApplication(app);
 						version.setArchive(archive);
 						archiveUncreated = false;
 					} catch(Exception ioe) {

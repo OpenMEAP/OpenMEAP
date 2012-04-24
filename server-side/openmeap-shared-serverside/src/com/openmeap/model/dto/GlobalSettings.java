@@ -71,7 +71,7 @@ public class GlobalSettings extends AbstractModelEntity implements HasJSONProper
 		new JSONProperty("getMaxFileUploadSize"),
 		new JSONProperty("getServiceManagementAuthSalt"),
 		new JSONProperty("getTemporaryStoragePath"),
-		new JSONProperty("getClusterNodes")
+		new JSONProperty("getClusterNodes",ClusterNode.class)
 	};
 	@Override @Transient
 	public JSONProperty[] getJSONProperties() {

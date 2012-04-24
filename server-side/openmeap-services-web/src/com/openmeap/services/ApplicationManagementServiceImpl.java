@@ -95,8 +95,8 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 		// and the version of that deployment differs in hash value or identifier
 		// then return an update in the response
 		Deployment lastDeployment = modelManager.getModelService().getLastDeployment(application);
-		Boolean reqAppVerDiffers = lastDeployment!=null && !lastDeployment.getApplicationVersion().getIdentifier().equals(reqAppVerId);
-		Boolean reqAppArchHashValDiffers = lastDeployment!=null && reqAppArchHashVal!=null && !lastDeployment.getHash().equals(reqAppArchHashVal);
+		Boolean reqAppVerDiffers = lastDeployment!=null && !lastDeployment.getVersionIdentifier().equals(reqAppVerId);
+		Boolean reqAppArchHashValDiffers = lastDeployment!=null && reqAppArchHashVal!=null && !lastDeployment.getApplicationArchive().getHash().equals(reqAppArchHashVal);
 		
 		// we only send an update if 
 		//   a deployment has been made
@@ -107,11 +107,10 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 			
 			// TODO: I'm not happy with the discrepancies between the model and schema
 			// ...besides, this update header should be encapsulated somewhere else
-			ApplicationVersion currentVersion = lastDeployment.getApplicationVersion();
-			ApplicationArchive currentVersionArchive = currentVersion.getArchive();
+			ApplicationArchive currentVersionArchive = lastDeployment.getApplicationArchive();
 			UpdateHeader uh = new UpdateHeader();
 			
-			uh.setVersionIdentifier(currentVersion.getIdentifier());
+			uh.setVersionIdentifier(lastDeployment.getVersionIdentifier());
 			uh.setInstallNeeds(Long.valueOf(currentVersionArchive.getBytesLength()+currentVersionArchive.getBytesLengthUncompressed())); 
 			uh.setStorageNeeds(Long.valueOf(currentVersionArchive.getBytesLengthUncompressed())); 
 			uh.setType( UpdateType.fromValue(lastDeployment.getType().toString()) );
@@ -148,20 +147,12 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 		ModelManager manager = getModelManager();
 		
 		// we will need to verify that they have the latest version
-		com.openmeap.model.dto.ApplicationVersion appVer = manager.getModelService().findAppVersionByNameAndId(appName,appVersionId);
-		Application application;
-		if( appVer==null ) {
-			application = manager.getModelService().findApplicationByName(appName);
-			if( application==null 
-					|| application.getInitialVersionIdentifier()==null 
-					|| !(application.getInitialVersionIdentifier().equals(appVersionId)) ) {
-				throw new WebServiceException(WebServiceException.TypeEnum.APPLICATION_VERSION_NOTFOUND,
-						"The application "+appName+"(version "+appVersionId+") was not found.");
-			}
-		} else {
-			application = appVer.getApplication();
+		Application application = manager.getModelService().findApplicationByName(appName);
+		if( application==null ) {
+			throw new WebServiceException(WebServiceException.TypeEnum.APPLICATION_NOTFOUND,
+					"The application \""+appName+"\" was not found.");
 		}
-		
+				
 		return application;
 	}	
 }

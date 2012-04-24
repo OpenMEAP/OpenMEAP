@@ -95,7 +95,7 @@ public class ApplicationManagementPortTypeImplTest {
 		} catch( WebServiceException wse ) {
 			thrown = true;
 		}
-		Assert.assertTrue("A non-existent application version should trigger an exception",thrown);
+		Assert.assertFalse("A non-existent application version should not trigger an exception",thrown);
 	}
 	
 	/**

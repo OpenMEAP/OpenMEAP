@@ -119,29 +119,30 @@ public class AdminTest {
 	public void testUpdateGlobalSettings() throws Exception {
 		
 		// correct location of storage path prefix
-		GlobalSettings settings = new GlobalSettings();
-		settings.setExternalServiceUrlPrefix(AdminTestHelper.SERVICES_WEB_URL);
-		settings.setMaxFileUploadSize(1234550);
-		settings.setServiceManagementAuthSalt(AdminTestHelper.SERVICES_WEB_AUTH_SALT);
-		settings.setTemporaryStoragePath(AdminTestHelper.ADMIN_WEB_STORAGE);
+		GlobalSettings originalSettings = new GlobalSettings();
+		originalSettings.setExternalServiceUrlPrefix(AdminTestHelper.SERVICES_WEB_URL);
+		originalSettings.setMaxFileUploadSize(1234550);
+		originalSettings.setServiceManagementAuthSalt(AdminTestHelper.SERVICES_WEB_AUTH_SALT);
+		originalSettings.setTemporaryStoragePath(AdminTestHelper.ADMIN_WEB_STORAGE);
 		
 		// correct cluster node location and path prefix
 		ClusterNode node = new ClusterNode();
 		node.setServiceWebUrlPrefix(AdminTestHelper.NODE_01_SERVICES_URL);
 		node.setFileSystemStoragePathPrefix(AdminTestHelper.NODE_01_STORAGE);
-		settings.addClusterNode(node);
+		originalSettings.addClusterNode(node);
 		
 		// validate settings stored in database
-		Utils.consumeInputStream(helper.postGlobalSettings(settings).getResponseBody());
+		Utils.consumeInputStream(helper.postGlobalSettings(originalSettings).getResponseBody());
 		
+		//modelManager.getModelService().clearPersistenceContext();
 		GlobalSettings insertedSettings = modelManager.getGlobalSettings();
 		
 		JSONObjectBuilder job = new JSONObjectBuilder();
+		String originalSettingsJSON = job.toJSON(originalSettings).toString(3);
 		String insertedSettingsJSON = job.toJSON(insertedSettings).toString(3);
-		String originalSettingsJSON = job.toJSON(settings).toString(3);
 		logger.info("original: {}",originalSettingsJSON);
 		logger.info("inserted: {}",insertedSettingsJSON);
-		Assert.assertEquals(insertedSettingsJSON,originalSettingsJSON);
+		Assert.assertEquals(originalSettingsJSON,insertedSettingsJSON);
 	}
 	
 	public void testAddApplication() throws Exception {
@@ -208,7 +209,14 @@ public class AdminTest {
 	public void testCreateDeployments() throws Exception {
 		
 		_createDeployment(VERSION_01,Deployment.Type.IMMEDIATE);
+		modelManager.getModelService().clearPersistenceContext();
+		Application app = modelManager.getModelService().findApplicationByName(APP_NAME);
+		Assert.assertTrue(app.getDeployments().size()==1);
+		
 		_createDeployment(VERSION_02,Deployment.Type.REQUIRED);
+		modelManager.getModelService().clearPersistenceContext();
+		app = modelManager.getModelService().findApplicationByName(APP_NAME);
+		Assert.assertTrue(app.getDeployments().size()==2);
 		
 		_createDeployment(VERSION_02,Deployment.Type.REQUIRED);
 		Assert.assertTrue("as this deployment is created, the archive for version01 should be removed from the deployed location",
@@ -218,10 +226,11 @@ public class AdminTest {
 		Assert.assertTrue("as this deployment is created, the archive for version01 should be in the deployed location",
 				_isVersionArchiveInDeployedLocation(VERSION_01_HASH));
 		
-		Application app = modelManager.getModelService().findApplicationByName(APP_NAME);
+		modelManager.getModelService().clearPersistenceContext();
+		app = modelManager.getModelService().findApplicationByName(APP_NAME);
 		Assert.assertTrue(app.getDeployments().size()==2);
-		Assert.assertTrue(app.getDeployments().get(0).getApplicationVersion().getIdentifier().equals(VERSION_02));
-		Assert.assertTrue(app.getDeployments().get(1).getApplicationVersion().getIdentifier().equals(VERSION_01));
+		Assert.assertTrue(app.getDeployments().get(0).getVersionIdentifier().equals(VERSION_02));
+		Assert.assertTrue(app.getDeployments().get(1).getVersionIdentifier().equals(VERSION_01));
 	}
 	
 	public void testDeleteApplication() throws Exception {
@@ -287,6 +296,7 @@ public class AdminTest {
 	}
 	
 	private void _createDeployment(String identifier, Deployment.Type type) throws Exception {
+		modelManager.getModelService().clearPersistenceContext();
 		ApplicationVersion version = modelManager.getModelService().findAppVersionByNameAndId(APP_NAME, identifier);
 		Utils.consumeInputStream(helper.postCreateDeployment(version, type).getResponseBody());
 		Assert.assertTrue(_isVersionArchiveInDeployedLocation(version.getArchive().getHash()));

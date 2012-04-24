@@ -39,7 +39,7 @@ public class ModelManagerImplTest {
 	@Test public void testGetLastDeployment() throws Exception {
 		Application app = modelManager.getModelService().findByPrimaryKey(Application.class, 1L);
 		Deployment d = modelManager.getModelService().getLastDeployment(app);
-		Assert.assertTrue(d!=null && d.getApplicationVersion().getIdentifier().equals("ApplicationVersion.identifier.2"));
+		Assert.assertTrue(d!=null && d.getVersionIdentifier().equals("ApplicationVersion.identifier.2"));
 	}
 	@Test public void testAddModifyApplication() throws Exception {
 		
@@ -114,6 +114,7 @@ public class ModelManagerImplTest {
 		////////////////////////////
 		// Verify creating a new application version
 		ApplicationVersion version = newValidAppVersion(app);
+		version.setArchive(modelManager.addModify(version.getArchive(), null));
 		version = modelManager.addModify(version,null);
 		modelManager.getModelService().delete(version);
 		
@@ -201,7 +202,7 @@ public class ModelManagerImplTest {
 		ApplicationVersion version = new ApplicationVersion();
 		version.setIdentifier(UUID.randomUUID().toString());
 		version.setArchive(new ApplicationArchive());
-		version.getArchive().setVersion(version);
+		version.getArchive().setApplication(app);
 		version.getArchive().setUrl("ApplicationArchive.url.3");
 		version.getArchive().setHashAlgorithm("SHA1");
 		version.getArchive().setHash("ApplicationArchive.hash.3");

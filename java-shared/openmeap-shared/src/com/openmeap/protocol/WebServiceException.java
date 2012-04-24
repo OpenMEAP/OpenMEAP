@@ -24,10 +24,9 @@
 
 package com.openmeap.protocol;
 
-import java.lang.reflect.Field;
-
+import com.openmeap.json.Enum;
+import com.openmeap.json.EnumUtils;
 import com.openmeap.protocol.dto.ErrorCode;
-import com.openmeap.protocol.dto.HashAlgorithm;
 
 /**
  * Provides a bridge to the xml generated type errorcode enum
@@ -38,7 +37,7 @@ public class WebServiceException extends Exception {
 
 	public TypeEnum type = null;
 	
-	static public class TypeEnum {
+	static public class TypeEnum implements Enum {
 		static final public TypeEnum CLIENT = new TypeEnum("CLIENT");
 		static final public TypeEnum CLIENT_CONNECTION = new TypeEnum("CLIENT_CONNECTION");
 		static final public TypeEnum CLIENT_UPDATE = new TypeEnum("CLIENT_UPDATE");
@@ -61,19 +60,7 @@ public class WebServiceException extends Exception {
 			return name;
 		}
 		public static TypeEnum fromValue(String v) {
-	    	Field[] fields = TypeEnum.class.getDeclaredFields();
-	    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
-	    		Field field = fields[fieldIdx];
-	    		try {
-		    		if( ((TypeEnum)field.get(null)).value().equals(v) ) {
-		    			return (TypeEnum)field.get(null);
-						
-		    		}
-	    		} catch(Exception e) {
-	    			throw new IllegalArgumentException(v);
-	    		}
-	    	}
-	    	throw new IllegalArgumentException(v);
+			return (TypeEnum)EnumUtils.fromValue(TypeEnum.class, v);
 	    }
 		public ErrorCode asErrorCode() {
 			if( APPLICATION_NOTFOUND.equals(this) ) {

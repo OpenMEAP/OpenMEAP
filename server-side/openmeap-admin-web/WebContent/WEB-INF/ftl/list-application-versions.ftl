@@ -34,7 +34,7 @@ Input params:
 		[#if version.identifier?? && version.activeFlag]
 			<tr>
 				<td>[#if mayCreateDeployments]
-				<input type="radio" [#if currentVersionId==version.id]checked[/#if] name="versionId" value="${version.id}"/>
+				<input type="radio" name="versionId" value="${version.id}"/>
 				[#else]&nbsp;[/#if]</td>
 				<td>${(version.lastModifier)!}</td>
 				<td><a href="?bean=addModifyAppVersionPage&applicationId=${application.id}&versionId=${version.id}">${version.identifier}</a></td>

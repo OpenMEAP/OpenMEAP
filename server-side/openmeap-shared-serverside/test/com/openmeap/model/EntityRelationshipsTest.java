@@ -61,7 +61,7 @@ public class EntityRelationshipsTest {
 		app = em.find(Application.class, 1L);
 		aa = em.find(ApplicationArchive.class, 1L);
 		Assert.assertTrue(app!=null);
-		Assert.assertTrue(aa==null);		
+		Assert.assertTrue(aa!=null);		
 		
 		// Verify that deleting an application deletes all the crap associated to it
 		app = em.find(Application.class, 1L);
@@ -72,7 +72,7 @@ public class EntityRelationshipsTest {
 		em.getTransaction().commit();
 		
 		av = em.find(ApplicationVersion.class, 2L);
-		Assert.assertTrue(av==null);
+		Assert.assertTrue(av!=null);
 		
 		em.clear();
 	}

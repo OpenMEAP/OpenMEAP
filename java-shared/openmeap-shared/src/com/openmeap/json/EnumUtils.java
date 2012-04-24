@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.openmeap.protocol.dto.HashAlgorithm;
+import com.openmeap.json.Enum;
 
 abstract public class EnumUtils {
 	

@@ -12,8 +12,8 @@
 		<tr>
 			<td>${(depl.creator)!}</td>
 			<td>${depl.createDate?datetime}</td>
-			<td><a href="?bean=addModifyAppVersionPage&applicationId=${depl.application.id}&versionId=${depl.applicationVersion.id}">${depl.applicationVersion.identifier}</a></td>
-			<td><a href="${(depl.downloadUrl)!}">[${(depl.hashAlgorithm)!"NONE"}]${(depl.hash)!"NONE"}</a>
+			<td>${depl.versionIdentifier}</td>
+			<td><a href="${(archiveUrls[depl.applicationArchive.hash])!}">[${(depl.applicationArchive.hashAlgorithm)!"NONE"}]${(depl.applicationArchive.hash)!"NONE"}</a>
 			<td>${depl.type}</td>
 		</tr>
 	[/#list]

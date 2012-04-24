@@ -39,7 +39,6 @@ import java.util.zip.ZipFile;
 
 import javax.persistence.PersistenceException;
 
-import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +48,6 @@ import org.springframework.context.ApplicationContextAware;
 
 import com.openmeap.AuthorizationException;
 import com.openmeap.Authorizer;
-import com.openmeap.event.Event;
 import com.openmeap.event.EventNotificationException;
 import com.openmeap.event.MessagesEvent;
 import com.openmeap.event.ProcessingEvent;
@@ -105,47 +103,24 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 		}
 	}
 	
-	public void deleteApplicationVersion(ApplicationVersion version, List<ProcessingEvent> events) {
+	private void deleteApplicationVersion(ApplicationVersion version, List<ProcessingEvent> events) {
 		
 		ApplicationArchive archive2Delete = null;
 		if( version.getArchive()!=null ) {
-			archive2Delete = new ApplicationArchive();
-			archive2Delete.setHash(version.getArchive().getHash());
-			archive2Delete.setHashAlgorithm(version.getArchive().getHashAlgorithm());
+			archive2Delete = version.getArchive();
 		}
 		
-		Boolean versionInUse = false;
-		if( version.getApplication().getDeployments()!=null ) {
-			for( Deployment depl : version.getApplication().getDeployments() ) {
-				if( depl.getApplicationVersion().getPk().equals(version.getPk()) ) {
-					versionInUse = true;
-				}
-			}
+		//version.getApplication().removeVersion(version);
+		modelService.delete(version);
+		if( archive2Delete!=null ) {
+			maintainFileSystemCleanliness(archive2Delete, events);
 		}
-		if( versionInUse ) {
-		
-			version.setActiveFlag(false);
-			try {
-				version = addModify(version,events);
-				refresh(version.getApplication(),events);
-				events.add( new MessagesEvent("Application version successfully set to inactive.  It will be deleted when the last deployment made with it is removed.") );
-			} catch( InvalidPropertiesException ipe ) {
-				events.add( new MessagesEvent(ipe.getMessage()) );
-			} catch( PersistenceException pe ) {
-				events.add( new MessagesEvent(pe.getMessage()) );								
-			}
-		} else {
-			version.getApplication().removeVersion(version);
-			modelService.delete(version);
-			if( archive2Delete!=null ) {
-				maintainFileSystemCleanliness(archive2Delete, events);
-			}
-			events.add( new MessagesEvent("Application version successfully deleted!") );
-		}
+		events.add( new MessagesEvent("Application version successfully deleted!") );
+
 		version=null;
 	}
 	
-	public void deleteApplication(Application app, List<ProcessingEvent> events) throws PersistenceException {
+	private void deleteApplication(Application app, List<ProcessingEvent> events) throws PersistenceException {
 		
 		// flip all the versions to inactive, so they don't prevent archive deletion
 		for( ApplicationVersion appVer : app.getVersions().values() ) {
@@ -167,8 +142,8 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 		iterator = depls.iterator();
 		while(iterator.hasNext()) {
 			Deployment depl = (Deployment)iterator.next();
-			app.removeDeployment(depl);
 			delete(depl,events);
+			app.removeDeployment(depl);
 		}
 		
 		// iterate over each version, deleting each
@@ -188,6 +163,8 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 	public <T extends ModelEntity> T addModify(T entity, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
 		if( ApplicationVersion.class.isAssignableFrom(entity.getClass()) ) {
 			return (T) addModifyApplicationVersion((ApplicationVersion)entity,events);
+		} else if( ApplicationArchive.class.isAssignableFrom(entity.getClass()) ) {
+			return (T) addModifyApplicationArchive((ApplicationArchive)entity,events);
 		} else if( GlobalSettings.class.isAssignableFrom(entity.getClass()) ) {
 			return (T) addModifyGlobalSettings((GlobalSettings)entity,events);
 		} else if( Deployment.class.isAssignableFrom(entity.getClass()) ) {
@@ -195,25 +172,31 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 		} else return (T) _addModify(entity,events);
 	}
 	
-	public Deployment addModifyDeployment(Deployment deployment, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
+	private Deployment addModifyDeployment(Deployment deployment, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
 		authorizeAndValidate(deployment,determineCreateUpdateAction(deployment));
 		Application app = deployment.getApplication();
+		Deployment depl = (Deployment)_addModify((ModelEntity)deployment,events);
 		maintainDeploymentHistoryLength(app,events);
-		return (Deployment)_addModify((ModelEntity)deployment,events);
+		return depl;
 	}
 	
-	public ApplicationVersion addModifyApplicationVersion(ApplicationVersion version, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
-		if( version.getArchive()!=null && version.getArchive().getNewFileUploaded() ) {
-			if( processApplicationArchiveFileUpload(version.getArchive(),events)==null ) {
-				throw new PersistenceException("Zip archive failed to process!");
-			}
+	private ApplicationArchive addModifyApplicationArchive(ApplicationArchive archive, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
+		boolean newUpload = archive.getNewFileUploaded();
+		ApplicationArchive ret = archive;
+		if( newUpload && (ret=processApplicationArchiveFileUpload(archive,events))==null ) {
+			throw new PersistenceException("Zip archive failed to process!");
 		}
+		ret = (ApplicationArchive)_addModify((ModelEntity)ret, events);
+		return ret;
+	}
+	
+	private ApplicationVersion addModifyApplicationVersion(ApplicationVersion version, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
 		ApplicationVersion ret = (ApplicationVersion)_addModify((ModelEntity)version, events);
 		modelService.refresh(version.getApplication());
 		return ret;
 	}
 	
-	public GlobalSettings addModifyGlobalSettings(GlobalSettings settings, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
+	private GlobalSettings addModifyGlobalSettings(GlobalSettings settings, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
 		
 		if( settings==null || settings.getId()==null || !settings.getId().equals(Long.valueOf(1)) ) {
 			throw new PersistenceException("There can be only 1 instance of GlobalSettings.  "
@@ -231,6 +214,7 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 		return settings;
 	}
 	
+	@Override
 	public GlobalSettings getGlobalSettings() {
 		GlobalSettings settings = modelService.findByPrimaryKey(GlobalSettings.class,(Long)1L);
 		if( settings==null ) {
@@ -247,6 +231,7 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 		return settings;
 	}
 	
+	@Override
 	public ClusterNode getClusterNode() {
 		if( context!=null ) {
 			try {
@@ -334,20 +319,12 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 		
 		GlobalSettings settings = getGlobalSettings();
 		
-		// check to see if any other archives have this hash and md5
-		List<ApplicationArchive> archives = modelService
-				.findApplicationArchivesByHashAndAlgorithm(archive.getHash(), archive.getHashAlgorithm());
+		// check to see if any deployments or versions are currently using this archive
+		List<Deployment> deployments = (List<Deployment>)modelService.findDeploymentsByApplicationArchive(archive);
+		List<ApplicationVersion> versions = (List<ApplicationVersion>)modelService.findVersionsByApplicationArchive(archive);
 		
 		// either more than one archive has this file
-		Boolean archiveIsInUseElsewhere = 
-				archives!=null 
-				&& (
-						archives.size()>1
-						|| (
-								archives.size()==1 
-								&& !archives.get(0).getPk().equals(archive.getPk())
-						)
-				);
+		Boolean archiveIsInUseElsewhere = deployments.size()>0 || versions.size()>0;
 		
 		if( !archiveIsInUseElsewhere ) {
 			
@@ -369,6 +346,8 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 				logger.error(mesg);
 				events.add(new MessagesEvent(mesg));
 			}
+			
+			this.delete(archive,events);
 		}
 	}
 	
@@ -395,6 +374,15 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 			try {
 				is = new FileInputStream(tempFile);
 				hashValue = Utils.hashInputStream("MD5", is);
+				ApplicationArchive archiveExists = getModelService().findApplicationArchiveByHashAndAlgorithm(hashValue, "MD5");
+				if(archiveExists!=null) {
+					if( !tempFile.delete() ) {
+						String mesg = String.format("Failed to delete temporary file %s",tempFile.getName());
+						logger.error(mesg);
+						events.add(new MessagesEvent(mesg));	
+					}
+					return archiveExists;
+				}
 			} finally {
 				is.close();
 			}
@@ -509,6 +497,8 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 	 * @throws InvalidPropertiesException 
 	 */
 	private Boolean maintainDeploymentHistoryLength(Application app,List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
+		
+		getModelService().refresh(app);
 		
 		Integer lengthToMaintain = app.getDeploymentHistoryLength();
 		List<Deployment> deployments = app.getDeployments();

@@ -1,4 +1,31 @@
+/*
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011-2012 OpenMEAP, Inc.                                   #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the LGPLv3                                                #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU Lesser General Public License as published #
+ #    by the Free Software Foundation, either version 3 of the License, or     #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU Lesser General Public License for more details.                      #
+ #                                                                             #
+ #    You should have received a copy of the GNU Lesser General Public License #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+ */
+
 package com.openmeap.json;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -33,16 +60,24 @@ public class JSONObjectBuilderTest extends TestCase {
 		private Long longValue;
 		private Integer integerValue;
 		private Double doubleValue;
+		private List list;
 		private static JSONProperty[] jsonProperties = new JSONProperty[] {
 	    	new JSONProperty("getChild"),
 	    	new JSONProperty("getStringValue"),
 	    	new JSONProperty("getStringArrayValue"),
 	    	new JSONProperty("getLongValue"),
 	    	new JSONProperty("getIntegerValue"),
-	    	new JSONProperty("getDoubleValue")
+	    	new JSONProperty("getDoubleValue"),
+	    	new JSONProperty("getList",String.class)
 	    };
 	    public JSONProperty[] getJSONProperties() {
 			return jsonProperties;
+		}
+	    public List getList() {
+			return list;
+		}
+		public void setList(List list) {
+			this.list = list;
 		}
 		public BranchClass getChild() {
 			return child;
@@ -125,12 +160,18 @@ public class JSONObjectBuilderTest extends TestCase {
 		root.getChild().setTypeTwo(Types.ONE);
 		root.getChild().setString("child_string");
 		
+		List list = new ArrayList();
+		list.add("1");
+		list.add("2");
+		list.add("3");
+		root.setList(list);
+		
 		JSONObjectBuilder builder = new JSONObjectBuilder();
 		JSONObject jsonObj = builder.toJSON(root);
 		Assert.assertEquals(
 					"{\"child\":{\"typeTwo\":\"ONE\",\"typeOne\":\"TWO\",\"string\":\"child_string\"}"
 					+",\"longValue\":1000,\"integerValue\":2000,\"stringArrayValue\":[\"value1\",\"value2\"],"
-					+"\"stringValue\":\"value\",\"doubleValue\":3.14}",
+					+"\"stringValue\":\"value\",\"list\":[\"1\",\"2\",\"3\"],\"doubleValue\":3.14}",
 					jsonObj.toString()
 				);
 		RootClass afterRoundTrip = (RootClass)builder.fromJSON(jsonObj,new RootClass());

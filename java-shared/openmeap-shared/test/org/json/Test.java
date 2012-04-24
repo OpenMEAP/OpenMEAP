@@ -161,7 +161,7 @@ public class Test extends TestCase {
                 jsonobject.toString(4));
 
         jsonobject = new JSONObject(beanie);
-        assertEquals("{\"string\":\"A beany object\",\"boolean\":true,\"BENT\":\"All uppercase key\",\"number\":42,\"x\":\"x\"}"
+        assertEquals("{\"string\":\"A beany object\",\"BENT\":\"All uppercase key\",\"boolean\":true,\"number\":42,\"x\":\"x\"}"
                 , jsonobject.toString());
 
         string = "{ \"entity\": { \"imageURL\": \"\", \"name\": \"IXXXXXXXXXXXXX\", \"id\": 12336, \"ratingCount\": null, \"averageRating\": null } }";

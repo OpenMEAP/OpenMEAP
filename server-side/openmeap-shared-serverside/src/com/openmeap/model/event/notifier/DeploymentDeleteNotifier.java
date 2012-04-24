@@ -75,42 +75,26 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 	public <E extends Event<Deployment>> void notify(final E event, List<ProcessingEvent> events) throws ClusterNotificationException {
 		
 		Deployment deployment2Delete = (Deployment)event.getPayload();
-		ApplicationVersion version = deployment2Delete.getApplicationVersion();
-		Application app = version.getApplication();
+		ApplicationArchive archive = deployment2Delete.getApplicationArchive();
+		Application app = deployment2Delete.getApplication();
 		
 		// if there are any other deployments with this hash,
 		//   then we cannot yet delete it's archive.
-		int versionCount = 0;
-		for( Deployment deployment : app.getDeployments() ) {
-			if( deployment.getId()==null || !deployment.getId().equals(deployment2Delete.getId()) ) {
-				if( deployment.getHash().equals(deployment2Delete.getHash()) 
-						&& deployment.getHashAlgorithm().equals(deployment2Delete.getHashAlgorithm()) ) {
-					return;
-				}
-			}
-			if( deployment.getApplicationVersion().getPk().equals(version.getPk()) ) {
-				versionCount++;
-			}
+		List<Deployment> deployments = archiveDeleteHandler.getModelManager().getModelService().findDeploymentsByApplicationArchive(archive);
+		if(deployments.size()>1) {
+			return;
 		}
 		
 		// OK TO CLEANUP CLUSTER FILE SYSTEM
 		
 		// use the archive delete notifier to cleanup to cluster nodes
-		ApplicationArchive archive = new ApplicationArchive();
-		archive.setHash(deployment2Delete.getHash());
-		archive.setHashAlgorithm(deployment2Delete.getHashAlgorithm());
 		archiveDeleteNotifier.notify(new ModelEntityEvent(ModelServiceOperation.DELETE,archive), events);
 		
 		// if there are any application versions with this archive, 
 		//   then we cannot delete it's archive.
-		for( String versionId : app.getVersions().keySet() ) {
-			version = app.getVersions().get(versionId);
-			archive = version.getArchive();
-			if( version.getActiveFlag().equals(Boolean.TRUE)
-					&& archive.getHash().equals(deployment2Delete.getHash()) 
-					&& archive.getHashAlgorithm().equals(deployment2Delete.getHashAlgorithm()) ) {
-				return;
-			} 
+		List<ApplicationVersion> versions = archiveDeleteHandler.getModelManager().getModelService().findVersionsByApplicationArchive(archive);
+		if(versions.size()!=0) {
+			return;
 		}
 		
 		// OK TO CLEANUP LOCAL FILE SYSTEM
@@ -122,15 +106,11 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 			GlobalSettings settings = archiveDeleteHandler.getModelManager().getGlobalSettings();
 			archiveDeleteHandler.setFileSystemStoragePathPrefix(settings.getTemporaryStoragePath());
 			archiveDeleteHandler.handle(new MapPayloadEvent(map));
+			archiveDeleteHandler.getModelManager().delete(archive,events);
 		} catch (EventHandlingException e) {
 			throw new ClusterNotificationException(e);
 		}
 		
-		// if all other deployments using the version of this deployment have been deleted,
-		// and this version is inactive...then delete this version.
-		if( versionCount==1 ) {
-			archiveDeleteHandler.getModelManager().delete(version,events);
-		}
 	}
 
 	public ArchiveFileDeleteNotifier getArchiveDeleteNotifier() {

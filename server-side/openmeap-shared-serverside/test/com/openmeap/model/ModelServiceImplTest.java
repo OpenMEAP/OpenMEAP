@@ -93,12 +93,6 @@ public class ModelServiceImplTest {
 		Assert.assertTrue(app!=null);
 	}
 	
-	@Test public void testFindDeploymentsByNameAndId() {
-		List<Deployment> deployments = modelService.findDeploymentsByNameAndId("Application.name","ApplicationVersion.identifier.1");
-		Assert.assertTrue(deployments!=null);
-		Assert.assertTrue(deployments.size()==2);
-	}
-	
 	// putting this last because it corrupts the model
 	@Test public void testDelete() {
 		// verify that we 
@@ -112,6 +106,6 @@ public class ModelServiceImplTest {
 		modelService.delete(app);
 		app = modelService.findByPrimaryKey(Application.class, 1L);
 		appVer = modelService.findByPrimaryKey(ApplicationVersion.class,2L);
-		Assert.assertTrue(appVer==null);
+		Assert.assertTrue(appVer!=null);
 	}
 }

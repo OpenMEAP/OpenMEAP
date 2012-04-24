@@ -145,17 +145,46 @@ public class ModelServiceImpl implements ModelService
 	}
 	
 	@Override
-	public List<Deployment> findDeploymentsByNameAndId(String appName, String identifier) {
+	public List<Deployment> findDeploymentsByApplication(Application app) {
 		Query q = entityManager.createQuery("select d "
-				+"from Deployment d inner join fetch d.applicationVersion av inner join fetch d.application a "
-				+"where av.identifier=:identifier "
-				+"and a.name=:name ");
-		q.setParameter("name", appName);
-		q.setParameter("identifier", identifier);
+				+"from Deployment d inner join fetch d.applicationArchive aa "
+				+"inner join d.application a "
+				+"where a.name=:name ");
+		q.setParameter("name", app.getName());
 		try {
 			@SuppressWarnings(value={"unchecked"})
 			List<Deployment> deployments = (List<Deployment>)q.getResultList();
 			return deployments;
+		} catch( NoResultException nre ) {
+			return null;
+		}
+	}
+	
+	@Override
+	public List<Deployment> findDeploymentsByApplicationArchive(ApplicationArchive archive) {
+		Query q = entityManager.createQuery("select distinct d "
+				+"from Deployment d inner join fetch d.applicationArchive aa "
+				+"where aa.id=:id" );
+		q.setParameter("id", archive.getId());
+		try {
+			@SuppressWarnings(value={"unchecked"})
+			List<Deployment> deployments = (List<Deployment>)q.getResultList();
+			return deployments;
+		} catch( NoResultException nre ) {
+			return null;
+		}
+	}
+	
+	@Override
+	public List<ApplicationVersion> findVersionsByApplicationArchive(ApplicationArchive archive) {
+		Query q = entityManager.createQuery("select distinct av "
+				+"from ApplicationVersion av inner join fetch av.archive aa "
+				+"where aa.id=:id" );
+		q.setParameter("id", archive.getId());
+		try {
+			@SuppressWarnings(value={"unchecked"})
+			List<ApplicationVersion> versions = (List<ApplicationVersion>)q.getResultList();
+			return versions;
 		} catch( NoResultException nre ) {
 			return null;
 		}
@@ -178,35 +207,35 @@ public class ModelServiceImpl implements ModelService
 	}
 	
 	@Override
-	public List<ApplicationArchive> findApplicationArchivesByHashAndAlgorithm(String hash, String hashAlgorithm) {
+	public ApplicationArchive findApplicationArchiveByHashAndAlgorithm(String hash, String hashAlgorithm) {
 		Query q = entityManager.createQuery("select distinct ar "
-				+"from ApplicationArchive ar join fetch ar.version "
+				+"from ApplicationArchive ar join fetch ar.application "
 				+"where ar.hash=:hash "
 				+"and ar.hashAlgorithm=:hashAlgorithm");
 		q.setParameter("hash", hash);
 		q.setParameter("hashAlgorithm", hashAlgorithm);
 		q.setMaxResults(1);
 		try {
-			List<ApplicationArchive> o = (List<ApplicationArchive>)q.getResultList();
-			return (List<ApplicationArchive>)o;
+			ApplicationArchive o = (ApplicationArchive)q.getSingleResult();
+			return (ApplicationArchive)o;
 		} catch( NoResultException nre ) {
 			return null;
 		}
 	}
 	
-	public <E extends ModelEntity, T extends ModelEntity> List<T> getOrderedDeployments(E entity, String listMethod, Comparator<T> comparator) {
+	public <E extends ModelEntity, T extends ModelEntity> List<T> getOrdered(E entity, String listMethod, Comparator<T> comparator) {
 		EntityManager entityManager = getEntityManager(); 
 		entityManager.getTransaction().begin();
 		entityManager.merge(entity);
-		List<T> depls;
+		List<T> ents;
 		try {
-			depls = (List<T>) entity.getClass().getMethod(listMethod).invoke(entity);
+			ents = (List<T>) entity.getClass().getMethod(listMethod).invoke(entity);
 		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
-		Collections.sort( depls, comparator );
+		Collections.sort( ents, comparator );
 		entityManager.getTransaction().commit();
-		return depls;
+		return ents;
 	}
 	
 	// ACCESSORS

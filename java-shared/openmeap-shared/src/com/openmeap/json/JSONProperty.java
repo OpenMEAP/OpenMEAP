@@ -26,8 +26,19 @@ package com.openmeap.json;
 
 public class JSONProperty {
 	private String getterName;
+	private Class containedType;
 	public JSONProperty(String getterName) {
 		this.getterName=getterName;
+	}
+	public JSONProperty(String getterName, Class containedType) {
+		this.getterName=getterName;
+		this.containedType=containedType;
+	}
+	public boolean isList() {
+		return containedType!=null;
+	}
+	public Class getContainedType() {
+		return containedType;
 	}
 	public String getGetterName() {
 		return getterName;

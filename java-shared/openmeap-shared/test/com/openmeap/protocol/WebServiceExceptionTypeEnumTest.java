@@ -22,34 +22,15 @@
  ###############################################################################
  */
 
-package com.openmeap.protocol.dto;
+package com.openmeap.protocol;
 
-import com.openmeap.json.Enum;
-import com.openmeap.json.EnumUtils;
+import junit.framework.TestCase;
+import junit.framework.Assert;
 
-public class ErrorCode implements Enum {
-
-	static final public ErrorCode UNDEFINED = new ErrorCode("UNDEFINED");
-	static final public ErrorCode MISSING_PARAMETER = new ErrorCode("MISSING_PARAMETER");
-	static final public ErrorCode DATABASE_ERROR = new ErrorCode("DATABASE_ERROR");
-	static final public ErrorCode AUTHENTICATION_FAILURE = new ErrorCode("AUTHENTICATION_FAILURE");
-	static final public ErrorCode APPLICATION_NOTFOUND = new ErrorCode("APPLICATION_NOTFOUND");
-	static final public ErrorCode APPLICATION_VERSION_NOTFOUND = new ErrorCode("APPLICATION_VERSION_NOTFOUND");
-	
-	private String name;
-	private ErrorCode(String name) {
-		this.name = name;
+public class WebServiceExceptionTypeEnumTest extends TestCase {
+	public void testTypeEnum() {
+		String value = "APPLICATION_NOTFOUND";
+		Assert.assertSame(WebServiceException.TypeEnum.APPLICATION_NOTFOUND, 
+				WebServiceException.TypeEnum.fromValue(value));
 	}
-    
-    public String value() {
-        return name;
-    }
-
-    public static ErrorCode fromValue(String v) {
-        return valueOf(v);
-    }
-    
-    public static ErrorCode valueOf(String v) {
-    	return (ErrorCode)EnumUtils.fromValue(ErrorCode.class, v);
-    }
 }

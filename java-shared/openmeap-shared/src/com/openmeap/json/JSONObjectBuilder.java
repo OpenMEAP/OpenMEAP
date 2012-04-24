@@ -94,7 +94,22 @@ public class JSONObjectBuilder {
 						} catch (Exception p) {
 							throw new JSONException(p);
 						}
-					} else if( value instanceof JSONArray ) {
+					} else if( value instanceof JSONArray && List.class.isAssignableFrom(returnType) ) {
+						
+						JSONArray array = (JSONArray)value;
+						List list = new ArrayList();
+						Class containedType = property.getContainedType();
+						for( int i=0; i<array.length(); i++ ) {
+							Object obj = array.get(i);
+							if( obj instanceof JSONObject ) {
+								Object newObj = (Object)containedType.newInstance();
+								list.add(fromJSON((JSONObject)obj,newObj));
+							} else {
+								list.add(obj);
+							}
+						}
+						setterMethod.invoke(rootObject,new Object[] {list});
+					} else if( value instanceof JSONArray && returnType.isArray() ) {
 						
 						JSONArray array = (JSONArray)value;
 						List list = new ArrayList();
@@ -174,14 +189,20 @@ public class JSONObjectBuilder {
 					jsonObj.put(propertyName, handleSimpleType(returnType,method.invoke(obj,null)) );
 				} else {
 					if( returnType.isArray() ) {
+						
 						Object[] returnValues = (Object[])method.invoke(obj,null);
 						JSONArray jsonArray = new JSONArray();
 						for( int returnValueIdx=0; returnValueIdx<returnValues.length; returnValueIdx++ ) {
 							Object value = returnValues[returnValueIdx];
-							jsonArray.put(toJSON(value));
+							if(PropertyUtils.isSimpleType(returnType) ) {
+								jsonArray.put(value);
+							} else {
+								jsonArray.put(toJSON(value));
+							}
 						}
 						jsonObj.put(propertyName, jsonArray);
 					} else if( Map.class.isAssignableFrom(returnType) ) {
+						
 						Map map = (Map)method.invoke(obj,null);
 						JSONObject jsonMap = new JSONObject();
 						Iterator iterator = map.entrySet().iterator();
@@ -195,6 +216,20 @@ public class JSONObjectBuilder {
 							}
 						}
 						jsonObj.put(propertyName, jsonMap);
+					} else if( List.class.isAssignableFrom(returnType) ) {
+						
+						List returnValues = (List)method.invoke(obj,null);
+						JSONArray jsonArray = new JSONArray();
+						int size = returnValues.size();
+						for( int returnValueIdx=0; returnValueIdx<size; returnValueIdx++ ) {
+							Object value = returnValues.get(returnValueIdx);
+							if(PropertyUtils.isSimpleType(property.getContainedType()) ) {
+								jsonArray.put(value);
+							} else {
+								jsonArray.put(toJSON(value));
+							}
+						}
+						jsonObj.put(propertyName, jsonArray);
 					} else {
 						jsonObj.put(propertyName, toJSON(method.invoke(obj,null)));
 					}
