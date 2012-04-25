@@ -22,50 +22,55 @@
  ###############################################################################
  */
 
-package com.openmeap.cluster;
+package com.openmeap.cluster.dto;
 
-import java.net.URL;
+import com.openmeap.json.HasJSONProperties;
+import com.openmeap.json.JSONProperty;
+import com.openmeap.model.dto.ClusterNode;
+import com.openmeap.model.event.ModelEntityEventAction;
 
-import com.openmeap.event.EventNotificationException;
+public class ClusterNodeRequest implements HasJSONProperties {
 
-/**
- * @author schang
- */
-public class ClusterNotificationException extends EventNotificationException {
-
-	private URL url;
+	public final static String MODEL_REFRESH = ModelEntityEventAction.MODEL_REFRESH.getActionName();
+	public final static String CLEAR_PERSISTENCE_CONTEXT = "clearPersistenceContext";
+	public final static String ARCHIVE_DELETE = ModelEntityEventAction.ARCHIVE_DELETE.getActionName();
+	public final static String ARCHIVE_UPLOAD = ModelEntityEventAction.ARCHIVE_UPLOAD.getActionName();
+	public final static String HEALTH_CHECK = "healthCheck";
 	
-	public URL getUrl() {
-		return url;
-	}
+	private ClusterNode clusterNode;
+	private String subject;
+	private HasJSONProperties content;
 	
-	public ClusterNotificationException(URL url) {
-		super();
-		this.url=url;
-	}
+	private static JSONProperty[] properties = new JSONProperty[] {
+				new JSONProperty("getClusterNode"),
+				new JSONProperty("getSubject"),
+				new JSONProperty("getContent")
+			};
 	
-	public ClusterNotificationException(String arg0) {
-		super(arg0);
-	}
-	
-	public ClusterNotificationException(String arg0, Throwable arg1) {
-		super(arg0, arg1);
-		this.url=url;
+	@Override
+	public JSONProperty[] getJSONProperties() {
+		return properties;
 	}
 
-	public ClusterNotificationException(URL url, String arg0) {
-		super(arg0);
-		this.url=url;
+	public void setClusterNode(ClusterNode clusterNode) {
+		this.clusterNode = clusterNode;
+	}
+	public ClusterNode getClusterNode() {
+		return clusterNode;
 	}
 
-	public ClusterNotificationException(URL url, Throwable arg0) {
-		super(arg0);
-		this.url=url;
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+	public String getSubject() {
+		return subject;
 	}
 
-	public ClusterNotificationException(URL url, String arg0, Throwable arg1) {
-		super(arg0, arg1);
-		this.url=url;
+	public void setContent(HasJSONProperties content) {
+		this.content = content;
+	}
+	public HasJSONProperties getContent() {
+		return content;
 	}
 
 }

@@ -59,4 +59,21 @@
 		<property name="modelManager" ref="modelManager"/>
 	</bean>
 	
+	<bean id="clusterNodeHealthCheck" class="com.openmeap.cluster.ClusterNodeHealthCheckThread">
+		<property name="modelManager">	
+			<bean class="com.openmeap.model.ModelManagerImpl">
+				<property name="modelService">
+					<bean class="com.openmeap.model.ModelServiceImpl">
+						<property name="entityManager">
+							<bean factory-bean="www_entityManagerFactory" factory-method="createEntityManager"/>
+						</property>
+					</bean>
+				</property>
+			</bean>
+		</property>
+		<property name="httpRequestExecuter">
+			<bean class="com.openmeap.util.HttpRequestExecuterFactory" factory-method="newDefault"/>
+		</property>
+	</bean>
+	
 </beans>

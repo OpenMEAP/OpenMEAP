@@ -236,7 +236,10 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 		if( context!=null ) {
 			try {
 				Map<String,String> servicesWebProperties = (Map<String,String>)context.getBean("openmeapServicesWebPropertiesMap");
-				String serviceUrl = (String)servicesWebProperties.get("clusterNodeUrlPrefix");
+				String serviceUrl = null;
+				synchronized(servicesWebProperties) {
+					serviceUrl = (String)servicesWebProperties.get("clusterNodeUrlPrefix");
+				}
 				return this.getGlobalSettings().getClusterNode(serviceUrl);
 			} catch(Exception e) {
 				logger.warn("{}",e);

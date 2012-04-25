@@ -91,12 +91,12 @@ abstract public class AbstractEventNotifier<T extends ModelEntity> extends
 			if( statusCode!=200 ) {
 				String responseText = Utils.readInputStream(response.getResponseBody(), FormConstants.CHAR_ENC_DEFAULT);
 				logger.error(responseText);
-				throw new ClusterNotificationException(String.format("Notification to %s returned status code %s and response text was ",sendUrl,statusCode));
+				throw new ClusterNotificationException(url,String.format("Notification to %s returned status code %s and response text was ",sendUrl,statusCode));
 			} else {
 				Utils.consumeInputStream(response.getResponseBody());
 			}
 		} catch( Exception e ) {
-			throw new ClusterNotificationException(e.getMessage(),e);
+			throw new ClusterNotificationException(url,e.getMessage(),e);
 		}
 	}
 }

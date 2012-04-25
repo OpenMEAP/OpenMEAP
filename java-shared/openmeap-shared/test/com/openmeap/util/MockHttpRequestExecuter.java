@@ -56,9 +56,9 @@ public class MockHttpRequestExecuter implements HttpRequestExecuter {
 	static public String getLastPostXmlData() {
 		return lastPostXmlData;
 	}
-	public HttpResponse postXml(String url, String xmlData) throws HttpRequestException {
+	public HttpResponse postContent(String url, String content, String contentType) throws HttpRequestException {
 		lastPostUrl = url;
-		lastPostXmlData = xmlData;
+		lastPostXmlData = content;
 		return putTogetherResponse();
 	}
 	public HttpResponse postData(String url,Map getData, Map postData) throws HttpRequestException {

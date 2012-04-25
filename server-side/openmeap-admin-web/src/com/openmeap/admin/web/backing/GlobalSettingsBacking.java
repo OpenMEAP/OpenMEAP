@@ -32,6 +32,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,7 @@ import java.util.Map;
 import javax.persistence.PersistenceException;
 
 import com.openmeap.Authorizer.Action;
+import com.openmeap.cluster.ClusterNodeHealthCheckThread;
 import com.openmeap.constants.FormConstants;
 import com.openmeap.event.MessagesEvent;
 import com.openmeap.event.ProcessingEvent;
@@ -52,6 +54,7 @@ import com.openmeap.web.ProcessingContext;
 
 public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 	private ModelManager modelManager;
+	private ClusterNodeHealthCheckThread healthChecker;
 	
 	private final static String PROCESS_TARGET_PARAM     = FormConstants.PROCESS_TARGET;
 	private final static String AUTH_SALT_PARAM          = "authSalt";
@@ -141,8 +144,9 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 					if( thisNodePath.length()==0 ) {
 						events.add(new MessagesEvent("The cluster node with url "+thisNodeUrl+" should specify a path to store application archives at."));
 					}
-					if( settings.getClusterNode(thisNodeUrl)!=null ) {
-						settings.getClusterNode(thisNodeUrl).setFileSystemStoragePathPrefix(thisNodePath);
+					ClusterNode node = null;
+					if( (node=settings.getClusterNode(thisNodeUrl))!=null ) {
+						node.setFileSystemStoragePathPrefix(thisNodePath);
 					} else {
 						ClusterNode thisNode = new ClusterNode();
 						thisNode.setServiceWebUrlPrefix(thisNodeUrl);
@@ -187,6 +191,22 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 			templateVariables.put(AUTH_SALT_VERIFY_PARAM, settings.getServiceManagementAuthSalt());
 		}
 		if( settings.getClusterNodes()!=null && settings.getClusterNodes().size()>0 ) {
+			if(healthChecker!=null) {
+				for(ClusterNode node:settings.getClusterNodes()) {
+					ClusterNode checkerNode = healthChecker.getSettings().getClusterNode(node.getServiceWebUrlPrefix());
+					if(checkerNode!=null) {
+						synchronized(checkerNode) {
+							node.setLastStatus(checkerNode.getLastStatus());
+							Date date=null;
+							node.setLastStatusCheck(
+									(Date) ((date=checkerNode.getLastStatusCheck())!=null
+									?date.clone()
+									:null));
+							node.setLastStatusMessage(checkerNode.getLastStatusMessage());
+						}
+					}
+				}
+			}
 			templateVariables.put(CLUSTER_NODES_VAR, settings.getClusterNodes());
 		}
 		if( settings.getMaxFileUploadSize()!=null ) {
@@ -205,6 +225,10 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 	}
 	public void setModelManager(ModelManager modelManager) {
 		this.modelManager = modelManager;
+	}
+	
+	public void setClusterNodeHealthCheck(ClusterNodeHealthCheckThread healthChecker) {
+		this.healthChecker = healthChecker;
 	}
 }
 

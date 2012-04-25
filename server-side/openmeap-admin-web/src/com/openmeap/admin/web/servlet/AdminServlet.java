@@ -39,6 +39,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.openmeap.AuthorizerImpl;
+import com.openmeap.cluster.ClusterNodeHealthCheckThread;
 import com.openmeap.constants.FormConstants;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.ModelServiceImpl;
@@ -61,6 +62,8 @@ public class AdminServlet extends HttpServlet {
 	
 	public void init() {
 		context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+		ClusterNodeHealthCheckThread healthChecker = (ClusterNodeHealthCheckThread)context.getBean("clusterNodeHealthCheck");
+		new Thread(healthChecker).start();
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -108,7 +108,7 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 			archiveDeleteHandler.handle(new MapPayloadEvent(map));
 			archiveDeleteHandler.getModelManager().delete(archive,events);
 		} catch (EventHandlingException e) {
-			throw new ClusterNotificationException(e);
+			throw new ClusterNotificationException("An event handling exception occured",e);
 		}
 		
 	}

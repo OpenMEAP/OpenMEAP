@@ -1,5 +1,7 @@
 OpenMEAP 1.1.1a
   - Bug fixes and refactoring.
+  - ClusterNodes are now notified of their identity.
+  - ClusterNode health checker.
 
 OpenMEAP 1.1.0a
   - Bug fixes and refactoring.

@@ -106,12 +106,12 @@ public class ModelServiceRefreshNotifier
 			if( statusCode!=200 ) {
 				String exMesg = "HTTP "+statusCode+" returned for refresh post to "+thisUrl+" for "+simpleName+" with id "+obj.getPk();
 				logger.error(exMesg);
-				throw new ClusterNotificationException(exMesg);
+				throw new ClusterNotificationException(url,exMesg);
 			}
 		} catch( Exception e ) {
 			String exMesg = "Refresh post to "+thisUrl+" for "+simpleName+" with id "+obj.getPk()+" threw an exception";
 			logger.error(exMesg,e);
-			throw new ClusterNotificationException(exMesg,e);
+			throw new ClusterNotificationException(url,exMesg,e);
 		}
 	}
 }
