@@ -24,8 +24,10 @@
 
 package com.openmeap.model.event.handler;
 
+import java.sql.SQLException;
 import java.util.Map;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,9 +70,10 @@ public class ModelServiceRefreshHandler implements ModelServiceEventHandler {
 
 		@SuppressWarnings("unchecked")
 		Class<ModelEntity> clazz = (Class<ModelEntity>)Class.forName("com.openmeap.model.dto."+refreshType);
-		ModelEntity app = (ModelEntity)modelManager.getModelService().findByPrimaryKey(clazz, id);
-		
-		modelManager.refresh(app,null);
+		ModelEntity entity = (ModelEntity)modelManager.getModelService().findByPrimaryKey(clazz, id);
+		if(entity!=null) {
+			modelManager.refresh(entity,null);
+		}
 		return true;	
 	}
 

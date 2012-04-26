@@ -92,5 +92,9 @@ public interface ModelService {
 	
 	public void clearPersistenceContext();
 	
+	public ModelService begin();
+	public ModelService commit();
+	public ModelService rollback();
+	
 	<E extends ModelEntity, T extends ModelEntity> List<T> getOrdered(E entity, String listMethod, Comparator<T> comparator);
 }

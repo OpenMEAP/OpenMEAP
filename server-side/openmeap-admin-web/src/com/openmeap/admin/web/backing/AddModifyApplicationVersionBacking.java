@@ -43,6 +43,7 @@ import javax.persistence.PersistenceException;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,7 +156,15 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 				
 				if( ParameterMapUtils.firstValue("deleteConfirm", parameterMap).equals(FormConstants.APPVER_DELETE_CONFIRM_TEXT) ) {
 					
-					modelManager.delete(version, events);
+					try {
+						modelManager.begin().delete(version, events);
+						modelManager.commit(events);
+					} catch(Exception e) {
+						modelManager.rollback();
+						String msg = String.format("Unable to delete the version - %s",ExceptionUtils.getRootCauseMessage(e));
+						logger.error(msg,e);
+						events.add( new MessagesEvent(msg) );
+					}
 					
 				} else {
 					
@@ -271,17 +280,23 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 			events.add( new MessagesEvent("Application archive could not be created.  Not creating empty version.") );
 		} else {
 			try {
+				modelManager.begin();
 				version.setLastModifier(firstValue("userPrincipalName",parameterMap));
 				version.setArchive(modelManager.addModify(version.getArchive(), events));
 				version = modelManager.addModify(version,events);
 				app.addVersion(version);
 				app = modelManager.addModify(app,events);
 				modelManager.refresh(app,events);
+				modelManager.commit(events);
 				events.add( new MessagesEvent("Application version successfully created/modified!") );
 			} catch( InvalidPropertiesException ipe ) {
-				events.add( new MessagesEvent(ipe.getMessage()) );
+				modelManager.rollback();
+				logger.error("Unable to add/modify version "+version.getIdentifier(),ipe);
+				events.add( new MessagesEvent("Unable to add/modify version - "+ipe.getMessage()) );
 			} catch( PersistenceException pe ) {
-				events.add( new MessagesEvent(pe.getMessage()) );								
+				modelManager.rollback();
+				logger.error("Unable to add/modify version "+version.getIdentifier(),pe);
+				events.add( new MessagesEvent("Unable to add/modify version - "+pe.getMessage()) );								
 			}
 		}
 	}

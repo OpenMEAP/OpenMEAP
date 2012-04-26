@@ -50,6 +50,9 @@ import com.openmeap.model.ModelEntity;
 @Entity @Table(name="cluster_node")
 public class ClusterNode extends AbstractModelEntity implements HasJSONProperties {
 	
+	/**
+	 * Status resulting from the health check 
+	 */
 	public static enum Status {
 		CONNECT_ERROR,
 		GOOD,

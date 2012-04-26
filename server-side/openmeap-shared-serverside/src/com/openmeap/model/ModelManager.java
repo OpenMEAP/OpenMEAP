@@ -45,16 +45,19 @@ import com.openmeap.model.dto.GlobalSettings;
  * All business rules specifically related to CRUD operations on any ModelEntity object
  * should be performed by the implementing class of this interface.
  * 
- * Yes, I realize that all the business logic is currently in the backings...
- * that needs to change.
- * 
  * @author schang
  */
 public interface ModelManager {
 	
+	/**
+	 * @param notifiers event notifiers to trigger when certain operations are beginning or completed
+	 */
 	void setEventNotifiers(Collection<ModelServiceEventNotifier> notifiers);
 	Collection<ModelServiceEventNotifier> getEventNotifiers();
 	
+	/**
+	 * @param auth The authorization mechanism to use
+	 */
 	void setAuthorizer(Authorizer auth);
 	Authorizer getAuthorizer();
 	
@@ -64,24 +67,31 @@ public interface ModelManager {
 	void setModelService(ModelService service);
 	ModelService getModelService();
 	
-	public <T extends ModelEntity> void refresh(T obj2Refresh, List<ProcessingEvent> events) throws PersistenceException;
+	public <T extends ModelEntity> ModelManager refresh(T entity, List<ProcessingEvent> events) throws PersistenceException;
 	
-	<T extends ModelEntity> void delete(T o, List<ProcessingEvent> events);
+	<T extends ModelEntity> ModelManager delete(T entity, List<ProcessingEvent> events);
 	
 	/**
-	 * Save or update an Application object.
+	 * Save or update a Model Entity
 	 * 
-	 * If the proxyAuthSalt is not set, then this method will assign the Application a new random UUID.
-	 * 
-	 * @throws InvalidPropertiesException when name, description, or device types are empty
-	 * @throws PersistenceException 
+	 * @throws InvalidPropertiesException when the object's validate() method fails
+	 * @throws PersistenceException when the operation fails
 	 */
-	<T extends ModelEntity> T addModify(T application, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException;
+	<T extends ModelEntity> T addModify(T entity, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException;
 	
+	/**
+	 * Get the settings for the installation.
+	 * @return The global settings and cluster nodes of the setup
+	 */
 	GlobalSettings getGlobalSettings();
 	
 	/**
 	 * @return The cluster node of this services war instance, else null if the admin war
 	 */
 	ClusterNode getClusterNode();
+	
+	ModelManager begin();
+	ModelManager commit();
+	ModelManager commit(List<ProcessingEvent> events);
+	void rollback();
 }

@@ -47,13 +47,25 @@ public class ModelServiceImplTest {
 		// and that the application returned has the pk assigned by the db/orm 
 		Application app = new Application();
 		app.setName("This is a unique app name, or my name ain't Jon.");
-		app = modelService.saveOrUpdate(app);
+		try {
+			app = modelService.begin().saveOrUpdate(app);
+			modelService.commit();
+		} catch(Exception e) {
+			modelService.rollback();
+			throw new RuntimeException(e);
+		}
 		Assert.assertTrue(app.getId()!=null);
 		
 		ApplicationVersion appVer = new ApplicationVersion();
 		appVer.setApplication(app);
 		appVer.setIdentifier("smacky id");
-		appVer = modelService.saveOrUpdate(appVer);
+		try {
+			appVer = modelService.begin().saveOrUpdate(appVer);
+			modelService.commit();
+		} catch(Exception e) {
+			modelService.rollback();
+			throw new RuntimeException(e);
+		}
 		Assert.assertTrue(appVer.getId()!=null);
 		
 		/////////////////
@@ -61,13 +73,25 @@ public class ModelServiceImplTest {
 		app = modelService.findByPrimaryKey(Application.class,1L);
 		String origName = app.getName();
 		app.setName("picard");
-		modelService.saveOrUpdate(app);
+		try {
+			app = modelService.begin().saveOrUpdate(app);
+			modelService.commit();
+		} catch(Exception e) {
+			modelService.rollback();
+			throw new RuntimeException(e);
+		}
 		app = modelService.findByPrimaryKey(Application.class,1L);
 		Assert.assertTrue(app.getName()!=null && app.getName().compareTo("picard")==0 );
 		Assert.assertTrue(app.getId()!=null);
 		// put the app back the way we found it
 		app.setName(origName);
-		modelService.saveOrUpdate(app);
+		try {
+			app = modelService.begin().saveOrUpdate(app);
+			modelService.commit();
+		} catch(Exception e) {
+			modelService.rollback();
+			throw new RuntimeException(e);
+		}
 	}
 	
 	@Test public void testFind() {

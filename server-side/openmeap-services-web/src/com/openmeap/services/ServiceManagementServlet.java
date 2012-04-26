@@ -319,7 +319,8 @@ public class ServiceManagementServlet extends HttpServlet {
 	// ACCESSORS
 	
 	public String getAuthSalt() {
-		return modelManager.getGlobalSettings().getServiceManagementAuthSalt();
+		GlobalSettings settings = modelManager.getGlobalSettings();
+		return settings.getServiceManagementAuthSalt();
 	}
 	
 	public void setModelManager(ModelManager manager) {

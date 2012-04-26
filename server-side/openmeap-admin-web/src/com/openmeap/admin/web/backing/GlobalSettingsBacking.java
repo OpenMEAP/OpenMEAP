@@ -165,6 +165,7 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 			}
 		
 			try {
+				modelManager.begin();
 				if(toDelete!=null) {
 					for(ClusterNode node : toDelete) {
 						settings.removeClusterNode(node);
@@ -172,10 +173,14 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 					}
 				}
 				modelManager.addModify(settings,events);
+				modelManager.commit(events);
+				modelManager.refresh(settings, events);
 				events.add(new MessagesEvent("The settings were successfully modified."));
 			} catch( InvalidPropertiesException ipe ) {
+				modelManager.rollback();
 				events.add( new MessagesEvent(ipe.getMessage()) );
 			} catch( PersistenceException ipe ) {
+				modelManager.rollback();
 				events.add( new MessagesEvent(ipe.getMessage()) );
 			}
 		} 

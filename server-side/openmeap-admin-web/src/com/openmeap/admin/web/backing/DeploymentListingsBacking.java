@@ -107,12 +107,16 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 				pushArchiveToClusterForDeployment(depl,events);
 				
 				try {
+					modelManager.begin();
 					depl = modelManager.addModify(depl,events);
+					modelManager.commit(events);
 					events.add( new MessagesEvent("Deployment successfully create!") );
 				} catch (PersistenceException pe) {
+					modelManager.rollback();
 					Throwable root = ExceptionUtils.getRootCause(pe);
 					events.add( new MessagesEvent("An exception was thrown creating the deployment: "+root.getMessage()));
 				} catch (InvalidPropertiesException pe) {
+					modelManager.rollback();
 					Throwable root = ExceptionUtils.getRootCause(pe);
 					events.add( new MessagesEvent("An exception was thrown creating the deployment: "+root.getMessage()));
 				}

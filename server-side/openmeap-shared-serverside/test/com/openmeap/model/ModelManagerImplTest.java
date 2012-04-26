@@ -51,8 +51,10 @@ public class ModelManagerImplTest {
 		// to modify a completely invalid Application
 		try {
 			app = new Application();
-			modelManager.addModify(app,null);
+			modelManager.begin().addModify(app,null);
+			modelManager.commit();
 		} catch( InvalidPropertiesException ipe ) {
+			modelManager.rollback();
 			e = ipe;
 		}
 		Assert.assertTrue(e!=null && e.getMethodMap().size()==1);
@@ -61,11 +63,13 @@ public class ModelManagerImplTest {
 		//////////////////////////////////
 		// make sure that adding name changes the exception
 		e=null;
+		app = new Application();
+		app.setName("Application.2.name");
 		try {
-			app = new Application();
-			app.setName("Application.2.name");
-			app = modelManager.addModify(app,null);
+			app = modelManager.begin().addModify(app,null);
+			modelManager.commit();
 		} catch( InvalidPropertiesException ipe ) {
+			modelManager.rollback();
 			e = ipe;
 		}
 		Assert.assertTrue(e==null);
@@ -75,7 +79,13 @@ public class ModelManagerImplTest {
 		// now modify the application returned by addModifyApplication
 		Long id = app.getId();
 		app.setName("Application.2.name_modified");
-		app = modelManager.addModify(app,null);
+		try {
+			app = modelManager.begin().addModify(app,null);
+			modelManager.commit();
+		} catch(Exception e1) {
+			modelManager.rollback();
+			throw new Exception(e1);
+		}
 		Application appFound = modelManager.getModelService().findByPrimaryKey(Application.class,id);
 		Assert.assertTrue(appFound.getName().compareTo("Application.2.name_modified")==0);
 	}
@@ -84,8 +94,10 @@ public class ModelManagerImplTest {
 		GlobalSettings settings = new GlobalSettings();
 		Boolean peThrown = false;
 		try {
-			modelManager.addModify(settings,null);
+			modelManager.begin().addModify(settings,null);
+			modelManager.commit();
 		} catch(PersistenceException pe) {
+			modelManager.rollback();
 			peThrown = true;
 		}
 		Assert.assertTrue(peThrown);
@@ -95,11 +107,16 @@ public class ModelManagerImplTest {
 		
 		ClusterNode node = new ClusterNode();
 		node.setServiceWebUrlPrefix("http://test");
-		node.setFileSystemStoragePathPrefix("/tmp2");
+		node.setFileSystemStoragePathPrefix("/");
 		settings.addClusterNode(node);
-		settings = modelManager.addModify(settings,null);
+		try{
+			settings = modelManager.begin().addModify(settings,null);
+			modelManager.commit();
+		} catch(Exception e) {
+			modelManager.rollback();
+			throw new Exception(e);
+		}
 		
-		modelManager.refresh(settings,null);
 		settings = modelManager.getGlobalSettings();
 		Assert.assertTrue(settings.getClusterNodes().size()==3);
 		Assert.assertTrue(settings.getClusterNode("http://test")!=null);
@@ -114,9 +131,16 @@ public class ModelManagerImplTest {
 		////////////////////////////
 		// Verify creating a new application version
 		ApplicationVersion version = newValidAppVersion(app);
+		modelManager.begin();
 		version.setArchive(modelManager.addModify(version.getArchive(), null));
 		version = modelManager.addModify(version,null);
-		modelManager.getModelService().delete(version);
+		try {
+			modelManager.getModelService().delete(version);
+			modelManager.commit();
+		} catch(Exception e1) {
+			modelManager.rollback();
+			throw new Exception(e1);
+		}
 		
 		////////////////////////////
 		// Verify that attempting to create an application version 
@@ -124,8 +148,10 @@ public class ModelManagerImplTest {
 		version = newValidAppVersion(app);
 		version.getArchive().setBytesLength(null);
 		try {
-			version = modelManager.addModify(version,null);
+			version = modelManager.begin().addModify(version,null);
+			modelManager.commit();
 		} catch( InvalidPropertiesException ipe ) {
+			modelManager.rollback();
 			e=ipe;
 			thrown=true;
 		}
@@ -137,8 +163,10 @@ public class ModelManagerImplTest {
 		// with no content length specified throws an exception
 		version.getArchive().setBytesLength(0);
 		try {
-			version = modelManager.addModify(version,null);
+			version = modelManager.begin().addModify(version,null);
+			modelManager.commit();
 		} catch( InvalidPropertiesException ipe ) {
+			modelManager.rollback();
 			e=ipe;
 			thrown=true;
 		}
@@ -149,8 +177,10 @@ public class ModelManagerImplTest {
 		// Verify that trying to add a version with an invalid hash throws an exception
 		version.getArchive().setHashAlgorithm("NOT_SUCH_ALGORITHM");
 		try {
-			version = modelManager.addModify(version,null);
+			version = modelManager.begin().addModify(version,null);
+			modelManager.commit();
 		} catch( InvalidPropertiesException ipe ) {
+			modelManager.rollback();
 			e=ipe;
 		}
 		Assert.assertTrue(e!=null);
@@ -163,7 +193,8 @@ public class ModelManagerImplTest {
 		ApplicationInstallation ai = new ApplicationInstallation();
 		ai.setApplicationVersion( modelManager.getModelService().findAppVersionByNameAndId("Application.name","ApplicationVersion.identifier.1") );
 		ai.setUuid("AppInst.name.1");
-		modelManager.addModify(ai,null);
+		modelManager.begin().addModify(ai,null);
+		modelManager.commit();
 		ai = modelManager.getModelService().findByPrimaryKey(ApplicationInstallation.class,"AppInst.name.1");
 		Assert.assertTrue(ai!=null);
 	}
@@ -188,7 +219,13 @@ public class ModelManagerImplTest {
 		handlers.add(new MockUpdateNotifier());
 		modelManager.setEventNotifiers(handlers);
 		Application app = modelManager.getModelService().findByPrimaryKey(Application.class, 1L);
-		modelManager.addModify(app,null);
+		try {
+			modelManager.begin();
+			modelManager.addModify(app,null);
+			modelManager.commit();
+		} catch(Exception e) {
+			modelManager.rollback();
+		}			
 		Assert.assertTrue(((MockUpdateNotifier)modelManager.getEventNotifiers().toArray()[0]).getEventFired());
 	}
 	

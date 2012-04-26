@@ -24,24 +24,26 @@
 
 package com.openmeap.model;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
-import com.openmeap.cluster.ClusterNotificationException;
-import com.openmeap.event.EventNotificationException;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.openmeap.event.ProcessingEvent;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.Deployment;
-import com.openmeap.model.event.ModelEntityEvent;
-import com.openmeap.model.event.ModelEntityModifyEvent;
-import com.openmeap.model.event.handler.*;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.*;
-import javax.persistence.*;
 
 /**
  * Intended to basically pass-through to the entity manager.
@@ -56,43 +58,64 @@ public class ModelServiceImpl implements ModelService
 {
 	private Logger logger = LoggerFactory.getLogger(ModelServiceImpl.class);
 	
-	@PersistenceContext(name="openmeap-jpa")
 	private EntityManager entityManager = null;
+	
+	private int numberOfRefreshRetries=3;
+	
+	private int refreshRetryInterval=1000;
 	
 	public void clearPersistenceContext() {
 		entityManager.clear();
 	}
 	
 	@Override
-	public <T extends ModelEntity> T saveOrUpdate(T obj) throws PersistenceException {
-		T obj2Persist = obj;
+	public <T extends ModelEntity> T saveOrUpdate(T entity) throws PersistenceException {
+		T entityToReturn = entity;
 		try {
-			entityManager.getTransaction().begin();
 			// if we haven't loaded this object yet,
 			// then attempt to do so
-			if( ! entityManager.contains(obj2Persist) ) {
-				obj2Persist = entityManager.merge(obj);
+			if( ! entityManager.contains(entity) ) {
+				entityToReturn = entityManager.merge(entity);
 			}
-			entityManager.persist(obj2Persist);
-			entityManager.getTransaction().commit();
-			this._refresh(obj2Persist);
+			entityManager.persist(entityToReturn);
 		} catch( PersistenceException pe ) {
-			if( entityManager.isOpen() && entityManager.getTransaction().isActive() ) {
-				entityManager.getTransaction().rollback();
-			}
 			throw new PersistenceException(pe);
 		}
-		return obj2Persist;
+		return entityToReturn;
 	}
 	
 	@Override
 	public <T extends ModelEntity> void delete(T obj2Delete) throws PersistenceException {		
 		_delete(obj2Delete,null);		
 	}
-	
+
 	@Override
-	public <T extends ModelEntity> void refresh(T obj2Refresh) throws PersistenceException {
-		this._refresh(obj2Refresh);
+	public <T extends ModelEntity> void refresh(T entity) throws PersistenceException {
+		int numRetries = numberOfRefreshRetries;
+		boolean notSuccessful = false;
+		do {
+			try{
+				if(entity!=null) {
+					this._refresh(entity);
+				}
+			} catch(Exception e) {
+				Throwable t = ExceptionUtils.getRootCause(e);
+				if(!(t instanceof SQLException)) {
+					throw new PersistenceException(e);
+				}
+				logger.warn("Unable to refresh model entity, "+numRetries+" left.  "+t.getMessage());
+				numRetries--;
+				notSuccessful=true;
+				try {
+					Thread.sleep(refreshRetryInterval);
+				} catch (InterruptedException e1) {
+					throw new PersistenceException("Thread.sleep() interrupted during the refresh retry interval",e1);
+				}
+			}
+		} while(notSuccessful && numRetries!=0);
+		if(numRetries==0) {
+			throw new PersistenceException("Unable to refresh model entity.  "+numberOfRefreshRetries+" retries failed");
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -247,22 +270,21 @@ public class ModelServiceImpl implements ModelService
 		return entityManager;
 	}
 	
+	public void setRefreshRetryInterval(int refreshRetryInterval) {
+		this.refreshRetryInterval = refreshRetryInterval;
+	}
+
+	public void setNumberOfRefreshRetries(int numberOfRefreshRetries) {
+		this.numberOfRefreshRetries = numberOfRefreshRetries;
+	}
+	
 	// PRIVATE METHODS
 	
-	private <T extends ModelEntity> void _delete(T obj2Delete, List<ProcessingEvent> events) throws PersistenceException {		
+	private <T extends ModelEntity> void _delete(T entity, List<ProcessingEvent> events) throws PersistenceException {		
 		// give the event notifiers an opportunity to act, prior to deletion
-		try {
-			entityManager.getTransaction().begin();
-			this._refresh(obj2Delete);
-			obj2Delete.remove();
-			entityManager.remove(obj2Delete);
-			entityManager.getTransaction().commit();
-		} catch( PersistenceException pe ) {
-			if( entityManager.isOpen() && entityManager.getTransaction().isActive() ) {
-				entityManager.getTransaction().rollback();
-			}
-			throw new PersistenceException(pe);
-		}			
+		this._refresh(entity);
+		entity.remove();
+		entityManager.remove(entity);
 	}
 	
 	private void _refresh(ModelEntity obj2Refresh) {
@@ -270,5 +292,25 @@ public class ModelServiceImpl implements ModelService
 			entityManager.merge(obj2Refresh);
 		}
 		entityManager.refresh(obj2Refresh);
+	}
+
+	@Override
+	public ModelService begin() {
+		entityManager.getTransaction().begin();
+		return this;
+	}
+
+	@Override
+	public ModelService commit() {
+		entityManager.getTransaction().commit();
+		return this;
+	}
+
+	@Override
+	public ModelService rollback() {
+		if( entityManager.isOpen() && entityManager.getTransaction().isActive() ) {
+			entityManager.getTransaction().rollback();
+		}
+		return this;
 	}
 }

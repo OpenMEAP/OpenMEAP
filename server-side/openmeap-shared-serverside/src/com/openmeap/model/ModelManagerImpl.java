@@ -31,9 +31,11 @@ import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.UUID;
 import java.util.zip.ZipFile;
 
@@ -76,6 +78,7 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 				return Boolean.TRUE;
 			}
 		};
+	private Map<Thread,List<ModelEntityEvent>> eventQueue = new HashMap<Thread,List<ModelEntityEvent>>();
 	
 	public ModelManagerImpl() {}
 	public ModelManagerImpl(ModelService service) {
@@ -83,24 +86,23 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 	}
 	
 	@Override
-	public <T extends ModelEntity> void refresh(T obj2Refresh, List<ProcessingEvent> events) throws PersistenceException {
+	public <T extends ModelEntity> ModelManager refresh(T obj2Refresh, List<ProcessingEvent> events) throws PersistenceException {
 		callEventNotifiers(ModelServiceOperation.REFRESH,obj2Refresh,events);
 		modelService.refresh(obj2Refresh);
+		return this;
 	}
 	
 	@Override
-	public <T extends ModelEntity> void delete(T entity, List<ProcessingEvent> events) {
+	public <T extends ModelEntity> ModelManager delete(T entity, List<ProcessingEvent> events) {
 		
 		if( ApplicationVersion.class.isAssignableFrom(entity.getClass()) ) {
 			deleteApplicationVersion((ApplicationVersion)entity,events);
-			return; 
 		} else if( Application.class.isAssignableFrom(entity.getClass()) ) {
 			deleteApplication((Application)entity,events);
-			return;
 		} else {
 			_delete(entity,events);
-			return;
 		}
+		return this;
 	}
 	
 	private void deleteApplicationVersion(ApplicationVersion version, List<ProcessingEvent> events) {
@@ -161,15 +163,19 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 	
 	@Override
 	public <T extends ModelEntity> T addModify(T entity, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
+		T entityToReturn = entity;
 		if( ApplicationVersion.class.isAssignableFrom(entity.getClass()) ) {
-			return (T) addModifyApplicationVersion((ApplicationVersion)entity,events);
+			entityToReturn = (T) addModifyApplicationVersion((ApplicationVersion)entity,events);
 		} else if( ApplicationArchive.class.isAssignableFrom(entity.getClass()) ) {
-			return (T) addModifyApplicationArchive((ApplicationArchive)entity,events);
+			entityToReturn = (T) addModifyApplicationArchive((ApplicationArchive)entity,events);
 		} else if( GlobalSettings.class.isAssignableFrom(entity.getClass()) ) {
-			return (T) addModifyGlobalSettings((GlobalSettings)entity,events);
+			entityToReturn = (T) addModifyGlobalSettings((GlobalSettings)entity,events);
 		} else if( Deployment.class.isAssignableFrom(entity.getClass()) ) {
-			return (T) addModifyDeployment((Deployment)entity,events);
-		} else return (T) _addModify(entity,events);
+			entityToReturn = (T) addModifyDeployment((Deployment)entity,events);
+		} else {
+			entityToReturn = (T) _addModify(entity,events);
+		}
+		return entityToReturn;
 	}
 	
 	private Deployment addModifyDeployment(Deployment deployment, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
@@ -192,7 +198,6 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 	
 	private ApplicationVersion addModifyApplicationVersion(ApplicationVersion version, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
 		ApplicationVersion ret = (ApplicationVersion)_addModify((ModelEntity)version, events);
-		modelService.refresh(version.getApplication());
 		return ret;
 	}
 	
@@ -210,23 +215,31 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 		settings = modelService.saveOrUpdate(settings);
 		callEventNotifiers(ModelServiceOperation.SAVE_OR_UPDATE,settings,events);
 		
-		modelService.refresh(settings);
 		return settings;
 	}
 	
 	@Override
 	public GlobalSettings getGlobalSettings() {
 		GlobalSettings settings = modelService.findByPrimaryKey(GlobalSettings.class,(Long)1L);
+		boolean update = false;
 		if( settings==null ) {
 			settings = new GlobalSettings();
 			settings.setServiceManagementAuthSalt(UUID.randomUUID().toString());
-			settings = modelService.saveOrUpdate(settings);
-			modelService.refresh(settings);
+			update = true;
 		}
 		if( settings.getServiceManagementAuthSalt()==null || settings.getServiceManagementAuthSalt().trim().length()==0 ) {
 			settings.setServiceManagementAuthSalt(UUID.randomUUID().toString());
-			settings = modelService.saveOrUpdate(settings);
-			modelService.refresh(settings);
+			update = true;
+		}
+		if(update) {
+			try {
+				modelService.begin();
+				settings = modelService.saveOrUpdate(settings);
+				modelService.commit();
+			} catch(Exception e) {
+				modelService.rollback();
+				throw new PersistenceException(e);
+			}
 		}
 		return settings;
 	}
@@ -281,17 +294,16 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 	 * PRIVATE METHODS
 	 */
 	
-	public <T extends ModelEntity> void _delete(T entity, List<ProcessingEvent> events) {
+	private <T extends ModelEntity> void _delete(T entity, List<ProcessingEvent> events) {
 		
 		if( ! getAuthorizer().may(Authorizer.Action.DELETE, entity) ) {
 			throw new PersistenceException(new AuthorizationException("The user logged in does not have permissions to DELETE "+entity.getClass().getSimpleName()+" objects."));
 		}
 		callEventNotifiers(ModelServiceOperation.DELETE,entity,events);
-		
 		modelService.delete(entity);
 	}
 	
-	public <T extends ModelEntity> T _addModify(T entity, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
+	private <T extends ModelEntity> T _addModify(T entity, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
 		
 		authorizeAndValidate(entity,determineCreateUpdateAction(entity));
 		T o = modelService.saveOrUpdate(entity);
@@ -302,17 +314,36 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 	private void callEventNotifiers(ModelServiceOperation op, ModelEntity obj2ActOn, List<ProcessingEvent> events) {
 		// if there are any web-servers out there to notify of the update, then do so
 		if( eventNotifiers!=null ) {
-			for( ModelServiceEventNotifier handler : eventNotifiers ) {
-				try {
-					if( handler.notifiesFor(op,obj2ActOn) ) {
-						handler.notify( new ModelEntityEvent(op,obj2ActOn), events );
-					}
-				} catch( EventNotificationException e ) {
-					String msg = String.format("EventNotificationException occurred: %s",e.getMessage());
-					logger.error(msg);
-					if(events!=null) {
-						events.add(new MessagesEvent(msg));
-					}
+			if(op==ModelServiceOperation.SAVE_OR_UPDATE) {
+				deferModelEntityEventTillAfterCommit(new ModelEntityEvent(op,obj2ActOn));
+			} else {
+				_callEventNotifiers(new ModelEntityEvent(op,obj2ActOn),events);
+			}
+		}
+	}
+	
+	private void deferModelEntityEventTillAfterCommit(ModelEntityEvent event) {
+		List<ModelEntityEvent> modelEvents = eventQueue.get(Thread.currentThread());
+		if(modelEvents==null) {
+			modelEvents = new ArrayList<ModelEntityEvent>();
+			eventQueue.put(Thread.currentThread(),modelEvents);
+		}
+		if(!modelEvents.contains(event)) {
+			modelEvents.add(event);
+		}
+	}
+	
+	private void _callEventNotifiers(ModelEntityEvent event, List<ProcessingEvent> events) {
+		for( ModelServiceEventNotifier handler : eventNotifiers ) {
+			try {
+				if( handler.notifiesFor(event.getOperation(),(ModelEntity)event.getPayload()) ) {
+					handler.notify( event, events );
+				}
+			} catch( EventNotificationException e ) {
+				String msg = String.format("EventNotificationException occurred: %s",e.getMessage());
+				logger.error(msg);
+				if(events!=null) {
+					events.add(new MessagesEvent(msg));
 				}
 			}
 		}
@@ -546,5 +577,35 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 		if( errors!=null ) {
 			throw new InvalidPropertiesException(entity,errors);
 		}
+	}
+	
+	@Override
+	public ModelManager begin() {
+		modelService.begin();
+		return this;
+	}
+	@Override
+	public ModelManager commit() {
+		return commit(null);
+	}
+	@Override 
+	public ModelManager commit(List<ProcessingEvent> events) {
+		modelService.commit();
+		
+		List<ModelEntityEvent> modelEvents = eventQueue.get(Thread.currentThread());
+		if( (modelEvents = eventQueue.get(Thread.currentThread()))!=null ) {
+			while(modelEvents.size()>0) {
+				ModelEntityEvent event = modelEvents.remove(0);
+				_callEventNotifiers(event,events);
+			}
+		}
+		return this;
+	}
+	@Override
+	public void rollback() {
+		if( eventQueue.containsKey(Thread.currentThread()) ) {
+			eventQueue.remove(Thread.currentThread());
+		}
+		modelService.rollback();
 	}
 }
