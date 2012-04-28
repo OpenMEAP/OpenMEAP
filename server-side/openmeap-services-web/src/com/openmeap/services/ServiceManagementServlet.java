@@ -80,10 +80,7 @@ import com.openmeap.util.Utils;
  */
 public class ServiceManagementServlet extends HttpServlet {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 3528435164985362736L;
 
 	private Logger logger = LoggerFactory.getLogger(ServiceManagementServlet.class);
 	

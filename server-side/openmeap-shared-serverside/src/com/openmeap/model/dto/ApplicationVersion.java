@@ -48,7 +48,7 @@ import javax.persistence.Transient;
 import com.openmeap.constants.FormConstants;
 import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
-import com.openmeap.model.AbstractModelEntity;
+import com.openmeap.model.event.AbstractModelEntity;
 import com.openmeap.web.form.Parameter;
 
 @Entity @Table(name="application_version")

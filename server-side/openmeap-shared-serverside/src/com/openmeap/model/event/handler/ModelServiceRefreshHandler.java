@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import com.openmeap.event.Event;
 import com.openmeap.model.ModelEntity;
 import com.openmeap.model.ModelManager;
-import com.openmeap.model.ModelServiceEventHandler;
 
 public class ModelServiceRefreshHandler implements ModelServiceEventHandler {
 	

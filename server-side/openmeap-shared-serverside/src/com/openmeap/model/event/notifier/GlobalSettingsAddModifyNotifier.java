@@ -22,18 +22,36 @@
  ###############################################################################
  */
 
-package com.openmeap.model;
+package com.openmeap.model.event.notifier;
 
-import com.openmeap.event.EventNotifier;
+import java.util.List;
 
-/**
- * 
- * @author schang
- */
-public interface ModelServiceEventNotifier<T extends ModelEntity> extends EventNotifier<T> {
-	/**
-	 * @param operation
-	 * @return true if the event notifier should be executed on a specific operation and payload, else false
-	 */
-	Boolean notifiesFor(ModelServiceOperation operation, ModelEntity payload);
+import javax.persistence.PersistenceException;
+
+import com.openmeap.event.Event;
+import com.openmeap.event.EventNotificationException;
+import com.openmeap.event.ProcessingEvent;
+import com.openmeap.model.ModelEntity;
+import com.openmeap.model.ModelServiceOperation;
+import com.openmeap.model.dto.GlobalSettings;
+import com.openmeap.model.event.AbstractModelServiceEventNotifier;
+
+public class GlobalSettingsAddModifyNotifier extends AbstractModelServiceEventNotifier<GlobalSettings>{
+
+	@Override
+	public Boolean notifiesFor(ModelServiceOperation operation,
+			ModelEntity payload) {
+		return operation==ModelServiceOperation.SAVE_OR_UPDATE && payload instanceof GlobalSettings;
+	}
+
+	@Override
+	public <E extends Event<GlobalSettings>> void onBeforeOperation(E event,
+			List<ProcessingEvent> events) throws EventNotificationException {
+
+		GlobalSettings settings = (GlobalSettings)event.getPayload();
+		if( settings==null || settings.getId()==null || !settings.getId().equals(Long.valueOf(1)) ) {
+			throw new PersistenceException("There can be only 1 instance of GlobalSettings.  "
+					+ "Please first acquire with modelManager.getGlobalSettings(), make modifications, then update.");
+		}
+	}
 }

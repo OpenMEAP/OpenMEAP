@@ -37,16 +37,17 @@ import org.slf4j.LoggerFactory;
 import com.openmeap.cluster.ClusterNotificationException;
 import com.openmeap.event.Event;
 import com.openmeap.event.EventHandlingException;
+import com.openmeap.event.EventNotificationException;
 import com.openmeap.event.ProcessingEvent;
 import com.openmeap.model.InvalidPropertiesException;
 import com.openmeap.model.ModelEntity;
-import com.openmeap.model.ModelServiceEventNotifier;
 import com.openmeap.model.ModelServiceOperation;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
+import com.openmeap.model.event.AbstractModelServiceEventNotifier;
 import com.openmeap.model.event.MapPayloadEvent;
 import com.openmeap.model.event.ModelEntityEvent;
 import com.openmeap.model.event.handler.ArchiveFileDeleteHandler;
@@ -56,7 +57,7 @@ import com.openmeap.model.event.handler.ArchiveFileDeleteHandler;
  * the application archive from the file-system. 
  * @author schang
  */
-public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deployment> {
+public class DeploymentDeleteNotifier extends AbstractModelServiceEventNotifier<Deployment> {
 	
 	private Logger logger = LoggerFactory.getLogger(DeploymentDeleteNotifier.class);
 	private ArchiveFileDeleteNotifier archiveDeleteNotifier = null;
@@ -70,10 +71,11 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 		}
 		return false;
 	}
-
+	
 	@Override
-	public <E extends Event<Deployment>> void notify(final E event, List<ProcessingEvent> events) throws ClusterNotificationException {
-		
+	public <E extends Event<Deployment>> void onInCommitBeforeCommit(E event,
+			List<ProcessingEvent> events) throws EventNotificationException {
+	
 		Deployment deployment2Delete = (Deployment)event.getPayload();
 		ApplicationArchive archive = deployment2Delete.getApplicationArchive();
 		Application app = deployment2Delete.getApplication();

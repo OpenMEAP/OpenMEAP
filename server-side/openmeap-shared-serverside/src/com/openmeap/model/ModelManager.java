@@ -38,6 +38,7 @@ import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
+import com.openmeap.model.event.notifier.ModelServiceEventNotifier;
 
 /**
  * Interface to handle the business rules of managing ModelEntity objects.
@@ -67,15 +68,35 @@ public interface ModelManager {
 	void setModelService(ModelService service);
 	ModelService getModelService();
 	
+	/**
+	 * Refresh the entity passed in from the database.
+	 * 
+	 * @param <T> 
+	 * @param entity The model entity.
+	 * @param events The list of events being generated.  These are actually processed by the caller, generally the web-tier.
+	 * @return this, for chaining together commands in a more compact fashion.
+	 * @throws PersistenceException
+	 */
 	public <T extends ModelEntity> ModelManager refresh(T entity, List<ProcessingEvent> events) throws PersistenceException;
 	
-	<T extends ModelEntity> ModelManager delete(T entity, List<ProcessingEvent> events);
+	/**
+	 * Delete a Model Entity
+	 * 
+	 * @param entity The entity to delete.
+	 * @param events The list of events being generated.  These are actually processed by the caller, generally the web-tier.
+	 * @return The entity returned by the entity manager after persist.
+	 * @throws PersistenceException
+	 */
+	<T extends ModelEntity> ModelManager delete(T entity, List<ProcessingEvent> events) throws PersistenceException;
 	
 	/**
 	 * Save or update a Model Entity
 	 * 
+	 * @param entity The entity to add/modify.
+	 * @param events The list of events being generated.  These are actually processed by the caller, generally the web-tier.
+	 * @return The entity returned by the entity manager after persist.
 	 * @throws InvalidPropertiesException when the object's validate() method fails
-	 * @throws PersistenceException when the operation fails
+	 * @throws PersistenceException
 	 */
 	<T extends ModelEntity> T addModify(T entity, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException;
 	

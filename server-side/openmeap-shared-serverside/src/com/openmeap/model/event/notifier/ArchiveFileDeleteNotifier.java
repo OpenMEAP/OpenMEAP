@@ -24,6 +24,11 @@
 
 package com.openmeap.model.event.notifier;
 
+import java.util.List;
+
+import com.openmeap.cluster.ClusterNotificationException;
+import com.openmeap.event.Event;
+import com.openmeap.event.ProcessingEvent;
 import com.openmeap.model.ModelEntity;
 import com.openmeap.model.ModelServiceOperation;
 import com.openmeap.model.dto.ApplicationArchive;
@@ -33,11 +38,16 @@ import com.openmeap.model.event.ModelEntityEventAction;
  * Notifies the cluster of the need to delete an application archive file.
  * @author schang
  */
-public class ArchiveFileDeleteNotifier extends AbstractArchiveEventNotifier {
+public class ArchiveFileDeleteNotifier extends AbstractArchiveFileEventNotifier {
 	
 	@Override 
 	protected String getEventActionName() {
 		return ModelEntityEventAction.ARCHIVE_DELETE.getActionName();
+	}
+	
+	@Override
+	public <E extends Event<ApplicationArchive>> void onInCommitBeforeCommit(final E event, List<ProcessingEvent> events) throws ClusterNotificationException {
+		notify(event,events);
 	}
 
 	@Override

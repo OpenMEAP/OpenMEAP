@@ -22,14 +22,37 @@
  ###############################################################################
  */
 
-package com.openmeap.web.event;
+package com.openmeap.model.event.notifier;
 
-import com.openmeap.web.GenericProcessingEvent;
-import com.openmeap.web.html.ScriptTag;
+import java.util.List;
 
-public class AddScriptTagEvent extends GenericProcessingEvent<ScriptTag> {
-	public final static String ADD_SCRIPT_TAG_EVENT = "com.openmeap.web.event.AddScriptTagEvent";
-	public AddScriptTagEvent(ScriptTag payload) {
-		super(AddScriptTagEvent.ADD_SCRIPT_TAG_EVENT,payload);
-	}
+import com.openmeap.event.Event;
+import com.openmeap.event.EventNotificationException;
+import com.openmeap.event.ProcessingEvent;
+import com.openmeap.model.ModelEntity;
+import com.openmeap.model.ModelServiceOperation;
+
+/**
+ * 
+ * @author schang
+ */
+public interface ModelServiceEventNotifier<T extends ModelEntity> {
+	
+	public enum CutPoint {
+		BEFORE_OPERATION,
+		AFTER_OPERATION,
+		IN_COMMIT_AFTER_COMMIT,
+		IN_COMMIT_BEFORE_COMMIT
+	};
+	
+	/**
+	 * @param operation
+	 * @return true if the event notifier should be executed on a specific operation and payload, else false
+	 */
+	public Boolean notifiesFor(ModelServiceOperation operation, ModelEntity payload);
+	
+	public <E extends Event<T>> void onInCommitAfterCommit(E event, List<ProcessingEvent> events) throws EventNotificationException;
+	public <E extends Event<T>> void onInCommitBeforeCommit(E event, List<ProcessingEvent> events) throws EventNotificationException;
+	public <E extends Event<T>> void onBeforeOperation(E event, List<ProcessingEvent> events) throws EventNotificationException;
+	public <E extends Event<T>> void onAfterOperation(E event, List<ProcessingEvent> events) throws EventNotificationException;
 }

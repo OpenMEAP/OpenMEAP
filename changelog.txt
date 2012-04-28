@@ -3,6 +3,7 @@ OpenMEAP 1.1.1a
   - ClusterNodes are now notified of their identity.
   - ClusterNode health checker.
   - removed the blackberry project, as does not really belong yet
+  - add/modify/delete ModelManager operations are now atomic
 
 OpenMEAP 1.1.0a
   - Bug fixes and refactoring.

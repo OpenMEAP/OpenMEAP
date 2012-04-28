@@ -44,8 +44,8 @@ import org.apache.commons.lang.StringUtils;
 
 import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
-import com.openmeap.model.AbstractModelEntity;
 import com.openmeap.model.ModelEntity;
+import com.openmeap.model.event.AbstractModelEntity;
 
 @Entity @Table(name="cluster_node")
 public class ClusterNode extends AbstractModelEntity implements HasJSONProperties {

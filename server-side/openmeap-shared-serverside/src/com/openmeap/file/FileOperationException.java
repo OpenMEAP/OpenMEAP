@@ -22,14 +22,30 @@
  ###############################################################################
  */
 
-package com.openmeap.web.event;
+package com.openmeap.file;
 
-import com.openmeap.web.GenericProcessingEvent;
-import com.openmeap.web.html.ScriptTag;
+public class FileOperationException extends Exception {
 
-public class AddScriptTagEvent extends GenericProcessingEvent<ScriptTag> {
-	public final static String ADD_SCRIPT_TAG_EVENT = "com.openmeap.web.event.AddScriptTagEvent";
-	public AddScriptTagEvent(ScriptTag payload) {
-		super(AddScriptTagEvent.ADD_SCRIPT_TAG_EVENT,payload);
+	private static final long serialVersionUID = 1287784524961821339L;
+
+	public FileOperationException() {
+		super();
+		// TODO Auto-generated constructor stub
 	}
+
+	public FileOperationException(String arg0, Throwable arg1) {
+		super(arg0, arg1);
+		// TODO Auto-generated constructor stub
+	}
+
+	public FileOperationException(String arg0) {
+		super(arg0);
+		// TODO Auto-generated constructor stub
+	}
+
+	public FileOperationException(Throwable arg0) {
+		super(arg0);
+		// TODO Auto-generated constructor stub
+	}
+
 }

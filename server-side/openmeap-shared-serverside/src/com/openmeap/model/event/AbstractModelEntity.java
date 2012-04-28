@@ -22,10 +22,12 @@
  ###############################################################################
  */
 
-package com.openmeap.model;
+package com.openmeap.model.event;
 
 import java.lang.reflect.Method;
 import java.util.Map;
+
+import com.openmeap.model.ModelEntity;
 
 abstract public class AbstractModelEntity implements ModelEntity {
 	@Override public void remove() {

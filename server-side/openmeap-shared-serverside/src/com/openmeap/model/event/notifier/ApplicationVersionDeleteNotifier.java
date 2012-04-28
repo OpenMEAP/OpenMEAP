@@ -22,80 +22,61 @@
  ###############################################################################
  */
 
-package com.openmeap.model.event.handler;
+package com.openmeap.model.event.notifier;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.openmeap.event.Event;
-import com.openmeap.event.EventHandler;
-import com.openmeap.event.EventHandlingException;
+import com.openmeap.event.EventNotificationException;
+import com.openmeap.event.MessagesEvent;
+import com.openmeap.event.ProcessingEvent;
+import com.openmeap.model.ArchiveFileHelper;
+import com.openmeap.model.ModelEntity;
 import com.openmeap.model.ModelManager;
+import com.openmeap.model.ModelServiceOperation;
 import com.openmeap.model.dto.ApplicationArchive;
+import com.openmeap.model.dto.ApplicationVersion;
+import com.openmeap.model.event.AbstractModelServiceEventNotifier;
 
-/**
- * Handles the actual deletion of an application archive.
- * @author schang
- */
-public class ArchiveFileDeleteHandler implements EventHandler<Map> {
+public class ApplicationVersionDeleteNotifier extends
+		AbstractModelServiceEventNotifier<ApplicationVersion> {
 
-	private Logger logger = LoggerFactory.getLogger(ArchiveFileDeleteHandler.class);
-	
+	private Map<Thread,ApplicationArchive> archives = new HashMap<Thread,ApplicationArchive>();
 	private ModelManager modelManager;
-	private String fileSystemStoragePathPrefix;
 	
 	@Override
-	public <E extends Event<Map>> void handle(E event)
-			throws EventHandlingException {
+	public Boolean notifiesFor(ModelServiceOperation operation,
+			ModelEntity payload) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-		if( logger.isTraceEnabled() ) {
-			logger.trace("entering handle()");
-		}
+	@Override
+	public <E extends Event<ApplicationVersion>> void onBeforeOperation(
+			E event, List<ProcessingEvent> events)
+			throws EventNotificationException {
 		
-		ApplicationArchive archive = (ApplicationArchive)event.getPayload().get("archive");
-		File file = archive.getFile(getFileSystemStoragePathPrefix());
-		
-		if( file.exists() ) {
-			if( !file.delete() ) {
-				logger.error("Failed to delete archive "+archive.getFile(getFileSystemStoragePathPrefix()));
-			}
-		} else {
-			logger.error("Failed to find archive "+archive.getFile(getFileSystemStoragePathPrefix()));
-		}
-		
-		File directory = archive.getExplodedPath(getFileSystemStoragePathPrefix());
-		if( directory.exists() ) {
-			try {
-				FileUtils.deleteDirectory(directory);
-			} catch(IOException ioe) {
-				String msg = "Unable to delete directory "+directory;
-				logger.error(msg);
-				throw new EventHandlingException(msg,ioe);
-			}
-		}		
-		
-		if( logger.isTraceEnabled() ) {
-			logger.trace("exiting handle()");
+		ApplicationVersion version = (ApplicationVersion)event.getPayload();
+		if( version.getArchive()!=null ) {
+			archives.put(Thread.currentThread(), version.getArchive());
 		}
 	}
-	
+
+	@Override
+	public <E extends Event<ApplicationVersion>> void onAfterOperation(E event,
+			List<ProcessingEvent> events) throws EventNotificationException {
+		
+		ApplicationArchive archive = archives.get(Thread.currentThread());
+		if( archive!=null ) {
+			ArchiveFileHelper.maintainFileSystemCleanliness(modelManager, archive, events);
+		}
+		events.add( new MessagesEvent("Application version successfully deleted!") );
+	}
+
 	public void setModelManager(ModelManager modelManager) {
 		this.modelManager = modelManager;
-	}
-	public ModelManager getModelManager() {
-		return modelManager;
-	}
-
-	public String getFileSystemStoragePathPrefix() {
-		return fileSystemStoragePathPrefix;
-	}
-	public void setFileSystemStoragePathPrefix(String fileSystemStoragePathPrefix) {
-		this.fileSystemStoragePathPrefix = fileSystemStoragePathPrefix;
 	}
 
 }

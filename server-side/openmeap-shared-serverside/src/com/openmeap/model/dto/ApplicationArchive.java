@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 import com.openmeap.constants.FormConstants;
 import com.openmeap.constants.ServletNameConstants;
 import com.openmeap.constants.UrlParamConstants;
-import com.openmeap.model.AbstractModelEntity;
+import com.openmeap.model.event.AbstractModelEntity;
 import com.openmeap.util.AuthTokenProvider;
 import com.openmeap.web.form.Parameter;
 

@@ -22,14 +22,42 @@
  ###############################################################################
  */
 
-package com.openmeap.web.event;
+package com.openmeap.file;
 
-import com.openmeap.web.GenericProcessingEvent;
-import com.openmeap.web.html.ScriptTag;
+import java.io.File;
 
-public class AddScriptTagEvent extends GenericProcessingEvent<ScriptTag> {
-	public final static String ADD_SCRIPT_TAG_EVENT = "com.openmeap.web.event.AddScriptTagEvent";
-	public AddScriptTagEvent(ScriptTag payload) {
-		super(AddScriptTagEvent.ADD_SCRIPT_TAG_EVENT,payload);
+import org.apache.commons.transaction.file.FileResourceManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.openmeap.model.ModelService;
+import com.openmeap.model.dto.GlobalSettings;
+
+public class FileOperationManagerFactory {
+	
+	private ModelService modelService;
+	private Logger logger = LoggerFactory.getLogger(FileOperationManagerFactory.class);
+	
+	public FileOperationManager newFileOperationManager() {
+		
+		GlobalSettings settings = (GlobalSettings)modelService.findByPrimaryKey(GlobalSettings.class, 1L);
+		if( settings.getTemporaryStoragePath()==null 
+				|| !new File(settings.getTemporaryStoragePath()).exists()) {
+			logger.error("The storage path has not been set in GlobalSettings.  Use the settings page to fix this.");
+		}
+		
+		FileOperationManagerImpl mgr = new FileOperationManagerImpl();
+		FileResourceManager resMgr = new FileResourceManager(
+				settings.getTemporaryStoragePath()
+				,settings.getTemporaryStoragePath()+"/tmp",
+				true,
+				new SLF4JLoggerFacade(LoggerFactory.getLogger(FileResourceManager.class)));
+		mgr.setFileResourceManager(resMgr);
+		
+		return mgr;
+	}
+	
+	public void setModelService(ModelService modelService) {
+		this.modelService = modelService;
 	}
 }

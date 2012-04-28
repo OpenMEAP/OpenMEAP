@@ -26,6 +26,7 @@ package com.openmeap.model.event.notifier;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -37,8 +38,9 @@ import com.openmeap.cluster.ClusterNotificationException;
 import com.openmeap.constants.ServletNameConstants;
 import com.openmeap.constants.UrlParamConstants;
 import com.openmeap.event.Event;
+import com.openmeap.event.EventNotificationException;
+import com.openmeap.event.ProcessingEvent;
 import com.openmeap.model.ModelEntity;
-import com.openmeap.model.ModelServiceEventNotifier;
 import com.openmeap.model.ModelServiceOperation;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationArchive;
@@ -49,8 +51,7 @@ import com.openmeap.model.event.ModelEntityEventAction;
 import com.openmeap.util.Utils;
 
 public class ModelServiceRefreshNotifier 
-		extends AbstractClusterServiceMgmtNotifier<ModelEntity>
-		implements ModelServiceEventNotifier<ModelEntity> {
+		extends AbstractModelServiceClusterServiceMgmtNotifier<ModelEntity> {
 
 	private Logger logger = LoggerFactory.getLogger(ModelServiceRefreshNotifier.class);
 	
@@ -61,6 +62,11 @@ public class ModelServiceRefreshNotifier
 		}
 		return false;
 	}
+	
+	@Override
+	public <E extends Event<ModelEntity>> void onInCommitAfterCommit(final E event, List<ProcessingEvent> events) throws ClusterNotificationException {
+		notify(event,events);
+	}	
 	
 	/**
 	 * This MUST remain state-less
@@ -113,5 +119,10 @@ public class ModelServiceRefreshNotifier
 			logger.error(exMesg,e);
 			throw new ClusterNotificationException(url,exMesg,e);
 		}
+	}
+
+	@Override
+	protected String getEventActionName() {
+		return "refresh";
 	}
 }

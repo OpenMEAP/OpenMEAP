@@ -1,3 +1,27 @@
+/*
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011-2012 OpenMEAP, Inc.                                   #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the LGPLv3                                                #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU Lesser General Public License as published #
+ #    by the Free Software Foundation, either version 3 of the License, or     #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU Lesser General Public License for more details.                      #
+ #                                                                             #
+ #    You should have received a copy of the GNU Lesser General Public License #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+ */
+
 package com.openmeap.model;
 
 import java.util.*;
@@ -19,12 +43,14 @@ import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
+import com.openmeap.model.event.notifier.ModelServiceEventNotifier;
 
 public class ModelManagerImplTest {
 	
 	private static ModelManager modelManager = null;
 	
 	@BeforeClass static public void beforeClass() {
+		org.apache.log4j.BasicConfigurator.configure();
 		if( modelManager == null ) {
 			ModelTestUtils.resetTestDb();
 			ModelTestUtils.createModel(null);
@@ -207,13 +233,36 @@ public class ModelManagerImplTest {
 				return eventFired;
 			}
 			@Override
-			public <E extends Event<ModelEntity>> void notify(E event, List<ProcessingEvent> events) throws EventNotificationException {
-				eventFired = true;
-			}
-			@Override
 			public Boolean notifiesFor(ModelServiceOperation operation,
 					ModelEntity payload) {
 				return true;
+			}
+			@Override
+			public <E extends Event<ModelEntity>> void onInCommitAfterCommit(
+					E event, List<ProcessingEvent> events)
+					throws EventNotificationException {
+				eventFired = true;
+			}
+			@Override
+			public <E extends Event<ModelEntity>> void onInCommitBeforeCommit(
+					E event, List<ProcessingEvent> events)
+					throws EventNotificationException {
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public <E extends Event<ModelEntity>> void onBeforeOperation(
+					E event, List<ProcessingEvent> events)
+					throws EventNotificationException {
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public <E extends Event<ModelEntity>> void onAfterOperation(
+					E event, List<ProcessingEvent> events)
+					throws EventNotificationException {
+				// TODO Auto-generated method stub
+				
 			}
 		};	
 		handlers.add(new MockUpdateNotifier());

@@ -84,13 +84,15 @@ abstract public class Utils {
       return text.toString();
     }
     
-    public static void pipeInputStreamIntoOutputStream(InputStream inputStream, OutputStream outputStream) throws IOException {
+    public static long pipeInputStreamIntoOutputStream(InputStream inputStream, OutputStream outputStream) throws IOException {
     	byte[] bytes = new byte[1024];
         int count = inputStream.read(bytes);
+        long totalCount = 0;
         while( count!=(-1) ) {
         	outputStream.write(bytes,0,count);
-        	count = inputStream.read(bytes);
+        	totalCount += count = inputStream.read(bytes);
         }
+        return totalCount;
     }
     
     public static String createParamsString(Map params) throws UnsupportedEncodingException {

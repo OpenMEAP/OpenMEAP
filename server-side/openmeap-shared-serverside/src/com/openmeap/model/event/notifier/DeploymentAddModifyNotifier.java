@@ -22,14 +22,44 @@
  ###############################################################################
  */
 
-package com.openmeap.web.event;
+package com.openmeap.model.event.notifier;
 
-import com.openmeap.web.GenericProcessingEvent;
-import com.openmeap.web.html.ScriptTag;
+import java.util.List;
 
-public class AddScriptTagEvent extends GenericProcessingEvent<ScriptTag> {
-	public final static String ADD_SCRIPT_TAG_EVENT = "com.openmeap.web.event.AddScriptTagEvent";
-	public AddScriptTagEvent(ScriptTag payload) {
-		super(AddScriptTagEvent.ADD_SCRIPT_TAG_EVENT,payload);
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.openmeap.event.Event;
+import com.openmeap.event.EventNotificationException;
+import com.openmeap.event.ProcessingEvent;
+import com.openmeap.model.ArchiveFileHelper;
+import com.openmeap.model.ModelEntity;
+import com.openmeap.model.ModelManager;
+import com.openmeap.model.ModelServiceOperation;
+import com.openmeap.model.dto.Deployment;
+import com.openmeap.model.event.AbstractModelServiceEventNotifier;
+
+public class DeploymentAddModifyNotifier extends AbstractModelServiceEventNotifier<Deployment> {
+
+	private static Logger logger = LoggerFactory.getLogger(DeploymentAddModifyNotifier.class);
+	private ModelManager modelManager;
+	
+	public void setModelManager(ModelManager modelManager) {
+		this.modelManager = modelManager;
 	}
+
+	@Override
+	public <E extends Event<Deployment>> void onAfterOperation(E event, List<ProcessingEvent> events) throws EventNotificationException {
+		ArchiveFileHelper.maintainFileSystemCleanliness(
+				modelManager,
+				((Deployment)event.getPayload()).getApplicationArchive(), 
+				events);
+	}
+
+	@Override
+	public Boolean notifiesFor(ModelServiceOperation operation,
+			ModelEntity payload) {
+		return operation.equals(ModelServiceOperation.DELETE) && Deployment.class.isAssignableFrom(payload.getClass());
+	}
+
 }

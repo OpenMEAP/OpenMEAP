@@ -151,13 +151,15 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 				&& PROCESS_TARGET.compareTo(firstValue(FormConstants.PROCESS_TARGET,parameterMap ))==0 
 				&& willProcess ) {
 			
+			modelManager.begin();
+			
 			// TODO: check to see if the user can delete versions
 			if( ParameterMapUtils.notEmpty(FormConstants.DELETE,parameterMap) && ParameterMapUtils.notEmpty("deleteConfirm",parameterMap) ) {
 				
 				if( ParameterMapUtils.firstValue("deleteConfirm", parameterMap).equals(FormConstants.APPVER_DELETE_CONFIRM_TEXT) ) {
 					
 					try {
-						modelManager.begin().delete(version, events);
+						modelManager.delete(version, events);
 						modelManager.commit(events);
 					} catch(Exception e) {
 						modelManager.rollback();
@@ -280,7 +282,6 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 			events.add( new MessagesEvent("Application archive could not be created.  Not creating empty version.") );
 		} else {
 			try {
-				modelManager.begin();
 				version.setLastModifier(firstValue("userPrincipalName",parameterMap));
 				version.setArchive(modelManager.addModify(version.getArchive(), events));
 				version = modelManager.addModify(version,events);

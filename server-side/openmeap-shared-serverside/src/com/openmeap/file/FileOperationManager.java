@@ -22,14 +22,40 @@
  ###############################################################################
  */
 
-package com.openmeap.web.event;
+package com.openmeap.file;
 
-import com.openmeap.web.GenericProcessingEvent;
-import com.openmeap.web.html.ScriptTag;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.zip.ZipFile;
 
-public class AddScriptTagEvent extends GenericProcessingEvent<ScriptTag> {
-	public final static String ADD_SCRIPT_TAG_EVENT = "com.openmeap.web.event.AddScriptTagEvent";
-	public AddScriptTagEvent(ScriptTag payload) {
-		super(AddScriptTagEvent.ADD_SCRIPT_TAG_EVENT,payload);
-	}
+public interface FileOperationManager {
+
+	public abstract void deleteDir(String path) throws FileOperationException;
+
+	public abstract void delete(String path) throws FileOperationException;
+
+	public abstract boolean exists(String path) throws FileOperationException;
+
+	public abstract void create(String path) throws FileOperationException;
+
+	public abstract void copy(String src, String dest)
+			throws FileOperationException;
+
+	public abstract void move(String src, String dest)
+			throws FileOperationException;
+
+	public abstract InputStream read(String path) throws FileOperationException;
+
+	public abstract OutputStream write(String path)
+			throws FileOperationException;
+
+	public abstract void begin() throws FileOperationException;
+
+	public abstract void commit() throws FileOperationException;
+
+	public abstract void rollback() throws FileOperationException;
+
+	public abstract void unzipFile(ZipFile zipFile, String destinationDir)
+			throws FileOperationException;
+
 }

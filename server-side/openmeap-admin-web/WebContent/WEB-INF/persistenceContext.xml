@@ -33,6 +33,42 @@
 		<property name="entityManager" ref="entityManager"/>
 	</bean>
 	
+	<bean id="modelServiceRefreshNotifier" class="com.openmeap.model.event.notifier.ModelServiceRefreshNotifier">
+		<property name="modelManager" ref="modelManager"/>
+		<property name="httpRequestExecuter">
+			<bean class="com.openmeap.util.HttpRequestExecuterFactory" factory-method="newDefault"/>
+		</property>
+	</bean>
+	
+	<bean id="deploymentDeleteNotifier" class="com.openmeap.model.event.notifier.DeploymentDeleteNotifier">
+		<property name="archiveDeleteNotifier" ref="archiveDeleteNotifier"/>
+		<property name="archiveDeleteHandler" ref="archiveDeleteHandler"/>
+	</bean>
+	
+	<bean id="archiveUploadNotifier" class="com.openmeap.model.event.notifier.ArchiveFileUploadNotifier">
+		<property name="modelManager" ref="modelManager"/>
+		<property name="httpRequestExecuter">
+			<bean class="com.openmeap.util.HttpRequestExecuterFactory" factory-method="newDefault"/>
+		</property>
+	</bean>
+	
+	<bean id="archiveDeleteNotifier" class="com.openmeap.model.event.notifier.ArchiveFileDeleteNotifier">
+		<property name="modelManager" ref="modelManager"/>
+		<property name="httpRequestExecuter">
+			<bean class="com.openmeap.util.HttpRequestExecuterFactory" factory-method="newDefault"/>
+		</property>
+	</bean>
+	
+	<bean id="archiveDeleteHandler" class="com.openmeap.model.event.handler.ArchiveFileDeleteHandler">
+		<property name="modelManager" ref="modelManager"/>
+	</bean>
+	
+	<bean id="globalSettingsAddModifyNotifier" class="com.openmeap.model.event.notifier.GlobalSettingsAddModifyNotifier">
+		<property name="modelManager" ref="modelManager"/>
+	</bean>
+	
+	
+	
 	<bean id="modelManager" class="com.openmeap.model.ModelManagerImpl">
 		<property name="modelService" ref="modelService"/>
 		<property name="authorizer" ref="authorizer"/>
@@ -40,6 +76,8 @@
 			<list>
 				<ref bean="modelServiceRefreshNotifier"/>
 				<ref bean="deploymentDeleteNotifier"/>
+				<ref bean="archiveDeleteNotifier"/>
+				<ref bean="archiveUploadNotifier"/>
 			</list>
 		</property>
 	</bean>

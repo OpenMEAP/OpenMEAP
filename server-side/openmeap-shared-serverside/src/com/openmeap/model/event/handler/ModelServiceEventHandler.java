@@ -22,9 +22,10 @@
  ###############################################################################
  */
 
-package com.openmeap.model;
+package com.openmeap.model.event.handler;
 
 import com.openmeap.event.EventHandler;
+import com.openmeap.model.ModelEntity;
 
 /**
  * Serves as a base for ModelService event handling classes
