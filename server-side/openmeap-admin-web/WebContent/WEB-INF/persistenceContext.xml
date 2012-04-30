@@ -39,6 +39,7 @@
 	
 	<bean id="applicationVersionDeleteNotifier" class="com.openmeap.model.event.notifier.ApplicationVersionDeleteNotifier">
 		<property name="modelManager" ref="modelManager"/>
+		<property name="fileManager" ref="fileOperationManager"/>
 	</bean>
 	
 	<bean id="archiveDeleteNotifier" class="com.openmeap.model.event.notifier.ArchiveFileDeleteNotifier">
@@ -55,13 +56,14 @@
 	<bean id="archiveUploadNotifier" class="com.openmeap.model.event.notifier.ArchiveFileUploadNotifier">
 		<property name="modelManager" ref="modelManager"/>
 		<property name="fileManager" ref="fileOperationManager"/>
-		<property name="httpRequestExecuter">
-			<bean class="com.openmeap.util.HttpRequestExecuterFactory" factory-method="newDefault"/>
-		</property>
 	</bean>
 	
 	<bean id="deploymentAddModifyNotifier" class="com.openmeap.model.event.notifier.DeploymentAddModifyNotifier">
 		<property name="modelManager" ref="modelManager"/>
+		<property name="fileManager" ref="fileOperationManager"/>
+		<property name="httpRequestExecuter">
+			<bean class="com.openmeap.util.HttpRequestExecuterFactory" factory-method="newDefault"/>
+		</property>
 	</bean>
 	
 	<bean id="deploymentDeleteNotifier" class="com.openmeap.model.event.notifier.DeploymentDeleteNotifier">

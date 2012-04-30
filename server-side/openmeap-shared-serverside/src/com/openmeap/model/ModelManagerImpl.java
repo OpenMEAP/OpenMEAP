@@ -169,20 +169,26 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 	@Override
 	public <T extends ModelEntity> T addModify(T entity, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
 		
+		T revised = entity;
+		
 		authorize(entity,determineCreateUpdateAction(entity));
 		
 		ModelEntityEvent event = new ModelEntityEvent(ModelServiceOperation.SAVE_OR_UPDATE,entity);
 		
 		stashModelEntityEventTillCommit(event);
-		callEventNotifiers(CutPoint.BEFORE_OPERATION,event,events);
 		
-		T entityToReturn = (T) _addModify(entity,events);
-		event.setPayload(entityToReturn);
-		validate(entity);
+		callEventNotifiers(CutPoint.BEFORE_OPERATION,event,events);
+		revised = (T)event.getPayload();
+		
+		revised = (T) _addModify(revised,events);
+		event.setPayload(revised);
 		
 		callEventNotifiers(CutPoint.AFTER_OPERATION,event,events);
+		revised = (T)event.getPayload();
 		
-		return entityToReturn;
+		validate(revised);
+		
+		return revised;
 	}
 	
 	@Override

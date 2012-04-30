@@ -95,7 +95,7 @@ public class FileOperationManagerImpl implements FileOperationManager {
 	public boolean exists(String path) throws FileOperationException {
 		Object txId = activeTransactions.get(Thread.currentThread());
 		try {
-			return fileResourceManager.resourceExists(txId,path);
+			return fileResourceManager.resourceExists(txId,path) || new File(fileResourceManager.getStoreDir()+File.separator+path).exists();
 		} catch (ResourceManagerException e) {
 			throw new FileOperationException(e);
 		}
@@ -191,6 +191,7 @@ public class FileOperationManagerImpl implements FileOperationManager {
 			int BUFFER = 1024;
 			BufferedOutputStream dest = null;
 			BufferedInputStream is = null;
+			OutputStream fos = null;
 	
 			ZipEntry entry;
 			
@@ -203,13 +204,16 @@ public class FileOperationManagerImpl implements FileOperationManager {
 					if( entry.isDirectory() ) {
 						continue; // skip directories, resource manager will create for us
 					} else {
-						OutputStream fos = write(newFile);
+						fos = write(newFile);
 						dest = new BufferedOutputStream(fos, BUFFER);
-						Utils.pipeInputStreamIntoOutputStream(is, fos);
+						Utils.pipeInputStreamIntoOutputStream(is, dest);
 					}
 				} finally {
 					if( dest!=null ) {
 						dest.close();
+					}
+					if( fos!=null ) {
+						fos.close();
 					}
 					if( is!=null ) {
 						is.close();
@@ -261,7 +265,7 @@ public class FileOperationManagerImpl implements FileOperationManager {
 		FileResourceManager resMgr = new FileResourceManager(
 				settings.getTemporaryStoragePath()
 				,settings.getTemporaryStoragePath()+"/tmp",
-				true,
+				false,
 				new SLF4JLoggerFacade(LoggerFactory.getLogger(FileResourceManager.class)));
 		fileResourceManager = resMgr; 
 	}

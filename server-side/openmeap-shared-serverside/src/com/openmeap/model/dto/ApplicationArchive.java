@@ -55,7 +55,7 @@ public class ApplicationArchive extends AbstractModelEntity {
 	private Application application;
 	private Integer bytesLength;
 	private Integer bytesLengthUncompressed;
-	private Boolean newFileUploaded = Boolean.FALSE;
+	private String newFileUploaded;
 
 	final static public String HASH_BASED_URL_TEMPLATE = "${globalSettings.externalServiceUrlPrefix}/"+ServletNameConstants.APPLICATION_MANAGEMENT
 	+"/?"+UrlParamConstants.ACTION+"=archiveDownload"
@@ -92,6 +92,14 @@ public class ApplicationArchive extends AbstractModelEntity {
 	
 	@Transient public String getDownloadUrl(GlobalSettings settings) {
 		return substituteArchiveVariables(settings,getUrl());
+	}
+	
+	@Transient
+	public String getNewFileUploaded() {
+		return newFileUploaded;
+	}
+	public void setNewFileUploaded(String newFileUploaded) {
+		this.newFileUploaded = newFileUploaded;
 	}
 	
 	/**
@@ -209,14 +217,6 @@ public class ApplicationArchive extends AbstractModelEntity {
 	}
 	public void setBytesLengthUncompressed(Integer bytesLength) {
 		bytesLengthUncompressed = bytesLength;
-	}
-	
-	@Transient
-	public Boolean getNewFileUploaded() {
-		return newFileUploaded;
-	}
-	public void setNewFileUploaded(Boolean newFileUploaded) {
-		this.newFileUploaded = newFileUploaded;
 	}
 	
 	public Map<Method,String> validate() {

@@ -69,7 +69,6 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 	private Logger logger = LoggerFactory.getLogger(DeploymentListingsBacking.class);
 	
 	private ModelManager modelManager = null;
-	private ArchiveFileUploadNotifier archiveFileUploadNotifier = null;
 
 	public Collection<ProcessingEvent> process(ProcessingContext context, Map<Object,Object> templateVariables, Map<Object, Object> parameterMap) {
 		
@@ -104,7 +103,6 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 			if( version!=null ) {
 				
 				Deployment depl = createDeployment(firstValue("userPrincipalName",parameterMap),version,deploymentType);
-				pushArchiveToClusterForDeployment(depl,events);
 				
 				try {
 					modelManager.begin();
@@ -154,32 +152,11 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 		return depl;
 	}
 	
-	private void pushArchiveToClusterForDeployment(Deployment depl, List<ProcessingEvent> events) {
-		try {
-			ApplicationArchive archive = depl.getApplicationArchive();
-			archiveFileUploadNotifier.notify(new ModelEntityEvent(ModelServiceOperation.SAVE_OR_UPDATE,archive), events);
-		} catch (Exception e) {
-			logger.error("An exception occurred pushing the new archive to cluster nodes: {}",e);
-			events.add(new MessagesEvent(String.format("An exception occurred pushing the new archive to cluster nodes: %s",e.getMessage())));
-		}
-	}
-	
 	/*
 	 * ACCESSORS	
 	 */
 	
 	public void setModelManager(ModelManager modelManager) {
 		this.modelManager = modelManager;
-	}
-	public ModelManager getModelManager() {
-		return modelManager;
-	}
-	
-	public ArchiveFileUploadNotifier getArchiveFileUploadNotifier() {
-		return archiveFileUploadNotifier;
-	}
-	public void setArchiveFileUploadNotifier(
-			ArchiveFileUploadNotifier archiveFileUploadNotifier) {
-		this.archiveFileUploadNotifier = archiveFileUploadNotifier;
 	}
 }

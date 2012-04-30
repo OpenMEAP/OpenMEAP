@@ -72,7 +72,7 @@ public class ApplicationListingsBacking extends AbstractTemplatedSectionBacking 
 					deplUrls.put( app.getName(),
 							new Anchor("?bean=addModifyAppVersionPage"
 								+"&applicationId="+app.getId()
-								+"&versionId="+d.getVersionIdentifier(),
+								+"&versionId="+d.getId(),
 							d.getVersionIdentifier(),
 							d.getVersionIdentifier()));
 				}

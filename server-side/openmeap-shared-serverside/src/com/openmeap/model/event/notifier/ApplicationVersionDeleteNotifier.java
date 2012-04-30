@@ -32,20 +32,25 @@ import com.openmeap.event.Event;
 import com.openmeap.event.EventNotificationException;
 import com.openmeap.event.MessagesEvent;
 import com.openmeap.event.ProcessingEvent;
+import com.openmeap.file.FileOperationManager;
 import com.openmeap.model.ArchiveFileHelper;
 import com.openmeap.model.ModelEntity;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.ModelServiceOperation;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
-import com.openmeap.model.event.AbstractModelServiceEventNotifier;
 
 public class ApplicationVersionDeleteNotifier extends
 		AbstractModelServiceEventNotifier<ApplicationVersion> {
 
 	private Map<Thread,ApplicationArchive> archives = new HashMap<Thread,ApplicationArchive>();
 	private ModelManager modelManager;
+	private FileOperationManager fileManager;
 	
+	public void setFileManager(FileOperationManager fileManager) {
+		this.fileManager = fileManager;
+	}
+
 	@Override
 	public Boolean notifiesFor(ModelServiceOperation operation,
 			ModelEntity payload) {
@@ -64,12 +69,11 @@ public class ApplicationVersionDeleteNotifier extends
 	}
 
 	@Override
-	public <E extends Event<ApplicationVersion>> void onAfterOperation(E event,
-			List<ProcessingEvent> events) throws EventNotificationException {
+	public <E extends Event<ApplicationVersion>> void onAfterOperation(E event, List<ProcessingEvent> events) throws EventNotificationException {
 		
 		ApplicationArchive archive = archives.get(Thread.currentThread());
 		if( archive!=null ) {
-			ArchiveFileHelper.maintainFileSystemCleanliness(modelManager, archive, events);
+			ArchiveFileHelper.maintainFileSystemCleanliness(modelManager, fileManager, archive, events);
 		}
 		events.add( new MessagesEvent("Application version successfully deleted!") );
 	}

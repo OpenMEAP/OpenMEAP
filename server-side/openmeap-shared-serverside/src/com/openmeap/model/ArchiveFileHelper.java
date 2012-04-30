@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import com.openmeap.event.MessagesEvent;
 import com.openmeap.event.ProcessingEvent;
+import com.openmeap.file.FileOperationException;
 import com.openmeap.file.FileOperationManager;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
@@ -53,7 +54,7 @@ public class ArchiveFileHelper {
 	 * @throws PersistenceException 
 	 * @throws InvalidPropertiesException 
 	 */
-	public static void maintainFileSystemCleanliness(ModelManager modelManager, ApplicationArchive archive, List<ProcessingEvent> events) {
+	public static void maintainFileSystemCleanliness(ModelManager modelManager, FileOperationManager fileManager, ApplicationArchive archive, List<ProcessingEvent> events) {
 		
 		ModelService modelService = modelManager.getModelService();
 		GlobalSettings settings = modelManager.getGlobalSettings();
@@ -69,19 +70,22 @@ public class ArchiveFileHelper {
 			
 			// delete the web-view
 			try {
-				File oldExplodedPath = archive.getExplodedPath(settings.getTemporaryStoragePath());
-				if( oldExplodedPath!=null && oldExplodedPath.exists() ) {
-					FileUtils.deleteDirectory(oldExplodedPath);
+				if(fileManager.exists(archive.getHash())) {
+					fileManager.deleteDir(archive.getHash());
 				}
-			} catch( IOException ioe ) {
+			} catch( Exception ioe ) {
 				logger.error("There was an exception deleting the old web-view directory",ioe);
 				events.add(new MessagesEvent(String.format("Upload process will continue.  There was an exception deleting the old web-view directory: %s",ioe.getMessage())));
 			}
 			
 			// delete the zip file
-			File originalFile = archive.getFile(settings.getTemporaryStoragePath());
-			if( originalFile.exists() && !originalFile.delete() ) {
-				String mesg = String.format("Failed to delete old file %s, was different so proceeding anyhow.",originalFile.getName());
+			String originalFile = archive.getHash()+".zip";
+			try {
+				if( fileManager.exists(originalFile) ) {
+					fileManager.delete(originalFile);
+				}
+			} catch(FileOperationException foe) {
+				String mesg = String.format("Failed to delete old file %s, was different so proceeding anyhow.",originalFile);
 				logger.error(mesg);
 				events.add(new MessagesEvent(mesg));
 			}
@@ -107,7 +111,7 @@ public class ArchiveFileHelper {
 			ZipFile file = null;
 			try {
 				file = new ZipFile(zipFile);
-				fileManager.unzipFile(file, dest.getAbsolutePath());
+				fileManager.unzipFile(file, archive.getHash());
 			} finally {
 				file.close();
 			}

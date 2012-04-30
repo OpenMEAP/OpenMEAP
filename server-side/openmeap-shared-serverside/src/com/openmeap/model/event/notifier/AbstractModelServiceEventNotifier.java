@@ -22,7 +22,7 @@
  ###############################################################################
  */
 
-package com.openmeap.model.event;
+package com.openmeap.model.event.notifier;
 
 import java.util.List;
 
@@ -30,7 +30,6 @@ import com.openmeap.event.Event;
 import com.openmeap.event.EventNotificationException;
 import com.openmeap.event.ProcessingEvent;
 import com.openmeap.model.ModelEntity;
-import com.openmeap.model.event.notifier.ModelServiceEventNotifier;
 
 abstract public class AbstractModelServiceEventNotifier<T extends ModelEntity> 
 		implements ModelServiceEventNotifier<T> {

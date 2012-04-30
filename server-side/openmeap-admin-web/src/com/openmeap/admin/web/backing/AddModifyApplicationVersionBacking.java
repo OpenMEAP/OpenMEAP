@@ -281,14 +281,22 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 			events.add( new MessagesEvent("Application archive could not be created.  Not creating empty version.") );
 		} else {
 			try {
-				version.setLastModifier(firstValue("userPrincipalName",parameterMap));
 				modelManager.begin();
-				version.setArchive(modelManager.addModify(version.getArchive(), events));
+				version.setLastModifier(firstValue("userPrincipalName",parameterMap));
+				
+				ApplicationArchive savedArchive = version.getArchive();
+				version.setArchive(null);
+				savedArchive = modelManager.addModify(savedArchive, events);
+				version.setArchive(savedArchive);
+				
 				version = modelManager.addModify(version,events);
-				app.addVersion(version);
+				app.addVersion(version);				
 				app = modelManager.addModify(app,events);
+				
 				modelManager.commit(events);
+				
 				modelManager.refresh(app,events);
+				
 				events.add( new MessagesEvent("Application version successfully created/modified!") );
 			} catch( InvalidPropertiesException ipe ) {
 				modelManager.rollback();
@@ -332,11 +340,8 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 					try {
 						
 						File tempFile = ServletUtils.tempFileFromFileItem(modelManager.getGlobalSettings().getTemporaryStoragePath(), item);
-						ApplicationArchive archive = new ApplicationArchive();
-						archive.setNewFileUploaded(true);
-						archive.setHash(tempFile.getAbsolutePath());
-						archive.setApplication(app);
-						version.setArchive(archive);
+						ApplicationArchive archive = version.getArchive();
+						archive.setNewFileUploaded(tempFile.getAbsolutePath());
 						archiveUncreated = false;
 					} catch(Exception ioe) {
 						

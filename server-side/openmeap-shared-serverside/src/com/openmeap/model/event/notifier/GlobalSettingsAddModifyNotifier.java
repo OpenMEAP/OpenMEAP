@@ -34,7 +34,6 @@ import com.openmeap.event.ProcessingEvent;
 import com.openmeap.model.ModelEntity;
 import com.openmeap.model.ModelServiceOperation;
 import com.openmeap.model.dto.GlobalSettings;
-import com.openmeap.model.event.AbstractModelServiceEventNotifier;
 
 public class GlobalSettingsAddModifyNotifier extends AbstractModelServiceEventNotifier<GlobalSettings>{
 

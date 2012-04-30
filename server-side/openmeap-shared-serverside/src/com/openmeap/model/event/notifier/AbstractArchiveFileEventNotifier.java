@@ -30,7 +30,7 @@ import com.openmeap.constants.UrlParamConstants;
 import com.openmeap.model.ModelEntity;
 import com.openmeap.model.dto.ApplicationArchive;
 
-abstract public class AbstractArchiveFileEventNotifier extends AbstractModelServiceClusterServiceMgmtNotifier<ApplicationArchive> {
+abstract public class AbstractArchiveFileEventNotifier<T extends ModelEntity> extends AbstractModelServiceClusterServiceMgmtNotifier<T> {
 	
 	protected void addRequestParameters(ModelEntity modelEntity, Map<String,Object> parms) {
 		ApplicationArchive archive = (ApplicationArchive)modelEntity;

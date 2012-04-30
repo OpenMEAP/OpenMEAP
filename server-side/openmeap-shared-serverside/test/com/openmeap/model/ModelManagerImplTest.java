@@ -45,7 +45,7 @@ import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
-import com.openmeap.model.event.AbstractModelServiceEventNotifier;
+import com.openmeap.model.event.notifier.AbstractModelServiceEventNotifier;
 import com.openmeap.model.event.notifier.ModelServiceEventNotifier;
 
 public class ModelManagerImplTest {

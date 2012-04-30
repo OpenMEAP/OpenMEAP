@@ -40,7 +40,6 @@ import com.openmeap.model.ModelServiceOperation;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.Deployment;
-import com.openmeap.model.event.AbstractModelServiceEventNotifier;
 
 public class ApplicationDeleteNotifier extends AbstractModelServiceEventNotifier<Application> {
 	

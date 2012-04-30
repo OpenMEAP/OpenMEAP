@@ -54,68 +54,44 @@ import com.openmeap.model.event.ModelEntityEventAction;
 import com.openmeap.util.Utils;
 import com.openmeap.util.ZipUtils;
 
-public class ArchiveFileUploadNotifier extends AbstractArchiveFileEventNotifier {	
+public class ArchiveFileUploadNotifier extends AbstractModelServiceEventNotifier<ApplicationArchive> {	
 	
 	private Logger logger = LoggerFactory.getLogger(ArchiveFileUploadNotifier.class);
+	private ModelManager modelManager;
 	private FileOperationManager fileManager;
 	
+	public void setModelManager(ModelManager modelManager) {
+		this.modelManager = modelManager;
+	}
+
 	public void setFileManager(FileOperationManager fileManager) {
 		this.fileManager = fileManager;
 	}
 	
 	@Override
-	protected String getEventActionName() {
-		return ModelEntityEventAction.ARCHIVE_UPLOAD.getActionName();
-	}
-		
-	@Override
-	protected void addRequestParameters(ModelEntity modelEntity, Map<String,Object> parms) {
-		ApplicationArchive archive = (ApplicationArchive)modelEntity;
-		parms.put(UrlParamConstants.APPARCH_FILE, archive.getFile(getModelManager().getGlobalSettings().getTemporaryStoragePath()));
-		super.addRequestParameters(modelEntity, parms);
+	public Boolean notifiesFor(ModelServiceOperation operation,
+			ModelEntity payload) {
+		return ModelServiceOperation.SAVE_OR_UPDATE==operation && ApplicationArchive.class.isAssignableFrom(payload.getClass());
 	}
 	
 	@Override
-	public Boolean notifiesFor(ModelServiceOperation operation, ModelEntity payload) {
-		return operation==ModelServiceOperation.SAVE_OR_UPDATE && ApplicationArchive.class.isAssignableFrom(payload.getClass());
-	}
-	
-	@Override
-	public <E extends Event<ApplicationArchive>> void onBeforeOperation(
-			E event, List<ProcessingEvent> events)
-			throws EventNotificationException {
+	public <E extends Event<ApplicationArchive>> void onBeforeOperation(E event, List<ProcessingEvent> events) throws EventNotificationException {
 		
 		ApplicationArchive archive = (ApplicationArchive)event.getPayload();
-		boolean newUpload = archive.getNewFileUploaded();
+		boolean newUpload = archive.getNewFileUploaded()!=null;
 		ApplicationArchive ret = archive;
 		if( newUpload && (ret=processApplicationArchiveFileUpload(archive,events))==null ) {
 			throw new PersistenceException("Zip archive failed to process!");
+		} else {
+			event.setPayload(ret);
 		}
-	}
-	
-	@Override
-	public <E extends Event<ApplicationArchive>> void onInCommitBeforeCommit(final E event, List<ProcessingEvent> events) throws ClusterNotificationException {
-		notify(event,events);
-	}
-	
-	@Override
-	public <E extends Event<ApplicationArchive>> void notify(final E event, List<ProcessingEvent> events) throws ClusterNotificationException {
-		ApplicationArchive archive = (ApplicationArchive)event.getPayload();
-		File archiveFile = archive.getFile(getModelManager().getGlobalSettings().getTemporaryStoragePath());
-		if( !archiveFile.exists() ) {
-			String msg = String.format("The archive file %s cannot be found.  This could be because you opted to fill in the version details yourself.",archiveFile.getAbsoluteFile());
-			logger.warn(msg);
-			events.add(new MessagesEvent(msg));
-			return;
-		}
-		super.notify(event, events);
 	}
 	
 	@SuppressWarnings("unchecked")
 	private ApplicationArchive processApplicationArchiveFileUpload(ApplicationArchive archive, List<ProcessingEvent> events) {
 		
-		GlobalSettings settings = getModelManager().getGlobalSettings();
-		File tempFile = new File(archive.getHash());
+		GlobalSettings settings = modelManager.getGlobalSettings();
+		File tempFile = new File(archive.getNewFileUploaded());
 		Long size = tempFile.length();
 		
 		String pathError = settings.validateTemporaryStoragePath();
@@ -130,11 +106,20 @@ public class ArchiveFileUploadNotifier extends AbstractArchiveFileEventNotifier 
 		FileInputStream is = null;
 		File destinationFile = null;
 		try {	
+			
+			// if the archive is pre-existing and not the same,
+			// then determine if the web-view and zip should be deleted
+			// that is, they are not used by any other versions
+			if( archive.getId()!=null ) {
+				ArchiveFileHelper.maintainFileSystemCleanliness(modelManager,fileManager,archive,events);
+			}
+			
 			String hashValue = null;
+			ApplicationArchive archiveExists = null;
 			try {
 				is = new FileInputStream(tempFile);
 				hashValue = Utils.hashInputStream("MD5", is);
-				ApplicationArchive archiveExists = getModelManager().getModelService().findApplicationArchiveByHashAndAlgorithm(hashValue, "MD5");
+				archiveExists = modelManager.getModelService().findApplicationArchiveByHashAndAlgorithm(hashValue, "MD5");
 				if(archiveExists!=null) {
 					if( !tempFile.delete() ) {
 						String mesg = String.format("Failed to delete temporary file %s",tempFile.getName());
@@ -145,14 +130,6 @@ public class ArchiveFileUploadNotifier extends AbstractArchiveFileEventNotifier 
 				}
 			} finally {
 				is.close();
-			}
-			
-			// if the archive is pre-existing and not the same,
-			// then determine if the web-view and zip should be deleted
-			// that is, they are not used by any other versions
-			if( archive.getId()!=null && !archive.getHash().equals(hashValue) ) {
-
-				ArchiveFileHelper.maintainFileSystemCleanliness(getModelManager(),archive,events);
 			}
 			
 			archive.setHashAlgorithm("MD5");
@@ -181,7 +158,7 @@ public class ArchiveFileUploadNotifier extends AbstractArchiveFileEventNotifier 
 				String mesg = String.format("Uploaded temporary file %s successfully renamed to %s",tempFile.getName(),destinationFile.getName());
 				logger.debug(mesg);
 				events.add(new MessagesEvent(mesg));
-				ArchiveFileHelper.unzipFile(getModelManager(),fileManager,archive,destinationFile,events);
+				ArchiveFileHelper.unzipFile(modelManager,fileManager,archive,destinationFile,events);
 			} else {
 				String mesg = String.format("Failed to renamed file %s to %s",tempFile.getName(),destinationFile.getName());
 				logger.error(mesg);
@@ -216,7 +193,6 @@ public class ArchiveFileUploadNotifier extends AbstractArchiveFileEventNotifier 
 		}
 		
 		archive.setUrl(ApplicationArchive.URL_TEMPLATE);
-		archive.setNewFileUploaded(true);
 		
 		return archive;
 	}
