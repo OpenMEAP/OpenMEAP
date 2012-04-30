@@ -125,7 +125,7 @@ public abstract class AbstractClusterServiceMgmtNotifier<T> implements EventNoti
 					throw new ClusterNotificationException( String.format("Blocking timed-out still waiting to notify: %s", StringUtils.join(waiting,", ")) );
 				}
 			} catch( InterruptedException ie ) {
-				throw new ClusterNotificationException(ie);
+				throw new ClusterNotificationException("The notification thread was interrupted",ie);
 			}
 		} else if(exceptions.size()>0){
 			throw new ClusterNotificationException( String.format("The following exceptions were thrown: %s",exceptions.getMessages()) );
@@ -141,7 +141,7 @@ public abstract class AbstractClusterServiceMgmtNotifier<T> implements EventNoti
 			makeRequest(thisUrl,event);
 			urlRequestCompleteStatus.put(thisUrl.toString(), Boolean.TRUE);
 		} catch( ClusterNotificationException e ) {
-			logger.error("ClusterNode with url {} threw and exception : {}",thisUrl,e);
+			logger.error("ClusterNode with url {} threw an exception : {}",thisUrl,e);
 			exceptions.add(e);
 		}
 	}

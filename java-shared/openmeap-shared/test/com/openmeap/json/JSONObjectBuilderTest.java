@@ -25,6 +25,7 @@
 package com.openmeap.json;
 
 import java.util.Hashtable;
+import java.util.Vector;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -124,7 +125,16 @@ public class JSONObjectBuilderTest extends TestCase {
 					public void setValue(Object dest, Object value) {
 						((RootClass)dest).setHashTable((Hashtable)value);
 					}
-	    		})
+	    		}),
+	    	new JSONProperty("vector",Vector.class,Long.class,
+    	    		new JSONGetterSetter(){
+    		    		public Object getValue(Object src) {
+    						return ((RootClass)src).getVector();
+    					}
+    					public void setValue(Object dest, Object value) {
+    						((RootClass)dest).setVector((Vector)value);
+    					}
+    	    		})
 	    };
 	    public JSONProperty[] getJSONProperties() {
 			return jsonProperties;
@@ -137,6 +147,7 @@ public class JSONObjectBuilderTest extends TestCase {
 		private Integer integerValue;
 		private Double doubleValue;
 		private Hashtable hashTable;
+		private Vector vector;
 		
 		public Hashtable getHashTable() {
 			return hashTable;
@@ -145,6 +156,12 @@ public class JSONObjectBuilderTest extends TestCase {
 			this.hashTable = hashTable;
 		}
 	    
+	    public Vector getVector() {
+			return vector;
+		}
+		public void setVector(Vector vector) {
+			this.vector = vector;
+		}
 		public BranchClass getChild() {
 			return child;
 		}
@@ -251,22 +268,30 @@ public class JSONObjectBuilderTest extends TestCase {
 		root.getChild().setTypeOne(Types.TWO);
 		root.getChild().setTypeTwo(Types.ONE);
 		root.getChild().setString("child_string");
+		
 		Hashtable table = new Hashtable();
 		table.put("key1","value1");
 		table.put("key2",new Long(1000));
 		table.put("key3",new Integer(1000));
 		root.setHashTable(table);
 		
+		Vector vector = new Vector();
+		vector.add(Long.valueOf(1));
+		vector.add(Long.valueOf(2));
+		vector.add(Long.valueOf(3));
+		root.setVector(vector);
+		
 		JSONObjectBuilder builder = new JSONObjectBuilder();
 		JSONObject jsonObj = builder.toJSON(root);
+		System.out.println(jsonObj.toString());
 		Assert.assertEquals(
-						"{\"stringValue\":\"value\",\"integerValue\":2000,"
-						+"\"stringArrayValue\":[\"value1\",\"value2\"],"
-						+"\"hashTable\":{\"key3\":1000,\"key2\":1000,\"key1\":\"value1\"},"
-						+"\"doubleValue\":\"3.14\",\"longValue\":1000,"
-						+"\"child\":{\"string\":\"child_string\",\"typeTwo\":\"ONE\",\"typeOne\":\"TWO\"}}",
-					jsonObj.toString()
-				);
+				 "{\"stringValue\":\"value\",\"vector\":[1,2,3],\"integerValue\":2000,"
+				+"\"stringArrayValue\":[\"value1\",\"value2\"],"
+				+"\"hashTable\":{\"key3\":1000,\"key2\":1000,\"key1\":\"value1\"},"
+				+"\"doubleValue\":\"3.14\",\"longValue\":1000,"
+				+"\"child\":{\"string\":\"child_string\",\"typeTwo\":\"ONE\",\"typeOne\":\"TWO\"}}",
+				jsonObj.toString()
+			);
 		RootClass afterRoundTrip = (RootClass)builder.fromJSON(jsonObj,new RootClass());
 		Assert.assertEquals( builder.toJSON(afterRoundTrip).toString(), jsonObj.toString() );
 	}

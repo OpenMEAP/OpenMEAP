@@ -96,7 +96,7 @@ public class RESTAppMgmtClient implements ApplicationManagementService {
 			try {
 				result = (Result)builder.fromJSON(new JSONObject(responseText), result);
 				if( result.getError()!=null ) {
-					throw new WebServiceException(WebServiceException.TypeEnum.fromValue(result.getError().getCode().toString()),result.getError().getMessage());
+					throw new WebServiceException(WebServiceException.TypeEnum.fromValue(result.getError().getCode().value()),result.getError().getMessage());
 				}
 			} catch( JSONException e ) {
 				throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,e);

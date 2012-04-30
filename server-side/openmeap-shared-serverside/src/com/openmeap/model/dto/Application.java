@@ -47,7 +47,7 @@ import com.openmeap.constants.FormConstants;
 import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
 import com.openmeap.json.JSONGetterSetter;
-import com.openmeap.model.AbstractModelEntity;
+import com.openmeap.model.event.AbstractModelEntity;
 import com.openmeap.web.form.Parameter;
 
 @Entity @Table(name="application")
@@ -233,7 +233,7 @@ public class Application extends AbstractModelEntity implements HasJSONPropertie
 	public void setVersions(Map<String,ApplicationVersion> versions) {
 		this.versions = versions;
 	}
-	@OneToMany(mappedBy="application",fetch=FetchType.LAZY,cascade={CascadeType.ALL},targetEntity=ApplicationVersion.class)
+	@OneToMany(mappedBy="application",fetch=FetchType.LAZY,cascade={},targetEntity=ApplicationVersion.class)
 	@MapKey(name="identifier")
 	public Map<String,ApplicationVersion> getVersions() {
 		return versions;
@@ -262,7 +262,7 @@ public class Application extends AbstractModelEntity implements HasJSONPropertie
 	public void setDeployments(List<Deployment> deployments) {
 		this.deployments = deployments;
 	}
-	@OneToMany(mappedBy="application",fetch=FetchType.LAZY,cascade={CascadeType.ALL},targetEntity=Deployment.class)
+	@OneToMany(mappedBy="application",fetch=FetchType.LAZY,cascade={},targetEntity=Deployment.class)
 	public List<Deployment> getDeployments() {
 		return deployments;
 	}	
@@ -271,7 +271,7 @@ public class Application extends AbstractModelEntity implements HasJSONPropertie
 		if( deployments == null ) {
 			deployments = new ArrayList<Deployment>();
 		}
-		deployments.add(d);
+		//deployments.add(d);
 	}
 	public void removeDeployment(Deployment d) {
 		d.setApplication(null);

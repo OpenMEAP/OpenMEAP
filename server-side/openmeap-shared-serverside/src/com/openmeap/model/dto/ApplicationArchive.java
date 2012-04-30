@@ -40,7 +40,7 @@ import com.openmeap.constants.FormConstants;
 import com.openmeap.constants.ServletNameConstants;
 import com.openmeap.constants.UrlParamConstants;
 import com.openmeap.digest.DigestException;
-import com.openmeap.model.AbstractModelEntity;
+import com.openmeap.model.event.AbstractModelEntity;
 import com.openmeap.util.AuthTokenProvider;
 import com.openmeap.util.GenericRuntimeException;
 import com.openmeap.web.form.Parameter;
@@ -54,22 +54,18 @@ public class ApplicationArchive extends AbstractModelEntity {
 	private String fileDataUrl;
 	private String hash;
 	private String hashAlgorithm;
-	private ApplicationVersion version;
+	private Application application;
 	private Integer bytesLength;
 	private Integer bytesLengthUncompressed;
-	private Boolean newFileUploaded = Boolean.FALSE;
+	private String newFileUploaded;
 
-	final static public String URL_TEMPLATE = "${globalSettings.externalServiceUrlPrefix}/"+ServletNameConstants.APPLICATION_MANAGEMENT
-		+"/?"+UrlParamConstants.ACTION+"=archiveDownload"
-		+"&"+UrlParamConstants.APP_NAME+"=${appName}"
-		+"&"+UrlParamConstants.AUTH_TOKEN+"=${newAuthToken}"
-		+"&"+UrlParamConstants.APP_VERSION+"=${appVersion}";
-	
 	final static public String HASH_BASED_URL_TEMPLATE = "${globalSettings.externalServiceUrlPrefix}/"+ServletNameConstants.APPLICATION_MANAGEMENT
-		+"/?"+UrlParamConstants.ACTION+"=archiveDownload"
-		+"&"+UrlParamConstants.APPARCH_HASH+"=${hash}"
-		+"&"+UrlParamConstants.AUTH_TOKEN+"=${newAuthToken}"
-		+"&"+UrlParamConstants.APPARCH_HASH_ALG+"=${hashAlgorithm}";
+	+"/?"+UrlParamConstants.ACTION+"=archiveDownload"
+	+"&"+UrlParamConstants.AUTH_TOKEN+"=${newAuthToken}"
+	+"&"+UrlParamConstants.APPARCH_HASH+"=${hash}"
+	+"&"+UrlParamConstants.APPARCH_HASH_ALG+"=${hashAlgorithm}";
+	
+	final static public String URL_TEMPLATE = HASH_BASED_URL_TEMPLATE;
 	
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="id")
@@ -100,6 +96,14 @@ public class ApplicationArchive extends AbstractModelEntity {
 		return substituteArchiveVariables(settings,getUrl());
 	}
 	
+	@Transient
+	public String getNewFileUploaded() {
+		return newFileUploaded;
+	}
+	public void setNewFileUploaded(String newFileUploaded) {
+		this.newFileUploaded = newFileUploaded;
+	}
+	
 	/**
 	 * Creates a url for downloading the zip file directly.
 	 * 
@@ -121,13 +125,13 @@ public class ApplicationArchive extends AbstractModelEntity {
 	}
 	
 	@Transient public String getViewUrl(GlobalSettings settings) {
-		return substituteArchiveVariables(settings,"/openmeap-admin-web/web-view/${appName}/${appVersion}/${newAuthToken}/index.html");
+		return substituteArchiveVariables(settings,"/openmeap-admin-web/web-view/${appName}/${hash}/${newAuthToken}/index.html");
 	}
 	
 	@Transient private String substituteArchiveVariables(GlobalSettings settings,String url) {
 		
 		String externalServiceUrlPrefix = settings.getExternalServiceUrlPrefix();
-		String authSalt = this.getVersion().getApplication().getProxyAuthSalt();
+		String authSalt = this.getApplication().getProxyAuthSalt();
 		String newAuthToken;
 		try {
 			newAuthToken = AuthTokenProvider.newAuthToken(authSalt!=null?authSalt:"");
@@ -139,8 +143,7 @@ public class ApplicationArchive extends AbstractModelEntity {
 		try {
 			// TODO: replace these with constants
 			replUrl = replUrl.replace("${globalSettings.externalServiceUrlPrefix}", externalServiceUrlPrefix!=null?externalServiceUrlPrefix:"");
-			replUrl = replUrl.replace("${appName}", URLEncoder.encode(getVersion().getApplication().getName(),FormConstants.CHAR_ENC_DEFAULT));
-			replUrl = replUrl.replace("${appVersion}", URLEncoder.encode(getVersion().getIdentifier(),FormConstants.CHAR_ENC_DEFAULT));
+			replUrl = replUrl.replace("${appName}", URLEncoder.encode(getApplication().getName(),FormConstants.CHAR_ENC_DEFAULT));
 			replUrl = replUrl.replace("${newAuthToken}", URLEncoder.encode(newAuthToken,FormConstants.CHAR_ENC_DEFAULT));
 			replUrl = replUrl.replace("${hash}", URLEncoder.encode(hash,FormConstants.CHAR_ENC_DEFAULT));
 			replUrl = replUrl.replace("${hashAlgorithm}", URLEncoder.encode(hashAlgorithm,FormConstants.CHAR_ENC_DEFAULT));
@@ -172,7 +175,7 @@ public class ApplicationArchive extends AbstractModelEntity {
 	/**
 	 * @return A hash the artifact residing at the url can be verified with.
 	 */
-	@Column(name="hash")
+	@Column(name="hash",unique=true)
 	@Parameter("hash")
 	public String getHash() {
 		return hash;
@@ -196,13 +199,13 @@ public class ApplicationArchive extends AbstractModelEntity {
 	/**
 	 * @return The version of the application the archive is associated to.
 	 */
-	@OneToOne(fetch=FetchType.EAGER,cascade={CascadeType.ALL},targetEntity=ApplicationVersion.class)
-	@JoinColumn(name="version_id")
-	public ApplicationVersion getVersion() {
-		return version;
+	@OneToOne(fetch=FetchType.EAGER,cascade={},targetEntity=Application.class)
+	@JoinColumn(name="application_id")
+	public Application getApplication() {
+		return application;
 	}
-	public void setVersion(ApplicationVersion version) {
-		this.version = version;
+	public void setApplication(Application application) {
+		this.application = application;
 	}
 	
 	@Column(name="bytes_length")
@@ -221,14 +224,6 @@ public class ApplicationArchive extends AbstractModelEntity {
 	}
 	public void setBytesLengthUncompressed(Integer bytesLength) {
 		bytesLengthUncompressed = bytesLength;
-	}
-	
-	@Transient
-	public Boolean getNewFileUploaded() {
-		return newFileUploaded;
-	}
-	public void setNewFileUploaded(Boolean newFileUploaded) {
-		this.newFileUploaded = newFileUploaded;
 	}
 	
 	public Map<Method,String> validate() {

@@ -16,5 +16,8 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=openmeap-services-web&amp;ivyXmlPath=ivy.xml&amp;confs=ide"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/openmeap-shared"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/openmeap-shared-jdk5"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/openmeap-shared-serverside"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

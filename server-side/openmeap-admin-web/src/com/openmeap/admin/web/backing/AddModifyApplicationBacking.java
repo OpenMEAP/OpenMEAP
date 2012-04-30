@@ -33,6 +33,9 @@ import java.util.Map;
 
 import javax.persistence.PersistenceException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.openmeap.Authorizer;
 import com.openmeap.admin.web.events.AddSubNavAnchorEvent;
 import com.openmeap.constants.FormConstants;
@@ -59,6 +62,8 @@ import com.openmeap.web.html.Anchor;
 public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking {
 
 	private static String PROCESS_TARGET = ProcessingTargets.ADDMODIFY_APP;
+	
+	private Logger logger = LoggerFactory.getLogger(AddModifyApplicationBacking.class);
 	
 	private ModelManager modelManager = null;
 	
@@ -114,11 +119,15 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 			if( events.size()==0 ) {
 				try {
 					app.setLastModifier(firstValue("userPrincipalName",parameterMap));
+					modelManager.begin();
 					app = modelManager.addModify(app,events);
+					modelManager.commit(events);
 					events.add( new MessagesEvent("Application successfully created/modified!") );
 				} catch( InvalidPropertiesException ipe ) {
+					modelManager.rollback();
 					events.add( new MessagesEvent(ipe.getMessage()) );
 				} catch( PersistenceException pe ) {
+					modelManager.rollback();
 					events.add( new MessagesEvent(pe.getMessage()) );							
 				}
 			}
@@ -130,12 +139,19 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 			if( ParameterMapUtils.notEmpty(FormConstants.DELETE,parameterMap) && ParameterMapUtils.notEmpty("deleteConfirm",parameterMap) ) {
 				
 					if( ParameterMapUtils.firstValue("deleteConfirm", parameterMap).equals(FormConstants.APP_DELETE_CONFIRM_TEXT) ) {
-						
-						modelManager.delete(app,events);
-						events.add( new MessagesEvent("Application successfully deleted!") );
-						app = null;
-						// we remove the applicationId parameter, so that the form can populate empty
-						parameterMap.remove(FormConstants.APP_ID);
+						try {
+							modelManager.begin();
+							modelManager.delete(app,events);
+							modelManager.commit(events);
+							events.add( new MessagesEvent("Application successfully deleted!") );
+							app = null;
+							// we remove the applicationId parameter, so that the form can populate empty
+							parameterMap.remove(FormConstants.APP_ID);
+						} catch(Exception e) {
+							events.add( new MessagesEvent("Application delete failed!") );
+							logger.error("Deleting application with id "+app.getId()+" failed",e);
+							modelManager.rollback();
+						}
 					} else {
 						
 						events.add( new MessagesEvent("You must confirm your desire to delete by typing in the delete confirmation message.") );

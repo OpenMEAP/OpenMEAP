@@ -30,7 +30,7 @@ public interface HttpRequestExecuter {
 	
 	public final static String SSL_PEER_NOVERIFY_PROPERTY = "com.openmeap.sslPeerNoVerify";
 	
-	public HttpResponse postXml(String url, String xmlData)  throws HttpRequestException;
+	public HttpResponse postContent(String url, String content, String contentType)  throws HttpRequestException;
 	public HttpResponse postData(String url, Hashtable params) throws HttpRequestException;
 	public HttpResponse postData(String url, Hashtable urlParams, Hashtable postParams) throws HttpRequestException;
 	public HttpResponse get(String url) throws HttpRequestException;

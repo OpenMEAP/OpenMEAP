@@ -48,7 +48,7 @@ import javax.persistence.Transient;
 import com.openmeap.constants.FormConstants;
 import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
-import com.openmeap.model.AbstractModelEntity;
+import com.openmeap.model.event.AbstractModelEntity;
 import com.openmeap.web.form.Parameter;
 
 @Entity @Table(name="application_version")
@@ -125,7 +125,7 @@ public class ApplicationVersion extends AbstractModelEntity {
 	/**
 	 * @return The binary archive of the application and associated integrity information.
 	 */
-	@OneToOne(fetch=FetchType.EAGER,cascade={CascadeType.ALL},targetEntity=ApplicationArchive.class)
+	@OneToOne(fetch=FetchType.EAGER,cascade={},targetEntity=ApplicationArchive.class)
 	@JoinColumn(name="archive_id")
 	public ApplicationArchive getArchive() {
 		return archive;
@@ -154,12 +154,9 @@ public class ApplicationVersion extends AbstractModelEntity {
 				errors.put( this.getClass().getMethod("getApplication"), "must be associated to an application");
 			
 			// validate the archive
-			if( this.getArchive()==null 
-					|| this.getArchive().getVersion()==null 
-					|| (this.getArchive().getVersion().getId()!=null 
-							&& this.getArchive().getVersion().getId().compareTo(this.getId())!=0 ) )
+			if( this.getArchive()==null ) {
 				errors.put( this.getClass().getMethod("getArchive"), "The version must have an archive");
-			else {
+			} else {
 				Map<Method,String> archiveErrors = this.getArchive().validate();
 				if( archiveErrors!=null ) {
 					errors.putAll(archiveErrors);

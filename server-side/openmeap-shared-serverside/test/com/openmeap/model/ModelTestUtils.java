@@ -137,7 +137,7 @@ public class ModelTestUtils {
 			
 			em.getTransaction().begin();
 			
-			for( String className : new String[] {"GlobalSettings","Application","ApplicationVersion","Deployment","ApplicationInstallation"} ) {
+			for( String className : new String[] {"GlobalSettings","Application","ApplicationArchive","ApplicationVersion","Deployment","ApplicationInstallation"} ) {
 				Map<String,? extends ModelEntity> members = modelBeans.get(className);
 				for( ModelEntity member : members.values() ) {
 					if( className.equals("Application") ) {

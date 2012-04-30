@@ -79,6 +79,7 @@ public class JSONObjectBuilder {
 					if( Enum.class.isAssignableFrom(returnType) ) {
 						
 						property.getGetterSetter().setValue(rootObject,value);
+						
 					} else if( value instanceof JSONArray ) {
 						
 						JSONArray array = (JSONArray)value;
@@ -92,7 +93,12 @@ public class JSONObjectBuilder {
 								list.addElement(obj);
 							}
 						}
-						property.getGetterSetter().setValue(rootObject,toTypedArray(list));
+						
+						if(property.getContainedType()!=null) {
+							property.getGetterSetter().setValue(rootObject,list);
+						} else {
+							property.getGetterSetter().setValue(rootObject,toTypedArray(list));
+						}
 						
 					} else if( value instanceof JSONObject ) {
 						
@@ -134,7 +140,7 @@ public class JSONObjectBuilder {
 			return null;
 		}
 		if( ! HasJSONProperties.class.isAssignableFrom(obj.getClass()) ) {
-			throw new RuntimeException("The rootObject being converted to JSON must implement the HashJSONProperties interface.");
+			throw new RuntimeException("The rootObject being converted to JSON must implement the HasJSONProperties interface.");
 		}		
 		JSONProperty[] properties = ((HasJSONProperties)obj).getJSONProperties();
 		JSONObject jsonObj = new JSONObject();
@@ -191,6 +197,20 @@ public class JSONObjectBuilder {
 							}
 						}
 						jsonObj.put(propertyName, jsonMap);
+					} else if( Vector.class.isAssignableFrom(returnType) ) {
+						
+						Vector returnValues = (Vector)property.getGetterSetter().getValue(obj);
+						JSONArray jsonArray = new JSONArray();
+						int size = returnValues.size();
+						for( int returnValueIdx=0; returnValueIdx<size; returnValueIdx++ ) {
+							Object thisValue = returnValues.elementAt(returnValueIdx);
+							if(isSimpleType(property.getContainedType()) ) {
+								jsonArray.put(thisValue);
+							} else {
+								jsonArray.put(toJSON(thisValue));
+							}
+						}
+						jsonObj.put(propertyName, jsonArray);
 					} else {
 						jsonObj.put(propertyName, toJSON(value));
 					}

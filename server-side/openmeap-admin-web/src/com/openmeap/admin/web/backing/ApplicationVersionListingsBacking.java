@@ -79,10 +79,11 @@ public class ApplicationVersionListingsBacking extends AbstractTemplatedSectionB
 				setupMayCreateDeployments(templateVariables,app,events);
 				
 				Deployment lastDeployment = modelManager.getModelService().getLastDeployment(app);
-				Long currentVersionId = null;
-				if( lastDeployment!=null && lastDeployment.getApplicationVersion()!=null ) 
-					currentVersionId = lastDeployment.getApplicationVersion().getId();
-				currentVersionId = currentVersionId!=null ? currentVersionId:(-1);
+				String currentVersionId = null;
+				if( lastDeployment!=null && lastDeployment.getVersionIdentifier()!=null ) {
+					currentVersionId = lastDeployment.getVersionIdentifier();
+				}
+				currentVersionId = currentVersionId != null ? currentVersionId : "";
 				
 				templateVariables.put("application", app);
 				templateVariables.put(FormConstants.PROCESS_TARGET, ProcessingTargets.DEPLOYMENTS);

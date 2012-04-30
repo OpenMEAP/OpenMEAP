@@ -22,20 +22,20 @@
  ###############################################################################
  */
 
-package com.openmeap.model.event.notifier;
+package com.openmeap.model.event.handler;
 
-import java.util.Map;
-
-import com.openmeap.constants.UrlParamConstants;
+import com.openmeap.event.EventHandler;
 import com.openmeap.model.ModelEntity;
-import com.openmeap.model.dto.ApplicationArchive;
 
-abstract public class AbstractArchiveEventNotifier extends AbstractEventNotifier<ApplicationArchive> {
-	protected void addRequestParameters(ModelEntity modelEntity, Map<String,Object> parms) {
-		ApplicationArchive archive = (ApplicationArchive)modelEntity;
-		String hash = archive.getHash();
-		String hashType = archive.getHashAlgorithm();
-		parms.put(UrlParamConstants.APPARCH_HASH, hash);
-		parms.put(UrlParamConstants.APPARCH_HASH_ALG, hashType);
-	}
+/**
+ * Serves as a base for ModelService event handling classes
+ * @author schang
+ */
+public interface ModelServiceEventHandler extends EventHandler<ModelEntity> {
+	/**
+	 * @param operation
+	 * @return true if the event notifier should be executed on a specific operation and payload, else false
+	 
+	Boolean handlesFor(ModelServiceOperation operation, ModelEntity payload);
+	 */
 }

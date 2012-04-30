@@ -95,7 +95,7 @@ public class ApplicationManagementPortTypeImplTest {
 		} catch( WebServiceException wse ) {
 			thrown = true;
 		}
-		Assert.assertTrue("A non-existent application version should trigger an exception",thrown);
+		Assert.assertFalse("A non-existent application version should not trigger an exception",thrown);
 	}
 	
 	/**
@@ -108,9 +108,16 @@ public class ApplicationManagementPortTypeImplTest {
 		
 		com.openmeap.model.dto.Application app = modelManager.getModelService().findByPrimaryKey(Application.class, 1L);
 		Iterator<Deployment> i = new ArrayList<Deployment>(app.getDeployments()).iterator();
-		while(i.hasNext()) {
-			Deployment d = i.next();
-			modelManager.delete(d,null);
+		try {
+			modelManager.begin();
+			while(i.hasNext()) {
+				Deployment d = i.next();
+				modelManager.delete(d,null);
+			}
+			modelManager.commit();
+		} catch(Exception e) {
+			modelManager.rollback();
+			throw new Exception(e);
 		}
 		
 		try {

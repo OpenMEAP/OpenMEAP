@@ -60,10 +60,10 @@ import com.openmeap.util.Utils;
  */
 public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 	
-	public HttpResponse postXml(String url, String xmlData) throws HttpRequestException {
+	public HttpResponse postContent(String url, String content, String contentType) throws HttpRequestException {
 		
 		try {
-			return makeRequest(url,xmlData.getBytes(FormConstants.CHAR_ENC_DEFAULT),new HttpHeader[]{new HttpHeader(FormConstants.CONTENT_TYPE,FormConstants.CONT_TYPE_XML)});
+			return makeRequest(url,content.getBytes(FormConstants.CHAR_ENC_DEFAULT),new HttpHeader[]{new HttpHeader(FormConstants.CONTENT_TYPE,contentType)});
 		} catch (UnsupportedEncodingException e) {
 			throw new HttpRequestException(e);
 		}

@@ -24,6 +24,8 @@
 
 package com.openmeap.cluster;
 
+import java.net.URL;
+
 import com.openmeap.event.EventNotificationException;
 
 /**
@@ -31,19 +33,39 @@ import com.openmeap.event.EventNotificationException;
  */
 public class ClusterNotificationException extends EventNotificationException {
 
-	public ClusterNotificationException() {
+	private URL url;
+	
+	public URL getUrl() {
+		return url;
 	}
-
+	
+	public ClusterNotificationException(URL url) {
+		super();
+		this.url=url;
+	}
+	
 	public ClusterNotificationException(String arg0) {
 		super(arg0);
 	}
-
-	public ClusterNotificationException(Throwable arg0) {
-		super(arg0);
-	}
-
+	
 	public ClusterNotificationException(String arg0, Throwable arg1) {
 		super(arg0, arg1);
+		this.url=url;
+	}
+
+	public ClusterNotificationException(URL url, String arg0) {
+		super(arg0);
+		this.url=url;
+	}
+
+	public ClusterNotificationException(URL url, Throwable arg0) {
+		super(arg0);
+		this.url=url;
+	}
+
+	public ClusterNotificationException(URL url, String arg0, Throwable arg1) {
+		super(arg0, arg1);
+		this.url=url;
 	}
 
 }

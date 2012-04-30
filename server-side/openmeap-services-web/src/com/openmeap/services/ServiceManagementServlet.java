@@ -44,6 +44,8 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.openmeap.cluster.dto.ClusterNodeRequest;
+import com.openmeap.constants.FormConstants;
 import com.openmeap.constants.UrlParamConstants;
 import com.openmeap.digest.DigestException;
 import com.openmeap.event.Event;
@@ -66,6 +68,7 @@ import com.openmeap.util.AuthTokenProvider;
 import com.openmeap.util.GenericRuntimeException;
 import com.openmeap.util.ParameterMapUtils;
 import com.openmeap.util.ServletUtils;
+import com.openmeap.util.Utils;
 
 /**
  * Used to notify that model items have been modified in the administrative interface.
@@ -78,10 +81,7 @@ import com.openmeap.util.ServletUtils;
  */
 public class ServiceManagementServlet extends HttpServlet {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 3528435164985362736L;
 
 	private Logger logger = LoggerFactory.getLogger(ServiceManagementServlet.class);
 	
@@ -134,6 +134,12 @@ public class ServiceManagementServlet extends HttpServlet {
 			
 			logger.trace("Processing refresh");
 			result = refresh(request,response);
+			sendResult(response,os,result);
+			return;
+		} else if( action.equals(ClusterNodeRequest.HEALTH_CHECK) ) {
+			
+			logger.trace("Cluster node health check");
+			result = healthCheck(request,response);
 			sendResult(response,os,result);
 			return;
 		}
@@ -262,6 +268,35 @@ public class ServiceManagementServlet extends HttpServlet {
 	}
 	
 	/**
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 */
+	private Result healthCheck(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String json = Utils.readInputStream(request.getInputStream(), FormConstants.CHAR_ENC_DEFAULT);
+		Result result = null;
+		try {
+			ClusterNodeRequest nodeRequest = (ClusterNodeRequest)new JSONObjectBuilder().fromJSON(new JSONObject(json), new ClusterNodeRequest());
+			Map<String,String> properties = (Map<String,String>)context.getBean("openmeapServicesWebPropertiesMap");
+			synchronized(properties) {
+				properties.put("clusterNodeUrlPrefix", nodeRequest.getClusterNode().getServiceWebUrlPrefix());
+				properties.put("fileSystemStoragePathPrefix", nodeRequest.getClusterNode().getFileSystemStoragePathPrefix());
+			}
+			result = new Result(Result.Status.SUCCESS);
+		} catch (JSONException e) {
+			result = new Result();
+			result.setStatus(Result.Status.FAILURE);
+			String msg = "Failed to parse health status check JSON - "+json;
+			logger.error(msg);
+			result.setMessage(msg);
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * Validates that the auth in a request passes validation
 	 * @param arg0
 	 * @return
@@ -282,7 +317,8 @@ public class ServiceManagementServlet extends HttpServlet {
 	// ACCESSORS
 	
 	public String getAuthSalt() {
-		return modelManager.getGlobalSettings().getServiceManagementAuthSalt();
+		GlobalSettings settings = modelManager.getGlobalSettings();
+		return settings.getServiceManagementAuthSalt();
 	}
 	
 	public void setModelManager(ModelManager manager) {

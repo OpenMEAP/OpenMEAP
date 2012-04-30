@@ -29,6 +29,7 @@ import com.openmeap.json.EnumUtils;
 import com.openmeap.protocol.dto.ErrorCode;
 import com.openmeap.util.GenericException;
 
+
 /**
  * Provides a bridge to the xml generated type errorcode enum
  * 

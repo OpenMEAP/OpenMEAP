@@ -72,10 +72,8 @@ import com.openmeap.util.Utils;
 
 public class ApplicationManagementServlet extends HttpServlet {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -4989132152150822192L;
+	
 	private Logger logger = LoggerFactory.getLogger(ApplicationManagementServlet.class);
 	private ModelManager modelManager = null;
 	private WebApplicationContext context = null;

@@ -69,7 +69,6 @@ public class ModelServiceImplTest {
 		testFind();
 		testFindAll();
 		testFindAppVersionByNameAndId();
-		testFindDeploymentsByNameAndId();
 		testDelete();
 	}
 	
@@ -80,13 +79,25 @@ public class ModelServiceImplTest {
 		// and that the application returned has the pk assigned by the db/orm 
 		Application app = new Application();
 		app.setName("This is a unique app name, or my name ain't Jon.");
-		app = modelService.saveOrUpdate(app);
+		try {
+			app = modelService.begin().saveOrUpdate(app);
+			modelService.commit();
+		} catch(Exception e) {
+			modelService.rollback();
+			throw new RuntimeException(e);
+		}
 		Assert.assertTrue(app.getId()!=null);
 		
 		ApplicationVersion appVer = new ApplicationVersion();
 		appVer.setApplication(app);
 		appVer.setIdentifier("smacky id");
-		appVer = modelService.saveOrUpdate(appVer);
+		try {
+			appVer = modelService.begin().saveOrUpdate(appVer);
+			modelService.commit();
+		} catch(Exception e) {
+			modelService.rollback();
+			throw new RuntimeException(e);
+		}
 		Assert.assertTrue(appVer.getId()!=null);
 		
 		/////////////////
@@ -94,13 +105,25 @@ public class ModelServiceImplTest {
 		app = modelService.findByPrimaryKey(Application.class,1L);
 		String origName = app.getName();
 		app.setName("picard");
-		modelService.saveOrUpdate(app);
+		try {
+			app = modelService.begin().saveOrUpdate(app);
+			modelService.commit();
+		} catch(Exception e) {
+			modelService.rollback();
+			throw new RuntimeException(e);
+		}
 		app = modelService.findByPrimaryKey(Application.class,1L);
 		Assert.assertTrue(app.getName()!=null && app.getName().compareTo("picard")==0 );
 		Assert.assertTrue(app.getId()!=null);
 		// put the app back the way we found it
 		app.setName(origName);
-		modelService.saveOrUpdate(app);
+		try {
+			app = modelService.begin().saveOrUpdate(app);
+			modelService.commit();
+		} catch(Exception e) {
+			modelService.rollback();
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public void testFind() {
@@ -126,12 +149,6 @@ public class ModelServiceImplTest {
 		Assert.assertTrue(app!=null);
 	}
 	
-	public void testFindDeploymentsByNameAndId() {
-		List<Deployment> deployments = modelService.findDeploymentsByNameAndId("Application.name","ApplicationVersion.identifier.1");
-		Assert.assertTrue(deployments!=null);
-		Assert.assertTrue(deployments.size()==2);
-	}
-	
 	// putting this last because it corrupts the model
 	public void testDelete() {
 		// verify that we 
@@ -145,6 +162,6 @@ public class ModelServiceImplTest {
 		modelService.delete(app);
 		app = modelService.findByPrimaryKey(Application.class, 1L);
 		appVer = modelService.findByPrimaryKey(ApplicationVersion.class,2L);
-		Assert.assertTrue(appVer==null);
+		Assert.assertTrue(appVer!=null);
 	}
 }

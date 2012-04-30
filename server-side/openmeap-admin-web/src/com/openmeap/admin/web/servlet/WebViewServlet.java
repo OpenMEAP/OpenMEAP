@@ -48,6 +48,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import com.openmeap.constants.FormConstants;
 import com.openmeap.digest.DigestException;
 import com.openmeap.model.ModelManager;
+import com.openmeap.model.dto.Application;
+import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.util.AuthTokenProvider;
@@ -91,11 +93,12 @@ public class WebViewServlet extends HttpServlet {
 		String fileRelative = pathInfo.replace(remove,""); 
 
 		String applicationNameString = URLDecoder.decode(pathParts[APP_NAME_INDEX],FormConstants.CHAR_ENC_DEFAULT);
-		String applicationVersionString = URLDecoder.decode(pathParts[APP_VER_INDEX],FormConstants.CHAR_ENC_DEFAULT);
+		String archiveHash = URLDecoder.decode(pathParts[APP_VER_INDEX],FormConstants.CHAR_ENC_DEFAULT);
 		
-		ApplicationVersion ver = mgr.getModelService().findAppVersionByNameAndId(applicationNameString, applicationVersionString);
+		Application app = mgr.getModelService().findApplicationByName(applicationNameString);
+		ApplicationArchive arch = mgr.getModelService().findApplicationArchiveByHashAndAlgorithm(archiveHash,"MD5");
 	
-		String authSalt = ver.getApplication().getProxyAuthSalt();
+		String authSalt = app.getProxyAuthSalt();
 		String authToken = URLDecoder.decode(pathParts[AUTH_TOKEN_INDEX],FormConstants.CHAR_ENC_DEFAULT);
 		
 		try {
@@ -106,7 +109,7 @@ public class WebViewServlet extends HttpServlet {
 			throw new GenericRuntimeException(e1);
 		}
 		
-		File fileFull = new File( ver.getArchive().getExplodedPath(settings.getTemporaryStoragePath()).getAbsolutePath() + "/" + fileRelative );
+		File fileFull = new File( arch.getExplodedPath(settings.getTemporaryStoragePath()).getAbsolutePath() + "/" + fileRelative );
 		try {
 			FileNameMap fileNameMap = URLConnection.getFileNameMap();
 			String mimeType = fileNameMap.getContentTypeFor(fileFull.toURL().toString());

@@ -32,9 +32,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.persistence.PersistenceException;
 
@@ -43,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.openmeap.Authorizer.Action;
+import com.openmeap.cluster.ClusterNodeHealthCheckThread;
 import com.openmeap.constants.FormConstants;
 import com.openmeap.event.MessagesEvent;
 import com.openmeap.event.ProcessingEvent;
@@ -56,6 +59,7 @@ import com.openmeap.web.ProcessingContext;
 
 public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 	private ModelManager modelManager;
+	private ClusterNodeHealthCheckThread healthChecker;
 	
 	private final static Logger logger = LoggerFactory.getLogger(GlobalSettingsBacking.class); 
 	
@@ -132,7 +136,7 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 				// make sure there is a map in cluster nodes
 				List<ClusterNode> clusterNodes = settings.getClusterNodes();
 				if( clusterNodes==null ) {
-					clusterNodes = new ArrayList<ClusterNode>();
+					clusterNodes = new Vector<ClusterNode>();
 					settings.setClusterNodes(clusterNodes);
 				} 
 				
@@ -160,8 +164,9 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 						clusterNodes.remove(node);
 						modelManager.delete(node,events);
 					}
-					if( settings.getClusterNode(thisNodeUrl)!=null ) {
-						settings.getClusterNode(thisNodeUrl).setFileSystemStoragePathPrefix(thisNodePath);
+					ClusterNode node = null;
+					if( (node=settings.getClusterNode(thisNodeUrl))!=null ) {
+						node.setFileSystemStoragePathPrefix(thisNodePath);
 					} else {
 						ClusterNode thisNode = new ClusterNode();
 						thisNode.setServiceWebUrlPrefix(thisNodeUrl);
@@ -180,6 +185,7 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 			}
 		
 			try {
+				modelManager.begin();
 				if(toDelete!=null) {
 					for(ClusterNode node : toDelete) {
 						settings.removeClusterNode(node);
@@ -187,13 +193,15 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 					}
 				}
 				modelManager.addModify(settings,events);
+				modelManager.commit(events);
+				modelManager.refresh(settings, events);
 				events.add(new MessagesEvent("The settings were successfully modified."));
 			} catch( InvalidPropertiesException ipe ) {
-				logger.error("An exception updating GlobalSettings: {}",ipe);
-				events.add( new MessagesEvent(ExceptionUtils.getRootCauseMessage(ipe)) );
+				modelManager.rollback();
+				events.add( new MessagesEvent(ipe.getMessage()) );
 			} catch( PersistenceException ipe ) {
-				logger.error("An exception updating GlobalSettings: {}",ipe);
-				events.add( new MessagesEvent(ExceptionUtils.getRootCauseMessage(ipe)) );
+				modelManager.rollback();
+				events.add( new MessagesEvent(ipe.getMessage()) );
 			}
 		} 
 		
@@ -208,6 +216,22 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 			templateVariables.put(AUTH_SALT_VERIFY_PARAM, settings.getServiceManagementAuthSalt());
 		}
 		if( settings.getClusterNodes()!=null && settings.getClusterNodes().size()>0 ) {
+			if(healthChecker!=null) {
+				for(ClusterNode node:settings.getClusterNodes()) {
+					ClusterNode checkerNode = healthChecker.getSettings().getClusterNode(node.getServiceWebUrlPrefix());
+					if(checkerNode!=null) {
+						synchronized(checkerNode) {
+							node.setLastStatus(checkerNode.getLastStatus());
+							Date date=null;
+							node.setLastStatusCheck(
+									(Date) ((date=checkerNode.getLastStatusCheck())!=null
+									?date.clone()
+									:null));
+							node.setLastStatusMessage(checkerNode.getLastStatusMessage());
+						}
+					}
+				}
+			}
 			templateVariables.put(CLUSTER_NODES_VAR, settings.getClusterNodes());
 		}
 		if( settings.getMaxFileUploadSize()!=null ) {
@@ -226,6 +250,10 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 	}
 	public void setModelManager(ModelManager modelManager) {
 		this.modelManager = modelManager;
+	}
+	
+	public void setClusterNodeHealthCheck(ClusterNodeHealthCheckThread healthChecker) {
+		this.healthChecker = healthChecker;
 	}
 }
 

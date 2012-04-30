@@ -69,6 +69,7 @@
 		<dependency org="commons-lang" name="commons-lang" rev="2.6" conf="ide->default"/>
 		<dependency org="commons-io" name="commons-io" rev="2.1" conf="ide->default"/>
 		<dependency org="commons-fileupload" name="commons-fileupload" rev="1.2.2" conf="ide->default"/>
+		<dependency org="commons-transaction" name="commons-transaction" rev="1.2" conf="ide->default"/>
 		
 		<dependency org="mockit" name="jmockit" rev="0.999.4" conf="ide->default"/>
 		<dependency org="mockit" name="jmockit" rev="0.999.4" conf="test->default"/>

@@ -149,16 +149,15 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
 		}
 	}
 	
-	public HttpResponse postXml(String url, String xmlData) throws HttpRequestException {
+	public HttpResponse postContent(String url, String content, String contentType) throws HttpRequestException {
 		try {
-	    	StringEntity stringEntity = new StringEntity(xmlData,FormConstants.CHAR_ENC_DEFAULT);
-	    	stringEntity.setContentType(FormConstants.CONT_TYPE_XML);
+	    	StringEntity stringEntity = new StringEntity(content,FormConstants.CHAR_ENC_DEFAULT);
+	    	stringEntity.setContentType(contentType);
 	    	
 	    	HttpPost httppost = new HttpPost(url);
-	    	httppost.setHeader(FormConstants.CONTENT_TYPE,FormConstants.CONT_TYPE_XML);
+	    	httppost.setHeader(FormConstants.CONTENT_TYPE,contentType);
 	    	httppost.setEntity(stringEntity);
 	    	
-	    	// TODO: figure out how to get "application/soap+xml;charset=UTF-8" working...keeps giving me a "415: Unsupported Media Type"
 	    	return execute(httppost);
 		} catch(Exception e) {
 			throw new HttpRequestException(e);

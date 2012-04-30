@@ -45,8 +45,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import com.openmeap.model.AbstractModelEntity;
 import com.openmeap.model.ModelEntity;
+import com.openmeap.model.event.AbstractModelEntity;
 
 @Entity @Table(name="deployment")
 public class Deployment extends AbstractModelEntity {
@@ -84,12 +84,10 @@ public class Deployment extends AbstractModelEntity {
 	
 	private Long id;
 	private Application application;
-	private ApplicationVersion applicationVersion;
+	private ApplicationArchive applicationArchive;
+	private String versionIdentifier;
 	private Date createDate;
 	private Deployment.Type type;
-	private String hash;
-	private String hashAlgorithm;
-	private String downloadUrl;
 	private String creator;
 	
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
@@ -119,12 +117,20 @@ public class Deployment extends AbstractModelEntity {
 		this.application = application;
 	}
 	
-	@ManyToOne(fetch=FetchType.LAZY,cascade={},targetEntity=ApplicationVersion.class,optional=false)
-	public ApplicationVersion getApplicationVersion() {
-		return applicationVersion;
+	@ManyToOne(fetch=FetchType.EAGER,cascade={},targetEntity=ApplicationArchive.class,optional=false)
+	public ApplicationArchive getApplicationArchive() {
+		return applicationArchive;
 	}
-	public void setApplicationVersion(ApplicationVersion applicationVersion) {
-		this.applicationVersion = applicationVersion;
+	public void setApplicationArchive(ApplicationArchive applicationArchive) {
+		this.applicationArchive = applicationArchive;
+	}
+	
+	@Column(name="version_identifier")
+	public String getVersionIdentifier() {
+		return versionIdentifier;
+	}
+	public void setVersionIdentifier(String versionIdentifier) {
+		this.versionIdentifier = versionIdentifier;
 	}
 
 	@Basic(optional=false)
@@ -135,29 +141,6 @@ public class Deployment extends AbstractModelEntity {
 	}
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
-	}
-	
-	public String getHash() {
-		return hash;
-	}
-	public void setHash(String hash) {
-		this.hash = hash;
-	}
-	
-	@Column(name="hash_alg")
-	public String getHashAlgorithm() {
-		return hashAlgorithm;
-	}
-	public void setHashAlgorithm(String hashAlgorithm) {
-		this.hashAlgorithm = hashAlgorithm;
-	}
-	
-	@Column(name="download_url")
-	public String getDownloadUrl() {
-		return downloadUrl;
-	}
-	public void setDownloadUrl(String downloadUrl) {
-		this.downloadUrl = downloadUrl;
 	}
 	
 	@Column(name="creator")
@@ -186,7 +169,7 @@ public class Deployment extends AbstractModelEntity {
 	@Override 
 	public String toString() {
 		return "Deployment("+(application!=null?application.getName():null)+", "
-				+(applicationVersion!=null?applicationVersion.getIdentifier():null)+", "
+				+getVersionIdentifier()+", "
 				+getCreateDate()+", "+getType()+")";
 	}
 	

@@ -65,7 +65,7 @@ public class ArchiveFileDeleteHandler implements EventHandler<Map> {
 				logger.error("Failed to delete archive "+archive.getFile(getFileSystemStoragePathPrefix()));
 			}
 		} else {
-			logger.error("Failed to find archive "+archive.getFile(getFileSystemStoragePathPrefix()));
+			logger.warn("Failed to find archive "+archive.getFile(getFileSystemStoragePathPrefix())+".  It may have yet to be deployed.");
 		}
 		
 		File directory = archive.getExplodedPath(getFileSystemStoragePathPrefix());

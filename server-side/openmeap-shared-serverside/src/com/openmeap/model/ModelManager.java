@@ -38,6 +38,7 @@ import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
+import com.openmeap.model.event.notifier.ModelServiceEventNotifier;
 
 /**
  * Interface to handle the business rules of managing ModelEntity objects.
@@ -45,16 +46,19 @@ import com.openmeap.model.dto.GlobalSettings;
  * All business rules specifically related to CRUD operations on any ModelEntity object
  * should be performed by the implementing class of this interface.
  * 
- * Yes, I realize that all the business logic is currently in the backings...
- * that needs to change.
- * 
  * @author schang
  */
 public interface ModelManager {
 	
+	/**
+	 * @param notifiers event notifiers to trigger when certain operations are beginning or completed
+	 */
 	void setEventNotifiers(Collection<ModelServiceEventNotifier> notifiers);
 	Collection<ModelServiceEventNotifier> getEventNotifiers();
 	
+	/**
+	 * @param auth The authorization mechanism to use
+	 */
 	void setAuthorizer(Authorizer auth);
 	Authorizer getAuthorizer();
 	
@@ -64,24 +68,51 @@ public interface ModelManager {
 	void setModelService(ModelService service);
 	ModelService getModelService();
 	
-	public <T extends ModelEntity> void refresh(T obj2Refresh, List<ProcessingEvent> events) throws PersistenceException;
-	
-	<T extends ModelEntity> void delete(T o, List<ProcessingEvent> events);
+	/**
+	 * Refresh the entity passed in from the database.
+	 * 
+	 * @param <T> 
+	 * @param entity The model entity.
+	 * @param events The list of events being generated.  These are actually processed by the caller, generally the web-tier.
+	 * @return this, for chaining together commands in a more compact fashion.
+	 * @throws PersistenceException
+	 */
+	public <T extends ModelEntity> ModelManager refresh(T entity, List<ProcessingEvent> events) throws PersistenceException;
 	
 	/**
-	 * Save or update an Application object.
+	 * Delete a Model Entity
 	 * 
-	 * If the proxyAuthSalt is not set, then this method will assign the Application a new random UUID.
-	 * 
-	 * @throws InvalidPropertiesException when name, description, or device types are empty
-	 * @throws PersistenceException 
+	 * @param entity The entity to delete.
+	 * @param events The list of events being generated.  These are actually processed by the caller, generally the web-tier.
+	 * @return The entity returned by the entity manager after persist.
+	 * @throws PersistenceException
 	 */
-	<T extends ModelEntity> T addModify(T application, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException;
+	<T extends ModelEntity> ModelManager delete(T entity, List<ProcessingEvent> events) throws PersistenceException;
 	
+	/**
+	 * Save or update a Model Entity
+	 * 
+	 * @param entity The entity to add/modify.
+	 * @param events The list of events being generated.  These are actually processed by the caller, generally the web-tier.
+	 * @return The entity returned by the entity manager after persist.
+	 * @throws InvalidPropertiesException when the object's validate() method fails
+	 * @throws PersistenceException
+	 */
+	<T extends ModelEntity> T addModify(T entity, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException;
+	
+	/**
+	 * Get the settings for the installation.
+	 * @return The global settings and cluster nodes of the setup
+	 */
 	GlobalSettings getGlobalSettings();
 	
 	/**
 	 * @return The cluster node of this services war instance, else null if the admin war
 	 */
 	ClusterNode getClusterNode();
+	
+	ModelManager begin();
+	ModelManager commit();
+	ModelManager commit(List<ProcessingEvent> events);
+	void rollback();
 }

@@ -36,6 +36,12 @@ import java.util.zip.ZipFile;
 abstract public class ZipUtils {
 	private ZipUtils() {}
 	
+	/**
+	 * Determines the uncompressed size of a zip file, without deflating it.
+	 * 
+	 * @param zipFile
+	 * @return The size in bytes.
+	 */
 	static public Long getUncompressedSize(ZipFile zipFile) {
 		Enumeration e = zipFile.entries();
 		long uncompressedSize = 0L;
@@ -46,6 +52,13 @@ abstract public class ZipUtils {
 		return Long.valueOf(uncompressedSize);
 	}
 	
+	/**
+	 * Unzips a file into the destination directory provided.
+	 * 
+	 * @param zipFile
+	 * @param destinationDir
+	 * @throws IOException
+	 */
 	static public void unzipFile(ZipFile zipFile, File destinationDir) throws IOException {
 		int BUFFER = 1024;
 		BufferedOutputStream dest = null;

@@ -24,7 +24,6 @@
 
 package com.openmeap.json;
 
-
 abstract public class EnumUtils {
 
     final static public Enum fromValue(Enum enumObject, String v) {

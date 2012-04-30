@@ -22,18 +22,43 @@
  ###############################################################################
  */
 
-package com.openmeap.model;
+package com.openmeap.model.event.notifier;
 
-import com.openmeap.event.EventNotifier;
+import java.util.List;
 
-/**
- * 
- * @author schang
- */
-public interface ModelServiceEventNotifier<T extends ModelEntity> extends EventNotifier<T> {
-	/**
-	 * @param operation
-	 * @return true if the event notifier should be executed on a specific operation and payload, else false
-	 */
-	Boolean notifiesFor(ModelServiceOperation operation, ModelEntity payload);
+import com.openmeap.event.Event;
+import com.openmeap.event.EventNotificationException;
+import com.openmeap.event.ProcessingEvent;
+import com.openmeap.model.ModelEntity;
+
+abstract public class AbstractModelServiceEventNotifier<T extends ModelEntity> 
+		implements ModelServiceEventNotifier<T> {
+
+	@Override
+	public <E extends Event<T>> void onInCommitAfterCommit(E event,
+			List<ProcessingEvent> events) throws EventNotificationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public <E extends Event<T>> void onInCommitBeforeCommit(E event,
+			List<ProcessingEvent> events) throws EventNotificationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public <E extends Event<T>> void onBeforeOperation(E event,
+			List<ProcessingEvent> events) throws EventNotificationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public <E extends Event<T>> void onAfterOperation(E event,
+			List<ProcessingEvent> events) throws EventNotificationException {
+		// TODO Auto-generated method stub
+		
+	}
 }

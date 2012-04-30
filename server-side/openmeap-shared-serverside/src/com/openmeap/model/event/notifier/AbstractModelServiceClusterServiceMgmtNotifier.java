@@ -27,6 +27,7 @@ package com.openmeap.model.event.notifier;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -39,16 +40,18 @@ import com.openmeap.constants.ServletNameConstants;
 import com.openmeap.constants.UrlParamConstants;
 import com.openmeap.event.Event;
 import com.openmeap.http.HttpResponse;
+import com.openmeap.event.EventNotificationException;
+import com.openmeap.event.ProcessingEvent;
 import com.openmeap.model.ModelEntity;
-import com.openmeap.model.ModelServiceEventNotifier;
+import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.event.ModelEntityEvent;
 import com.openmeap.util.Utils;
 
-abstract public class AbstractEventNotifier<T extends ModelEntity> extends
-		AbstractClusterServiceMgmtNotifier<T> 
+abstract public class AbstractModelServiceClusterServiceMgmtNotifier<T extends ModelEntity> 
+		extends AbstractClusterServiceMgmtNotifier<T> 
 		implements ModelServiceEventNotifier<T> {
 	
-	private Logger logger = LoggerFactory.getLogger(AbstractEventNotifier.class);
+	private Logger logger = LoggerFactory.getLogger(AbstractModelServiceClusterServiceMgmtNotifier.class);
 	
 	/**
 	 * @return The action name to call the openmeap-services-web/service-manager/ interface with
@@ -92,12 +95,43 @@ abstract public class AbstractEventNotifier<T extends ModelEntity> extends
 			if( statusCode!=200 ) {
 				String responseText = Utils.readInputStream(response.getResponseBody(), FormConstants.CHAR_ENC_DEFAULT);
 				logger.error(responseText);
-				throw new ClusterNotificationException(String.format("Notification to %s returned status code %s and response text was ",sendUrl,statusCode));
+				throw new ClusterNotificationException(url,String.format("Notification to %s returned status code %s and response text was ",sendUrl,statusCode));
 			} else {
 				Utils.consumeInputStream(response.getResponseBody());
 			}
 		} catch( Exception e ) {
-			throw new ClusterNotificationException(e.getMessage(),e);
+			throw new ClusterNotificationException(url,e.getMessage(),e);
 		}
+	}
+	
+	@Override
+	public <E extends Event<T>> void onInCommitAfterCommit(
+			E event, List<ProcessingEvent> events)
+			throws EventNotificationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public <E extends Event<T>> void onInCommitBeforeCommit(
+			E event, List<ProcessingEvent> events)
+			throws EventNotificationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public <E extends Event<T>> void onBeforeOperation(
+			E event, List<ProcessingEvent> events)
+			throws EventNotificationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public <E extends Event<T>> void onAfterOperation(E event,
+			List<ProcessingEvent> events) throws EventNotificationException {
+		// TODO Auto-generated method stub
+		
 	}
 }
