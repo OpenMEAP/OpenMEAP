@@ -58,13 +58,9 @@
 		</property>
 	</bean>
 	
-	<bean id="fileOperationManagerFactory" class="com.openmeap.file.FileOperationManagerFactory">
+	<bean id="fileOperationManager" class="com.openmeap.file.FileOperationManagerImpl">
 		<property name="modelService" ref="modelService"/>
 	</bean>
-	
-	<bean id="fileOperationManager" 
-			factory-bean="fileOperationManagerFactory" 
-			factory-method="newFileOperationManager"/>
 	
 	<bean id="www_ejb3Config" 
 			scope="prototype" 

@@ -74,7 +74,7 @@ public class ArchiveFileHelper {
 					FileUtils.deleteDirectory(oldExplodedPath);
 				}
 			} catch( IOException ioe ) {
-				logger.error("There was an exception deleting the old web-view directory: {}",ioe);
+				logger.error("There was an exception deleting the old web-view directory",ioe);
 				events.add(new MessagesEvent(String.format("Upload process will continue.  There was an exception deleting the old web-view directory: %s",ioe.getMessage())));
 			}
 			

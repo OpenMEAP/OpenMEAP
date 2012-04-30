@@ -43,6 +43,10 @@ import org.apache.commons.transaction.file.ResourceManagerSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.openmeap.model.ModelManager;
+import com.openmeap.model.ModelService;
+import com.openmeap.model.dto.GlobalSettings;
+import com.openmeap.util.SLF4JLoggerFacade;
 import com.openmeap.util.Utils;
 
 /**
@@ -54,13 +58,18 @@ import com.openmeap.util.Utils;
 public class FileOperationManagerImpl implements FileOperationManager {
 	
 	Logger logger = LoggerFactory.getLogger(FileOperationManagerImpl.class);
+	ModelService modelService;
 	FileResourceManager fileResourceManager;
 	Map<Thread,Object> activeTransactions = Collections.synchronizedMap(new HashMap<Thread,Object>());
 	
 	public void setFileResourceManager(FileResourceManager fileResourceManager) {
 		this.fileResourceManager = fileResourceManager;
 	}
-
+	
+	public void setModelService(ModelService modelService) {
+		this.modelService = modelService;
+	}
+	
 	@Override
 	public void deleteDir(String path) throws FileOperationException {
 		String storeDir = this.fileResourceManager.getStoreDir();
@@ -144,6 +153,7 @@ public class FileOperationManagerImpl implements FileOperationManager {
 	
 	@Override
 	public void begin() throws FileOperationException {
+		_setup();
 		Object txId;
 		try {
 			fileResourceManager.start();
@@ -232,5 +242,27 @@ public class FileOperationManagerImpl implements FileOperationManager {
 				}
 			}
 		}
+	}
+	
+	private void _setup() throws FileOperationException {
+		
+		if(fileResourceManager!=null) {
+			return;
+		}
+		
+		GlobalSettings settings = (GlobalSettings)modelService.findByPrimaryKey(GlobalSettings.class, 1L);
+		if( settings.getTemporaryStoragePath()==null 
+				|| !new File(settings.getTemporaryStoragePath()).exists()) {
+			String msg = "The storage path has not been set in GlobalSettings.  Use the settings page to fix this.";
+			logger.error(msg);
+			throw new FileOperationException(msg);
+		}
+		
+		FileResourceManager resMgr = new FileResourceManager(
+				settings.getTemporaryStoragePath()
+				,settings.getTemporaryStoragePath()+"/tmp",
+				true,
+				new SLF4JLoggerFacade(LoggerFactory.getLogger(FileResourceManager.class)));
+		fileResourceManager = resMgr; 
 	}
 }

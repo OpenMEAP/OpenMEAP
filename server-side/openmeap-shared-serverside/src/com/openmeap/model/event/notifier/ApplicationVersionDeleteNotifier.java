@@ -49,8 +49,7 @@ public class ApplicationVersionDeleteNotifier extends
 	@Override
 	public Boolean notifiesFor(ModelServiceOperation operation,
 			ModelEntity payload) {
-		// TODO Auto-generated method stub
-		return null;
+		return payload instanceof ApplicationVersion && operation==ModelServiceOperation.DELETE;
 	}
 
 	@Override

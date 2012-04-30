@@ -22,42 +22,78 @@
  ###############################################################################
  */
 
-package com.openmeap.file;
+package com.openmeap.util;
 
-import java.io.File;
-
-import org.apache.commons.transaction.file.FileResourceManager;
+import org.apache.commons.transaction.util.LoggerFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.openmeap.model.ModelService;
-import com.openmeap.model.dto.GlobalSettings;
+public class SLF4JLoggerFacade implements LoggerFacade {
 
-public class FileOperationManagerFactory {
+	private Logger logger;
 	
-	private ModelService modelService;
-	private Logger logger = LoggerFactory.getLogger(FileOperationManagerFactory.class);
-	
-	public FileOperationManager newFileOperationManager() {
-		
-		GlobalSettings settings = (GlobalSettings)modelService.findByPrimaryKey(GlobalSettings.class, 1L);
-		if( settings.getTemporaryStoragePath()==null 
-				|| !new File(settings.getTemporaryStoragePath()).exists()) {
-			logger.error("The storage path has not been set in GlobalSettings.  Use the settings page to fix this.");
-		}
-		
-		FileOperationManagerImpl mgr = new FileOperationManagerImpl();
-		FileResourceManager resMgr = new FileResourceManager(
-				settings.getTemporaryStoragePath()
-				,settings.getTemporaryStoragePath()+"/tmp",
-				true,
-				new SLF4JLoggerFacade(LoggerFactory.getLogger(FileResourceManager.class)));
-		mgr.setFileResourceManager(resMgr);
-		
-		return mgr;
+	public SLF4JLoggerFacade(Logger logger) {
+		this.logger = logger;
 	}
 	
-	public void setModelService(ModelService modelService) {
-		this.modelService = modelService;
+	@Override
+	public LoggerFacade createLogger(String arg0) {
+		return new SLF4JLoggerFacade(LoggerFactory.getLogger(arg0));
 	}
+
+	@Override
+	public boolean isFineEnabled() {
+		return logger.isDebugEnabled();
+	}
+
+	@Override
+	public boolean isFinerEnabled() {
+		return logger.isDebugEnabled();
+	}
+
+	@Override
+	public boolean isFinestEnabled() {
+		return logger.isTraceEnabled();
+	}
+
+	@Override
+	public void logFine(String arg0) {
+		logger.debug(arg0);
+	}
+
+	@Override
+	public void logFiner(String arg0) {
+		logger.debug(arg0);
+	}
+
+	@Override
+	public void logFinest(String arg0) {
+		logger.trace(arg0);
+	}
+
+	@Override
+	public void logInfo(String arg0) {
+		logger.info(arg0);
+	}
+
+	@Override
+	public void logSevere(String arg0) {
+		logger.error(arg0);
+	}
+
+	@Override
+	public void logSevere(String arg0, Throwable arg1) {
+		logger.error(arg0,arg1);
+	}
+
+	@Override
+	public void logWarning(String arg0) {
+		logger.warn(arg0);
+	}
+
+	@Override
+	public void logWarning(String arg0, Throwable arg1) {
+		logger.warn(arg0,arg1);
+	}
+
 }

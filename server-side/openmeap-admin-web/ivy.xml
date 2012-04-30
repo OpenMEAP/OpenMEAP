@@ -69,6 +69,7 @@
 		<dependency org="commons-lang" name="commons-lang" rev="2.6" conf="core->default"/>
 		<dependency org="commons-fileupload" name="commons-fileupload" rev="1.2.2" conf="core->default"/>
 		<dependency org="commons-io" name="commons-io" rev="2.1" conf="core->default"/>
+		<dependency org="commons-transaction" name="commons-transaction" rev="1.2" conf="core->default"/>
 		
 		<!-- test->default -->
 		<dependency org="org.springframework" name="spring-mock" rev="2.0.8" conf="test->default"/>

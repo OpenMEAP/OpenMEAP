@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.openmeap.constants.FormConstants;
+import com.openmeap.util.SLF4JLoggerFacade;
 import com.openmeap.util.Utils;
 
 /**

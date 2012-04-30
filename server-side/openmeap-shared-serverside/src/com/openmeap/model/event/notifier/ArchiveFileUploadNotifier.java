@@ -56,18 +56,12 @@ import com.openmeap.util.ZipUtils;
 
 public class ArchiveFileUploadNotifier extends AbstractArchiveFileEventNotifier {	
 	
-	private ModelManager modelManager;
+	private Logger logger = LoggerFactory.getLogger(ArchiveFileUploadNotifier.class);
 	private FileOperationManager fileManager;
 	
 	public void setFileManager(FileOperationManager fileManager) {
 		this.fileManager = fileManager;
 	}
-
-	public void setModelManager(ModelManager modelManager) {
-		this.modelManager = modelManager;
-	}
-
-	private Logger logger = LoggerFactory.getLogger(ArchiveFileUploadNotifier.class);
 	
 	@Override
 	protected String getEventActionName() {
@@ -120,7 +114,7 @@ public class ArchiveFileUploadNotifier extends AbstractArchiveFileEventNotifier 
 	@SuppressWarnings("unchecked")
 	private ApplicationArchive processApplicationArchiveFileUpload(ApplicationArchive archive, List<ProcessingEvent> events) {
 		
-		GlobalSettings settings = modelManager.getGlobalSettings();
+		GlobalSettings settings = getModelManager().getGlobalSettings();
 		File tempFile = new File(archive.getHash());
 		Long size = tempFile.length();
 		
@@ -140,7 +134,7 @@ public class ArchiveFileUploadNotifier extends AbstractArchiveFileEventNotifier 
 			try {
 				is = new FileInputStream(tempFile);
 				hashValue = Utils.hashInputStream("MD5", is);
-				ApplicationArchive archiveExists = modelManager.getModelService().findApplicationArchiveByHashAndAlgorithm(hashValue, "MD5");
+				ApplicationArchive archiveExists = getModelManager().getModelService().findApplicationArchiveByHashAndAlgorithm(hashValue, "MD5");
 				if(archiveExists!=null) {
 					if( !tempFile.delete() ) {
 						String mesg = String.format("Failed to delete temporary file %s",tempFile.getName());
@@ -158,7 +152,7 @@ public class ArchiveFileUploadNotifier extends AbstractArchiveFileEventNotifier 
 			// that is, they are not used by any other versions
 			if( archive.getId()!=null && !archive.getHash().equals(hashValue) ) {
 
-				ArchiveFileHelper.maintainFileSystemCleanliness(modelManager,archive,events);
+				ArchiveFileHelper.maintainFileSystemCleanliness(getModelManager(),archive,events);
 			}
 			
 			archive.setHashAlgorithm("MD5");
@@ -187,7 +181,7 @@ public class ArchiveFileUploadNotifier extends AbstractArchiveFileEventNotifier 
 				String mesg = String.format("Uploaded temporary file %s successfully renamed to %s",tempFile.getName(),destinationFile.getName());
 				logger.debug(mesg);
 				events.add(new MessagesEvent(mesg));
-				ArchiveFileHelper.unzipFile(modelManager,fileManager,archive,destinationFile,events);
+				ArchiveFileHelper.unzipFile(getModelManager(),fileManager,archive,destinationFile,events);
 			} else {
 				String mesg = String.format("Failed to renamed file %s to %s",tempFile.getName(),destinationFile.getName());
 				logger.error(mesg);

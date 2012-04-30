@@ -151,14 +151,13 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 				&& PROCESS_TARGET.compareTo(firstValue(FormConstants.PROCESS_TARGET,parameterMap ))==0 
 				&& willProcess ) {
 			
-			modelManager.begin();
-			
 			// TODO: check to see if the user can delete versions
 			if( ParameterMapUtils.notEmpty(FormConstants.DELETE,parameterMap) && ParameterMapUtils.notEmpty("deleteConfirm",parameterMap) ) {
 				
 				if( ParameterMapUtils.firstValue("deleteConfirm", parameterMap).equals(FormConstants.APPVER_DELETE_CONFIRM_TEXT) ) {
 					
 					try {
+						modelManager.begin();
 						modelManager.delete(version, events);
 						modelManager.commit(events);
 					} catch(Exception e) {
@@ -283,12 +282,13 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		} else {
 			try {
 				version.setLastModifier(firstValue("userPrincipalName",parameterMap));
+				modelManager.begin();
 				version.setArchive(modelManager.addModify(version.getArchive(), events));
 				version = modelManager.addModify(version,events);
 				app.addVersion(version);
 				app = modelManager.addModify(app,events);
-				modelManager.refresh(app,events);
 				modelManager.commit(events);
+				modelManager.refresh(app,events);
 				events.add( new MessagesEvent("Application version successfully created/modified!") );
 			} catch( InvalidPropertiesException ipe ) {
 				modelManager.rollback();

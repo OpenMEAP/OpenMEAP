@@ -24,14 +24,16 @@
 
 package com.openmeap.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
-import javax.persistence.*;
+import javax.persistence.PersistenceException;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 import com.openmeap.event.Event;
 import com.openmeap.event.EventNotificationException;
@@ -43,6 +45,7 @@ import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
+import com.openmeap.model.event.AbstractModelServiceEventNotifier;
 import com.openmeap.model.event.notifier.ModelServiceEventNotifier;
 
 public class ModelManagerImplTest {
@@ -118,15 +121,15 @@ public class ModelManagerImplTest {
 	
 	@Test public void testGlobalSettings() throws Exception {
 		GlobalSettings settings = new GlobalSettings();
-		Boolean peThrown = false;
+		Boolean ipeThrown = false;
 		try {
 			modelManager.begin().addModify(settings,null);
 			modelManager.commit();
-		} catch(PersistenceException pe) {
+		} catch(InvalidPropertiesException ipe) {
 			modelManager.rollback();
-			peThrown = true;
+			ipeThrown = true;
 		}
-		Assert.assertTrue(peThrown);
+		Assert.assertTrue(ipeThrown);
 		
 		settings = modelManager.getGlobalSettings();
 		Assert.assertTrue(settings.getId().equals(Long.valueOf(1)));
@@ -227,7 +230,7 @@ public class ModelManagerImplTest {
 	
 	@Test public void testFireEventHandlers() throws InvalidPropertiesException, PersistenceException {
 		List<ModelServiceEventNotifier> handlers = new ArrayList<ModelServiceEventNotifier>();
-		class MockUpdateNotifier implements ModelServiceEventNotifier<ModelEntity> {
+		class MockUpdateNotifier extends AbstractModelServiceEventNotifier<ModelEntity> {
 			public Boolean eventFired = false;
 			public Boolean getEventFired() {
 				return eventFired;
@@ -243,34 +246,12 @@ public class ModelManagerImplTest {
 					throws EventNotificationException {
 				eventFired = true;
 			}
-			@Override
-			public <E extends Event<ModelEntity>> void onInCommitBeforeCommit(
-					E event, List<ProcessingEvent> events)
-					throws EventNotificationException {
-				// TODO Auto-generated method stub
-				
-			}
-			@Override
-			public <E extends Event<ModelEntity>> void onBeforeOperation(
-					E event, List<ProcessingEvent> events)
-					throws EventNotificationException {
-				// TODO Auto-generated method stub
-				
-			}
-			@Override
-			public <E extends Event<ModelEntity>> void onAfterOperation(
-					E event, List<ProcessingEvent> events)
-					throws EventNotificationException {
-				// TODO Auto-generated method stub
-				
-			}
 		};	
 		handlers.add(new MockUpdateNotifier());
 		modelManager.setEventNotifiers(handlers);
 		Application app = modelManager.getModelService().findByPrimaryKey(Application.class, 1L);
 		try {
-			modelManager.begin();
-			modelManager.addModify(app,null);
+			modelManager.begin().addModify(app,null);
 			modelManager.commit();
 		} catch(Exception e) {
 			modelManager.rollback();

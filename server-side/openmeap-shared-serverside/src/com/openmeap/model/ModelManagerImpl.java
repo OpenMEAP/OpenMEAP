@@ -118,15 +118,14 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 		modelService.commit();
 		
 		processModelEntityEventQueue(CutPoint.IN_COMMIT_AFTER_COMMIT, events);
+		clearModelEntityEventQueue();
 		
 		return this;
 	}
 	
 	@Override
 	public void rollback() {
-		if( eventQueue.containsKey(Thread.currentThread()) ) {
-			eventQueue.remove(Thread.currentThread());
-		}
+		clearModelEntityEventQueue();
 		try {
 			fileManager.rollback();
 		} catch (FileOperationException e) {
@@ -170,7 +169,7 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 	@Override
 	public <T extends ModelEntity> T addModify(T entity, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
 		
-		authorizeAndValidate(entity,determineCreateUpdateAction(entity));
+		authorize(entity,determineCreateUpdateAction(entity));
 		
 		ModelEntityEvent event = new ModelEntityEvent(ModelServiceOperation.SAVE_OR_UPDATE,entity);
 		
@@ -178,6 +177,8 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 		callEventNotifiers(CutPoint.BEFORE_OPERATION,event,events);
 		
 		T entityToReturn = (T) _addModify(entity,events);
+		event.setPayload(entityToReturn);
+		validate(entity);
 		
 		callEventNotifiers(CutPoint.AFTER_OPERATION,event,events);
 		
@@ -293,16 +294,28 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 	}
 	
 	private void processModelEntityEventQueue(CutPoint cutPoint,List<ProcessingEvent> events) {
-		List<ModelEntityEvent> modelEvents = eventQueue.get(Thread.currentThread());
+		List<ModelEntityEvent> modelEvents;
 		if( (modelEvents = eventQueue.get(Thread.currentThread()))!=null ) {
-			while(modelEvents.size()>0) {
-				ModelEntityEvent event = modelEvents.remove(0);
+			int size = modelEvents.size();
+			for(int i=0;i<size;i++) {
+				ModelEntityEvent event = modelEvents.get(i);
 				callEventNotifiers(cutPoint,event,events);
 			}
 		}
 	}
 	
+	private void clearModelEntityEventQueue() {
+		List<ModelEntityEvent> modelEvents;
+		if( (modelEvents = eventQueue.get(Thread.currentThread()))!=null ) {
+			eventQueue.remove(Thread.currentThread());
+		}
+	}
+	
 	private void callEventNotifiers(CutPoint cutPoint, ModelEntityEvent event, List<ProcessingEvent> events) {
+		
+		if(eventNotifiers==null) {
+			return;
+		}
 		
 		for( ModelServiceEventNotifier handler : eventNotifiers ) {
 			try {
