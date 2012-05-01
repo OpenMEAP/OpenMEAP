@@ -22,44 +22,38 @@
  ###############################################################################
  */
 
-package com.openmeap.android.javascript;
+package com.openmeap.thinclient.javascript;
 
 import org.json.me.JSONException;
 import org.json.me.JSONObject;
 
-import android.content.Context;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Configuration;
-import android.widget.Toast;
-
-import com.openmeap.android.MainActivity;
-import com.openmeap.android.SharedPreferencesImpl;
-import com.openmeap.android.WebView;
 import com.openmeap.protocol.WebServiceException;
 import com.openmeap.protocol.dto.UpdateHeader;
 import com.openmeap.protocol.json.JsError;
 import com.openmeap.protocol.json.JsUpdateHeader;
+import com.openmeap.thinclient.LocalStorageException;
+import com.openmeap.thinclient.OmMainActivity;
+import com.openmeap.thinclient.OmWebView;
 import com.openmeap.thinclient.Preferences;
-import com.openmeap.thinclient.javascript.JsApiCore;
-import com.openmeap.thinclient.javascript.Orientation;
 import com.openmeap.thinclient.update.UpdateException;
-import com.openmeap.thinclient.update.UpdateStatus;
 import com.openmeap.thinclient.update.UpdateHandler;
+import com.openmeap.thinclient.update.UpdateStatus;
+import com.openmeap.util.GenericRuntimeException;
 
 public class JsApiCoreImpl implements JsApiCore {
 	
-	private WebView webView = null;
-	private MainActivity activity = null;
+	private OmWebView webView = null;
+	private OmMainActivity activity = null;
 	private UpdateHandler updateHandler = null;
 	
-	public JsApiCoreImpl(MainActivity activity, WebView webView, UpdateHandler updateHandler) {
+	public JsApiCoreImpl(OmMainActivity activity, OmWebView webView, UpdateHandler updateHandler) {
 		this.webView = webView;
 		this.activity = activity;
 		this.updateHandler = updateHandler;
 	}
 	
 	public Preferences getPreferences(String name) {
-		return new SharedPreferencesImpl(activity.getSharedPreferences(name, 0));
+		return activity.getPreferences(name);
 	}
 	
 	public void setTitle(String title) {
@@ -71,21 +65,15 @@ public class JsApiCoreImpl implements JsApiCore {
 	}
 
 	public String getOrientation() {
-		Configuration config = activity.getResources().getConfiguration();
-		return config.orientation == Configuration.ORIENTATION_LANDSCAPE ? Orientation.LANDSCAPE.toString() : 
-			config.orientation == Configuration.ORIENTATION_PORTRAIT ? Orientation.PORTRAIT.toString() :
-				config.orientation == Configuration.ORIENTATION_SQUARE ? Orientation.SQUARE.toString() :
-					Orientation.UNDEFINED.toString();
+		return activity.getOrientation().toString();
 	}
 	
-	public void doToast(String mesg) { doToast(mesg,true); }
+	public void doToast(String mesg) { 
+		doToast(mesg,Boolean.TRUE); 
+	}
  
 	public void doToast(String mesg, Boolean isLong) {
-		Context context = activity.getApplicationContext();
-		CharSequence text = mesg;
-		int duration = isLong != null && isLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT;
-		Toast toast = Toast.makeText(context, text, duration);
-		toast.show();
+		activity.doToast(mesg,isLong.booleanValue());
 	}
 	
 	public String getDeviceType() {
@@ -93,11 +81,7 @@ public class JsApiCoreImpl implements JsApiCore {
 	}
 	
 	public void reload() {
-		try {
-			activity.restart();
-		} catch (NameNotFoundException e) {
-			throw new RuntimeException(e);
-		}
+		activity.restart();
 	}
 
 	public Boolean isTimeForUpdateCheck() {
@@ -115,12 +99,13 @@ public class JsApiCoreImpl implements JsApiCore {
 		WebServiceException err = null;
 		try {
 	    	updateHeader = updateHandler.checkForUpdate();
+	    	webView.setUpdateHeader(updateHeader,err,activity.getStorage().getBytesFree());
 		} catch( WebServiceException e ) {
 			err = e;
+		} catch (LocalStorageException e) {
+			;
 		}
-		
-		webView.setUpdateHeader(updateHeader,err,activity.getStorage().getBytesFree());
-		webView.executeJavascriptFunction(callBack,"window.update");
+		webView.executeJavascriptFunction(callBack,new String[]{"window.update"});
 	}
 
 	/**
@@ -136,7 +121,7 @@ public class JsApiCoreImpl implements JsApiCore {
 		try {
 			jsUpdateHeader = new JsUpdateHeader(header);
 		} catch(JSONException e) {
-			throw new RuntimeException(e);
+			throw new GenericRuntimeException(e);
 		}
 		UpdateHeader reloadedHeader = jsUpdateHeader.getWrappedObject();
 		if( reloadedHeader!=null ) {
@@ -152,9 +137,9 @@ public class JsApiCoreImpl implements JsApiCore {
 										? new JsError( error.getUpdateResult().toString(), error.getMessage() ).toJSONObject() 
 										: null
 								);
-						webView.executeJavascriptFunction(statusCallBack,js.toString());
+						webView.executeJavascriptFunction(statusCallBack,new String[]{js.toString()});
 					} catch (JSONException e) {
-						throw new RuntimeException(e);
+						throw new GenericRuntimeException(e);
 					}
 				}
 			});

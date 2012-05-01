@@ -28,7 +28,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import com.openmeap.constants.FormConstants;
+import com.openmeap.protocol.WebServiceException;
+import com.openmeap.protocol.dto.UpdateHeader;
 import com.openmeap.thinclient.LocalStorage;
+import com.openmeap.thinclient.OmWebView;
 import com.openmeap.thinclient.SLICConfig;
 import com.openmeap.util.GenericRuntimeException;
 import com.openmeap.util.Utils;
@@ -44,10 +47,11 @@ import net.rim.device.api.ui.container.MainScreen;
  * A class extending the MainScreen class, which provides default standard
  * behavior for BlackBerry GUI applications.
  */
-public final class OpenMEAPScreen extends MainScreen
+public final class OpenMEAPScreen extends MainScreen implements OmWebView
 {
 	private SLICConfig config;
 	private LocalStorage localStorage;
+	private BrowserField browserField;
 	private String DIRECTORY_INDEX = "index.html";
 	
     /**
@@ -62,7 +66,7 @@ public final class OpenMEAPScreen extends MainScreen
         setTitle(config.getApplicationTitle());
         
 		try {
-			createBrowserField();
+			browserField = createBrowserField();
 		} catch (IOException e) {
 			throw new GenericRuntimeException(e);
 		}
@@ -80,7 +84,6 @@ public final class OpenMEAPScreen extends MainScreen
     	controller.setResourceRequestHandler("assets", handler);
     	
     	add(browserField);
-    	browserField.requestContent(baseUrl+DIRECTORY_INDEX);
     	return browserField;
     }
     
@@ -98,4 +101,54 @@ public final class OpenMEAPScreen extends MainScreen
     		return config.getStorageLocation();
     	}
     }
+
+	public void clearCache(boolean arg0) {
+		
+	}
+
+	public void addJavascriptInterface(Object obj, String interfaceName) {
+		//browserField.extendScriptEngine(name, new BlackberryJsCoreApi());
+	}
+
+	public Object getJavascriptInterface(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void runJavascript(String stream) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setUpdateHeader(UpdateHeader update, WebServiceException err,
+			Long bytesFree) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void performOnResume() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void performOnPause() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void executeJavascriptFunction(String callBack, String[] arguments) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void loadDataWithBaseURL(String baseUrl, String pageContent,
+			String string, String sOURCE_ENCODING, String object) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void clearView() {
+		// TODO Auto-generated method stub
+		
+	}
 }

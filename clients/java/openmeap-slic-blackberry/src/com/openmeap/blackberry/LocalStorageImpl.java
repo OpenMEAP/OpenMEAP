@@ -210,4 +210,8 @@ public class LocalStorageImpl implements LocalStorage {
 		}
 	}
 
+	public void setupSystemProperties() {
+		
+	}
+
 }

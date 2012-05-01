@@ -31,6 +31,8 @@ import com.openmeap.thinclient.update.UpdateStatus;
 
 public interface LocalStorage {
 	
+	public void setupSystemProperties();
+	
 	public void deleteImportArchive() throws LocalStorageException;
 	
 	public void unzipImportArchive(UpdateStatus status) throws LocalStorageException;

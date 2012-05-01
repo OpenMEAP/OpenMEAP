@@ -35,7 +35,7 @@ import com.openmeap.util.Utils;
  * The non-OS specific configuration universal to all Java based slic clients
  * @author schang
  */
-public class SLICConfig {
+abstract public class SLICConfig {
 	
 	public static String PROPERTIES_FILE = "slic-config.properties";
 	public static String PREFERENCES_FILE = "slic-config.preferences";
@@ -52,6 +52,8 @@ public class SLICConfig {
 		this.preferences = preferences;
 		this.properties = properties;
 	}
+	
+	abstract public String getAssetsBaseUrl();
 	
 	public String getDeviceUuid() {
 		String uuid = getProperty("com.openmeap.slic.deviceUuid");

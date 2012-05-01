@@ -41,7 +41,11 @@ public class SLICConfigTest extends TestCase {
 		props.put("com.openmeap.slic.appVersion", "appVersion");
 		prefs.put("com.openmeap.slic.deviceType", "deviceType");
 		
-		SLICConfig slicConfig = new SLICConfig(prefs,props);
+		SLICConfig slicConfig = new SLICConfig(prefs,props){
+					public String getAssetsBaseUrl() {
+						return null;
+					}
+				};
 		
 		Assert.assertTrue(slicConfig.getDeviceUuid().compareTo("deviceUuid")==0);
 		Assert.assertTrue(slicConfig.getAppMgmtServiceUrl().compareTo("serviceUrl")==0);

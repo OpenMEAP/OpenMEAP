@@ -27,6 +27,7 @@ package com.openmeap.blackberry;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.rim.device.api.ui.Screen;
 import net.rim.device.api.ui.UiApplication;
 
 import org.json.me.JSONException;
@@ -35,7 +36,12 @@ import com.openmeap.blackberry.digest.Md5DigestInputStream;
 import com.openmeap.blackberry.digest.Sha1DigestInputStream;
 import com.openmeap.digest.DigestInputStreamFactory;
 import com.openmeap.thinclient.LocalStorage;
+import com.openmeap.thinclient.OmMainActivity;
+import com.openmeap.thinclient.OmWebView;
+import com.openmeap.thinclient.Preferences;
 import com.openmeap.thinclient.SLICConfig;
+import com.openmeap.thinclient.javascript.Orientation;
+import com.openmeap.thinclient.update.UpdateHandler;
 import com.openmeap.util.GenericRuntimeException;
 
 import fr.free.ichir.mahieddine.Properties;
@@ -44,10 +50,12 @@ import fr.free.ichir.mahieddine.Properties;
  * This class extends the UiApplication class, providing a
  * graphical user interface.
  */
-public class OpenMEAPApp extends UiApplication
+public class OpenMEAPApp extends UiApplication implements OmMainActivity
 {
 	private SLICConfig config;
 	private LocalStorage localStorage;
+	private UpdateHandler updateHandler;
+	private OmWebView webView;
 	
     /**
      * Creates a new MyApp object
@@ -63,7 +71,7 @@ public class OpenMEAPApp extends UiApplication
     		InputStream stream = System.class.getResourceAsStream('/'+SLICConfig.PROPERTIES_FILE);
     		Properties properties = new Properties();
     		properties.load(stream);
-	    	config = new SLICConfig(
+	    	config = new BlackberrySLICConfig(
 	    			new SharedPreferencesImpl("slic-config"),
 	    			properties.getProperties()
 	    		);
@@ -73,8 +81,68 @@ public class OpenMEAPApp extends UiApplication
 	    	throw new GenericRuntimeException(ioe);
 	    }
     	
-    	localStorage = new LocalStorageImpl(config);
-    	
-        pushScreen(new OpenMEAPScreen(config,localStorage));
-    }    
+    	localStorage = new LocalStorageImpl(config);    
+    	updateHandler = new UpdateHandler(webView,this,config,localStorage);
+    }
+
+	public SLICConfig getConfig() {
+		return config;
+	}
+
+	public Preferences getPreferences(String name) {
+		try {
+			return new SharedPreferencesImpl(name);
+		} catch (IOException e) {
+			throw new GenericRuntimeException(e);
+		} catch (JSONException e) {
+			throw new GenericRuntimeException(e);
+		}
+	}
+
+	public void setTitle(String title) {
+		this.setTitle(title);
+	}
+
+	public Orientation getOrientation() {
+		return Orientation.PORTRAIT;
+	}
+
+	public LocalStorage getStorage() {
+		return localStorage;
+	}
+
+	public UpdateHandler getUpdateHandler() {
+		return updateHandler;
+	}
+
+	public OmWebView createDefaultWebView() {
+		return new OpenMEAPScreen(config,localStorage);
+	}
+
+	public void setContentView(OmWebView webView) {
+		pushScreen((Screen)webView);
+	}
+
+	public void doToast(String mesg, boolean isLong) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void restart() {
+		
+	}
+	
+	public String getRootWebPageContent() throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public void runOnUiThread(Runnable runnable) {
+		
+	}
+
+	public void setWebView(OmWebView webView) {
+		pushScreen((Screen)webView);
+		this.webView = webView;
+	}    
 }

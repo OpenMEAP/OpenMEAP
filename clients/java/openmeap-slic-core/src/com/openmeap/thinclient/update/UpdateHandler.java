@@ -41,9 +41,12 @@ import com.openmeap.protocol.dto.ConnectionOpenRequest;
 import com.openmeap.protocol.dto.ConnectionOpenResponse;
 import com.openmeap.protocol.dto.SLIC;
 import com.openmeap.protocol.dto.UpdateHeader;
+import com.openmeap.protocol.dto.UpdateType;
 import com.openmeap.thinclient.AppMgmtClientFactory;
 import com.openmeap.thinclient.LocalStorage;
 import com.openmeap.thinclient.LocalStorageException;
+import com.openmeap.thinclient.OmMainActivity;
+import com.openmeap.thinclient.OmWebView;
 import com.openmeap.thinclient.SLICConfig;
 import com.openmeap.util.GenericRuntimeException;
 import com.openmeap.util.Utils;
@@ -57,10 +60,14 @@ public class UpdateHandler {
 	
 	private SLICConfig config = null;
 	private LocalStorage storage = null;
+	private OmMainActivity activity = null;
+	private OmWebView webView = null;
 	private Object interruptLock = new Object();
 	private Boolean interrupt = Boolean.FALSE;
 	
-	public UpdateHandler(SLICConfig config, LocalStorage storage) {
+	public UpdateHandler(OmWebView webView, OmMainActivity activity, SLICConfig config, LocalStorage storage) {
+		this.webView = webView;
+		this.activity = activity;
 		this.setSLICConfig(config);
 		this.setLocalStorage(storage);
 	}
@@ -377,6 +384,79 @@ public class UpdateHandler {
 		}
 		return true;
 	}
+	
+	public void initialize(final OmWebView webView) {
+        
+        // if this application is configured to fetch updates,
+        // then check for them now
+		Boolean shouldPerformUpdateCheck = activity.getConfig().shouldPerformUpdateCheck();
+        if( shouldPerformUpdateCheck!=null && shouldPerformUpdateCheck==Boolean.TRUE ) {
+        	
+        	activity.runOnUiThread(new Runnable() {
+        		public void run() {
+        			if( webView!=null ) {
+        				webView.clearView();
+        			}
+        		}
+        	});
+        	new Thread(new Runnable(){
+        		public void run() {
+        			UpdateHeader update = null;
+        			WebServiceException err = null;
+		        	try {
+		        		update = checkForUpdate();
+		        	} catch( WebServiceException wse ) {
+		        		err = wse;
+		        	}
+		        	if( update!=null && update.getType()==UpdateType.IMMEDIATE ) {
+		        		try {
+		        			handleUpdate(update);
+		        			storage.setupSystemProperties();
+		        			update=null;
+		        		} catch( Exception e ) {
+		            		err = new WebServiceException(WebServiceException.TypeEnum.CLIENT_UPDATE,e);
+		            	}
+		        	}
+		        	activity.runOnUiThread(new InitializeWebView(update, err));
+        		}
+        	}).start();
+        } else {
+        	activity.runOnUiThread(new InitializeWebView(null, null));
+        }
+	}
+    
+	private static String SOURCE_ENCODING = "utf-8";
+	private static String CONTENT_TYPE = "text/html";
+    private class InitializeWebView implements Runnable {
+    	UpdateHeader update=null;
+    	WebServiceException err=null;
+    	public InitializeWebView(UpdateHeader update, WebServiceException err) {
+    		this.update=update;
+    		this.err=err;
+    	}
+    	public void run() {
+	    	// here after, everything is handled by the html and javascript
+	        try {
+	        	Boolean justUpdated = config.getApplicationUpdated();
+	        	if( justUpdated!=null && justUpdated.booleanValue()==true ) {
+	        		config.setApplicationUpdated(Boolean.FALSE);
+	        	}
+	        	String baseUrl = config.getAssetsBaseUrl();
+	        	String pageContent = activity.getRootWebPageContent();
+	        	OmWebView webView = activity.createDefaultWebView();
+	        	if( justUpdated!=null && justUpdated.booleanValue() ) {
+	        		webView.clearCache(true);
+	        		webView = activity.createDefaultWebView();
+	        	}
+	        	webView.setUpdateHeader(update, err, storage.getBytesFree());
+	        	webView.loadDataWithBaseURL(baseUrl, pageContent, CONTENT_TYPE, SOURCE_ENCODING, null);
+	        	activity.setWebView(webView);
+	            activity.setContentView(webView);
+	        } catch( Exception e ) {
+	        	throw new GenericRuntimeException(e);
+	        }
+	    }
+    }
 	
 	/* ACCESSORS BELOW HERE */
 	
