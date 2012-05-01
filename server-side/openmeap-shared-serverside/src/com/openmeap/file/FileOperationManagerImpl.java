@@ -269,4 +269,9 @@ public class FileOperationManagerImpl implements FileOperationManager {
 				new SLF4JLoggerFacade(LoggerFactory.getLogger(FileResourceManager.class)));
 		fileResourceManager = resMgr; 
 	}
+
+	@Override
+	public boolean isTransactionActive() throws FileOperationException {
+		return activeTransactions.get(Thread.currentThread())!=null;
+	}
 }

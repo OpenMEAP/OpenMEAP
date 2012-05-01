@@ -60,9 +60,16 @@ public class ModelServiceImpl implements ModelService
 	
 	private EntityManager entityManager = null;
 	
+	/**
+	 * Number of times to retry refreshing a model entity before failing the operation.
+	 * Using SQLite, sometimes the database file is locked by another process.
+	 */
 	private int numberOfRefreshRetries=3;
 	
-	private int refreshRetryInterval=1000;
+	/**
+	 * Amount of time to wait between each refresh retry.
+	 */
+	private int refreshRetryInterval=250;
 	
 	public void clearPersistenceContext() {
 		entityManager.clear();
@@ -109,7 +116,7 @@ public class ModelServiceImpl implements ModelService
 				try {
 					Thread.sleep(refreshRetryInterval);
 				} catch (InterruptedException e1) {
-					throw new PersistenceException("Thread.sleep() interrupted during the refresh retry interval",e1);
+					throw new PersistenceException("Thread sleep interrupted during the refresh retry interval: "+e1.getMessage(),e1);
 				}
 			}
 		} while(notSuccessful && numRetries!=0);
@@ -246,6 +253,7 @@ public class ModelServiceImpl implements ModelService
 		}
 	}
 	
+	@Override
 	public <E extends ModelEntity, T extends ModelEntity> List<T> getOrdered(E entity, String listMethod, Comparator<T> comparator) {
 		EntityManager entityManager = getEntityManager(); 
 		entityManager.getTransaction().begin();
@@ -270,10 +278,17 @@ public class ModelServiceImpl implements ModelService
 		return entityManager;
 	}
 	
+	/**
+	 * Amount of time to wait between each refresh retry.
+	 */
 	public void setRefreshRetryInterval(int refreshRetryInterval) {
 		this.refreshRetryInterval = refreshRetryInterval;
 	}
 
+	/**
+	 * Number of times to retry refreshing a model entity before failing the operation.
+	 * Using SQLite, sometimes the database file is locked by another process.
+	 */
 	public void setNumberOfRefreshRetries(int numberOfRefreshRetries) {
 		this.numberOfRefreshRetries = numberOfRefreshRetries;
 	}

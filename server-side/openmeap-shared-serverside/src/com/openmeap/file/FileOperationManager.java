@@ -30,6 +30,8 @@ import java.util.zip.ZipFile;
 
 public interface FileOperationManager {
 
+	public abstract boolean isTransactionActive() throws FileOperationException;
+	
 	public abstract void deleteDir(String path) throws FileOperationException;
 
 	public abstract void delete(String path) throws FileOperationException;

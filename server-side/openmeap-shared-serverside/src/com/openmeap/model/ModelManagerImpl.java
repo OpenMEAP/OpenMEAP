@@ -55,6 +55,7 @@ import com.openmeap.model.event.notifier.ModelServiceEventNotifier.CutPoint;
 
 /**
  * Handles all business logic related to the model Entity objects. 
+ * 
  * @author schang
  */
 public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
@@ -81,26 +82,28 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 		try {
 			fileManager.begin();
 		} catch (FileOperationException e) {
-			throw new PersistenceException("During transaction begin",e);
+			throw new PersistenceException("An exception was thrown creating a file-resource transaction: "+e.getMessage(),e);
 		}
 		modelService.begin();
 		return this;
 	}
 	
 	@Override
-	public ModelManager commit() {
+	public ModelManager commit() throws PersistenceException {
 		return commit(null);
 	}
 	
 	@Override 
-	public ModelManager commit(List<ProcessingEvent> events) {
+	public ModelManager commit(List<ProcessingEvent> events) throws PersistenceException {
 		
 		processModelEntityEventQueue(CutPoint.IN_COMMIT_BEFORE_COMMIT, events);
 		
 		try {
-			fileManager.commit();
+			if(fileManager.isTransactionActive()) {
+				fileManager.commit();
+			}
 		} catch (FileOperationException e) {
-			throw new PersistenceException("During file operations commit",e);
+			throw new PersistenceException("An exception was thrown commiting a file-resource transaction: "+e.getMessage(),e);
 		}
 		modelService.commit();
 		
@@ -111,12 +114,14 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 	}
 	
 	@Override
-	public void rollback() {
+	public void rollback() throws PersistenceException {
 		clearModelEntityEventQueue();
 		try {
-			fileManager.rollback();
+			if(fileManager.isTransactionActive()) {
+				fileManager.rollback();
+			}
 		} catch (FileOperationException e) {
-			throw new PersistenceException("During file operations commit",e);
+			throw new PersistenceException("An exception was thrown rolling back a file-resource transaction:"+e.getMessage(),e);
 		}
 		modelService.rollback();
 	}

@@ -108,12 +108,7 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 			// process the storage path parameter
 			if( !empty(STORAGE_PATH_PARAM,parameterMap) ) {
 				String path = firstValue(STORAGE_PATH_PARAM,parameterMap);
-				File f = new File(path);
-				if( !( f.exists() && f.canWrite() && f.canRead() ) ) {
-					events.add(new MessagesEvent("The temporary local storage path must exist and be readable, writable, and executable by the system user this virtual machine is running as."));
-				} else {
-					settings.setTemporaryStoragePath( path );
-				}
+				settings.setTemporaryStoragePath( path );
 			}
 			
 			// process auth salt
@@ -141,13 +136,15 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 				} 
 				
 				// iterate over each node configuration, updating the clusterNodes as per input
+				boolean warn = false;
 				for( int i=0; i<end; i++ ) {
 					
 					String thisNodeUrl = clusterNodeUrls[i].trim();
 					String thisNodePath = clusterNodePaths[i].trim();
 					
-					if( thisNodeUrl.length()==0 ) {
-						events.add(new MessagesEvent("A cluster node must specify a service url it is internally accessible via the admin service."));
+					if( thisNodeUrl.length()==0 && warn==false ) {
+						warn=true;
+						events.add(new MessagesEvent("A cluster node must be specified.  The service url must be internally accessible by the administrative service, and should point to the services context.  The rest of settings changes will be applied."));
 						continue;
 					}
 				

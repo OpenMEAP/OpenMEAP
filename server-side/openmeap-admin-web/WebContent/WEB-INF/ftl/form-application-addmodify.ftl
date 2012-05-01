@@ -56,7 +56,13 @@ Parameter Values / Outputs:
 				<input type="text" name="initialVersionIdentifier" value="${(application.initialVersionIdentifier?html)!}"/>
 				</dd>
 				<dt>Deployment History Length:</dt>
-				<dd><input type="text" name="deploymentHistoryLength" value="${(application.deploymentHistoryLength?string.computer)!}"/></dd>
+				<dd>
+				<div>
+					The number of deployments to maintain in the deployment history table.  As old archives fall off the end, 
+					they are deleted from the admin and cluster nodes, if they are not being used by any other versions.
+				</div>
+					<input type="text" name="deploymentHistoryLength" value="${(application.deploymentHistoryLength?string.computer)!}"/>
+				</dd>
 				[#if willProcess]
 				<dt>Submit:</dt>
 				<dd>
@@ -71,9 +77,8 @@ Parameter Values / Outputs:
 				<dt>
 					Delete:<br/>
 					<span class="copy">After filling in the "Delete Confirm" field, click here.  Warning: this
-					is not an "undoable" action and will erase, permanently, the version
-					history of the application and all application installation records
-					underneath it.  Only do this if you really, really mean it!</span>
+					is not an "undoable" action and will erase, permanently, the version and deployment
+					history of the application.  Only do this if you really, really mean it!</span>
 				</dt>
 				<dd>
 					<input type="hidden" name="delete" value="Delete!">	
