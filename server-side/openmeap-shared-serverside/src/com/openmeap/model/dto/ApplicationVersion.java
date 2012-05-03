@@ -125,7 +125,7 @@ public class ApplicationVersion extends AbstractModelEntity {
 	/**
 	 * @return The binary archive of the application and associated integrity information.
 	 */
-	@OneToOne(fetch=FetchType.EAGER,cascade={},targetEntity=ApplicationArchive.class)
+	@ManyToOne(fetch=FetchType.LAZY,cascade={},targetEntity=ApplicationArchive.class)
 	@JoinColumn(name="archive_id")
 	public ApplicationArchive getArchive() {
 		return archive;
@@ -137,7 +137,8 @@ public class ApplicationVersion extends AbstractModelEntity {
 	/**
 	 * @return The application which this version is of.
 	 */
-	@ManyToOne(cascade={}) @JoinColumn(name="application_id",nullable=false)
+	@ManyToOne(fetch=FetchType.LAZY,cascade={}) 
+	@JoinColumn(name="application_id",nullable=false)
 	public Application getApplication() {
 		return application;
 	}

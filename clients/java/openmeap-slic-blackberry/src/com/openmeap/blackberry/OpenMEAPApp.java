@@ -34,7 +34,9 @@ import org.json.me.JSONException;
 
 import com.openmeap.blackberry.digest.Md5DigestInputStream;
 import com.openmeap.blackberry.digest.Sha1DigestInputStream;
+import com.openmeap.constants.FormConstants;
 import com.openmeap.digest.DigestInputStreamFactory;
+import com.openmeap.http.HttpRequestExecuterFactory;
 import com.openmeap.thinclient.LocalStorage;
 import com.openmeap.thinclient.OmMainActivity;
 import com.openmeap.thinclient.OmWebView;
@@ -43,6 +45,7 @@ import com.openmeap.thinclient.SLICConfig;
 import com.openmeap.thinclient.javascript.Orientation;
 import com.openmeap.thinclient.update.UpdateHandler;
 import com.openmeap.util.GenericRuntimeException;
+import com.openmeap.util.Utils;
 
 import fr.free.ichir.mahieddine.Properties;
 
@@ -55,7 +58,7 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 	private SLICConfig config;
 	private LocalStorage localStorage;
 	private UpdateHandler updateHandler;
-	private OmWebView webView;
+	private OpenMEAPScreen webView;
 	
     /**
      * Creates a new MyApp object
@@ -66,6 +69,7 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
     	
     	DigestInputStreamFactory.setDigestInputStreamForName("MD5", Md5DigestInputStream.class);
     	DigestInputStreamFactory.setDigestInputStreamForName("SHA1", Sha1DigestInputStream.class);
+    	HttpRequestExecuterFactory.setDefaultType(HttpRequestExecuterImpl.class);
     	
     	try {
     		InputStream stream = System.class.getResourceAsStream('/'+SLICConfig.PROPERTIES_FILE);
@@ -83,6 +87,12 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
     	
     	localStorage = new LocalStorageImpl(config);    
     	updateHandler = new UpdateHandler(webView,this,config,localStorage);
+    	
+    	new Thread(new Runnable(){
+			public void run() {
+				updateHandler.initialize(webView);
+			}
+    	}).start();
     }
 
 	public SLICConfig getConfig() {
@@ -99,6 +109,19 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 		}
 	}
 
+	/**
+     * Sets up the window title, per the properties
+     */
+    private void setupWindowTitle() {
+    	if( config.getApplicationTitle()!=null ) {
+        	if( config.getApplicationTitle().equals("off") ) {
+        		setTitle(null);
+        	} else {
+        		setTitle(config.getApplicationTitle());
+        	}
+		} else setTitle(config.getApplicationName());
+    }
+	
 	public void setTitle(String title) {
 		this.setTitle(title);
 	}
@@ -116,15 +139,45 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 	}
 
 	public OmWebView createDefaultWebView() {
-		return new OpenMEAPScreen(config,localStorage);
+		return new OpenMEAPScreen(this,config,localStorage);
 	}
 
 	public void setContentView(OmWebView webView) {
-		pushScreen((Screen)webView);
+		runOnUiThread(new Runnable(){
+			OmWebView webView;
+			public void run() {
+				pushScreen((Screen)webView);
+			}
+			public Runnable construct(OmWebView webView) {
+				this.webView = webView;
+				return this;
+			}
+		}.construct(webView));
+	}
+	
+	public void runOnUiThread(Runnable runnable) {
+		if(isEventThread()) {
+			runnable.run();
+		} else {
+			invokeLater(runnable);
+		}
 	}
 
-	public void doToast(String mesg, boolean isLong) {
-		// TODO Auto-generated method stub
+	public void setWebView(OmWebView webView) {
+		this.webView = (OpenMEAPScreen) webView;
+	}  
+	
+	/**
+     * Loads in the content of the index document page to load into the WebView
+     * 
+     * @return The url of the index document
+     * @throws IOException
+     */
+    public String getBaseUrl() {
+    	return config.getAssetsBaseUrl();
+    }
+    
+    public void doToast(String mesg, boolean isLong) {
 		
 	}
 	
@@ -133,16 +186,16 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 	}
 	
 	public String getRootWebPageContent() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		InputStream is = null;
+		try {
+			is = webView.getContent(getBaseUrl()+"index.html");
+			return Utils.readInputStream(is,FormConstants.CHAR_ENC_DEFAULT);
+		} catch(Exception e) {
+			throw new IOException(e.getMessage());
+		} finally {
+			if(is!=null) {
+				is.close();
+			}
+		}
 	}
-	
-	public void runOnUiThread(Runnable runnable) {
-		
-	}
-
-	public void setWebView(OmWebView webView) {
-		pushScreen((Screen)webView);
-		this.webView = webView;
-	}    
 }

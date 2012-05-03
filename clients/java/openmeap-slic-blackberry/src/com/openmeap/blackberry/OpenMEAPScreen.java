@@ -26,20 +26,27 @@ package com.openmeap.blackberry;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
+import com.openmeap.blackberry.javascript.BlackberryJsCoreApi;
 import com.openmeap.constants.FormConstants;
 import com.openmeap.protocol.WebServiceException;
 import com.openmeap.protocol.dto.UpdateHeader;
+import com.openmeap.protocol.json.JsUpdateHeader;
 import com.openmeap.thinclient.LocalStorage;
+import com.openmeap.thinclient.OmMainActivity;
 import com.openmeap.thinclient.OmWebView;
+import com.openmeap.thinclient.OmWebViewHelper;
 import com.openmeap.thinclient.SLICConfig;
 import com.openmeap.util.GenericRuntimeException;
+import com.openmeap.util.StringUtils;
 import com.openmeap.util.Utils;
 
 import net.rim.device.api.browser.field2.BrowserField;
 import net.rim.device.api.browser.field2.BrowserFieldConfig;
 import net.rim.device.api.browser.field2.BrowserFieldConnectionManager;
 import net.rim.device.api.browser.field2.BrowserFieldController;
+import net.rim.device.api.browser.field2.BrowserFieldRequest;
 import net.rim.device.api.browser.field2.ProtocolController;
 import net.rim.device.api.ui.container.MainScreen;
 
@@ -53,12 +60,14 @@ public final class OpenMEAPScreen extends MainScreen implements OmWebView
 	private LocalStorage localStorage;
 	private BrowserField browserField;
 	private String DIRECTORY_INDEX = "index.html";
+	private OpenMEAPApp activity;
+	private AssetsRequestHandler handler;
 	
     /**
      * Creates a new OpenMEAPScreen object
      */
-    public OpenMEAPScreen(SLICConfig config, LocalStorage localStorage)
-    {        
+    public OpenMEAPScreen(OpenMEAPApp activity, SLICConfig config, LocalStorage localStorage) {        
+    	this.activity = activity;
     	this.config = config;
     	this.localStorage = localStorage;
     	
@@ -74,81 +83,66 @@ public final class OpenMEAPScreen extends MainScreen implements OmWebView
     
     public BrowserField createBrowserField() throws IOException {
     	
-    	String baseUrl = getBaseUrl();
-    	
     	BrowserField browserField = new BrowserField();
-
-    	AssetsRequestHandler handler = new AssetsRequestHandler(browserField,baseUrl);
+    	handler = new AssetsRequestHandler(browserField,activity.getBaseUrl());
     	ProtocolController controller = (ProtocolController)browserField.getController();
     	controller.setNavigationRequestHandler("assets", handler);
     	controller.setResourceRequestHandler("assets", handler);
-    	
+    	try {
+			browserField.extendScriptEngine(OmMainActivity.JS_API_NAME, new BlackberryJsCoreApi(activity,this,activity.getUpdateHandler()));
+		} catch (Exception e) {
+			throw new GenericRuntimeException(e);
+		}
     	add(browserField);
     	return browserField;
     }
-    
-    /**
-     * Loads in the content of the index document page to load into the WebView
-     * 
-     * @return The url of the index document
-     * @throws IOException
-     */
-    protected String getBaseUrl() throws IOException {
-    	// storage location will be null until the first successful update
-    	if( config.shouldUseAssetsOrSdCard().booleanValue() ) {
-   			return config.getPackagedAppRoot();
-    	} else {
-    		return config.getStorageLocation();
-    	}
-    }
+
+	public void runJavascript(String stream) {
+		browserField.executeScript(stream);
+	}
+
+	public void setUpdateHeader(final UpdateHeader update, final WebServiceException err, final Long bytesFree) {
+		final OmWebView webView = this;
+		activity.runOnUiThread(new Runnable(){
+			public void run() {
+				OmWebViewHelper.setUpdateHeader(webView,update,err,bytesFree);
+			}
+		});
+	}
+
+	public void performOnResume() {
+		activity.getUpdateHandler().clearInterruptFlag();
+	}
+
+	public void performOnPause() {
+		activity.getUpdateHandler().interruptRunningUpdate();
+	}
+
+	public void executeJavascriptFunction(String callBack, String[] arguments) {
+		OmWebViewHelper.executeJavascriptFunction(this, callBack, arguments);
+	}
+
+	public void loadDataWithBaseURL(String baseUrl, String pageContent, String mimeType, String sourceEncoding, String historyUrl) {
+		try {
+			handler = new AssetsRequestHandler(browserField,baseUrl);
+	    	ProtocolController controller = (ProtocolController)browserField.getController();
+	    	controller.setNavigationRequestHandler("assets", handler);
+	    	controller.setResourceRequestHandler("assets", handler);
+			browserField.displayContent(pageContent.getBytes(sourceEncoding), mimeType, baseUrl);
+		} catch (UnsupportedEncodingException e) {
+			throw new GenericRuntimeException(e);
+		}
+	}
+	
+	public InputStream getContent(String resourcePath) throws Exception {
+		return handler.handleResource(new BrowserFieldRequest(resourcePath)).openInputStream();
+	}
 
 	public void clearCache(boolean arg0) {
 		
 	}
-
-	public void addJavascriptInterface(Object obj, String interfaceName) {
-		//browserField.extendScriptEngine(name, new BlackberryJsCoreApi());
-	}
-
-	public Object getJavascriptInterface(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void runJavascript(String stream) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setUpdateHeader(UpdateHeader update, WebServiceException err,
-			Long bytesFree) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void performOnResume() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void performOnPause() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void executeJavascriptFunction(String callBack, String[] arguments) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void loadDataWithBaseURL(String baseUrl, String pageContent,
-			String string, String sOURCE_ENCODING, String object) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	public void clearView() {
-		// TODO Auto-generated method stub
 		
 	}
 }

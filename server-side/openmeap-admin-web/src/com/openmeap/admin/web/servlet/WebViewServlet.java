@@ -96,7 +96,7 @@ public class WebViewServlet extends HttpServlet {
 		String archiveHash = URLDecoder.decode(pathParts[APP_VER_INDEX],FormConstants.CHAR_ENC_DEFAULT);
 		
 		Application app = mgr.getModelService().findApplicationByName(applicationNameString);
-		ApplicationArchive arch = mgr.getModelService().findApplicationArchiveByHashAndAlgorithm(archiveHash,"MD5");
+		ApplicationArchive arch = mgr.getModelService().findApplicationArchiveByHashAndAlgorithm(app,archiveHash,"MD5");
 	
 		String authSalt = app.getProxyAuthSalt();
 		String authToken = URLDecoder.decode(pathParts[AUTH_TOKEN_INDEX],FormConstants.CHAR_ENC_DEFAULT);

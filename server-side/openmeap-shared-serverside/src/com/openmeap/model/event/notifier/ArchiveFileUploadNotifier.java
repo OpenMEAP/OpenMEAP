@@ -120,7 +120,7 @@ public class ArchiveFileUploadNotifier extends AbstractModelServiceEventNotifier
 			try {
 				is = new FileInputStream(tempFile);
 				hashValue = Utils.hashInputStream("MD5", is);
-				archiveExists = modelManager.getModelService().findApplicationArchiveByHashAndAlgorithm(hashValue, "MD5");
+				archiveExists = modelManager.getModelService().findApplicationArchiveByHashAndAlgorithm(archive.getApplication(), hashValue, "MD5");
 				if(archiveExists!=null) {
 					if( !tempFile.delete() ) {
 						String mesg = String.format("Failed to delete temporary file %s",tempFile.getName());

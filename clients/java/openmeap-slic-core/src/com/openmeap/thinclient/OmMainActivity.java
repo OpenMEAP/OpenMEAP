@@ -31,6 +31,8 @@ import com.openmeap.thinclient.update.UpdateHandler;
 
 public interface OmMainActivity {
 	
+	public static final String JS_API_NAME = "OpenMEAP_Core";
+	
 	public void restart();
 	public SLICConfig getConfig();
 	public Preferences getPreferences(String name);
@@ -40,6 +42,11 @@ public interface OmMainActivity {
 	public void doToast(String mesg, boolean isLong);
 	public UpdateHandler getUpdateHandler();
 	public String getRootWebPageContent() throws IOException;
+	
+	/**
+	 * Creates the default web view and extends the javascript engine with the JsApiCoreImpl attached at "OpenMEAP_Core";
+	 * @return
+	 */
 	public OmWebView createDefaultWebView();
 	public void setContentView(OmWebView webView);
 	public void runOnUiThread(Runnable runnable);

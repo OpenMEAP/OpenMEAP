@@ -45,7 +45,7 @@ import com.openmeap.util.AuthTokenProvider;
 import com.openmeap.util.GenericRuntimeException;
 import com.openmeap.web.form.Parameter;
 
-@Entity @Table(name="application_archive")
+@Entity @Table(name="application_archive",uniqueConstraints=@UniqueConstraint(columnNames={"application_id","hash","hash_algorithm"}))
 public class ApplicationArchive extends AbstractModelEntity {
 	
 	private Logger logger = LoggerFactory.getLogger(ApplicationArchive.class);
@@ -175,7 +175,7 @@ public class ApplicationArchive extends AbstractModelEntity {
 	/**
 	 * @return A hash the artifact residing at the url can be verified with.
 	 */
-	@Column(name="hash",unique=true)
+	@Column(name="hash")
 	@Parameter("hash")
 	public String getHash() {
 		return hash;
@@ -199,7 +199,7 @@ public class ApplicationArchive extends AbstractModelEntity {
 	/**
 	 * @return The version of the application the archive is associated to.
 	 */
-	@OneToOne(fetch=FetchType.EAGER,cascade={},targetEntity=Application.class)
+	@ManyToOne(fetch=FetchType.EAGER,cascade={},targetEntity=Application.class)
 	@JoinColumn(name="application_id")
 	public Application getApplication() {
 		return application;

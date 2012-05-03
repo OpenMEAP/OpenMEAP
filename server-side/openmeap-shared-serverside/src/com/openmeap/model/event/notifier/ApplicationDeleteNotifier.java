@@ -60,6 +60,7 @@ public class ApplicationDeleteNotifier extends AbstractModelServiceEventNotifier
 			List<ProcessingEvent> events) throws EventNotificationException {
 		
 		Application app = (Application)event.getPayload();
+		modelManager.refresh(app, events);
 		
 		// flip all the versions to inactive, so they don't prevent archive deletion
 		for( ApplicationVersion appVer : app.getVersions().values() ) {
@@ -69,6 +70,16 @@ public class ApplicationDeleteNotifier extends AbstractModelServiceEventNotifier
 			} catch (InvalidPropertiesException e) {
 				throw new PersistenceException(e);
 			}
+		}
+		
+		// iterate over each version, deleting each
+		List<ApplicationVersion> appVers = new ArrayList<ApplicationVersion>();
+		for( ApplicationVersion appVer : app.getVersions().values() ) {
+			appVers.add(appVer);
+		}
+		for( ApplicationVersion appVer : appVers ) {
+			modelManager.delete(appVer,events);
+			//app.removeVersion(appVer);
 		}
 		
 		// call the event notifiers on each deployment that will be deleted
@@ -83,16 +94,6 @@ public class ApplicationDeleteNotifier extends AbstractModelServiceEventNotifier
 			Deployment depl = (Deployment)iterator.next();
 			modelManager.delete(depl,events);
 			app.removeDeployment(depl);
-		}
-		
-		// iterate over each version, deleting each
-		List<ApplicationVersion> appVers = new ArrayList<ApplicationVersion>();
-		for( ApplicationVersion appVer : app.getVersions().values() ) {
-			appVers.add(appVer);
-		}
-		for( ApplicationVersion appVer : appVers ) {
-			modelManager.delete(appVer,events);
-			//app.removeVersion(appVer);
 		}
 	}
 

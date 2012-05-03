@@ -32,4 +32,5 @@ public class AssetsRequestHandler implements BrowserFieldResourceRequestHandler,
 	public InputConnection handleResource(BrowserFieldRequest request) throws Exception {
 		return new AssetsInputConnection(request.getURL().substring(ASSETS_PREFIX.length()));
 	}
+
 }

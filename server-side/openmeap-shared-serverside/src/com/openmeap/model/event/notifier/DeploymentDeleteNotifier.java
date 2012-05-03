@@ -98,7 +98,7 @@ public class DeploymentDeleteNotifier extends AbstractModelServiceEventNotifier<
 			return;
 		}
 		
-		// OK TO CLEANUP LOCAL FILE SYSTEM
+		// OK TO DELETE ARCHIVE, but possibly not the archive file...as it may be in use by another app
 		
 		// use the archive delete handler to cleanup localhost
 		Map<String, Object> map = new HashMap<String, Object>();

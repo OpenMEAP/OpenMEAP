@@ -37,6 +37,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -109,20 +110,22 @@ public class Deployment extends AbstractModelEntity {
 		this.type = type;
 	}
 
-	@ManyToOne(fetch=FetchType.LAZY,cascade={},targetEntity=Application.class,optional=false)
-	public Application getApplication() {
-		return application;
-	}
-	public void setApplication(Application application) {
-		this.application = application;
-	}
-	
-	@ManyToOne(fetch=FetchType.EAGER,cascade={},targetEntity=ApplicationArchive.class,optional=false)
+	@ManyToOne(fetch=FetchType.LAZY,cascade={},targetEntity=ApplicationArchive.class,optional=false)
+	@JoinColumn(name="archive_id",nullable=false)
 	public ApplicationArchive getApplicationArchive() {
 		return applicationArchive;
 	}
 	public void setApplicationArchive(ApplicationArchive applicationArchive) {
 		this.applicationArchive = applicationArchive;
+	}
+	
+	@ManyToOne(fetch=FetchType.LAZY,cascade={},targetEntity=Application.class,optional=false)
+	@JoinColumn(name="application_id",nullable=false)
+	public Application getApplication() {
+		return application;
+	}
+	public void setApplication(Application application) {
+		this.application = application;
 	}
 	
 	@Column(name="version_identifier")

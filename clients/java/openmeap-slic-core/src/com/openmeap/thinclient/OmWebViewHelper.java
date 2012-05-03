@@ -22,25 +22,45 @@
  ###############################################################################
  */
 
-package com.openmeap.blackberry;
+package com.openmeap.thinclient;
 
-import java.util.Hashtable;
+import java.util.Random;
 
-import com.openmeap.thinclient.Preferences;
-import com.openmeap.thinclient.SLICConfig;
+import com.openmeap.protocol.WebServiceException;
+import com.openmeap.protocol.dto.UpdateHeader;
+import com.openmeap.protocol.json.JsUpdateHeader;
+import com.openmeap.util.StringUtils;
 
-public class BlackberrySLICConfig extends SLICConfig {
-
-	public BlackberrySLICConfig(Preferences preferences, Hashtable properties) {
-		super(preferences, properties);
+final public class OmWebViewHelper {
+	
+	private static final Random randoms = new Random();
+	
+	private OmWebViewHelper() {
 	}
-
-	public String getAssetsBaseUrl() {
-		// storage location will be null until the first successful update
-    	if( shouldUseAssetsOrSdCard().booleanValue() ) {
-   			return getPackagedAppRoot();
-    	} else {
-    		return getStorageLocation();
-    	}
+	
+	final static public void setUpdateHeader(OmWebView webView, UpdateHeader update, WebServiceException err, Long bytesFree) {
+		String js = "void(0);";
+		if( err!=null ) {
+			js = StringUtils.replaceAll(OmWebView.UPDATE_ERROR, "%s", WebServiceException.toJSON(err));
+		} else if(update!=null) {
+			js = StringUtils.replaceAll(OmWebView.UPDATE_NOT_NULL, "%s", new JsUpdateHeader(update,bytesFree).toString());
+		} else {
+			js = OmWebView.UPDATE_NULL;
+		}
+		webView.runJavascript(js);
+	}
+	
+	final static public void executeJavascriptFunction(OmWebView webView, String callBack, String[] arguments) {
+		
+		int random = new Double(randoms.nextDouble()*10000.0).intValue();
+		String func = "openMEAP_anon"+random;
+		String str = "var "+func+"="+callBack+"; "+func+"(";
+		int cnt = arguments.length;
+		for( int i=0; i<cnt; i++ ) {
+			str += i!=0 ? ",":"";
+			str += arguments[i];
+		}
+		str += "); "+func+"=undefined;";
+		webView.runJavascript(str);
 	}
 }

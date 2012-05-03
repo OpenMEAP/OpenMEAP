@@ -37,10 +37,6 @@ public interface OmWebView {
 	
 	public void clearCache(boolean arg0);
 	
-	public void addJavascriptInterface( Object obj, String interfaceName );
-	
-	public Object getJavascriptInterface(String name);
-	
 	public void runJavascript(String stream);
 	
 	public void setUpdateHeader(UpdateHeader update, WebServiceException err, Long bytesFree);
@@ -59,7 +55,7 @@ public interface OmWebView {
 	 */
 	public void executeJavascriptFunction(String callBack, String[] arguments);
 
-	public void loadDataWithBaseURL(String baseUrl, String pageContent, String string, String sOURCE_ENCODING, String object);
+	public void loadDataWithBaseURL(String baseUrl, String pageContent, String mimeType, String sourceEncoding, String historyUrl);
 
 	public void clearView();
 	

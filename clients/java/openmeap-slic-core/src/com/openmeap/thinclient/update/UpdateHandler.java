@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 
+import com.openmeap.constants.FormConstants;
 import com.openmeap.http.HttpRequestException;
 import com.openmeap.http.HttpRequestExecuter;
 import com.openmeap.http.HttpRequestExecuterFactory;
@@ -363,7 +364,7 @@ public class UpdateHandler {
 				fis.close();
 			}
 		} catch(Exception e) {
-			throw new UpdateException(UpdateResult.UNDEFINED,"",e);
+			throw new UpdateException(UpdateResult.UNDEFINED,"The archive failed validation",e);
 		}
 	}
 	
@@ -371,7 +372,7 @@ public class UpdateHandler {
 		try {
 			storage.unzipImportArchive(update);
 		} catch (LocalStorageException e) {
-			throw new UpdateException(UpdateResult.IO_EXCEPTION,"",e);
+			throw new UpdateException(UpdateResult.IO_EXCEPTION,"The archive failed to install",e);
 		}
 	}
 	
@@ -390,7 +391,7 @@ public class UpdateHandler {
         // if this application is configured to fetch updates,
         // then check for them now
 		Boolean shouldPerformUpdateCheck = activity.getConfig().shouldPerformUpdateCheck();
-        if( shouldPerformUpdateCheck!=null && shouldPerformUpdateCheck==Boolean.TRUE ) {
+        if( shouldPerformUpdateCheck!=null && shouldPerformUpdateCheck.equals(Boolean.TRUE) ) {
         	
         	activity.runOnUiThread(new Runnable() {
         		public void run() {
@@ -417,16 +418,20 @@ public class UpdateHandler {
 		            		err = new WebServiceException(WebServiceException.TypeEnum.CLIENT_UPDATE,e);
 		            	}
 		        	}
-		        	activity.runOnUiThread(new InitializeWebView(update, err));
+					new InitializeWebView(update, err).run();
         		}
         	}).start();
         } else {
-        	activity.runOnUiThread(new InitializeWebView(null, null));
+        	new Thread(new Runnable(){
+				public void run() {
+					new InitializeWebView(null, null).run();
+				}
+        	}).start();
         }
 	}
     
-	private static String SOURCE_ENCODING = "utf-8";
-	private static String CONTENT_TYPE = "text/html";
+	private static String SOURCE_ENCODING = FormConstants.CHAR_ENC_DEFAULT;
+	private static String CONTENT_TYPE = FormConstants.CONT_TYPE_HTML;
     private class InitializeWebView implements Runnable {
     	UpdateHeader update=null;
     	WebServiceException err=null;
@@ -441,17 +446,17 @@ public class UpdateHandler {
 	        	if( justUpdated!=null && justUpdated.booleanValue()==true ) {
 	        		config.setApplicationUpdated(Boolean.FALSE);
 	        	}
-	        	String baseUrl = config.getAssetsBaseUrl();
-	        	String pageContent = activity.getRootWebPageContent();
 	        	OmWebView webView = activity.createDefaultWebView();
 	        	if( justUpdated!=null && justUpdated.booleanValue() ) {
 	        		webView.clearCache(true);
 	        		webView = activity.createDefaultWebView();
 	        	}
-	        	webView.setUpdateHeader(update, err, storage.getBytesFree());
-	        	webView.loadDataWithBaseURL(baseUrl, pageContent, CONTENT_TYPE, SOURCE_ENCODING, null);
 	        	activity.setWebView(webView);
-	            activity.setContentView(webView);
+	        	String baseUrl = config.getAssetsBaseUrl();
+	        	String pageContent = activity.getRootWebPageContent();
+	        	webView.loadDataWithBaseURL(baseUrl, pageContent, CONTENT_TYPE, SOURCE_ENCODING, null);
+        		activity.setContentView(webView);
+	            webView.setUpdateHeader(update, err, storage.getBytesFree());
 	        } catch( Exception e ) {
 	        	throw new GenericRuntimeException(e);
 	        }

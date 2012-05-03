@@ -34,6 +34,7 @@ import com.openmeap.protocol.dto.UpdateHeader;
 import com.openmeap.protocol.json.JsUpdateHeader;
 import com.openmeap.thinclient.OmMainActivity;
 import com.openmeap.thinclient.OmWebView;
+import com.openmeap.thinclient.OmWebViewHelper;
 
 public class WebView extends android.webkit.WebView implements OmWebView {
 
@@ -60,16 +61,13 @@ public class WebView extends android.webkit.WebView implements OmWebView {
 		loadUrl(url);
 	}
 	
-	public void setUpdateHeader(UpdateHeader update, WebServiceException err, Long bytesFree) {
-		String js = "void(0);";
-		if( err!=null ) {
-			js = String.format(UPDATE_ERROR, WebServiceException.toJSON(err));
-		} else if(update!=null) {
-			js = String.format(UPDATE_NOT_NULL, new JsUpdateHeader(update,bytesFree).toString());
-		} else {
-			js = UPDATE_NULL;
-		}
-		runJavascript(js);
+	public void setUpdateHeader(final UpdateHeader update, final WebServiceException err, final Long bytesFree) {
+		final OmWebView webView = this;
+		activity.runOnUiThread(new Runnable(){
+			public void run() {
+				OmWebViewHelper.setUpdateHeader(webView,update,err,bytesFree);
+			}
+		});
 	}
 
 	public void performOnResume() {
@@ -82,16 +80,7 @@ public class WebView extends android.webkit.WebView implements OmWebView {
 		// TODO: call the js callback
 	}
 	
-	public void executeJavascriptFunction(String callBack, String... arguments) {
-		Integer random = new Double(Math.random()*10000.0).intValue();
-    	String func = "openMEAP_anon"+random;
-		String str = "var "+func+"="+callBack+"; "+func+"(";
-		int cnt = arguments.length;
-		for( int i=0; i<cnt; i++ ) {
-			str += i!=0 ? ",":"";
-			str += arguments[i];
-		}
-		str += "); "+func+"=undefined;";
-		runJavascript(str);
+	public void executeJavascriptFunction(String callBack, String[] arguments) {
+		OmWebViewHelper.executeJavascriptFunction(this,callBack,arguments);
 	}
 }

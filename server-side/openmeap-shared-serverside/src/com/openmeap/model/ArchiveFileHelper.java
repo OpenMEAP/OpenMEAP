@@ -60,11 +60,11 @@ public class ArchiveFileHelper {
 		GlobalSettings settings = modelManager.getGlobalSettings();
 		
 		// check to see if any deployments or versions are currently using this archive
-		List<Deployment> deployments = (List<Deployment>)modelService.findDeploymentsByApplicationArchive(archive);
-		List<ApplicationVersion> versions = (List<ApplicationVersion>)modelService.findVersionsByApplicationArchive(archive);
+		int versions = modelService.countVersionsByHashAndHashAlg(archive.getHash(),archive.getHashAlgorithm());
+		int deployments = modelService.countDeploymentsByHashAndHashAlg(archive.getHash(),archive.getHashAlgorithm());
 		
 		// either more than one archive has this file
-		Boolean archiveIsInUseElsewhere = deployments.size()>0 || versions.size()>0;
+		Boolean archiveIsInUseElsewhere = deployments>0 || versions>0;
 		
 		if( !archiveIsInUseElsewhere ) {
 			

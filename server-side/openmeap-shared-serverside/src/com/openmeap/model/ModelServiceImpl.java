@@ -161,7 +161,8 @@ public class ModelServiceImpl implements ModelService
 	@Override
 	public ApplicationVersion findAppVersionByNameAndId(String appName, String identifier) {
 		Query q = entityManager.createQuery("select distinct av "
-				+"from ApplicationVersion av inner join fetch av.application a "
+				+"from ApplicationVersion av "
+				+"inner join fetch av.application a "
 				+"where av.identifier=:identifier "
 				+"and a.name=:name");
 		q.setParameter("name", appName);
@@ -177,9 +178,10 @@ public class ModelServiceImpl implements ModelService
 	@Override
 	public List<Deployment> findDeploymentsByApplication(Application app) {
 		Query q = entityManager.createQuery("select d "
-				+"from Deployment d inner join fetch d.applicationArchive aa "
+				+"from Deployment d "
+				+"inner join fetch d.applicationArchive aa "
 				+"inner join d.application a "
-				+"where a.name=:name ");
+				+"where a.name=:name");
 		q.setParameter("name", app.getName());
 		try {
 			@SuppressWarnings(value={"unchecked"})
@@ -193,7 +195,8 @@ public class ModelServiceImpl implements ModelService
 	@Override
 	public List<Deployment> findDeploymentsByApplicationArchive(ApplicationArchive archive) {
 		Query q = entityManager.createQuery("select distinct d "
-				+"from Deployment d inner join fetch d.applicationArchive aa "
+				+"from Deployment d "
+				+"inner join fetch d.applicationArchive aa "
 				+"where aa.id=:id" );
 		q.setParameter("id", archive.getId());
 		try {
@@ -208,8 +211,9 @@ public class ModelServiceImpl implements ModelService
 	@Override
 	public List<ApplicationVersion> findVersionsByApplicationArchive(ApplicationArchive archive) {
 		Query q = entityManager.createQuery("select distinct av "
-				+"from ApplicationVersion av inner join fetch av.archive aa "
-				+"where aa.id=:id" );
+				+"from ApplicationVersion av "
+				+"inner join fetch av.archive aa "
+				+"where aa.id=:id " );
 		q.setParameter("id", archive.getId());
 		try {
 			@SuppressWarnings(value={"unchecked"})
@@ -237,19 +241,72 @@ public class ModelServiceImpl implements ModelService
 	}
 	
 	@Override
-	public ApplicationArchive findApplicationArchiveByHashAndAlgorithm(String hash, String hashAlgorithm) {
+	public ApplicationArchive findApplicationArchiveByHashAndAlgorithm(Application app, String hash, String hashAlgorithm) {
 		Query q = entityManager.createQuery("select distinct ar "
-				+"from ApplicationArchive ar join fetch ar.application "
+				+"from ApplicationArchive ar "
+				+"join fetch ar.application app "
 				+"where ar.hash=:hash "
-				+"and ar.hashAlgorithm=:hashAlgorithm");
+				+"and ar.hashAlgorithm=:hashAlgorithm "
+				+"and app.id=:appId");
 		q.setParameter("hash", hash);
 		q.setParameter("hashAlgorithm", hashAlgorithm);
+		q.setParameter("appId",app.getId());
 		q.setMaxResults(1);
 		try {
 			ApplicationArchive o = (ApplicationArchive)q.getSingleResult();
 			return (ApplicationArchive)o;
 		} catch( NoResultException nre ) {
 			return null;
+		}
+	}
+	
+	@Override
+	public int countDeploymentsByHashAndHashAlg(String hash, String hashAlg) {
+		Query q = entityManager.createQuery("select count(d) "
+				+"from Deployment d "
+				+"left join d.applicationArchive aa "
+				+"where aa.hash=:hash "
+				+"and aa.hashAlgorithm=:hashAlgorithm");
+		q.setParameter("hash", hash);
+		q.setParameter("hashAlgorithm", hashAlg);
+		try {
+			Number ret = (Number)q.getSingleResult();
+			return ret.intValue();
+		} catch( NoResultException nre ) {
+			return 0;
+		}
+	}
+	
+	@Override
+	public int countVersionsByHashAndHashAlg(String hash, String hashAlg) {
+		Query q = entityManager.createQuery("select count(av) "
+				+"from ApplicationVersion av "
+				+"left join av.archive ar "
+				+"where ar.hash=:hash "
+				+"and ar.hashAlgorithm=:hashAlgorithm");
+		q.setParameter("hash", hash);
+		q.setParameter("hashAlgorithm", hashAlg);
+		try {
+			Number ret = (Number)q.getSingleResult();
+			return ret.intValue();
+		} catch( NoResultException nre ) {
+			return 0;
+		}
+	}
+	
+	@Override
+	public int countApplicationArchivesByHashAndHashAlg(String hash, String hashAlg) {
+		Query q = entityManager.createQuery("select count(ar) "
+				+"from ApplicationArchive ar "
+				+"where ar.hash=:hash "
+				+"and ar.hashAlgorithm=:hashAlgorithm ");
+		q.setParameter("hash", hash);
+		q.setParameter("hashAlgorithm", hashAlg);
+		try {
+			Number ret = (Number)q.getSingleResult();
+			return ret.intValue();
+		} catch( NoResultException nre ) {
+			return 0;
 		}
 	}
 	

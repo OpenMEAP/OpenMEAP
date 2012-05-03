@@ -66,8 +66,10 @@ Parameter Values / Outputs:
 				[#if willProcess]
 				<dt>Submit:</dt>
 				<dd>
-					<input type="hidden" name="submit" value="Submit!">
-					<input type="image" src="/openmeap-admin-web/img/btn/action_submit.gif" name="submit" value="Submit!"/></dd>
+					<input type="hidden" name="submit" value="false">
+					<input type="image" onclick="this.form.submit.value='true';this.form.submit();"
+						src="/openmeap-admin-web/img/btn/action_submit.gif"/>
+					</dd>
 					[#if (application.id)??]
 				<dt>
 					Delete Confirm:<br/>
@@ -81,8 +83,9 @@ Parameter Values / Outputs:
 					history of the application.  Only do this if you really, really mean it!</span>
 				</dt>
 				<dd>
-					<input type="hidden" name="delete" value="Delete!">	
-					<input type="image" src="/openmeap-admin-web/img/btn/action_delete.gif" value="Delete!"/>
+					<input type="hidden" name="delete" value="false">
+					<input type="image" onclick="this.form.delete.value='true';this.form.submit();"
+						src="/openmeap-admin-web/img/btn/action_delete.gif"/>
 				</dd>
 				[/#if]
 		[/#if]

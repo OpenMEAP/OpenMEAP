@@ -49,6 +49,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.openmeap.constants.FormConstants;
 import com.openmeap.digest.DigestInputStreamFactory;
 import com.openmeap.digest.Md5DigestInputStream;
 import com.openmeap.digest.Sha1DigestInputStream;
@@ -70,7 +71,7 @@ import com.openmeap.util.Utils;
 
 public class MainActivity extends Activity implements OmMainActivity,LoginFormLauncher {
 	
-	private static String SOURCE_ENCODING = "utf-8";
+	private static String SOURCE_ENCODING = FormConstants.CHAR_ENC_DEFAULT;
 	private static String DIRECTORY_INDEX = "index.html";
 	
 	private static final int LOGIN_DIALOG = 1;
@@ -275,7 +276,7 @@ public class MainActivity extends Activity implements OmMainActivity,LoginFormLa
     	// make sure javascript and our api is available to the webview
         webView.getSettings().setJavaScriptEnabled(true);
         JsApiCoreImpl jsApi = new JsApiCoreImpl(this,webView,updateHandler);
-        webView.addJavascriptInterface(jsApi, "OpenMEAP_Core");
+        webView.addJavascriptInterface(jsApi, JS_API_NAME);
         
         // make sure the web view fills the viewable area
         webView.setLayoutParams( new LinearLayout.LayoutParams(	
@@ -342,7 +343,16 @@ public class MainActivity extends Activity implements OmMainActivity,LoginFormLa
     }
 
 	public void setContentView(OmWebView webView) {
-		this.setContentView((View)webView);
+		runOnUiThread(new Runnable(){
+			OmWebView webView;
+			public void run() {
+				setContentView((View)webView);
+			}
+			public Runnable construct(OmWebView webView) {
+				this.webView = webView;
+				return this;
+			}
+		}.construct(webView));			
 	}
 
 	public void setWebView(OmWebView webView) {
