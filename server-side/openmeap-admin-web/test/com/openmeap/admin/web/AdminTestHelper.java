@@ -134,7 +134,8 @@ public class AdminTestHelper {
 		
 		Hashtable<String,Object> postData = new Hashtable<String,Object>();
 		postData.put(FormConstants.PROCESS_TARGET, ProcessingTargets.ADDMODIFY_APP);
-		postData.put("submit","Submit!");
+		postData.put("submit","true");
+		postData.put("delete","false");
 		
 		paramsBuilder.toParameters(postData,application);
 		
@@ -153,7 +154,8 @@ public class AdminTestHelper {
 		postData.put(FormConstants.PROCESS_TARGET, ProcessingTargets.ADDMODIFY_APP);
 		postData.put("deleteConfirm",FormConstants.APP_DELETE_CONFIRM_TEXT);
 		postData.put(FormConstants.DELETE,"Delete!");
-		postData.put("Delete!","Delete!");
+		postData.put("submit","false");
+		postData.put("delete","true");
 		
 		paramsBuilder.toParameters(postData, application);
 		

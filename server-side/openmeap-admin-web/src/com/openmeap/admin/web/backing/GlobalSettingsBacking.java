@@ -193,12 +193,25 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 				modelManager.commit(events);
 				modelManager.refresh(settings, events);
 				events.add(new MessagesEvent("The settings were successfully modified."));
-			} catch( InvalidPropertiesException ipe ) {
+			} catch( InvalidPropertiesException e ) {
 				modelManager.rollback();
-				events.add( new MessagesEvent(ipe.getMessage()) );
-			} catch( PersistenceException ipe ) {
+				logger.info("Invalid properties submitted for an application",e);
+				events.add( new MessagesEvent(e.getMessage()) );
+			} catch( PersistenceException e ) {
 				modelManager.rollback();
-				events.add( new MessagesEvent(ipe.getMessage()) );
+				logger.error("An exception occurred commiting the transaction",e);
+				events.add( new MessagesEvent(e.getMessage()) );
+			} 
+			try {
+				List<Exception> es = healthChecker.checkNowAndWait();
+				if(es.size()>0) {
+					for(Exception e:es) {
+						events.add( new MessagesEvent(e.getMessage()) );
+					}
+				}
+			} catch (InterruptedException e) {
+				logger.error("Exception occurred waiting on the health check thread after updating global settings",e);
+				events.add( new MessagesEvent(e.getMessage()) );
 			}
 		} 
 		

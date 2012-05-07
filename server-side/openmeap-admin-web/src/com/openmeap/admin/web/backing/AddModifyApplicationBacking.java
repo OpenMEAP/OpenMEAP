@@ -147,7 +147,7 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 				
 			}
 			
-			if( ParameterMapUtils.firstValue("delete",parameterMap).equals("true") ) {
+			if( ParameterMapUtils.notEmpty("delete", parameterMap) && ParameterMapUtils.firstValue("delete",parameterMap).equals("true") ) {
 				
 				if( !ParameterMapUtils.empty("deleteConfirm", parameterMap)
 						&& ParameterMapUtils.firstValue("deleteConfirm", parameterMap).equals(FormConstants.APP_DELETE_CONFIRM_TEXT) ) {

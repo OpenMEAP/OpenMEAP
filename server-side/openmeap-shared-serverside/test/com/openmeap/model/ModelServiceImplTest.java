@@ -32,6 +32,7 @@ import com.openmeap.event.Event;
 import com.openmeap.event.EventNotificationException;
 import com.openmeap.event.ProcessingEvent;
 import com.openmeap.model.dto.Application;
+import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.event.handler.*;
@@ -68,6 +69,7 @@ public class ModelServiceImplTest {
 		testSaveOrUpdate();
 		testFind();
 		testFindAll();
+		testGetApplicationArchiveByDeployment();
 		testFindAppVersionByNameAndId();
 		testDelete();
 	}
@@ -142,6 +144,13 @@ public class ModelServiceImplTest {
 			}
 			Assert.assertTrue("expecting a ApplicationVersion with name "+toFind,found);
 		}
+	}
+	
+	public void testGetApplicationArchiveByDeployment() {
+		Application app = modelService.findApplicationByName("Application.name");
+		Deployment d = modelService.getLastDeployment(app);
+		ApplicationArchive a = modelService.getApplicationArchiveByDeployment(d);
+		Assert.assertNotNull(a);
 	}
 	
 	public void testFindAppVersionByNameAndId() {

@@ -25,7 +25,10 @@
 package com.openmeap.cluster;
 
 import java.net.ConnectException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Vector;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.json.me.JSONObject;
@@ -50,14 +53,34 @@ public class ClusterNodeHealthCheckThread implements Runnable {
 	private HttpRequestExecuter httpRequestExecuter;
 	private ModelManager modelManager;
 	private GlobalSettings settings;
+	private Integer restartInterval = 30000;
+	private Integer checkInterval = 2000;
+	private Vector<Exception> lastCheckExceptions;
 
 	@Override
 	public void run() {
+		while(true) {
+			try {
+				_run();
+			} catch(Exception e) {
+				logger.error("Health check thread threw an exception.  Trying to restart in 30 seconds.",e);
+				try {
+					Thread.sleep(restartInterval);
+				} catch (InterruptedException e1) {
+					logger.error("Nap interrupted!",e1);
+				}
+			}
+		}
+	}
+		
+	private void _run() {
 		settings = modelManager.getGlobalSettings();
 		JSONObjectBuilder builder = new JSONObjectBuilder();
 		ClusterNodeRequest request = new ClusterNodeRequest();
 		request.setSubject(ClusterNodeRequest.HEALTH_CHECK);
+		lastCheckExceptions = new Vector<Exception>();
 		while(true) {
+			lastCheckExceptions.clear();
 			modelManager.getModelService().refresh(settings);
 			for(ClusterNode clusterNode : settings.getClusterNodes()) {
 				try {
@@ -114,31 +137,43 @@ public class ClusterNodeHealthCheckThread implements Runnable {
 					}
 				} catch(Exception e) {
 					logger.error("Exception performing health check",e);
+					lastCheckExceptions.add(e);
 				}
 			}
+			synchronized(this) {
+				notify();
+			}
 			try {
-				Thread.sleep(2000);
+				Thread.sleep(checkInterval);
 			} catch (InterruptedException e) {
 				logger.error("Nap interrupted!",e);
 			}
 		}
 	}
+	
+	public synchronized List<Exception> checkNowAndWait() throws InterruptedException {
+		wait();
+		return new ArrayList<Exception>(lastCheckExceptions);
+	}
+	
+	public GlobalSettings getSettings() {
+		return settings;
+	}
 
 	public void setHttpRequestExecuter(HttpRequestExecuter httpRequestExecuter) {
 		this.httpRequestExecuter = httpRequestExecuter;
-	}
-	public HttpRequestExecuter getHttpRequestExecuter() {
-		return httpRequestExecuter;
 	}
 
 	public void setModelManager(ModelManager modelManager) {
 		this.modelManager = modelManager;
 	}
-	public ModelManager getModelManager() {
-		return modelManager;
+
+	public void setCheckInterval(Integer checkInterval) {
+		this.checkInterval = checkInterval;
 	}
 
-	public GlobalSettings getSettings() {
-		return settings;
-	}	
+	public void setRestartInterval(Integer restartInterval) {
+		this.restartInterval = restartInterval;
+	}
+
 }

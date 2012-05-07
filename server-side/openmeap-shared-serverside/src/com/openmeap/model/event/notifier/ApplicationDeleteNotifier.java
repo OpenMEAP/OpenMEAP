@@ -62,39 +62,38 @@ public class ApplicationDeleteNotifier extends AbstractModelServiceEventNotifier
 		Application app = (Application)event.getPayload();
 		modelManager.refresh(app, events);
 		
+		deleteApplicationVersions(app,events);
+		deleteDeployments(app,events);
+		
+	}
+	
+	private void deleteApplicationVersions(Application app, List<ProcessingEvent> events) {
+		
 		// flip all the versions to inactive, so they don't prevent archive deletion
-		for( ApplicationVersion appVer : app.getVersions().values() ) {
+		/*for( ApplicationVersion appVer : app.getVersions().values() ) {
 			appVer.setActiveFlag(false);
 			try {
 				modelManager.addModify(appVer,events);
 			} catch (InvalidPropertiesException e) {
 				throw new PersistenceException(e);
 			}
-		}
+		}*/
 		
-		// iterate over each version, deleting each
-		List<ApplicationVersion> appVers = new ArrayList<ApplicationVersion>();
-		for( ApplicationVersion appVer : app.getVersions().values() ) {
-			appVers.add(appVer);
-		}
+		// delete each version
+		// archives should be deleted as they are no longer used
+		List<ApplicationVersion> appVers = new ArrayList<ApplicationVersion>(app.getVersions().values());
 		for( ApplicationVersion appVer : appVers ) {
 			modelManager.delete(appVer,events);
-			//app.removeVersion(appVer);
-		}
-		
-		// call the event notifiers on each deployment that will be deleted
-		Iterator iterator = app.getDeployments().iterator();
-		List<Deployment> depls = new ArrayList<Deployment>();
-		while(iterator.hasNext()) {
-			Deployment depl = (Deployment)iterator.next();
-			depls.add(depl);
-		}
-		iterator = depls.iterator();
-		while(iterator.hasNext()) {
-			Deployment depl = (Deployment)iterator.next();
-			modelManager.delete(depl,events);
-			app.removeDeployment(depl);
 		}
 	}
-
+	
+	private void deleteDeployments(Application app, List<ProcessingEvent> events) {
+		
+		// delete each deployment
+		// archives should be deleted as they are no longer used
+		List<Deployment> depls = new ArrayList<Deployment>(app.getDeployments());
+		for(Deployment depl : depls) {
+			modelManager.delete(depl,events);
+		}
+	}
 }

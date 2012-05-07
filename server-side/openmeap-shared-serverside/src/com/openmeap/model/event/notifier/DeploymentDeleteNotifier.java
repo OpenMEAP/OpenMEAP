@@ -76,7 +76,7 @@ public class DeploymentDeleteNotifier extends AbstractModelServiceEventNotifier<
 	//public <E extends Event<Deployment>> void onInCommitBeforeCommit(E event, List<ProcessingEvent> events) throws EventNotificationException {
 	
 		Deployment deployment2Delete = (Deployment)event.getPayload();
-		ApplicationArchive archive = deployment2Delete.getApplicationArchive();
+		ApplicationArchive archive = deployment2Delete.getApplicationArchive();//archiveDeleteHandler.getModelManager().getModelService().getApplicationArchiveByDeployment(deployment2Delete);
 		Application app = deployment2Delete.getApplication();
 		
 		// if there are any other deployments with this hash,
@@ -104,9 +104,12 @@ public class DeploymentDeleteNotifier extends AbstractModelServiceEventNotifier<
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("archive", archive);
 		try {
-			GlobalSettings settings = archiveDeleteHandler.getModelManager().getGlobalSettings();
-			archiveDeleteHandler.setFileSystemStoragePathPrefix(settings.getTemporaryStoragePath());
-			archiveDeleteHandler.handle(new MapPayloadEvent(map));
+			int archivesWithHashAndAlg = archiveDeleteHandler.getModelManager().getModelService().countApplicationArchivesByHashAndHashAlg(archive.getHash(), archive.getHashAlgorithm());
+			if(archivesWithHashAndAlg==1) {
+				GlobalSettings settings = archiveDeleteHandler.getModelManager().getGlobalSettings();
+				archiveDeleteHandler.setFileSystemStoragePathPrefix(settings.getTemporaryStoragePath());
+				archiveDeleteHandler.handle(new MapPayloadEvent(map));
+			}
 			archiveDeleteHandler.getModelManager().delete(archive,events);
 		} catch (EventHandlingException e) {
 			throw new ClusterNotificationException("An event handling exception occured",e);

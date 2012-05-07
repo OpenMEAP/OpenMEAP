@@ -241,6 +241,21 @@ public class ModelServiceImpl implements ModelService
 	}
 	
 	@Override
+	public ApplicationArchive getApplicationArchiveByDeployment(Deployment depl) {
+		Query q = entityManager.createQuery("select distinct aa "
+				+"from ApplicationArchive aa, Deployment d  "
+				+"where d.applicationArchive=aa and d.id=:id ");
+		q.setParameter("id", depl.getId());
+		q.setMaxResults(1);
+		try {
+			Object o = q.getSingleResult();
+			return ((ApplicationArchive)o);
+		} catch( NoResultException nre ) {
+			return null;
+		}
+	}
+	
+	@Override
 	public ApplicationArchive findApplicationArchiveByHashAndAlgorithm(Application app, String hash, String hashAlgorithm) {
 		Query q = entityManager.createQuery("select distinct ar "
 				+"from ApplicationArchive ar "

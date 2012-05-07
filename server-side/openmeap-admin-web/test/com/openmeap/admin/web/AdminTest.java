@@ -134,7 +134,8 @@ public class AdminTest {
 		originalSettings.addClusterNode(node);
 		
 		// validate settings stored in database
-		Utils.consumeInputStream(helper.postGlobalSettings(originalSettings).getResponseBody());
+		String returnBody = Utils.readInputStream(helper.postGlobalSettings(originalSettings).getResponseBody(),FormConstants.CHAR_ENC_DEFAULT);
+		logger.info(returnBody);
 		
 		//modelManager.getModelService().clearPersistenceContext();
 		GlobalSettings insertedSettings = modelManager.getGlobalSettings();
@@ -300,7 +301,8 @@ public class AdminTest {
 	private void _createDeployment(String identifier, Deployment.Type type) throws Exception {
 		modelManager.getModelService().clearPersistenceContext();
 		ApplicationVersion version = modelManager.getModelService().findAppVersionByNameAndId(APP_NAME, identifier);
-		Utils.consumeInputStream(helper.postCreateDeployment(version, type).getResponseBody());
+		String body = Utils.readInputStream(helper.postCreateDeployment(version, type).getResponseBody(),FormConstants.CHAR_ENC_DEFAULT);
+		logger.info(body);
 		Assert.assertTrue(_isVersionArchiveInDeployedLocation(version.getArchive().getHash()));
 	}
 	

@@ -88,6 +88,7 @@ public interface ModelService {
 	public List<ApplicationVersion> findVersionsByApplicationArchive(ApplicationArchive archive);
 	public ApplicationArchive findApplicationArchiveByHashAndAlgorithm(Application app, String hash, String hashAlgorithm);
 	public Deployment getLastDeployment(Application app);
+	public ApplicationArchive getApplicationArchiveByDeployment(Deployment depl);
 	
 	/*
 	 * ACROSS ALL APPLICATIONS

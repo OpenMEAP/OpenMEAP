@@ -44,6 +44,8 @@
 		<property name="httpRequestExecuter">
 			<bean class="com.openmeap.http.HttpRequestExecuterFactory" factory-method="newDefault"/>
 		</property>
+		<property name="checkInterval" value="2000"/>
+		<property name="restartInterval" value="30000"/>
 	</bean>
 	
 </beans>

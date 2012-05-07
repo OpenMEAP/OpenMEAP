@@ -110,8 +110,8 @@ public class Deployment extends AbstractModelEntity {
 		this.type = type;
 	}
 
-	@ManyToOne(fetch=FetchType.LAZY,cascade={},targetEntity=ApplicationArchive.class,optional=false)
-	@JoinColumn(name="archive_id",nullable=false)
+	@ManyToOne(fetch=FetchType.LAZY,cascade={},targetEntity=ApplicationArchive.class)
+	@JoinColumn(name="archive_id")
 	public ApplicationArchive getApplicationArchive() {
 		return applicationArchive;
 	}
