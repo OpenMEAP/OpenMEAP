@@ -44,7 +44,7 @@ import com.openmeap.util.GenericRuntimeException;
 
 public class LocalStorageImpl implements LocalStorage {
 
-	private static String STORAGE_ROOT = "file:///store";
+	private static String STORAGE_ROOT = "file:///store/home/user";
 	private static String IMPORT_ARCHIVE = STORAGE_ROOT+"/import.zip";
 	private static Hashtable connections = new Hashtable();
 	private SLICConfig config;
@@ -63,7 +63,7 @@ public class LocalStorageImpl implements LocalStorage {
 				}
 			}
 		} catch(IOException e) {
-			throw new GenericRuntimeException(e);
+			throw new GenericRuntimeException(e.getMessage(),e);
 		} 
 	}
 	
@@ -71,7 +71,7 @@ public class LocalStorageImpl implements LocalStorage {
 		
 		FileConnection fc=null;
 		try {
-			fc = (FileConnection)Connector.open(IMPORT_ARCHIVE);
+			fc = (FileConnection)Connector.open(IMPORT_ARCHIVE,Connector.READ_WRITE);
 			if(fc.exists()) {
 				fc.delete();
 			}
@@ -83,7 +83,7 @@ public class LocalStorageImpl implements LocalStorage {
 					fc.close();
 				}
 			} catch (IOException e) {
-				throw new GenericRuntimeException(e);
+				throw new GenericRuntimeException(e.getMessage(),e);
 			}
 		}
 	}
@@ -127,7 +127,7 @@ public class LocalStorageImpl implements LocalStorage {
 				try {
 					zis.close();
 				} catch (IOException e) {
-					throw new GenericRuntimeException(e);
+					throw new GenericRuntimeException(e.getMessage(),e);
 				}
 			}
 		}
@@ -150,12 +150,16 @@ public class LocalStorageImpl implements LocalStorage {
 
 	public OutputStream openFileOutputStream(String prefix, String fileName) throws LocalStorageException {
 		try {
-			FileConnection fc = (FileConnection)Connector.open(prefix+'/'+fileName);
+			String location = prefix+'/'+fileName;
+			FileConnection fc = (FileConnection)Connector.open(location,Connector.WRITE);
+			if(!fc.exists()) {
+				fc.create();
+			}
 			OutputStream os = fc.openOutputStream();
 			connections.put(os, fc);
 			return os;
 		} catch(IOException ioe) {
-			throw new LocalStorageException(ioe);
+			throw new LocalStorageException(ioe.getMessage(),ioe);
 		}
 	}
 	
@@ -169,7 +173,7 @@ public class LocalStorageImpl implements LocalStorage {
 				conn.close();
 			}
 		} catch(IOException ioe) {
-			throw new LocalStorageException(ioe);
+			throw new LocalStorageException(ioe.getMessage(),ioe);
 		}
 	}
 	
@@ -183,7 +187,7 @@ public class LocalStorageImpl implements LocalStorage {
 				conn.close();
 			}
 		} catch(IOException ioe) {
-			throw new LocalStorageException(ioe);
+			throw new LocalStorageException(ioe.getMessage(),ioe);
 		}
 	}
 
@@ -206,7 +210,7 @@ public class LocalStorageImpl implements LocalStorage {
 			c.close();
 			return ret;
 		} catch(IOException ioe) {
-			throw new LocalStorageException(ioe);
+			throw new LocalStorageException(ioe.getMessage(),ioe);
 		}
 	}
 

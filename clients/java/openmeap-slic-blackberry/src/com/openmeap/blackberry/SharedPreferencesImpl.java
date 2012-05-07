@@ -42,7 +42,7 @@ import com.openmeap.util.Utils;
 
 public class SharedPreferencesImpl implements Preferences {
 
-	private final static String CONNECTION = "file:///store/";
+	private final static String CONNECTION = "file:///store/home/user/";
 	private final static String EXTENSION = ".prefs";
 	
 	private JSONObject values;
@@ -121,8 +121,11 @@ public class SharedPreferencesImpl implements Preferences {
 	
 	private Boolean write() {
 		try {
-			FileConnection fc = (FileConnection)Connector.open(CONNECTION+name+EXTENSION);
+			FileConnection fc = (FileConnection)Connector.open(CONNECTION+name+EXTENSION,Connector.WRITE);
 			try {
+				if(!fc.exists()) {
+					fc.create();
+				}
 				OutputStream os = fc.openOutputStream();
 				try {
 					Utils.pipeInputStreamIntoOutputStream(new ByteArrayInputStream(values.toString().getBytes()), os);

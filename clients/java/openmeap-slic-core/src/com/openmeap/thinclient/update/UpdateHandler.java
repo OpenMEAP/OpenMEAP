@@ -280,7 +280,7 @@ public class UpdateHandler {
 		} catch (LocalStorageException e) {
 			throw new UpdateException(UpdateResult.IO_EXCEPTION,"Could not determine the number of bytes available",e);
 		}
-		return new Boolean(avail.equals(update.getUpdateHeader().getInstallNeeds())); 
+		return new Boolean(avail.longValue() > update.getUpdateHeader().getInstallNeeds().longValue()); 
 	}
 	
 	/**
@@ -332,15 +332,15 @@ public class UpdateHandler {
 	        	}
 	        }
 		} catch(IOException lse) {
-			throw new UpdateException(UpdateResult.IO_EXCEPTION,"",lse);
+			throw new UpdateException(UpdateResult.IO_EXCEPTION,lse.getMessage(),lse);
 		} catch(LocalStorageException lse) {
-			throw new UpdateException(UpdateResult.IO_EXCEPTION,"",lse);
+			throw new UpdateException(UpdateResult.IO_EXCEPTION,lse.getMessage(),lse);
 		} finally {
 			try {
 				storage.closeOutputStream(os);
 				storage.closeInputStream(is);
 			} catch (LocalStorageException e) {
-				throw new UpdateException(UpdateResult.IO_EXCEPTION,"",e);
+				throw new UpdateException(UpdateResult.IO_EXCEPTION,e.getMessage(),e);
 			}
 			
 			// have to hang on to the requester till the download is complete,
@@ -418,15 +418,11 @@ public class UpdateHandler {
 		            		err = new WebServiceException(WebServiceException.TypeEnum.CLIENT_UPDATE,e);
 		            	}
 		        	}
-					new InitializeWebView(update, err).run();
+		        	activity.runOnUiThread(new InitializeWebView(update, err));
         		}
         	}).start();
         } else {
-        	new Thread(new Runnable(){
-				public void run() {
-					new InitializeWebView(null, null).run();
-				}
-        	}).start();
+        	activity.runOnUiThread(new InitializeWebView(null, null));
         }
 	}
     

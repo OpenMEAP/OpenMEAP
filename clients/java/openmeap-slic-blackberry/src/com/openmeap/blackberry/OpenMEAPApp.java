@@ -88,11 +88,11 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
     	localStorage = new LocalStorageImpl(config);    
     	updateHandler = new UpdateHandler(webView,this,config,localStorage);
     	
-    	new Thread(new Runnable(){
-			public void run() {
+    	//new Thread(new Runnable(){
+			//public void run() {
 				updateHandler.initialize(webView);
-			}
-    	}).start();
+			//}
+    	//}).start();
     }
 
 	public SLICConfig getConfig() {
@@ -156,11 +156,7 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 	}
 	
 	public void runOnUiThread(Runnable runnable) {
-		if(isEventThread()) {
-			runnable.run();
-		} else {
-			invokeLater(runnable);
-		}
+		invokeLater(runnable);
 	}
 
 	public void setWebView(OmWebView webView) {
