@@ -42,7 +42,7 @@ import com.openmeap.util.Utils;
 
 public class SharedPreferencesImpl implements Preferences {
 
-	private final static String CONNECTION = "file:///store/home/user/";
+	private final static String CONNECTION = OpenMEAPApp.STORAGE_ROOT+"/";
 	private final static String EXTENSION = ".prefs";
 	
 	private JSONObject values;
@@ -104,11 +104,11 @@ public class SharedPreferencesImpl implements Preferences {
 				InputStream is = fc.openInputStream();
 				String json = "";
 				try {
-					json = Utils.readInputStream(is,FormConstants.ENCODING_TYPE);
+					json = Utils.readInputStream(is,FormConstants.CHAR_ENC_DEFAULT);
 				} finally {
 					is.close();
 				}
-				JSONObject obj = new JSONObject(json);
+				values = new JSONObject(json);
 			} else {
 				values = new JSONObject();
 			}
@@ -121,7 +121,8 @@ public class SharedPreferencesImpl implements Preferences {
 	
 	private Boolean write() {
 		try {
-			FileConnection fc = (FileConnection)Connector.open(CONNECTION+name+EXTENSION,Connector.WRITE);
+			String path = CONNECTION+name+EXTENSION;
+			FileConnection fc = (FileConnection)Connector.open(path);
 			try {
 				if(!fc.exists()) {
 					fc.create();

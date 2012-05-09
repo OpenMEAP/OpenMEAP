@@ -161,7 +161,13 @@ public class UpdateHandler {
 		        public void run() {
 		        	try {
 		            	_handleUpdate(update,eventHandler);
-		        	} catch( UpdateException ue ) {
+		        	} catch( Exception e ) {
+		        		UpdateException ue = null;
+		        		if(e instanceof UpdateException ) {
+							ue = (UpdateException)e;
+						} else {
+							ue = new UpdateException(UpdateResult.UNDEFINED,e.getMessage(),e);
+						}
 		        		config.setLastUpdateResult(ue.getUpdateResult().toString());
 		        		update.setError(ue);
 		        		eventHandler.onStatusChange(update);
@@ -172,9 +178,15 @@ public class UpdateHandler {
 		} else {
 			try {
 				_handleUpdate(update,eventHandler);
-			} catch(UpdateException ue) {
-				config.setLastUpdateResult(ue.getUpdateResult().toString());
-				throw new GenericRuntimeException(ue);
+			} catch(Exception e) {
+				UpdateException ue = null;
+        		if(e instanceof UpdateException ) {
+					ue = (UpdateException)e;
+				} else {
+					ue = new UpdateException(UpdateResult.UNDEFINED,e.getMessage(),e);
+				}
+        		config.setLastUpdateResult(ue.getUpdateResult().toString());
+        		throw new GenericRuntimeException(ue.getMessage(),ue);
 			}
 		}
 	}
@@ -241,8 +253,6 @@ public class UpdateHandler {
 		
 		installArchive(update);
 		
-		config.setLastUpdateResult(UpdateResult.SUCCESS.toString());
-		
 		// at this point, the archive should be of no use to us
 		try {
 			storage.deleteImportArchive();
@@ -250,18 +260,18 @@ public class UpdateHandler {
 			throw new UpdateException(UpdateResult.IO_EXCEPTION,"Could not delete import archive",lse);
 		}
 		
-		// delete the content at the old internal storage prefix
-		// TODO: decide whether this should be done pending notifying of the update or not
-		config.setApplicationVersion(update.getUpdateHeader().getVersionIdentifier());
-		config.setArchiveHash(update.getUpdateHeader().getHash().getValue());
-		
 		try {
 			storage.resetStorage();
 		} catch(LocalStorageException lse) {
 			throw new UpdateException(UpdateResult.IO_EXCEPTION,"Could not reset storage",lse);
 		}
 		
-		String newPrefix = "com.openmeap.storage."+update.getUpdateHeader().getHash().getValue();
+		config.setLastUpdateResult(UpdateResult.SUCCESS.toString());
+		
+		config.setApplicationVersion(update.getUpdateHeader().getVersionIdentifier());
+		config.setArchiveHash(update.getUpdateHeader().getHash().getValue());
+		
+		String newPrefix = storage.getStorageRoot()+update.getUpdateHeader().getHash().getValue();
 		config.setStorageLocation(newPrefix);
 
 		config.setApplicationUpdated(Boolean.TRUE);
@@ -353,15 +363,16 @@ public class UpdateHandler {
 	public Boolean archiveIsValid(UpdateStatus update) throws UpdateException {
 		try {
 			// validate the zip file against the hash of the response
-			InputStream fis = storage.getImportArchiveInputStream();
+			InputStream fis = null;
 			try {
+				fis = storage.getImportArchiveInputStream();
 				String hashValue = Utils.hashInputStream(update.getUpdateHeader().getHash().getAlgorithm().value(), fis);
 				if( !hashValue.equals(update.getUpdateHeader().getHash().getValue()) ) {
 					return Boolean.FALSE;
 				}
 				return Boolean.TRUE;
 			} finally {
-				fis.close();
+				storage.closeInputStream(fis);
 			}
 		} catch(Exception e) {
 			throw new UpdateException(UpdateResult.UNDEFINED,"The archive failed validation",e);
@@ -415,7 +426,7 @@ public class UpdateHandler {
 		        			storage.setupSystemProperties();
 		        			update=null;
 		        		} catch( Exception e ) {
-		            		err = new WebServiceException(WebServiceException.TypeEnum.CLIENT_UPDATE,e);
+		            		err = new WebServiceException(WebServiceException.TypeEnum.CLIENT_UPDATE,e.getMessage(),e);
 		            	}
 		        	}
 		        	activity.runOnUiThread(new InitializeWebView(update, err));

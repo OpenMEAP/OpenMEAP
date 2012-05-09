@@ -27,6 +27,7 @@ package com.openmeap.blackberry;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import javax.microedition.io.Connection;
@@ -44,12 +45,13 @@ import com.openmeap.util.GenericRuntimeException;
 
 public class LocalStorageImpl implements LocalStorage {
 
-	private static String STORAGE_ROOT = "file:///store/home/user";
+	private static String STORAGE_ROOT = OpenMEAPApp.STORAGE_ROOT;
 	private static String IMPORT_ARCHIVE = STORAGE_ROOT+"/import.zip";
 	private static Hashtable connections = new Hashtable();
 	private SLICConfig config;
 	
 	public LocalStorageImpl(SLICConfig config) {
+		this.config=config;
 		try {
 			FileConnection fc = null;
 			try {
@@ -71,19 +73,19 @@ public class LocalStorageImpl implements LocalStorage {
 		
 		FileConnection fc=null;
 		try {
-			fc = (FileConnection)Connector.open(IMPORT_ARCHIVE,Connector.READ_WRITE);
+			fc = (FileConnection)Connector.open(IMPORT_ARCHIVE);
 			if(fc.exists()) {
 				fc.delete();
 			}
 		} catch (IOException e) {
-			throw new LocalStorageException(e);
+			throw new LocalStorageException(e.getMessage(),e);
 		} finally {
 			try {
 				if(fc!=null) {
 					fc.close();
 				}
 			} catch (IOException e) {
-				throw new GenericRuntimeException(e.getMessage(),e);
+				throw new LocalStorageException(e.getMessage(),e);
 			}
 		}
 	}
@@ -95,40 +97,73 @@ public class LocalStorageImpl implements LocalStorage {
 		//   2) the archive downloaded is what was expected
 
 		ZipInputStream zis = null;
+		InputStream importIs = null;
 		String newPrefix = STORAGE_ROOT+'/'+status.getUpdateHeader().getHash().getValue();
+		assertDir(newPrefix);
+		
 		try {
-			zis = new ZipInputStream( getImportArchiveInputStream() );
+			importIs = getImportArchiveInputStream();
+			zis = new ZipInputStream(importIs);
 		    ZipEntry ze;
 		    while ((ze = zis.getNextEntry()) != null) {
-		    	if( ze.isDirectory() )
+		    	if( ze.isDirectory() ) {
+		    		assertDir(newPrefix+'/'+ze.getName());
 		    		continue;
-		        OutputStream baos = openFileOutputStream(newPrefix,ze.getName());
+		    	}
+		        OutputStream baos = null;
 		        try {
+		        	baos = openFileOutputStream(newPrefix,ze.getName());
 		        	byte[] buffer = new byte[1024];
 		        	int count;
 		        	while ((count = zis.read(buffer)) != -1) {
 		        		baos.write(buffer, 0, count);
 		        	}
-		        }
-		        catch( Exception e ) {
-		        	;// TODO: something, for the love of god.
-		        }
-		        finally {
-		        	baos.close();
+		        } finally {
+		        	if(baos!=null) {
+		        		baos.close();
+		        	}
 		        }
 		    }
 		} catch( Exception e ) {
-			
-			// delete the recently unzipped assets
-			
-			throw new LocalStorageException(e);
+			throw new LocalStorageException(e.getMessage(),e);
 		} finally {
-			if( zis!=null ) {
-				try {
+			try {
+				if( zis!=null ) {
 					zis.close();
-				} catch (IOException e) {
-					throw new GenericRuntimeException(e.getMessage(),e);
 				}
+				if( importIs!=null ) {
+					closeInputStream(importIs);
+				}
+			} catch (IOException e) {
+				throw new LocalStorageException(e.getMessage(),e);
+			}
+		}
+	}
+	
+	public void assertDir(String prefix) throws LocalStorageException {
+		FileConnection fc = null;
+		try {
+			fc = (FileConnection)Connector.open(prefix+"/");
+			
+			if( fc.exists() && !fc.isDirectory() ) {
+				fc.delete();
+				fc.close();
+				fc = (FileConnection)Connector.open(prefix+"/");
+			}
+			
+			if( !fc.exists() ) {
+				fc.mkdir();
+			}
+			
+		} catch (IOException e1) {
+			throw new LocalStorageException(e1.getMessage(),e1);
+		} finally {
+			try {
+				if(fc!=null) {
+					fc.close();
+				}
+			} catch(IOException ioe) {
+				throw new LocalStorageException(ioe.getMessage(),ioe);
 			}
 		}
 	}
@@ -140,8 +175,7 @@ public class LocalStorageImpl implements LocalStorage {
 
 	public InputStream getImportArchiveInputStream()
 			throws LocalStorageException {
-		// TODO Auto-generated method stub
-		return null;
+		return openFileInputStream("import.zip");
 	}
 
 	public OutputStream openFileOutputStream(String fileName) throws LocalStorageException {
@@ -151,7 +185,7 @@ public class LocalStorageImpl implements LocalStorage {
 	public OutputStream openFileOutputStream(String prefix, String fileName) throws LocalStorageException {
 		try {
 			String location = prefix+'/'+fileName;
-			FileConnection fc = (FileConnection)Connector.open(location,Connector.WRITE);
+			FileConnection fc = (FileConnection)Connector.open(location);
 			if(!fc.exists()) {
 				fc.create();
 			}
@@ -163,13 +197,34 @@ public class LocalStorageImpl implements LocalStorage {
 		}
 	}
 	
+	public InputStream openFileInputStream(String fileName) throws LocalStorageException {
+		return openFileInputStream(STORAGE_ROOT,fileName);
+	}
+	
+	public InputStream openFileInputStream(String prefix, String fileName) throws LocalStorageException {
+		try {
+			String location = prefix+'/'+fileName;
+			FileConnection fc = (FileConnection)Connector.open(location);
+			if(!fc.exists()) {
+				fc.close();
+				return null;
+			}
+			InputStream is = fc.openInputStream();
+			connections.put(is, fc);
+			return is;
+		} catch(IOException ioe) {
+			throw new LocalStorageException(ioe.getMessage(),ioe);
+		}
+	}
+	
 	public void closeOutputStream(OutputStream outputStream) throws LocalStorageException {
 		try {
 			if(outputStream==null) {
 				return;
 			}
-			Connection conn = (Connection)connections.remove(outputStream);
-			if(!connections.contains(conn)) {
+			outputStream.close();
+			if(connections.containsKey(outputStream)) {
+				Connection conn = (Connection)connections.remove(outputStream);
 				conn.close();
 			}
 		} catch(IOException ioe) {
@@ -182,8 +237,9 @@ public class LocalStorageImpl implements LocalStorage {
 			if(inputStream==null) {
 				return;
 			}
-			Connection conn = (Connection)connections.remove(inputStream);
-			if(!connections.contains(conn)) {
+			inputStream.close();
+			if(connections.containsKey(inputStream)) {
+				Connection conn = (Connection)connections.remove(inputStream);
 				conn.close();
 			}
 		} catch(IOException ioe) {
@@ -191,7 +247,7 @@ public class LocalStorageImpl implements LocalStorage {
 		}
 	}
 
-	public void resetStorage() {
+	public void resetStorage() throws LocalStorageException {
 		String currentPrefix = config.getStorageLocation();
 		if(currentPrefix!=null) {
 			resetStorage(currentPrefix);
@@ -199,23 +255,54 @@ public class LocalStorageImpl implements LocalStorage {
 		}
 	}
 
-	public void resetStorage(String prefix) {
-		
+	public void resetStorage(String prefix) throws LocalStorageException {
+		try {
+			_recursiveDelete(prefix);
+		} catch (IOException e) {
+			throw new LocalStorageException(e.getMessage(),e);
+		}
 	}
 
 	public Long getBytesFree() throws LocalStorageException {
+		FileConnection c = null;
 		try {
-			FileConnection c = (FileConnection)Connector.open(STORAGE_ROOT);
+			c = (FileConnection)Connector.open(STORAGE_ROOT);
 			Long ret = new Long(c.availableSize());
-			c.close();
 			return ret;
 		} catch(IOException ioe) {
 			throw new LocalStorageException(ioe.getMessage(),ioe);
+		} finally {
+			if(c!=null) {
+				try {
+					c.close();
+				} catch (IOException e) {
+					throw new LocalStorageException(e.getMessage(),e);
+				}
+			}
 		}
 	}
 
 	public void setupSystemProperties() {
 		
+	}
+	
+	private void _recursiveDelete(String prefix) throws IOException {
+		FileConnection fc = (FileConnection)Connector.open(prefix);
+		Enumeration e = fc.list();
+		while(e.hasMoreElements()) {
+			String path = (String)e.nextElement();
+			if(path.endsWith("/")) {
+				_recursiveDelete(prefix+path.substring(0,path.length()-1));
+			} else {
+				FileConnection fc2 = (FileConnection)Connector.open(prefix+'/'+path);
+				fc2.delete();
+			}
+		}
+		fc.delete();
+	}
+
+	public String getStorageRoot() {
+		return STORAGE_ROOT+'/';
 	}
 
 }

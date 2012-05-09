@@ -44,7 +44,7 @@ public class OpenMEAPAppTestScreen extends MainScreen {
 		config.setProperty(BrowserFieldConfig.JAVASCRIPT_ENABLED, Boolean.TRUE);
 		browserField = new BrowserField(config);
     	add(browserField);
-    	browserField.displayContent("<html><body></body></html>", "file:///Store");
+    	browserField.displayContent("<html><body></body></html>", "file:///store");
     }
 
 	public void assertTrue(final String mesg, final boolean testResult) {

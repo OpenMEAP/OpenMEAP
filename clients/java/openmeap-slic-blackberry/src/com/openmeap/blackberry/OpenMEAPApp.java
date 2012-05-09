@@ -55,6 +55,8 @@ import fr.free.ichir.mahieddine.Properties;
  */
 public class OpenMEAPApp extends UiApplication implements OmMainActivity
 {
+	public static final String STORAGE_ROOT = "file:///store/home/user";
+	
 	private SLICConfig config;
 	private LocalStorage localStorage;
 	private UpdateHandler updateHandler;
@@ -88,11 +90,7 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
     	localStorage = new LocalStorageImpl(config);    
     	updateHandler = new UpdateHandler(webView,this,config,localStorage);
     	
-    	//new Thread(new Runnable(){
-			//public void run() {
-				updateHandler.initialize(webView);
-			//}
-    	//}).start();
+		updateHandler.initialize(webView);
     }
 
 	public SLICConfig getConfig() {
@@ -184,7 +182,7 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 	public String getRootWebPageContent() throws IOException {
 		InputStream is = null;
 		try {
-			is = webView.getContent(getBaseUrl()+"index.html");
+			is = webView.getContent(getBaseUrl()+"/index.html");
 			return Utils.readInputStream(is,FormConstants.CHAR_ENC_DEFAULT);
 		} catch(Exception e) {
 			throw new IOException(e.getMessage());

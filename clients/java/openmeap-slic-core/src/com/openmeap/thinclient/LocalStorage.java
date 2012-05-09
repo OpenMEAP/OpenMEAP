@@ -54,6 +54,8 @@ public interface LocalStorage {
 	public void resetStorage() throws LocalStorageException;
 	public void resetStorage(String prefix) throws LocalStorageException;
 	
+	public String getStorageRoot();
+	
 	public void closeOutputStream(OutputStream outputStream) throws LocalStorageException;
 	public void closeInputStream(InputStream inputStream) throws LocalStorageException;
 	

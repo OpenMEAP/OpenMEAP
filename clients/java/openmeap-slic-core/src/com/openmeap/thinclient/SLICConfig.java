@@ -124,7 +124,9 @@ abstract public class SLICConfig {
     	boolean shouldUpdate = true;
     	if( lastUpdate!=null ) {
     		Date now = new Date();
-    		shouldUpdate = getUpdateFrequency()!=null? ((now.getTime()-lastUpdate.longValue())/1000 > getUpdateFrequency().intValue()) : false;
+    		long secondsSince = (now.getTime()-lastUpdate.longValue())/(long)1000;
+    		long secondsInterval = getUpdateFrequency()!=null ? getUpdateFrequency().intValue() : 0;
+    		shouldUpdate = secondsSince > secondsInterval;
     	}
 		return new Boolean(shouldUpdate);
 	}

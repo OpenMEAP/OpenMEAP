@@ -44,6 +44,8 @@ import com.openmeap.util.GenericRuntimeException;
 
 public class LocalStorageImpl implements LocalStorage {
 
+	private static String STORAGE_ROOT = "com.openmeap.storage";
+	
 	private MainActivity activity = null;
 	
 	public LocalStorageImpl(MainActivity activity) {
@@ -187,5 +189,9 @@ public class LocalStorageImpl implements LocalStorage {
 		} catch(IOException ioe) {
 			throw new LocalStorageException(ioe);
 		}
+	}
+
+	public String getStorageRoot() {
+		return STORAGE_ROOT+".";
 	}
 }
