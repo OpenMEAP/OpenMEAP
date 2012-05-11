@@ -128,6 +128,11 @@ public class ArchiveFileUploadNotifier extends AbstractModelServiceEventNotifier
 						events.add(new MessagesEvent(mesg));	
 					}
 					return archiveExists;
+				} else {
+					// if an archive of the hash/alg doesn't exist, 
+					// then we don't want to accidentally change an existing one.
+					archive = archive.clone();
+					archive.setId(null);
 				}
 			} catch(DigestException de) {
 				throw new PersistenceException(de); 

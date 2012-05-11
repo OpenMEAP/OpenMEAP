@@ -112,6 +112,13 @@ public class AdminTestHelper {
 	}
 	
 	/*
+	 * Connection open 
+	 
+	public HttpResponse getConnectionOptn(ApplicationVersion version) {
+		
+	}*/
+	
+	/*
 	 * Application Add/Modify
 	 */
 	

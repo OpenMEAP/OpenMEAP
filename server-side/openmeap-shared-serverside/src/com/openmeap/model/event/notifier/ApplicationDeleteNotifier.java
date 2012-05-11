@@ -64,20 +64,9 @@ public class ApplicationDeleteNotifier extends AbstractModelServiceEventNotifier
 		
 		deleteApplicationVersions(app,events);
 		deleteDeployments(app,events);
-		
 	}
 	
 	private void deleteApplicationVersions(Application app, List<ProcessingEvent> events) {
-		
-		// flip all the versions to inactive, so they don't prevent archive deletion
-		/*for( ApplicationVersion appVer : app.getVersions().values() ) {
-			appVer.setActiveFlag(false);
-			try {
-				modelManager.addModify(appVer,events);
-			} catch (InvalidPropertiesException e) {
-				throw new PersistenceException(e);
-			}
-		}*/
 		
 		// delete each version
 		// archives should be deleted as they are no longer used

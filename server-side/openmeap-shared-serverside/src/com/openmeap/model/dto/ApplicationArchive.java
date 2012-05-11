@@ -226,6 +226,19 @@ public class ApplicationArchive extends AbstractModelEntity {
 		bytesLengthUncompressed = bytesLength;
 	}
 	
+	public ApplicationArchive clone() {
+		ApplicationArchive clone = new ApplicationArchive();
+		clone.setApplication(application);
+		clone.setBytesLength(bytesLength);
+		clone.setBytesLengthUncompressed(bytesLengthUncompressed);
+		clone.setHash(hash);
+		clone.setHashAlgorithm(hashAlgorithm);
+		clone.setNewFileUploaded(newFileUploaded);
+		clone.setUrl(fileDataUrl);
+		clone.setId(id);
+		return clone;
+	}
+	
 	public Map<Method,String> validate() {
 		try {
 			Map<Method,String> errors = new HashMap<Method,String>();

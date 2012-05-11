@@ -95,6 +95,7 @@ public class AdminTest {
 		testModifyApplication();
 		testCreateApplicationVersion();
 		testDeleteApplicationVersion();
+		testUpdateApplicationVersion();
 		testCreateDeployments();
 		testDeleteApplication();
 	}
@@ -202,11 +203,50 @@ public class AdminTest {
 		Assert.assertTrue("if no other version shares the archive, then the archive file should be deleted",_deleteApplicationVersion(VERSION_01));
 		
 		// recreate version01, except with the archive used by version02 
+		// validate that the archive from version01 is deleted 
 		_createApplicationVersion(VERSION_01,VERSION_01_NOTES,VERSION_02_ZIP,VERSION_02_HASH);
 		Assert.assertTrue("if another version shares the archive, then leave it there",!_deleteApplicationVersion(VERSION_01));
 		
 		// restore original version01
+		// validates that the archive from version01 is recreated
 		_createApplicationVersion(VERSION_01,VERSION_01_NOTES,VERSION_01_ZIP,VERSION_01_HASH);
+	}
+	
+	public void testUpdateApplicationVersion() throws Exception {
+		
+		GlobalSettings settings = modelManager.getGlobalSettings();
+		
+		// validate that an unused archive is deleted
+		// update version update
+		// and that it is recreated when reuploaded
+		ApplicationVersion version1 = modelManager.getModelService().findAppVersionByNameAndId(APP_NAME, VERSION_01);
+		String response = Utils.readInputStream(
+				helper.postAddModifyAppVer(version1, 
+						new File(this.getClass().getResource(VERSION_02_ZIP).getFile())).getResponseBody(),
+				FormConstants.CHAR_ENC_DEFAULT
+			);
+		modelManager.getModelService().clearPersistenceContext();
+		version1 = modelManager.getModelService().findAppVersionByNameAndId(APP_NAME, VERSION_01);
+		ApplicationVersion version2 = modelManager.getModelService().findAppVersionByNameAndId(APP_NAME, VERSION_01);
+		Assert.assertTrue(version1.getArchive().getHash().equals(VERSION_02_HASH));
+		Assert.assertTrue(version2.getArchive().getHash().equals(VERSION_02_HASH));
+		Assert.assertSame(version2.getArchive(),version1.getArchive());
+		
+		// now restore the archive of version1
+		// and validate that version2's archive is not erroneously updated.
+		response = Utils.readInputStream(
+				helper.postAddModifyAppVer(version1, 
+						new File(this.getClass().getResource(VERSION_01_ZIP).getFile())).getResponseBody(),
+				FormConstants.CHAR_ENC_DEFAULT
+			);
+		modelManager.getModelService().clearPersistenceContext();
+		version1 = modelManager.getModelService().findAppVersionByNameAndId(APP_NAME, VERSION_01);
+		version2 = modelManager.getModelService().findAppVersionByNameAndId(APP_NAME, VERSION_02);
+		Assert.assertTrue(version1.getArchive().getHash().equals(VERSION_01_HASH));
+		Assert.assertTrue(version1.getArchive().getFile(settings.getTemporaryStoragePath()).exists());
+		Assert.assertTrue(version2.getArchive().getHash().equals(VERSION_02_HASH));
+		Assert.assertTrue(version2.getArchive().getFile(settings.getTemporaryStoragePath()).exists());
+		Assert.assertNotSame(version2.getArchive(),version1.getArchive());
 	}
 	
 	public void testCreateDeployments() throws Exception {

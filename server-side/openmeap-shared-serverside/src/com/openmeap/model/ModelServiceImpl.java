@@ -369,7 +369,6 @@ public class ModelServiceImpl implements ModelService
 	
 	private <T extends ModelEntity> void _delete(T entity, List<ProcessingEvent> events) throws PersistenceException {		
 		// give the event notifiers an opportunity to act, prior to deletion
-		this._refresh(entity);
 		entity.remove();
 		entityManager.remove(entity);
 	}

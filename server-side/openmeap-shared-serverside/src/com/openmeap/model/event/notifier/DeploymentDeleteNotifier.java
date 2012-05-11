@@ -76,20 +76,20 @@ public class DeploymentDeleteNotifier extends AbstractModelServiceEventNotifier<
 	//public <E extends Event<Deployment>> void onInCommitBeforeCommit(E event, List<ProcessingEvent> events) throws EventNotificationException {
 	
 		Deployment deployment2Delete = (Deployment)event.getPayload();
-		ApplicationArchive archive = deployment2Delete.getApplicationArchive();//archiveDeleteHandler.getModelManager().getModelService().getApplicationArchiveByDeployment(deployment2Delete);
-		Application app = deployment2Delete.getApplication();
+		ApplicationArchive archive = deployment2Delete.getApplicationArchive();
 		
 		// if there are any other deployments with this hash,
-		//   then we cannot yet delete it's archive.
+		//   then we cannot yet delete it's archive yet at all.
 		List<Deployment> deployments = archiveDeleteHandler.getModelManager().getModelService().findDeploymentsByApplicationArchive(archive);
-		if(deployments.size()>1) {
+		if(deployments.size()!=0) {
 			return;
+		} else {
+			int deplCount = archiveDeleteHandler.getModelManager().getModelService().countDeploymentsByHashAndHashAlg(archive.getHash(), archive.getHashAlgorithm());
+			if(deplCount==0) {
+				// use the archive delete notifier to cleanup to cluster nodes
+				archiveDeleteNotifier.notify(new ModelEntityEvent(ModelServiceOperation.DELETE,archive), events);
+			}
 		}
-		
-		// OK TO CLEANUP CLUSTER FILE SYSTEM
-		
-		// use the archive delete notifier to cleanup to cluster nodes
-		archiveDeleteNotifier.notify(new ModelEntityEvent(ModelServiceOperation.DELETE,archive), events);
 		
 		// if there are any application versions with this archive, 
 		//   then we cannot delete it's archive.
@@ -98,7 +98,8 @@ public class DeploymentDeleteNotifier extends AbstractModelServiceEventNotifier<
 			return;
 		}
 		
-		// OK TO DELETE ARCHIVE, but possibly not the archive file...as it may be in use by another app
+		// OK TO DELETE THIS APPLICATION'S COPY OF THE ARCHIVE, 
+		// but possibly not the archive file...as it may be in use by another app
 		
 		// use the archive delete handler to cleanup localhost
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -106,10 +107,12 @@ public class DeploymentDeleteNotifier extends AbstractModelServiceEventNotifier<
 		try {
 			int archivesWithHashAndAlg = archiveDeleteHandler.getModelManager().getModelService().countApplicationArchivesByHashAndHashAlg(archive.getHash(), archive.getHashAlgorithm());
 			if(archivesWithHashAndAlg==1) {
+				
+				// use the delete handler to cleanup the admin servers copy
 				GlobalSettings settings = archiveDeleteHandler.getModelManager().getGlobalSettings();
 				archiveDeleteHandler.setFileSystemStoragePathPrefix(settings.getTemporaryStoragePath());
 				archiveDeleteHandler.handle(new MapPayloadEvent(map));
-			}
+			}			
 			archiveDeleteHandler.getModelManager().delete(archive,events);
 		} catch (EventHandlingException e) {
 			throw new ClusterNotificationException("An event handling exception occured",e);

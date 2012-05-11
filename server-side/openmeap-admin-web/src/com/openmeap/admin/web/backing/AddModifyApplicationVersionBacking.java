@@ -361,12 +361,14 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		// else there was no zip archive uploaded
 		if( archiveUncreated ) {
 			ApplicationArchive archive = version.getArchive();
-			
-			archive.setUrl(firstValue("url",parameterMap));
-			
-			// TODO: this should be selectable
 			archive.setHashAlgorithm(firstValue("hashType",parameterMap));
 			archive.setHash(firstValue("hash",parameterMap));
+			ApplicationArchive arch = modelManager.getModelService().findApplicationArchiveByHashAndAlgorithm(app, archive.getHash(), archive.getHashAlgorithm());
+			if(arch!=null) {
+				version.setArchive(arch);
+				archive = arch;
+			} 
+			archive.setUrl(firstValue("url",parameterMap));
 			if( notEmpty("bytesLength",parameterMap) ) {
 				archive.setBytesLength(Integer.valueOf(firstValue("bytesLength",parameterMap)));
 			}
