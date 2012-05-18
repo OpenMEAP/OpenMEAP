@@ -25,16 +25,20 @@
 package com.openmeap.admin.web;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.json.me.JSONException;
+import org.json.me.JSONObject;
 import org.junit.Assert;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.openmeap.constants.FormConstants;
+import com.openmeap.constants.UrlParamConstants;
 import com.openmeap.event.ProcessingTargets;
 import com.openmeap.http.FileHandlingHttpRequestExecuterImpl;
 import com.openmeap.model.ModelManager;
@@ -43,9 +47,14 @@ import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
+import com.openmeap.protocol.dto.Result;
 import com.openmeap.http.HttpRequestException;
 import com.openmeap.http.HttpRequestExecuter;
 import com.openmeap.http.HttpResponse;
+import com.openmeap.json.JSONObjectBuilder;
+import com.openmeap.util.StringUtils;
+import com.openmeap.util.UUID;
+import com.openmeap.util.Utils;
 import com.openmeap.web.form.ParameterMapBuilder;
 import com.openmeap.web.form.ParameterMapBuilderException;
 
@@ -65,6 +74,8 @@ public class AdminTestHelper {
 	final static public String NODE_01_STORAGE = "/tmp/archs";
 	
 	private String adminUrl = "http://"+ADMIN_HOST+"/openmeap-admin-web/interface/";
+	
+	final static public String APP_MGMT_WEB_URL = SERVICES_WEB_URL+"/application-management";
 	
 	private HttpRequestExecuter requestExecuter;
 	private ParameterMapBuilder paramsBuilder;
@@ -113,10 +124,22 @@ public class AdminTestHelper {
 	
 	/*
 	 * Connection open 
-	 
-	public HttpResponse getConnectionOptn(ApplicationVersion version) {
+	 */
+	public Result getConnectionOpen(ApplicationVersion version, String slicVersion) throws HttpRequestException, IOException, JSONException {
+		Hashtable<String,Object> postData = new Hashtable<String,Object>();
+		postData.put(UrlParamConstants.ACTION, "connection-open-request");
+		postData.put(UrlParamConstants.DEVICE_UUID, UUID.randomUUID());
+		postData.put(UrlParamConstants.APP_NAME, version.getApplication().getName());
+		postData.put(UrlParamConstants.APP_VERSION, version.getIdentifier() );
+		postData.put(UrlParamConstants.APPARCH_HASH, version.getArchive().getHash());
+		postData.put(UrlParamConstants.SLIC_VERSION, slicVersion);
+		HttpResponse response = requestExecuter.postData(APP_MGMT_WEB_URL, postData);
 		
-	}*/
+		String responseText = Utils.readInputStream(response.getResponseBody(), FormConstants.CHAR_ENC_DEFAULT);
+		JSONObjectBuilder job = new JSONObjectBuilder();
+		Result result = (Result) job.fromJSON(new JSONObject(responseText), new Result());
+		return result;
+	}
 	
 	/*
 	 * Application Add/Modify

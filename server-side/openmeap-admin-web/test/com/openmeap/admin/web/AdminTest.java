@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.me.JSONObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -46,6 +47,10 @@ import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.ClusterNode;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
+import com.openmeap.protocol.dto.ConnectionOpenResponse;
+import com.openmeap.protocol.dto.Result;
+import com.openmeap.protocol.dto.UpdateHeader;
+import com.openmeap.util.AuthTokenProvider;
 import com.openmeap.util.Utils;
 
 /**
@@ -72,11 +77,17 @@ public class AdminTest {
 	final static private String VERSION_01_ZIP = "version01.zip";
 	final static private String VERSION_01_HASH = "08c7f5cb8486466b872aac2059cd47f4";
 	final static private String VERSION_01_NOTES = "Test notes - version01";
+	final static private Long VERSION_01_UNCOMPRESSED_BYTES_LENGTH = 1776L;
+	final static private Long VERSION_01_BYTES_LENGTH = 686L;
 	
 	final static private String VERSION_02 = "version02Id";
 	final static private String VERSION_02_ZIP = "version02.zip";
 	final static private String VERSION_02_HASH = "d2ed29ae33e7ddf9ff99fa9b6ad0724d";
 	final static private String VERSION_02_NOTES = "Test notes - version02";
+	final static private Long VERSION_02_UNCOMPRESSED_BYTES_LENGTH = 1776L;
+	final static private Long VERSION_02_BYTES_LENGTH = 686L;
+	
+	final static private String SLIC_VERSION = "0.0.1a";
 	
 	static private AdminTestHelper helper;
 	static private ModelManager modelManager;
@@ -247,27 +258,69 @@ public class AdminTest {
 		Assert.assertTrue(version2.getArchive().getHash().equals(VERSION_02_HASH));
 		Assert.assertTrue(version2.getArchive().getFile(settings.getTemporaryStoragePath()).exists());
 		Assert.assertNotSame(version2.getArchive(),version1.getArchive());
+		
+		Result result = helper.getConnectionOpen(version1,SLIC_VERSION);
+		Assert.assertTrue(result.getConnectionOpenResponse().getUpdate()==null);
+		Assert.assertTrue(AuthTokenProvider.validateAuthToken(
+				version1.getApplication().getProxyAuthSalt(), 
+				result.getConnectionOpenResponse().getAuthToken()));
 	}
 	
 	public void testCreateDeployments() throws Exception {
+		
+		Result result = null;
+		ApplicationVersion version1 = modelManager.getModelService().findAppVersionByNameAndId(APP_NAME, VERSION_01);
+		ApplicationVersion version2 = modelManager.getModelService().findAppVersionByNameAndId(APP_NAME, VERSION_02);
+		UpdateHeader update = null;
 		
 		_createDeployment(VERSION_01,Deployment.Type.IMMEDIATE);
 		modelManager.getModelService().clearPersistenceContext();
 		Application app = modelManager.getModelService().findApplicationByName(APP_NAME);
 		Assert.assertTrue(app.getDeployments().size()==1);
+		result = helper.getConnectionOpen(version2,SLIC_VERSION);
+		update = result.getConnectionOpenResponse().getUpdate();
+		Assert.assertTrue(update.getType().value().equals(Deployment.Type.IMMEDIATE.name()));
+		Assert.assertTrue(update.getVersionIdentifier().equals(VERSION_01));
+		Assert.assertTrue(update.getHash().getValue().equals(VERSION_01_HASH));
+		Assert.assertTrue(update.getStorageNeeds().equals(VERSION_01_UNCOMPRESSED_BYTES_LENGTH));
+		Assert.assertTrue(
+				update.getInstallNeeds().equals(
+						VERSION_01_UNCOMPRESSED_BYTES_LENGTH
+						+ VERSION_01_BYTES_LENGTH));
 		
 		_createDeployment(VERSION_02,Deployment.Type.REQUIRED);
 		modelManager.getModelService().clearPersistenceContext();
 		app = modelManager.getModelService().findApplicationByName(APP_NAME);
 		Assert.assertTrue(app.getDeployments().size()==2);
+		result = helper.getConnectionOpen(version1,SLIC_VERSION);
+		update = result.getConnectionOpenResponse().getUpdate();
+		Assert.assertTrue(update.getType().value().equals(Deployment.Type.REQUIRED.name()));
+		Assert.assertTrue(update.getVersionIdentifier().equals(VERSION_02));
+		Assert.assertTrue(update.getHash().getValue().equals(VERSION_02_HASH));
+		Assert.assertTrue(update.getStorageNeeds().equals(VERSION_02_UNCOMPRESSED_BYTES_LENGTH));
+		Assert.assertTrue(
+				update.getInstallNeeds().equals(
+						VERSION_02_UNCOMPRESSED_BYTES_LENGTH
+						+ VERSION_02_BYTES_LENGTH));
 		
 		_createDeployment(VERSION_02,Deployment.Type.REQUIRED);
 		Assert.assertTrue("as this deployment is created, the archive for version01 should be removed from the deployed location",
 				!_isVersionArchiveInDeployedLocation(VERSION_01_HASH));
 		
+		
 		_createDeployment(VERSION_01,Deployment.Type.IMMEDIATE);
 		Assert.assertTrue("as this deployment is created, the archive for version01 should be in the deployed location",
 				_isVersionArchiveInDeployedLocation(VERSION_01_HASH));
+		result = helper.getConnectionOpen(version2,SLIC_VERSION);
+		update = result.getConnectionOpenResponse().getUpdate();
+		Assert.assertTrue(update.getType().value().equals(Deployment.Type.IMMEDIATE.name()));
+		Assert.assertTrue(update.getVersionIdentifier().equals(VERSION_01));
+		Assert.assertTrue(update.getHash().getValue().equals(VERSION_01_HASH));
+		Assert.assertTrue(update.getStorageNeeds().equals(VERSION_01_UNCOMPRESSED_BYTES_LENGTH));
+		Assert.assertTrue(
+				update.getInstallNeeds().equals(
+						VERSION_01_UNCOMPRESSED_BYTES_LENGTH
+						+ VERSION_01_BYTES_LENGTH));
 		
 		modelManager.getModelService().clearPersistenceContext();
 		app = modelManager.getModelService().findApplicationByName(APP_NAME);
