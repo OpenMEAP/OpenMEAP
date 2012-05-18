@@ -203,6 +203,7 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 				events.add( new MessagesEvent(e.getMessage()) );
 			} 
 			try {
+				healthChecker.refreshSettings();
 				List<Exception> es = healthChecker.checkNowAndWait();
 				if(es.size()>0) {
 					for(Exception e:es) {

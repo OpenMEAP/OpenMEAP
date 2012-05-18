@@ -80,68 +80,68 @@ public class ClusterNodeHealthCheckThread implements Runnable {
 		request.setSubject(ClusterNodeRequest.HEALTH_CHECK);
 		lastCheckExceptions = new Vector<Exception>();
 		while(true) {
-			lastCheckExceptions.clear();
-			modelManager.getModelService().refresh(settings);
-			for(ClusterNode clusterNode : settings.getClusterNodes()) {
-				try {
-					modelManager.getModelService().refresh(clusterNode);
-					request.setClusterNode(clusterNode);
-					HttpResponse response = null;
+			synchronized(this) {
+				lastCheckExceptions.clear();
+				for(ClusterNode clusterNode : settings.getClusterNodes()) {
 					try {
-						response = httpRequestExecuter.postContent(
-								clusterNode.getServiceWebUrlPrefix()+"/service-management/?action="+ClusterNodeRequest.HEALTH_CHECK+"&auth="+AuthTokenProvider.newAuthToken(settings.getServiceManagementAuthSalt()), 
-								builder.toJSON(request).toString(3), FormConstants.CONT_TYPE_JSON);
-					} catch(Exception e) {
-						logger.error(clusterNode.getServiceWebUrlPrefix()+" health check returned exception",e);
-						Throwable t = ExceptionUtils.getRootCause(e);
-						ClusterNode.Status err = null;
-						if( t instanceof ConnectException ) {
-							err = ClusterNode.Status.CONNECT_ERROR;
+						request.setClusterNode(clusterNode);
+						HttpResponse response = null;
+						try {
+							response = httpRequestExecuter.postContent(
+									clusterNode.getServiceWebUrlPrefix()+"/service-management/?action="+ClusterNodeRequest.HEALTH_CHECK+"&auth="+AuthTokenProvider.newAuthToken(settings.getServiceManagementAuthSalt()), 
+									builder.toJSON(request).toString(3), FormConstants.CONT_TYPE_JSON);
+						} catch(Exception e) {
+							logger.error(clusterNode.getServiceWebUrlPrefix()+" health check returned exception",e);
+							Throwable t = ExceptionUtils.getRootCause(e);
+							ClusterNode.Status err = null;
+							if( t instanceof ConnectException ) {
+								err = ClusterNode.Status.CONNECT_ERROR;
+							} else {
+								err = ClusterNode.Status.ERROR;
+							}
+							synchronized(clusterNode) {
+								clusterNode.setLastStatus(err);
+								clusterNode.setLastStatusMessage(t.getMessage());
+								clusterNode.setLastStatusCheck(new Date());
+							}
+							if(response!=null && response.getResponseBody()!=null) {
+								Utils.consumeInputStream(response.getResponseBody());
+								response.getResponseBody().close();
+							}
+							continue;
+						}
+						if( response!=null && response.getStatusCode()==200 ) {
+							String json = Utils.readInputStream(response.getResponseBody(), FormConstants.CHAR_ENC_DEFAULT);
+							JSONObject jsonObj = new JSONObject(json);
+							Result result = (Result) builder.fromJSON(jsonObj, new Result());
+							response.getResponseBody().close();
+							synchronized(clusterNode) {
+								clusterNode.setLastStatus(
+										result.getStatus()==Result.Status.SUCCESS
+										? ClusterNode.Status.GOOD
+										: ClusterNode.Status.ERROR);
+								clusterNode.setLastStatusMessage(result.getMessage());
+								clusterNode.setLastStatusCheck(new Date());
+							}
 						} else {
-							err = ClusterNode.Status.ERROR;
+							synchronized(clusterNode) {
+								clusterNode.setLastStatus(ClusterNode.Status.ERROR);
+								String msg = "Service node "+clusterNode.getServiceWebUrlPrefix()+" returned a non-200 status code "+response.getStatusCode()
+									+" "+Utils.readInputStream(response.getResponseBody(), FormConstants.CHAR_ENC_DEFAULT);
+								logger.error(msg);
+								clusterNode.setLastStatusMessage(msg);
+								response.getResponseBody().close();
+								clusterNode.setLastStatusCheck(new Date());
+							}
 						}
-						synchronized(clusterNode) {
-							clusterNode.setLastStatus(err);
-							clusterNode.setLastStatusMessage(t.getMessage());
-							clusterNode.setLastStatusCheck(new Date());
-						}
-						if(response!=null && response.getResponseBody()!=null) {
-							Utils.consumeInputStream(response.getResponseBody());
-							response.getResponseBody().close();
-						}
-						continue;
+					} catch(Exception e) {
+						logger.error("Exception performing health check",e);
+						lastCheckExceptions.add(e);
 					}
-					if( response!=null && response.getStatusCode()==200 ) {
-						String json = Utils.readInputStream(response.getResponseBody(), FormConstants.CHAR_ENC_DEFAULT);
-						JSONObject jsonObj = new JSONObject(json);
-						Result result = (Result) builder.fromJSON(jsonObj, new Result());
-						response.getResponseBody().close();
-						synchronized(clusterNode) {
-							clusterNode.setLastStatus(
-									result.getStatus()==Result.Status.SUCCESS
-									? ClusterNode.Status.GOOD
-									: ClusterNode.Status.ERROR);
-							clusterNode.setLastStatusMessage(result.getMessage());
-							clusterNode.setLastStatusCheck(new Date());
-						}
-					} else {
-						synchronized(clusterNode) {
-							clusterNode.setLastStatus(ClusterNode.Status.ERROR);
-							String msg = "Service node "+clusterNode.getServiceWebUrlPrefix()+" returned a non-200 status code "+response.getStatusCode()
-								+" "+Utils.readInputStream(response.getResponseBody(), FormConstants.CHAR_ENC_DEFAULT);
-							logger.error(msg);
-							clusterNode.setLastStatusMessage(msg);
-							response.getResponseBody().close();
-							clusterNode.setLastStatusCheck(new Date());
-						}
-					}
-				} catch(Exception e) {
-					logger.error("Exception performing health check",e);
-					lastCheckExceptions.add(e);
 				}
 			}
-			synchronized(this) {
-				notify();
+			synchronized(lastCheckExceptions) {
+				lastCheckExceptions.notifyAll();
 			}
 			try {
 				Thread.sleep(checkInterval);
@@ -151,9 +151,16 @@ public class ClusterNodeHealthCheckThread implements Runnable {
 		}
 	}
 	
-	public synchronized List<Exception> checkNowAndWait() throws InterruptedException {
-		wait();
-		return new ArrayList<Exception>(lastCheckExceptions);
+	public synchronized void refreshSettings() {
+		modelManager.getModelService().clearPersistenceContext();
+		settings = modelManager.getGlobalSettings();
+	}
+	
+	public List<Exception> checkNowAndWait() throws InterruptedException {
+		synchronized(lastCheckExceptions) {
+			lastCheckExceptions.wait();
+			return new ArrayList<Exception>(lastCheckExceptions);
+		}
 	}
 	
 	public GlobalSettings getSettings() {
