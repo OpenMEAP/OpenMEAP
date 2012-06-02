@@ -87,5 +87,10 @@ public interface JsApiCore {
 	 * @param statusCallBack a javascript function to pass status information back to
 	 */
 	public void performUpdate(final String header, final String statusCallBack);
+	
+	/**
+	 * Reloads the application
+	 */
+	public void reload();
 }
 

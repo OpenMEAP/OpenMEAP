@@ -149,7 +149,7 @@ public class AdminTest {
 		String returnBody = Utils.readInputStream(helper.postGlobalSettings(originalSettings).getResponseBody(),FormConstants.CHAR_ENC_DEFAULT);
 		logger.info(returnBody);
 		
-		//modelManager.getModelService().clearPersistenceContext();
+		modelManager.getModelService().clearPersistenceContext();
 		GlobalSettings insertedSettings = modelManager.getGlobalSettings();
 		
 		JSONObjectBuilder job = new JSONObjectBuilder();

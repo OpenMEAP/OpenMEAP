@@ -461,9 +461,9 @@ public class UpdateHandler {
 	        	activity.setWebView(webView);
 	        	String baseUrl = config.getAssetsBaseUrl();
 	        	String pageContent = activity.getRootWebPageContent();
+	        	webView.setUpdateHeader(update, err, storage.getBytesFree());
 	        	webView.loadDataWithBaseURL(baseUrl, pageContent, CONTENT_TYPE, SOURCE_ENCODING, null);
         		activity.setContentView(webView);
-	            webView.setUpdateHeader(update, err, storage.getBytesFree());
 	        } catch( Exception e ) {
 	        	throw new GenericRuntimeException(e);
 	        }

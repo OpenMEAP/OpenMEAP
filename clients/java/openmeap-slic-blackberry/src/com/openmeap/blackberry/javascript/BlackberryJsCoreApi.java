@@ -68,8 +68,8 @@ public class BlackberryJsCoreApi extends Scriptable {
 		});
 		functions.put("doToast", new ScriptableFunction() {
 			public Object invoke(Object thiz, Object[] args) throws Exception {
-				if(args.length==2) {
-					jsApi.doToast((String)args[0],new Boolean(Utils.parseBoolean((String)args[1])));
+				if(args.length==2 && args[1] instanceof Boolean) {
+					jsApi.doToast((String)args[0],(Boolean)args[1]);
 				} else {
 					jsApi.doToast((String)args[0],Boolean.TRUE);
 				}
@@ -113,6 +113,12 @@ public class BlackberryJsCoreApi extends Scriptable {
 		functions.put("performUpdate", new ScriptableFunction() {
 			public Object invoke(Object thiz, Object[] args) throws Exception {
 				jsApi.performUpdate((String)args[0], (String)args[1]);
+				return null;
+			}
+		});
+		functions.put("reload", new ScriptableFunction() {
+			public Object invoke(Object thiz, Object[] args) throws Exception {
+				jsApi.reload();
 				return null;
 			}
 		});

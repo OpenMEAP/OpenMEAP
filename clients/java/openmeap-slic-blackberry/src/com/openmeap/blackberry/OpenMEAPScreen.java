@@ -46,6 +46,7 @@ import net.rim.device.api.browser.field2.BrowserField;
 import net.rim.device.api.browser.field2.BrowserFieldConfig;
 import net.rim.device.api.browser.field2.BrowserFieldConnectionManager;
 import net.rim.device.api.browser.field2.BrowserFieldController;
+import net.rim.device.api.browser.field2.BrowserFieldListener;
 import net.rim.device.api.browser.field2.BrowserFieldRequest;
 import net.rim.device.api.browser.field2.ProtocolController;
 import net.rim.device.api.ui.container.MainScreen;
@@ -103,11 +104,20 @@ public final class OpenMEAPScreen extends MainScreen implements OmWebView
 
 	public void setUpdateHeader(final UpdateHeader update, final WebServiceException err, final Long bytesFree) {
 		final OmWebView webView = this;
-		activity.runOnUiThread(new Runnable(){
-			public void run() {
-				OmWebViewHelper.setUpdateHeader(webView,update,err,bytesFree);
+		BrowserFieldListener listener = new BrowserFieldListener() {
+			private boolean firstCall = true;
+			public void documentLoaded(BrowserField browserField, org.w3c.dom.Document document) throws Exception {
+				if(firstCall==true) {
+					activity.runOnUiThread(new Runnable(){
+						public void run() {
+							OmWebViewHelper.setUpdateHeader(webView,update,err,bytesFree);
+						}
+					});
+					firstCall=false;
+				}
 			}
-		});
+    	};
+    	browserField.addListener(listener);
 	}
 
 	public void performOnResume() {

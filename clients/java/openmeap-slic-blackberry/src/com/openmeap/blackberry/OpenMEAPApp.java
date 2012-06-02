@@ -29,6 +29,7 @@ import java.io.InputStream;
 
 import net.rim.device.api.ui.Screen;
 import net.rim.device.api.ui.UiApplication;
+import net.rim.device.api.ui.component.Status;
 
 import org.json.me.JSONException;
 
@@ -145,6 +146,7 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 			OmWebView webView;
 			public void run() {
 				pushScreen((Screen)webView);
+				((Screen)webView).setFocus();
 			}
 			public Runnable construct(OmWebView webView) {
 				this.webView = webView;
@@ -171,12 +173,17 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
     	return config.getAssetsBaseUrl();
     }
     
-    public void doToast(String mesg, boolean isLong) {
-		
+    public void doToast(final String mesg, boolean isLong) {
+    	runOnUiThread(new Runnable(){
+			public void run() {
+				Status.show(mesg);
+			}   		
+    	});
 	}
 	
 	public void restart() {
-		
+		this.popScreen(webView);
+		updateHandler.initialize(webView);
 	}
 	
 	public String getRootWebPageContent() throws IOException {
