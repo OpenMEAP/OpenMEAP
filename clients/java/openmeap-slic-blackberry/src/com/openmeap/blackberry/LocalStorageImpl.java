@@ -45,8 +45,6 @@ import com.openmeap.util.GenericRuntimeException;
 
 public class LocalStorageImpl implements LocalStorage {
 
-	private static String STORAGE_ROOT = OpenMEAPApp.STORAGE_ROOT;
-	private static String IMPORT_ARCHIVE = STORAGE_ROOT+"/import.zip";
 	private static Hashtable connections = new Hashtable();
 	private SLICConfig config;
 	
@@ -55,7 +53,7 @@ public class LocalStorageImpl implements LocalStorage {
 		try {
 			FileConnection fc = null;
 			try {
-				fc = (FileConnection)Connector.open(STORAGE_ROOT);
+				fc = (FileConnection)Connector.open(getStorageRoot());
 				if( !fc.exists() ) {
 					fc.mkdir();
 				}
@@ -73,7 +71,7 @@ public class LocalStorageImpl implements LocalStorage {
 		
 		FileConnection fc=null;
 		try {
-			fc = (FileConnection)Connector.open(IMPORT_ARCHIVE);
+			fc = (FileConnection)Connector.open(getImportArchivePath());
 			if(fc.exists()) {
 				fc.delete();
 			}
@@ -98,7 +96,7 @@ public class LocalStorageImpl implements LocalStorage {
 
 		ZipInputStream zis = null;
 		InputStream importIs = null;
-		String newPrefix = STORAGE_ROOT+'/'+status.getUpdateHeader().getHash().getValue();
+		String newPrefix = getStorageRoot()+'/'+status.getUpdateHeader().getHash().getValue();
 		assertDir(newPrefix);
 		
 		try {
@@ -179,7 +177,7 @@ public class LocalStorageImpl implements LocalStorage {
 	}
 
 	public OutputStream openFileOutputStream(String fileName) throws LocalStorageException {
-		return openFileOutputStream(STORAGE_ROOT,fileName);
+		return openFileOutputStream(getStorageRoot(),fileName);
 	}
 
 	public OutputStream openFileOutputStream(String prefix, String fileName) throws LocalStorageException {
@@ -198,7 +196,7 @@ public class LocalStorageImpl implements LocalStorage {
 	}
 	
 	public InputStream openFileInputStream(String fileName) throws LocalStorageException {
-		return openFileInputStream(STORAGE_ROOT,fileName);
+		return openFileInputStream(getStorageRoot(),fileName);
 	}
 	
 	public InputStream openFileInputStream(String prefix, String fileName) throws LocalStorageException {
@@ -266,7 +264,7 @@ public class LocalStorageImpl implements LocalStorage {
 	public Long getBytesFree() throws LocalStorageException {
 		FileConnection c = null;
 		try {
-			c = (FileConnection)Connector.open(STORAGE_ROOT);
+			c = (FileConnection)Connector.open(getStorageRoot());
 			Long ret = new Long(c.availableSize());
 			return ret;
 		} catch(IOException ioe) {
@@ -302,7 +300,15 @@ public class LocalStorageImpl implements LocalStorage {
 	}
 
 	public String getStorageRoot() {
-		return STORAGE_ROOT+'/';
+		return getStorageRootPath();
+	}
+	
+	public static String getStorageRootPath() {
+		return OpenMEAPApp.STORAGE_ROOT;
+	}
+	
+	public static String getImportArchivePath() {
+		return getStorageRootPath()+'/'+"/import.zip";
 	}
 
 }

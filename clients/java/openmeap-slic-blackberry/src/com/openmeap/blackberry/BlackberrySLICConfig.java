@@ -43,4 +43,8 @@ public class BlackberrySLICConfig extends SLICConfig {
     		return getStorageLocation();
     	}
 	}
+	
+	public Preferences getPreferences() {
+		return preferences;
+	}
 }

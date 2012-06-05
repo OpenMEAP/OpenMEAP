@@ -27,6 +27,7 @@ package com.openmeap.blackberry;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.rim.device.api.system.CodeModuleManager;
 import net.rim.device.api.ui.Screen;
 import net.rim.device.api.ui.UiApplication;
 import net.rim.device.api.ui.component.Status;
@@ -56,7 +57,7 @@ import fr.free.ichir.mahieddine.Properties;
  */
 public class OpenMEAPApp extends UiApplication implements OmMainActivity
 {
-	public static final String STORAGE_ROOT = "file:///store/home/user";
+	public static String STORAGE_ROOT = "file:///store/home/user";
 	
 	private SLICConfig config;
 	private LocalStorage localStorage;
@@ -78,17 +79,31 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
     		InputStream stream = System.class.getResourceAsStream('/'+SLICConfig.PROPERTIES_FILE);
     		Properties properties = new Properties();
     		properties.load(stream);
+    		
+    		// we want everything for this installation instance
+        	// to go under it's own directory in /store/home/user
+        	// so that it's easy to wipe later.
+    		String storageRoot = (String)properties.getProperties().get("com.openmeap.slic.blackberry.localStorageRoot");
+    		if(storageRoot==null) {
+    			throw new GenericRuntimeException("com.openmeap.slic.blackberry.localStorageRoot is a required property and should be unique to your application");
+    		}
+    		STORAGE_ROOT = STORAGE_ROOT+'/'+storageRoot;
+    		
 	    	config = new BlackberrySLICConfig(
 	    			new SharedPreferencesImpl("slic-config"),
 	    			properties.getProperties()
 	    		);
+	    	
 	    } catch(JSONException jse) {
 	    	throw new GenericRuntimeException(jse);
 	    } catch(IOException ioe) {
 	    	throw new GenericRuntimeException(ioe);
-	    }
+	    }  
     	
-    	localStorage = new LocalStorageImpl(config);    
+    	localStorage = new LocalStorageImpl(config);
+    	
+    	CodeModuleManager.addListener(this, new ApplicationDeleteCleanup((BlackberrySLICConfig)config,(LocalStorageImpl)localStorage));
+    	
     	updateHandler = new UpdateHandler(this,config,localStorage);
     	
 		updateHandler.initialize(webView);
