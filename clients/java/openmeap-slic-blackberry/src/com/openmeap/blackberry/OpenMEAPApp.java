@@ -89,7 +89,7 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 	    }
     	
     	localStorage = new LocalStorageImpl(config);    
-    	updateHandler = new UpdateHandler(webView,this,config,localStorage);
+    	updateHandler = new UpdateHandler(this,config,localStorage);
     	
 		updateHandler.initialize(webView);
     }
@@ -182,8 +182,13 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 	}
 	
 	public void restart() {
-		this.popScreen(webView);
-		updateHandler.initialize(webView);
+		runOnUiThread(new Runnable(){
+			public void run() {
+				popScreen(webView);
+				webView=null;
+				updateHandler.initialize(webView);
+			}
+		});
 	}
 	
 	public String getRootWebPageContent() throws IOException {

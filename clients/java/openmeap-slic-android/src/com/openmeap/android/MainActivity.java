@@ -123,7 +123,7 @@ public class MainActivity extends Activity implements OmMainActivity,LoginFormLa
         }
         
         storage = new LocalStorageImpl(this);
-        updateHandler = new UpdateHandler(null,this,config,storage);
+        updateHandler = new UpdateHandler(this,config,storage);
 
         setupWindowTitle();
     }

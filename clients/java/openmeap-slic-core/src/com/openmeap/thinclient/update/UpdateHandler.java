@@ -62,12 +62,10 @@ public class UpdateHandler {
 	private SLICConfig config = null;
 	private LocalStorage storage = null;
 	private OmMainActivity activity = null;
-	private OmWebView webView = null;
 	private Object interruptLock = new Object();
 	private Boolean interrupt = Boolean.FALSE;
 	
-	public UpdateHandler(OmWebView webView, OmMainActivity activity, SLICConfig config, LocalStorage storage) {
-		this.webView = webView;
+	public UpdateHandler(OmMainActivity activity, SLICConfig config, LocalStorage storage) {
 		this.activity = activity;
 		this.setSLICConfig(config);
 		this.setLocalStorage(storage);

@@ -151,8 +151,8 @@ public final class OpenMEAPScreen extends MainScreen implements OmWebView
 	public void clearCache(boolean arg0) {
 		
 	}
-	
+
 	public void clearView() {
-		
+		super.deleteAll();
 	}
 }
