@@ -86,6 +86,7 @@
 	
 	<target name="build-debug" depends="-setup-client-properties" description="Build an OpenMEAP blackberry SLIC project for debug.">
 		<ant dir="${openmeap.slic.absPath}" antfile="${openmeap.project.build}/ant_scripts/client_blackberry.xml" target="copy-slic-assets"/>
+		<mkdir dir="${openmeap.slic.absPath}/bin"/>
 		<exec dir="${openmeap.slic.absPath}" executable="${blackberry.rapc}">
 			<arg value="-convertpng"/> 
 			<arg value="-nomain"/>
@@ -94,26 +95,26 @@
 			<arg value="-sourceroot=${openmeap.home}\clients\java\openmeap-slic-blackberry\src;${openmeap.home}\clients\java\openmeap-slic-core\src;${openmeap.home}\java-shared\openmeap-shared\src;${openmeap.home}\clients\java\openmeap-slic-blackberry\res"/>
 			<arg value="-import=${blackberry.sdk.home}\components\lib\net_rim_api.jar"/>
 			<arg value="deliverables\Standard\5.0.0\OpenMEAPSLICBlackberryOutputFileName.rapc"/>
-			<arg value="${openmeap.home}\clients\java\openmeap-slic-blackberry\bin"/>
+			<arg value="${openmeap.slic.absPath}\bin"/>
 		</exec>
 		<exec dir="${openmeap.slic.absPath}" executable="${blackberry.rapc}">
 			<arg value="-convertpng"/> 
 			<arg value="-quiet"/>
 			<arg value="codename=deliverables\Standard\5.0.0\${openmeap.slic.blackberry.projectName}"/> 
-			<arg value="-sourceroot=${openmeap.home}\clients\java\openmeap-slic-blackberry-test\src;${openmeap.home}\clients\java\openmeap-slic-blackberry-test\res"/> 
-			<arg value="-import=${blackberry.sdk.home}\components\lib\net_rim_api.jar;${openmeap.home}\clients\java\openmeap-slic-blackberry\deliverables\Standard\5.0.0\OpenMEAPSLICBlackberryOutputFileName.jar"/> 
+			<arg value="-sourceroot=${openmeap.slic.absPath}\src;${openmeap.slic.absPath}\res"/> 
+			<arg value="-import=${blackberry.sdk.home}\components\lib\net_rim_api.jar;${openmeap.slic.absPath}\deliverables\Standard\5.0.0\OpenMEAPSLICBlackberryOutputFileName.jar"/> 
 			<arg value="deliverables\Standard\5.0.0\${openmeap.slic.blackberry.projectName}.rapc"/>
-			<arg value="C:\OpenMEAP\clients\java\openmeap-slic-blackberry-test\bin"/>
+			<arg value="${openmeap.slic.absPath}\bin"/>
 		</exec>
 	</target>
-	<target name="build-release" depends="-setup-client-properties" description="Build an OpenMEAP blackberry SLIC project for release.">
-		<ant dir="${openmeap.slic.absPath}" antfile="${openmeap.project.build}/ant_scripts/client_blackberry.xml" target="copy-slic-assets"/>
+	<target name="build-release" depends="build-debug" description="Build an OpenMEAP blackberry SLIC project for release.">
+		<!-- TODO: code signing stuff -->
 	</target>
 	
 	<target name="package-debug" depends="build-debug" description="Build and package an OpenMEAP Blackberry SLIC project for debug."/>
 	<target name="package-release" depends="build-release" description="Build and package an OpenMEAP Blackberry SLIC project for release.">
 		
-		<available file="${openmeap.slic.blackberry.path}/bin/${openmeap.slic.projectName}-release-unsigned.apk" 
+		<!--<available file="${openmeap.slic.blackberry.path}/bin/${openmeap.slic.projectName}-release-unsigned.apk" 
 				property="openmeap.slic.blackberry.apk.exists"/>
 		
 		<fail unless="openmeap.slic.blackberry.apk.exists" 
@@ -154,7 +155,7 @@
 			<arg value="4"/>
 			<arg value="${openmeap.slic.blackberry.artifact.release.signed.unaligned}"/>
 			<arg value="${openmeap.slic.blackberry.artifact.release.signed.aligned}"/>
-		</exec>
+		</exec>-->
 		
 	</target>
 	
@@ -173,6 +174,16 @@
 		
 		<copy file="${openmeap.project.build}/template/blackberry/BlackBerry_App_Descriptor.xml" 
 						tofile="${openmeap.slic.blackberry.path}/BlackBerry_App_Descriptor.xml" overwrite="true"/>
+		
+		<copy file="${openmeap.project.build}/template/blackberry/deliverables/Standard/5.0.0/OpenMEAPSLICBlackberryOutputFileName.rapc" 
+						tofile="${openmeap.slic.blackberry.path}/deliverables/Standard/5.0.0/OpenMEAPSLICBlackberryOutputFileName.rapc" overwrite="true"/>
+						
+		<copy file="${openmeap.project.build}/template/blackberry/deliverables/Standard/5.0.0/@@PROJECT_NAME@@.rapc" 
+						tofile="${openmeap.slic.blackberry.path}/deliverables/Standard/5.0.0/${openmeap.slic.projectName}.rapc" overwrite="true"/>
+						
+		<copy file="${openmeap.project.build}/template/blackberry/deliverables/Standard/@@PROJECT_NAME@@.alx" 
+						tofile="${openmeap.slic.blackberry.path}/deliverables/Standard/${openmeap.slic.projectName}.alx" overwrite="true"/>
+
 		
 		<ant antfile="${openmeap.project.build}/ant_scripts/client_blackberry.xml" target="copy-slic-assets"/>
 		

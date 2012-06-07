@@ -1,0 +1,9 @@
+MIDlet-Name: openmeap-slic-blackberry
+MIDlet-Version: @@openmeap.slic.version@@
+MIDlet-Vendor: @@openmeap.slic.vendor@@
+MIDlet-Jar-URL: openmeap-slic-blackberry.jar
+MIDlet-Jar-Size: 0
+MicroEdition-Profile: MIDP-2.0
+MicroEdition-Configuration: CLDC-1.1
+RIM-Library-Flags: 2
+
