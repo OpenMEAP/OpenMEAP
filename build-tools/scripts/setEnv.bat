@@ -1,11 +1,12 @@
 @echo off
 
 rem  Ant
-set ANT_HOME=C:\Users\schang\apps\apache-ant-1.8.2
+set ANT_HOME=C:\apache-ant-1.8.3
 
 rem  OpenMEAP
 set ANDROID_SDK_HOME=C:\Users\schang\apps\android-sdk-windows
-set OPENMEAP_HOME=C:\Users\schang\openmeap.dev\openmeap
+set BLACKBERRY_SDK_HOME=C:\eclipse\plugins\net.rim.ejde.componentpack5.0.0_5.0.0.36
+set OPENMEAP_HOME=C:\OpenMEAP
 
 rem Required on services nodes.  Is used as an identity for a cluster node
 rem set OPENMEAP_CLUSTER_NODE_URL_PREFIX=http://localhost:8080/openmeap-services-web
