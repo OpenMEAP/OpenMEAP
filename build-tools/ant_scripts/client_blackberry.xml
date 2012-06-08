@@ -86,76 +86,37 @@
 	
 	<target name="build-debug" depends="-setup-client-properties" description="Build an OpenMEAP blackberry SLIC project for debug.">
 		<ant dir="${openmeap.slic.absPath}" antfile="${openmeap.project.build}/ant_scripts/client_blackberry.xml" target="copy-slic-assets"/>
-		<mkdir dir="${openmeap.slic.absPath}/bin"/>
-		<exec dir="${openmeap.slic.absPath}" executable="${blackberry.rapc}">
+		<delete dir="${openmeap.slic.absPath}/bin"/>
+	    <mkdir dir="${openmeap.slic.absPath}/bin"/>
+		<javac debug="${openmeap.debug}" 
+				target="1.2" 
+				source="1.2" 
+				debuglevel="${openmeap.debuglevel}" 
+				destdir="${openmeap.slic.absPath}/bin">
+			<src path="${openmeap.slic.absPath}/src"/>
+			<src path="${openmeap.home}/clients/java/openmeap-slic-blackberry/src"/>
+			<src path="${openmeap.home}/clients/java/openmeap-slic-core/src"/>
+			<src path="${openmeap.home}/java-shared/openmeap-shared/src"/>
+			<classpath>
+				<pathelement location="${blackberry.sdk.home}/components/lib/net_rim_api.jar"/>
+		    </classpath>
+		</javac>
+	</target>
+	<target name="build-release" depends="build-debug" description="Build an OpenMEAP blackberry SLIC project for release."/>
+	
+	<target name="package-debug" depends="build-debug" description="Build and package an OpenMEAP Blackberry SLIC project for debug.">
+		<exec dir="${openmeap.slic.absPath}" executable="${blackberry.rapc}" failonerror="yes">
 			<arg value="-convertpng"/> 
 			<arg value="-nomain"/>
 			<arg value="-quiet"/>
-			<arg value="library=deliverables\Standard\5.0.0\OpenMEAPSLICBlackberryOutputFileName"/> 
-			<arg value="-sourceroot=${openmeap.home}\clients\java\openmeap-slic-blackberry\src;${openmeap.home}\clients\java\openmeap-slic-core\src;${openmeap.home}\java-shared\openmeap-shared\src;${openmeap.home}\clients\java\openmeap-slic-blackberry\res"/>
-			<arg value="-import=${blackberry.sdk.home}\components\lib\net_rim_api.jar"/>
-			<arg value="deliverables\Standard\5.0.0\OpenMEAPSLICBlackberryOutputFileName.rapc"/>
-			<arg value="${openmeap.slic.absPath}\bin"/>
-		</exec>
-		<exec dir="${openmeap.slic.absPath}" executable="${blackberry.rapc}">
-			<arg value="-convertpng"/> 
-			<arg value="-quiet"/>
-			<arg value="codename=deliverables\Standard\5.0.0\${openmeap.slic.blackberry.projectName}"/> 
-			<arg value="-sourceroot=${openmeap.slic.absPath}\src;${openmeap.slic.absPath}\res"/> 
-			<arg value="-import=${blackberry.sdk.home}\components\lib\net_rim_api.jar;${openmeap.slic.absPath}\deliverables\Standard\5.0.0\OpenMEAPSLICBlackberryOutputFileName.jar"/> 
-			<arg value="deliverables\Standard\5.0.0\${openmeap.slic.blackberry.projectName}.rapc"/>
-			<arg value="${openmeap.slic.absPath}\bin"/>
+			<arg value="codename=deliverables/Standard/5.0.0/${openmeap.slic.blackberry.projectName}"/> 
+			<arg value="-sourceroot=${openmeap.home}/clients/java/openmeap-slic-blackberry/src;${openmeap.home}/clients/java/openmeap-slic-core/src;${openmeap.home}/java-shared/openmeap-shared/src;${openmeap.home}/clients/java/openmeap-slic-blackberry/res;${openmeap.slic.absPath}/src;${openmeap.slic.absPath}/res"/>
+			<arg value="-import=${blackberry.sdk.home}/components/lib/net_rim_api.jar"/>
+			<arg value="deliverables/Standard/5.0.0/${openmeap.slic.blackberry.projectName}.rapc"/>
+			<arg value="${openmeap.slic.absPath}/bin"/>
 		</exec>
 	</target>
-	<target name="build-release" depends="build-debug" description="Build an OpenMEAP blackberry SLIC project for release.">
-		<!-- TODO: code signing stuff -->
-	</target>
-	
-	<target name="package-debug" depends="build-debug" description="Build and package an OpenMEAP Blackberry SLIC project for debug."/>
-	<target name="package-release" depends="build-release" description="Build and package an OpenMEAP Blackberry SLIC project for release.">
-		
-		<!--<available file="${openmeap.slic.blackberry.path}/bin/${openmeap.slic.projectName}-release-unsigned.apk" 
-				property="openmeap.slic.blackberry.apk.exists"/>
-		
-		<fail unless="openmeap.slic.blackberry.apk.exists" 
-				message="The application must be build before it can be signed."/>
-		<fail unless="openmeap.slic.blackberry.keyStore" 
-				message="openmeap.slic.blackberry.keyStore is a required property for packaging.  It must be the path to the keystore to use."/>
-		<fail unless="openmeap.slic.blackberry.keyStorePassword" 
-				message="openmeap.slic.blackberry.keyStorePassword is a required property for packaging.  It must be the password of used to access the keystore."/>
-		<fail unless="openmeap.slic.blackberry.keyAlias" 
-				message="openmeap.slic.blackberry.keyAlias is a required property for packaging.  It must be the alias within the keystore to sign with."/>
-		<fail unless="openmeap.slic.blackberry.keyPassword" 
-				message="openmeap.slic.blackberry.keyPassword is a required property for packaging.  It must be the password for the alias within the keystore."/>
-		
-		<copy file="${openmeap.slic.blackberry.artifact.release.unsigned.unaligned}" 
-				tofile="${openmeap.slic.blackberry.artifact.release.signed.unaligned}"/>
-		
-		<condition property="jarsigner" 
-				value="${blackberry.sdk.home}tools/jarsigner.exe"
-				else="${blackberry.sdk.home}tools/jarsigner">
-			<os family="windows"/>
-		</condition>
-		<exec dir="${openmeap.slic.absPath}" executable="${jarsigner}">
-			<arg value="-verbose"/>
-			<arg value="-keystore"/><arg value="${openmeap.slic.blackberry.keyStore}"/>
-			<arg value="-storepass"/><arg value="${openmeap.slic.blackberry.keyStorePassword}"/>
-			<arg value="-keypass"/><arg value="${openmeap.slic.blackberry.keyPassword}"/>
-			<arg value="${openmeap.slic.blackberry.artifact.release.signed.unaligned}"/>
-			<arg value="${openmeap.slic.blackberry.keyAlias}"/>
-		</exec>
-		
-		<condition property="zipalign" 
-				value="${blackberry.sdk.home}tools/zipalign.exe"
-				else="${blackberry.sdk.home}tools/zipalign">
-			<os family="windows"/>
-		</condition>
-		<exec dir="${openmeap.slic.absPath}" executable="${zipalign}">
-			<arg value="-v"/>
-			<arg value="4"/>
-			<arg value="${openmeap.slic.blackberry.artifact.release.signed.unaligned}"/>
-			<arg value="${openmeap.slic.blackberry.artifact.release.signed.aligned}"/>
-		</exec>-->
+	<target name="package-release" depends="package-debug" description="Build and package an OpenMEAP Blackberry SLIC project for release.">
 		
 	</target>
 	
