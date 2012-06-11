@@ -32,11 +32,12 @@ import java.io.OutputStream;
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 
-import org.json.me.JSONException;
-import org.json.me.JSONObject;
+
 
 import com.openmeap.constants.FormConstants;
 import com.openmeap.thinclient.Preferences;
+import com.openmeap.thirdparty.org.json.me.JSONException;
+import com.openmeap.thirdparty.org.json.me.JSONObject;
 import com.openmeap.util.GenericRuntimeException;
 import com.openmeap.util.Utils;
 

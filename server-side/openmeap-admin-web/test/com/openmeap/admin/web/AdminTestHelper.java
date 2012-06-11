@@ -32,8 +32,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import org.json.me.JSONException;
-import org.json.me.JSONObject;
+import com.openmeap.thirdparty.org.json.me.JSONException;
+import com.openmeap.thirdparty.org.json.me.JSONObject;
 import org.junit.Assert;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

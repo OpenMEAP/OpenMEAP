@@ -27,12 +27,12 @@ package com.openmeap.blackberry;
 import java.io.IOException;
 import java.io.InputStream;
 
+
 import net.rim.device.api.system.CodeModuleManager;
 import net.rim.device.api.ui.Screen;
 import net.rim.device.api.ui.UiApplication;
 import net.rim.device.api.ui.component.Status;
 
-import org.json.me.JSONException;
 
 import com.openmeap.blackberry.digest.Md5DigestInputStream;
 import com.openmeap.blackberry.digest.Sha1DigestInputStream;
@@ -46,10 +46,11 @@ import com.openmeap.thinclient.Preferences;
 import com.openmeap.thinclient.SLICConfig;
 import com.openmeap.thinclient.javascript.Orientation;
 import com.openmeap.thinclient.update.UpdateHandler;
+import com.openmeap.thirdparty.fr.free.ichir.mahieddine.Properties;
+import com.openmeap.thirdparty.org.json.me.JSONException;
 import com.openmeap.util.GenericRuntimeException;
 import com.openmeap.util.Utils;
 
-import fr.free.ichir.mahieddine.Properties;
 
 /**
  * This class extends the UiApplication class, providing a

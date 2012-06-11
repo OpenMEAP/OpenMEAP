@@ -34,13 +34,13 @@ import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 
-import net.sf.zipme.ZipEntry;
-import net.sf.zipme.ZipInputStream;
 
 import com.openmeap.thinclient.LocalStorage;
 import com.openmeap.thinclient.LocalStorageException;
 import com.openmeap.thinclient.SLICConfig;
 import com.openmeap.thinclient.update.UpdateStatus;
+import com.openmeap.thirdparty.net.sf.zipme.ZipEntry;
+import com.openmeap.thirdparty.net.sf.zipme.ZipInputStream;
 import com.openmeap.util.GenericRuntimeException;
 
 public class LocalStorageImpl implements LocalStorage {

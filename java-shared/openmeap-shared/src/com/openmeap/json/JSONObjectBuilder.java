@@ -28,12 +28,13 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+
 import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.Enum;
+import com.openmeap.thirdparty.org.json.me.JSONArray;
+import com.openmeap.thirdparty.org.json.me.JSONException;
+import com.openmeap.thirdparty.org.json.me.JSONObject;
 
-import org.json.me.JSONArray;
-import org.json.me.JSONException;
-import org.json.me.JSONObject;
 
 /**
  * Converts an object hierarchy into a JSON representation.

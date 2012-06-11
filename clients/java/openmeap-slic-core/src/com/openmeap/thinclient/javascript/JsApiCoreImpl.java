@@ -24,8 +24,7 @@
 
 package com.openmeap.thinclient.javascript;
 
-import org.json.me.JSONException;
-import org.json.me.JSONObject;
+
 
 import com.openmeap.protocol.WebServiceException;
 import com.openmeap.protocol.dto.UpdateHeader;
@@ -38,6 +37,8 @@ import com.openmeap.thinclient.Preferences;
 import com.openmeap.thinclient.update.UpdateException;
 import com.openmeap.thinclient.update.UpdateHandler;
 import com.openmeap.thinclient.update.UpdateStatus;
+import com.openmeap.thirdparty.org.json.me.JSONException;
+import com.openmeap.thirdparty.org.json.me.JSONObject;
 import com.openmeap.util.GenericRuntimeException;
 
 public class JsApiCoreImpl implements JsApiCore {

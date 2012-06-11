@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.json.me.JSONObject;
+import com.openmeap.thirdparty.org.json.me.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

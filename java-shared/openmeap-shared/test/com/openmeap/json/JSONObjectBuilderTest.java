@@ -30,7 +30,7 @@ import java.util.Vector;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.json.me.JSONObject;
+import com.openmeap.thirdparty.org.json.me.JSONObject;
 
 public class JSONObjectBuilderTest extends TestCase {
 	
