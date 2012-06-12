@@ -66,7 +66,7 @@
 		<!-- generic slic properties -->
 		<property name="openmeap.slic.blackberry.path" location="${user.dir}"/>
 		<property name="openmeap.slic.absPath" location="${openmeap.slic.blackberry.path}"/>		
-		<property name="openmeap.slic.assets.dest.absPath" location="${openmeap.slic.absPath}/assets/${openmeap.slic.packagedAppRoot}"/>
+		<property name="openmeap.slic.assets.dest.absPath" location="${openmeap.slic.absPath}/src/${openmeap.slic.packagedAppRoot}"/>
 		
 		<property name="openmeap.slic.blackberry.artifact.release.unsigned.unaligned"
 				value="${openmeap.slic.blackberry.path}/bin/${openmeap.slic.projectName}-release-unsigned.apk"/>
@@ -125,7 +125,7 @@
 		<mkdir dir="${openmeap.slic.blackberry.path}"/>
 		
 		<!-- additional copy -->
-		<mkdir dir="${openmeap.slic.blackberry.path}/src/assets/${openmeap.slic.packagedAppRoot}"/>
+		<mkdir dir="${openmeap.slic.assets.dest.absPath}"/>
 		
 		<copy file="${openmeap.slic.icon}" 
 						tofile="${openmeap.slic.blackberry.path}/res/img/icon.png"/>
@@ -136,16 +136,12 @@
 		<copy file="${openmeap.project.build}/template/blackberry/BlackBerry_App_Descriptor.xml" 
 						tofile="${openmeap.slic.blackberry.path}/BlackBerry_App_Descriptor.xml" overwrite="true"/>
 		
-		<copy file="${openmeap.project.build}/template/blackberry/deliverables/Standard/5.0.0/OpenMEAPSLICBlackberryOutputFileName.rapc" 
-						tofile="${openmeap.slic.blackberry.path}/deliverables/Standard/5.0.0/OpenMEAPSLICBlackberryOutputFileName.rapc" overwrite="true"/>
-						
 		<copy file="${openmeap.project.build}/template/blackberry/deliverables/Standard/5.0.0/@@PROJECT_NAME@@.rapc" 
 						tofile="${openmeap.slic.blackberry.path}/deliverables/Standard/5.0.0/${openmeap.slic.projectName}.rapc" overwrite="true"/>
 						
 		<copy file="${openmeap.project.build}/template/blackberry/deliverables/Standard/@@PROJECT_NAME@@.alx" 
 						tofile="${openmeap.slic.blackberry.path}/deliverables/Standard/${openmeap.slic.projectName}.alx" overwrite="true"/>
 
-		
 		<ant antfile="${openmeap.project.build}/ant_scripts/client_blackberry.xml" target="copy-slic-assets"/>
 		
 		<!-- broader scope of replacements -->

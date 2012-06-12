@@ -34,7 +34,6 @@ import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 
-
 import com.openmeap.thinclient.LocalStorage;
 import com.openmeap.thinclient.LocalStorageException;
 import com.openmeap.thinclient.SLICConfig;
@@ -42,26 +41,18 @@ import com.openmeap.thinclient.update.UpdateStatus;
 import com.openmeap.thirdparty.net.sf.zipme.ZipEntry;
 import com.openmeap.thirdparty.net.sf.zipme.ZipInputStream;
 import com.openmeap.util.GenericRuntimeException;
+import com.openmeap.util.StringUtils;
 
 public class LocalStorageImpl implements LocalStorage {
 
+	private static String IMPORT_FILE = "import.zip";
 	private static Hashtable connections = new Hashtable();
 	private SLICConfig config;
 	
 	public LocalStorageImpl(SLICConfig config) {
 		this.config=config;
 		try {
-			FileConnection fc = null;
-			try {
-				fc = (FileConnection)Connector.open(getStorageRoot());
-				if( !fc.exists() ) {
-					fc.mkdir();
-				}
-			} finally {
-				if(fc!=null) {
-					fc.close();
-				}
-			}
+			_createDirs(getStorageRoot());
 		} catch(IOException e) {
 			throw new GenericRuntimeException(e.getMessage(),e);
 		} 
@@ -168,12 +159,12 @@ public class LocalStorageImpl implements LocalStorage {
 
 	public OutputStream getImportArchiveOutputStream()
 			throws LocalStorageException {
-		return openFileOutputStream("import.zip");
+		return openFileOutputStream(IMPORT_FILE);
 	}
 
 	public InputStream getImportArchiveInputStream()
 			throws LocalStorageException {
-		return openFileInputStream("import.zip");
+		return openFileInputStream(IMPORT_FILE);
 	}
 
 	public OutputStream openFileOutputStream(String fileName) throws LocalStorageException {
@@ -282,6 +273,25 @@ public class LocalStorageImpl implements LocalStorage {
 
 	public void setupSystemProperties() {
 		
+	}
+	
+	private void _createDirs(String path) throws IOException {
+		String root = StringUtils.replaceAll(getStorageRoot(),"file://", "");
+		String[] paths = StringUtils.split(root,"/");
+		for(int i=0; i<paths.length; i++) {
+			FileConnection fc = null;
+			String currentPath = StringUtils.join(paths, "/", 0, i);
+			try {
+				fc = (FileConnection)Connector.open("file:///"+currentPath);
+				if( !fc.exists() ) {
+					fc.mkdir();
+				}
+			} finally {
+				if(fc!=null) {
+					fc.close();
+				}
+			}
+		}
 	}
 	
 	private void _recursiveDelete(String prefix) throws IOException {
