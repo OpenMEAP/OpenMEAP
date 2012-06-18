@@ -214,9 +214,6 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 
 - (void) reload {
     NSLog(@"in OmSlicAppDelegate::reload");
-
-    // make sure the screen is blanked out, in-case they are returning to a running instance
-    self.window.rootViewController = nil;
     
     // insure that a stale update isn't lying about
     [self.viewController setUpdateHeaderJSON:nil];
@@ -294,6 +291,9 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 
 - (BOOL) initializeView {
 	
+    // make sure the screen is blanked out, in-case they are returning to a running instance
+    self.window.rootViewController = nil;
+    
 	NSLog(@"in OmSlicAppDelegate::initializeView");
 	
 	if( [NSURLProtocol registerClass:[OmSlicJsApiProtocol class]] == NO ) {

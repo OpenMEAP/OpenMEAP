@@ -31,10 +31,14 @@ OpenMEAP_Core = {
 		var toRet = {
 			name:name,
 			get:function(key){
-				return OpenMEAP_Core.getApiUrl("jsapi://preferences/get/?name="+encodeURIComponent(name)+"&key="+encodeURIComponent(key));
+				var val = OpenMEAP_Core.getApiUrl("jsapi://preferences/get/?name="+encodeURIComponent(name)+"&key="+encodeURIComponent(key));
+                if(val!=null {
+                   return decodeURIComponent(val);
+                }
+                return null
 			},
 			put:function(key,value) {
-				return OpenMEAP_Core.getApiUrl("jsapi://preferences/put/?name="+encodeURIComponent(name)+"&key="+encodeURIComponent(key)+"&value="+encodeURIComponent(value));
+				return eval(OpenMEAP_Core.getApiUrl("jsapi://preferences/put/?name="+encodeURIComponent(name)+"&key="+encodeURIComponent(key)+"&value="+encodeURIComponent(value)));
 			},
 			remove:function(key) {
 				return OpenMEAP_Core.getApiUrl("jsapi://preferences/remove/?name="+encodeURIComponent(name)+"&key="+encodeURIComponent(key));
