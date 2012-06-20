@@ -27,12 +27,11 @@ OpenMEAP_Core = {
 		deviceType:"iOS"
 	},
 	getPreferences:function(name) {
-		
 		var toRet = {
 			name:name,
 			get:function(key){
 				var val = OpenMEAP_Core.getApiUrl("jsapi://preferences/get/?name="+encodeURIComponent(name)+"&key="+encodeURIComponent(key));
-                if(val!=null {
+                if(val!=null) {
                    return decodeURIComponent(val);
                 }
                 return null

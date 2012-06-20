@@ -75,14 +75,14 @@
 - (void)setUpdateHeader:(NSString*)headerJSON {
     NSLog(@"in OmSlicViewController::setUpdateHeader:headerJSON");
     self.updateHeaderJSON = headerJSON;
-    const char * makeSureOpenMEAPExists="if(typeof OpenMEAP=='undefined') { OpenMEAP={data:{},config:{},persist:{cookie:{}}}; };";
+    const char * makeSureOpenMEAPExists="if(typeof OpenMEAP=='undefined') { OpenMEAP={data:{},config:{},persist:{cookie:{}}}; };OpenMEAP.updates.onInit();";
     if( self.updateHeaderJSON != nil ) {
-        char * js = om_string_format("%s%s%s;",makeSureOpenMEAPExists,"OpenMEAP.data.update=",[self.updateHeaderJSON UTF8String]);
+        char * js = om_string_format("%s%s%s;OpenMEAP.updates.onInit();",makeSureOpenMEAPExists,"OpenMEAP.data.update=",[self.updateHeaderJSON UTF8String]);
         NSLog(@"--%@",[NSString stringWithUTF8String:js]);
         [self executeJavascriptInMainThread:[NSString stringWithUTF8String:js]];
         om_free(js);
     } else {
-        char * js = om_string_format("%s%s",makeSureOpenMEAPExists,"OpenMEAP.data.update=null;");
+        char * js = om_string_format("%s%s",makeSureOpenMEAPExists,"OpenMEAP.data.update=null;OpenMEAP.updates.onInit();");
         NSLog(@"--%@",[NSString stringWithUTF8String:js]);
         [self executeJavascriptInMainThread:[NSString stringWithUTF8String:js]];
         om_free(js);
