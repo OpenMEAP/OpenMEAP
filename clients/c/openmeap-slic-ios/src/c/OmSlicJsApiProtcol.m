@@ -140,6 +140,8 @@ void ios_update_callback_net_download_callback_func_ptr(void *callback_info,
                 } else {
                     result=@"\"UNDEFINED\"";
                 }
+            } else if( [methodName compare:@"notifyReadyForUpdateCheck"]==NSOrderedSame ) {
+                appDel.readyForUpdateCheck = TRUE;
             }
         }
 
@@ -371,16 +373,12 @@ void ios_update_callback_net_download_callback_func_ptr(void *callback_info,
 		if( appDel.updateHeader!=OM_NULL ) {
             
             // set the update in the view
-            char * jsonUpdateHeader = om_update_header_to_json(appDel.storage,appDel.updateHeader);
-            NSString *json = [NSString stringWithUTF8String:jsonUpdateHeader];
-            [appDel.viewController setUpdateHeader:json];
+            [appDel.viewController setUpdateHeader:appDel.updateHeader];
             
             // execute the callback
             OmSlicViewController *viewcontroller = appDel.viewController;
-            NSArray *args = [NSArray arrayWithObject:json];
+            NSArray *args = [NSArray arrayWithObject:viewcontroller.updateHeaderJSON];
             [viewcontroller executeJSCallbackInMainThread:callBack withArguments:args waitUntilDone:YES];
-            [json release];
-            om_free(jsonUpdateHeader);
 		} 
 	}
 }

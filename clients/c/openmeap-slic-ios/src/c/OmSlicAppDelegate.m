@@ -40,6 +40,8 @@
 @synthesize config;
 @synthesize storage;
 
+@synthesize readyForUpdateCheck;
+
 static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 
 + (OmSlicAppDelegate*) globalInstance {
@@ -215,21 +217,17 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 - (void) reload {
     NSLog(@"in OmSlicAppDelegate::reload");
     
+    readyForUpdateCheck=FALSE;
+    
     // insure that a stale update isn't lying about
     [self.viewController setUpdateHeaderJSON:nil];
     if( self.updateHeader!=OM_NULL ) {
         om_update_release_update_header(self.updateHeader);
         self.updateHeader=OM_NULL;
     }
-
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-	dispatch_async(queue, ^{ 
-        NSLog(@"--about to check for update");
-        @synchronized([OmSlicAppDelegate class]) {
-            [self performUpdateCheck];
-            [self performSelectorOnMainThread:@selector(initializeView) withObject:nil waitUntilDone:NO];
-        } 
-    });
+    
+    // setup the view
+    [self performSelectorOnMainThread:@selector(initializeView) withObject:nil waitUntilDone:YES];
 }
 
 - (void) showAlert:(NSString*)message withTitle:(NSString*)title {
@@ -292,7 +290,13 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 - (BOOL) initializeView {
 	
     // make sure the screen is blanked out, in-case they are returning to a running instance
-    self.window.rootViewController = nil;
+    if(self.window.rootViewController!=nil) {
+        if( [self.window.rootViewController isViewLoaded]) {
+            self.window.rootViewController.view.hidden=TRUE;
+        }
+        //[self.window.rootViewController release];
+        self.window.rootViewController = nil;
+    }
     
 	NSLog(@"in OmSlicAppDelegate::initializeView");
 	
@@ -316,9 +320,7 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 	// Set the view controller as the window's root view controller and display.
 	self.viewController = [[OmSlicViewController alloc] init];
     if( self->updateHeader!=OM_NULL ) {
-        char * jsonUpdateHeader = om_update_header_to_json(self->storage,self->updateHeader);
-        self.viewController.updateHeaderJSON=[NSString stringWithUTF8String:jsonUpdateHeader];
-        om_free(jsonUpdateHeader);
+        [self.viewController setUpdateHeader:self->updateHeader];
     }
     
     self.viewController.cachePolicy = cachePolicy;
@@ -365,12 +367,14 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
             
             if( self->updateHeader->type==OM_UPDATE_TYPE_IMMEDIATE ) {
                 
-                NSLog(@"-- performing update");
+                // TODO: show IMMEDIATE update intercepting screen, kill webview
+                
+                NSLog(@"-- performing IMMEDIATE update");
                 const char * updateResult = om_update_perform(self->config,self->storage,self->updateHeader);
                 
                 if( updateResult!=OmUpdateResultSuccess ) {
                     
-                    NSLog(@"-- performing failed");
+                    NSLog(@"-- performing IMMEDIATE update failed");
                     om_update_release_update_header(self->updateHeader);
                     self.updateHeader=OM_NULL;
                     self.viewController.updateHeaderJSON=nil;
@@ -378,15 +382,20 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
                     return NO;
                 } else {
                     
-                    NSLog(@"-- performing succeeded");
+                    NSLog(@"-- performing IMMEDIATE update succeeded");
                     om_update_release_update_header(self->updateHeader);
                     self.updateHeader=OM_NULL;
                     self.viewController.updateHeaderJSON=nil;
                     
                     [self reload];
                 }
-            } 
-		} 
+            } else {
+                
+                [self.viewController setUpdateHeader:self->updateHeader];
+            }
+		} else {
+            [self.viewController setUpdateHeader:nil];
+        }
 	}
     
     return YES;

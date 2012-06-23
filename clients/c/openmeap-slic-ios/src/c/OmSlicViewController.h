@@ -50,7 +50,7 @@
 @property OmSlicAppDelegate * appDelegate;
 @property (retain,nonatomic) NSString * updateHeaderJSON;
 
-- (void)setUpdateHeader:(NSString*)headerJSON;
+- (void)setUpdateHeader:(om_update_header_ptr)header;
 -(NSString*) executeJavascriptInMainThread:(NSString *)javascript;
 -(NSString*) executeJavascriptInMainThread:(NSString *)javascript waitUntilDone:(Boolean)waitTil;
 -(NSString*) executeJSCallbackInMainThread:(NSString *)callbackJS withArguments:(NSArray*)args waitUntilDone:(Boolean)waitTil;

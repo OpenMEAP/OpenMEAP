@@ -39,6 +39,8 @@
 	om_storage_ptr storage;
     
     om_update_header_ptr updateHeader;
+    
+    BOOL readyForUpdateCheck;
 }
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
@@ -49,6 +51,8 @@
 
 @property (nonatomic) om_storage_ptr storage;
 @property (nonatomic) om_config_ptr config;
+
+@property (nonatomic) BOOL readyForUpdateCheck;
 
 + (OmSlicAppDelegate*)globalInstance;
 - (void) showAlert:(NSString*)message withTitle:(NSString*)title;

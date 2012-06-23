@@ -63,30 +63,33 @@
 	
 	[[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookieAcceptPolicy:NSHTTPCookieAcceptPolicyAlways];
 	[self executeJavascriptInMainThread:[NSString stringWithUTF8String:strJsApi]];
-    [self setUpdateHeader:updateHeaderJSON];
     om_free(strJsApi);
 	
 	NSURLRequest * request = [NSURLRequest requestWithURL:indexHtmlUrl
 		cachePolicy:self.cachePolicy
 		timeoutInterval:10.0f];
+    
 	[((UIWebView*)self.view) loadRequest:request];
-}
-
-- (void)setUpdateHeader:(NSString*)headerJSON {
-    NSLog(@"in OmSlicViewController::setUpdateHeader:headerJSON");
-    self.updateHeaderJSON = headerJSON;
-    const char * makeSureOpenMEAPExists="if(typeof OpenMEAP=='undefined') { OpenMEAP={data:{},config:{},persist:{cookie:{}}}; };OpenMEAP.updates.onInit();";
-    if( self.updateHeaderJSON != nil ) {
-        char * js = om_string_format("%s%s%s;OpenMEAP.updates.onInit();",makeSureOpenMEAPExists,"OpenMEAP.data.update=",[self.updateHeaderJSON UTF8String]);
-        NSLog(@"--%@",[NSString stringWithUTF8String:js]);
-        [self executeJavascriptInMainThread:[NSString stringWithUTF8String:js]];
-        om_free(js);
-    } else {
-        char * js = om_string_format("%s%s",makeSureOpenMEAPExists,"OpenMEAP.data.update=null;OpenMEAP.updates.onInit();");
-        NSLog(@"--%@",[NSString stringWithUTF8String:js]);
-        [self executeJavascriptInMainThread:[NSString stringWithUTF8String:js]];
-        om_free(js);
-    }
+    
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    // kick off the update check in a different thread
+	dispatch_async(queue, ^{ 
+        NSLog(@"--about to check for update");
+        @synchronized([OmSlicAppDelegate class]) {
+            
+            OmSlicAppDelegate *appDel = [OmSlicAppDelegate globalInstance];
+            
+            // wait for the api to notify that it has been loaded
+            // but only 5 seconds...as there may be an IMMEDIATE update
+            // pushed by the customer to fix the app.
+            long count = 0;
+            while( appDel.readyForUpdateCheck==FALSE && count<500 ) {
+                [NSThread sleepForTimeInterval:.01];
+                count++;
+            }
+            [appDel performUpdateCheck];
+        } 
+    });
 }
 
 
@@ -115,8 +118,31 @@
     [super dealloc];
 }
 
+
 #pragma mark -
 #pragma mark WebView interaction
+
+- (void)setUpdateHeader:(om_update_header_ptr)header {
+    
+    NSLog(@"in OmSlicViewController::setUpdateHeader:header");
+    
+    if( header != nil ) {
+        
+        char * jsonUpdateHeader = om_update_header_to_json(OmSlicAppDelegate.globalInstance.storage,header);
+        self.updateHeaderJSON=[NSString stringWithUTF8String:jsonUpdateHeader];
+        om_free(jsonUpdateHeader);
+        
+        char * js = om_string_format("if(OpenMEAP_onUpdateCheck!='undefined'){OpenMEAP_onUpdateCheck(%s);};",[self.updateHeaderJSON UTF8String]);
+        NSLog(@"--%@",[NSString stringWithUTF8String:js]);
+        [self executeJavascriptInMainThread:[NSString stringWithUTF8String:js]];
+        om_free(js);
+    } else {
+        char * js = om_string_format("if(OpenMEAP_onUpdateCheck!='undefined'){OpenMEAP_onUpdateCheck(null);};");
+        NSLog(@"--%@",[NSString stringWithUTF8String:js]);
+        [self executeJavascriptInMainThread:[NSString stringWithUTF8String:js]];
+        om_free(js);
+    }
+}
 
 -(NSString*) executeJSCallbackInMainThread:(NSString *)callbackJS withArguments:(NSArray*)args waitUntilDone:(Boolean)waitTil {
     int r = rand();

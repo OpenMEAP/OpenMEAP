@@ -72,6 +72,9 @@ OpenMEAP_Core = {
 	reload:function() { 
 		OpenMEAP_Core.getApiUrl("jsapi://application/reload/");
 	},
+    notifyReadyForUpdateCheck:function() { 
+		OpenMEAP_Core.getApiUrl("jsapi://application/notifyReadyForUpdateCheck/");
+	},
 	
 	/*
 	 * iOS specific methods

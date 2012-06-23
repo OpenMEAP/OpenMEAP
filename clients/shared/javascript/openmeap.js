@@ -59,7 +59,9 @@ if( typeof OpenMEAP_Core!="undefined" ) {
 		performUpdate:function(header,stateChangeCallback)
 			{ return OpenMEAP_Core.performUpdate(OpenMEAP.utils.toJSON(header),stateChangeCallback+' '); },
 		reload:function() 
-			{ OpenMEAP_Core.reload(); }
+			{ OpenMEAP_Core.reload(); },
+        notifyReadyForUpdateCheck:function()
+            { OpenMEAP_Core.notifyReadyForUpdateCheck(); }
 	});
 } else {
 	/**
@@ -123,7 +125,9 @@ if( typeof OpenMEAP_Core!="undefined" ) {
 		performUpdate:function(header,stateChangeCallback)
 			{ return; },
 		reload:function() 
-			{ ; }
+			{ ; },
+        notifyReadyForUpdateCheck:function()
+            { ; }
 	});
 }
 
@@ -238,8 +242,8 @@ if( OpenMEAP.config.deviceType=='Browser' ) {
  * to be overridden
  */
 OpenMEAP.updates={
-	onInit:function() {
-		var update = OpenMEAP.data.update;
+	onUpdate:function(update) {
+		var update
 		if( update == null ) {
 			OpenMEAP.updates.onNoUpdate();
 			return;
@@ -254,9 +258,9 @@ OpenMEAP.updates={
 			});
 		}
 	},
-	onNoUpdate:function() {
-		//OpenMEAP.doToast("No update available.");
-	},
+    onNoUpdate:function() {
+        //OpenMEAP.doToast('no update');
+    },
 	onCheckError:function(error) {
 		OpenMEAP.doToast("An error occurred checking for an update\n\n"+error.type+':'+error.message);
 	},
