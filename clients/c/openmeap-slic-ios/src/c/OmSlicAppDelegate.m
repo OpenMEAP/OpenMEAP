@@ -108,7 +108,7 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 	NSLog(@"-- dev uuid checked");
 	
 	NSLog(@"in OmSlicAppDelegate::applicationDidBecomeActive");
-	[self initializeView];
+	[self performSelectorOnMainThread:@selector(initializeView) withObject:self waitUntilDone:NO];
 	
     return YES;
 }
@@ -129,11 +129,7 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 	// for now, we'll re-initialize the view
 	// each time the application is foregrounded
 	NSLog(@"in OmSlicAppDelegate::applicationWillEnterForeground");
-    if(self.viewController!=nil) {
-        [self reloadView];
-    } else {
-        [self initializeView];
-    }
+    [self performSelectorOnMainThread:@selector(initializeView) withObject:self waitUntilDone:NO];
 }
 
 
@@ -241,7 +237,7 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 	NSLog(@"in OmSlicAppDelegate::initializeView");
     
     // this should be flipped to true exclusively at the end of the om_update_perform() func
-    /*int *updated = om_config_get(config,OM_CFG_APP_UPDATED);
+    int *updated = om_config_get(config,OM_CFG_APP_UPDATED);
     int cachePolicy = NSURLRequestUseProtocolCachePolicy;
 	if( updated!=OM_NULL && *updated==1 ) {
         *updated=0;
@@ -251,7 +247,7 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 		cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
         
         [self clearWebCache];
-	}*/
+	}
 	
 	// Set the view controller as the window's root view controller and display.
 	self.viewController = [[OmSlicViewController alloc] init];
@@ -259,7 +255,7 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
         [self.viewController setUpdateHeader:self->updateHeader];
     }
     
-    self.viewController.cachePolicy = NSURLRequestUseProtocolCachePolicy;//cachePolicy;
+    self.viewController.cachePolicy = cachePolicy;
 	self.viewController.appDelegate = self;
 	self.viewController.view;
     self.window.rootViewController = self.viewController;
@@ -273,17 +269,8 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
     NSLog(@"in OmSlicAppDelegate::reload");
     
     readyForUpdateCheck=FALSE;
-    
-    // insure that a stale update isn't lying about
-    [self.viewController setUpdateHeaderJSON:nil];
-    if( self.updateHeader!=OM_NULL ) {
-        om_update_release_update_header(self.updateHeader);
-        self.updateHeader=OM_NULL;
-    }
-    
-    // setup the view
-    [self.viewController clear];
-    [self.viewController setupWebView];
+
+    [self performSelectorOnMainThread:@selector(initializeView) withObject:self waitUntilDone:NO];
 }
 
 - (void) restoreToWebView {
@@ -396,13 +383,7 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 	withAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge 
 			 andProtectionSpace:(NSURLProtectionSpace *)protectionSpace 
 					 fromThread:(NSThread *)thread {
-	/*
-	 call:
-	 - (void) _doLoginFormForDelegate:(id)delegate 
-	 withAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
-	 andProtectionSpace:(NSURLProtectionSpace*)protectionSpace
-	 fromThread:NSThread *thread
-	 */
+
 	SEL sel = @selector(_doLoginFormForDelegate:withAuthenticationChallenge:andProtectionSpace:fromThread:);
 	NSMethodSignature * mySignature = [OmSlicAppDelegate instanceMethodSignatureForSelector:sel];
 	NSInvocation * inv = [NSInvocation invocationWithMethodSignature:mySignature];
