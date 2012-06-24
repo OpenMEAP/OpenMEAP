@@ -56,7 +56,7 @@
 
 + (OmSlicAppDelegate*)globalInstance;
 - (void) showAlert:(NSString*)message withTitle:(NSString*)title;
-- (void) reload;
+- (void) reloadView;
 - (void) clearWebCache;
 
 @end

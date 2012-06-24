@@ -32,7 +32,7 @@
 // THE FOUR FUNCTIONS THAT AREN'T IN SLIC CORE
 
 char * ios_om_storage_get_localstorage_path(om_storage_ptr storage) {
-	NSArray *savePaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+	NSArray *savePaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
 	NSMutableString *savePath = [NSMutableString stringWithString:[savePaths objectAtIndex:0]];
 	return om_string_copy([savePath UTF8String]);
 }

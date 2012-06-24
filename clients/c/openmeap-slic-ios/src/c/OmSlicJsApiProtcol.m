@@ -124,7 +124,7 @@ void ios_update_callback_net_download_callback_func_ptr(void *callback_info,
         if( [methodHandler compare:@"application"]==NSOrderedSame ) {
             
             if( [methodName compare:@"reload"]==NSOrderedSame ) {
-                [appDel reload];
+                [appDel reloadView];
                 
             } else if( [methodName compare:@"clearCache"]==NSOrderedSame ) {
                 [appDel clearWebCache];

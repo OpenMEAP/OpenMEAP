@@ -61,7 +61,7 @@ if( typeof OpenMEAP_Core!="undefined" ) {
 		reload:function() 
 			{ OpenMEAP_Core.reload(); },
         notifyReadyForUpdateCheck:function()
-            { OpenMEAP_Core.notifyReadyForUpdateCheck(); }
+            { alert("ready");OpenMEAP_Core.notifyReadyForUpdateCheck(); }
 	});
 } else {
 	/**

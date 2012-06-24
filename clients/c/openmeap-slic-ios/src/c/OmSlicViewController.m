@@ -25,6 +25,7 @@
 #import <openmeap-slic-core.h>
 
 #import "OmSlicViewController.h"
+#import "OmSlicJsApiProtocol.h"
 
 @implementation OmSlicViewController
 
@@ -40,7 +41,11 @@
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
     [super viewDidLoad];
-	
+	[self setupWebView];
+}
+
+- (void)setupWebView {
+    
     if( self.appDelegate==nil ) {
         self.appDelegate = [OmSlicAppDelegate globalInstance];
     }
@@ -49,6 +54,7 @@
 	
 	char * indexHtmlPath = om_string_format("%s%c%s",baseUrlChars,OM_FS_FILE_SEP,"index.html");
 	NSURL * indexHtmlUrl = [NSURL fileURLWithPath:[NSString stringWithUTF8String:indexHtmlPath]];
+    NSLog(@"--index url %@",indexHtmlUrl); 
     
 	char * bundledStorage = om_storage_get_bundleresources_path(stg);
 	char * jsApiPath = om_string_format("%s%c%s",bundledStorage,OM_FS_FILE_SEP,"openmeap-ios-api.js");
@@ -71,8 +77,8 @@
     
 	[((UIWebView*)self.view) loadRequest:request];
     
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     // kick off the update check in a different thread
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 	dispatch_async(queue, ^{ 
         NSLog(@"--about to check for update");
         @synchronized([OmSlicAppDelegate class]) {
@@ -163,8 +169,8 @@
 	
 	NSMethodSignature * mySignature = [UIWebView instanceMethodSignatureForSelector:sel];
 	NSInvocation * inv = [NSInvocation invocationWithMethodSignature:mySignature];
-	UIWebView *view = self.view;
-	
+	UIWebView *view = (UIWebView*)self.view;
+
 	NSString *msgCopy = [NSString stringWithString: javascript];
 	[msgCopy retain];
 	
@@ -185,5 +191,9 @@
     }
 }
 
+- (void)clear {
+    //[(UIWebView*)self.view loadHTMLString:@"" baseURL:[NSURL URLWithString:@"http://nowhere.com"]];
+    //[self setView:nil];
+}
 
 @end

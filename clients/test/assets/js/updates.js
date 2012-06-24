@@ -6,3 +6,4 @@ function OpenMEAP_onUpdateCheck(update) {
         OpenMEAP_update = null;
     }
 }
+OpenMEAP.notifyReadyForUpdateCheck();

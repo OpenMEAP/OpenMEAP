@@ -451,12 +451,12 @@ const const char * __om_update_check_revert_to_original(om_config_ptr cfg, om_st
 			retVal=OmUpdateResultSuccess;
 		}
 		
-		// clear out the 'a' or 'b' flag
+		// clear out the current storage location
 		om_prefs_remove(cfg->prefs,om_config_map_to_str(OM_CFG_CURRENT_STORAGE));
 	} 
 	
 	om_free(origVersionId);
-	return OM_NULL;
+	return retVal;
 }
 
 const char * __om_update_import_check_space(om_config_ptr cfg, om_storage_ptr stg, om_update_header_ptr update, 
@@ -603,15 +603,14 @@ const char * om_update_perform_with_callback(om_config_ptr cfg,
 {
     om_uint32 * lastTime = om_config_get(cfg,OM_CFG_UPDATE_LAST_ATTEMPT);
     om_uint32 * pendingTimeout = om_config_get(cfg,OM_CFG_UPDATE_PENDING_TIMEOUT);
-    om_uint32 tim = time(0);
+    om_uint32 currentTime = time(0);
     char * lastUpdateResult = om_config_get(cfg,OM_CFG_UPDATE_LAST_RESULT);
     om_uint32 timeoutTime = 0;    
     
-	if( lastUpdateResult!=OM_NULL 
-            && strcmp(lastUpdateResult,OmUpdateResultPending)==0        
-            && lastTime!=OM_NULL 
+	if( lastUpdateResult!=OM_NULL && lastTime!=OM_NULL 
             && (timeoutTime = *lastTime + *pendingTimeout)
-            && tim < timeoutTime
+            && currentTime < timeoutTime
+            && strcmp(lastUpdateResult,OmUpdateResultPending)==0
        ) {
         om_free(lastUpdateResult);
         om_free(lastTime);
@@ -625,12 +624,12 @@ const char * om_update_perform_with_callback(om_config_ptr cfg,
     }
 	
 	const char * retVal = OmUpdateResultSuccess;
-	const char * r;
+	const char * r=0;
 	
-	if( om_config_set(cfg,OM_CFG_UPDATE_LAST_ATTEMPT,&tim) ) {
+	if( om_config_set(cfg,OM_CFG_UPDATE_LAST_ATTEMPT,&currentTime) ) {
 		if( 
 			// check to see if we're just reverting to the original version
-			(r=__om_update_check_revert_to_original(cfg,stg,update_header,callback,callback_info))==0
+			__om_update_check_revert_to_original(cfg,stg,update_header,callback,callback_info)==0
 			   
 			// make sure there is enough space for the update
 			&& (r=__om_update_import_check_space(cfg,stg,update_header,callback,callback_info))==OmUpdateResultSuccess
@@ -644,20 +643,17 @@ const char * om_update_perform_with_callback(om_config_ptr cfg,
 			// flip-flop storage and unzip the import archive into it
 			// and update the config to point to the new version
 			&& (r=__om_update_import_unzip(cfg,stg,update_header,callback,callback_info))==OmUpdateResultSuccess
-			) {
-				if( callback_info!=OM_NULL && callback!=OM_NULL ) {
-					
-					callback_info->update_status->complete=OM_TRUE;
-					callback_info->update_status->error_type=OM_NULL;
-					callback(callback_info);
-				}
-			} 
+			) {} 
+            if( callback_info!=OM_NULL && callback!=OM_NULL ) {
+                
+                callback_info->update_status->complete=OM_TRUE;
+                callback_info->update_status->error_type=OM_NULL;
+                callback(callback_info);
+            }
 			retVal = r;
 	} else {
 		retVal = OmUpdateResultPlatform;
 	}
-	
-	om_config_set(cfg,OM_CFG_UPDATE_LAST_RESULT,retVal);
 	
 	if( retVal == OmUpdateResultSuccess ) {
 		
@@ -672,9 +668,18 @@ const char * om_update_perform_with_callback(om_config_ptr cfg,
         om_storage_reset_storage(stg);
         char * unzip_location = __om_localstorage_path_for_update(stg,update_header);
         om_config_set(cfg,OM_CFG_CURRENT_STORAGE,unzip_location);
-        om_config_set(cfg,OM_CFG_APP_VER_HASH,update_header->hash->hash);
         om_free(unzip_location);
 	}
+    
+    // it's possible that we've reverted to the original version
+    // in which case the current retVal will be 0 at this point
+    // so we need to correct that.
+    retVal = retVal==0?OmUpdateResultSuccess:retVal;
+    if( retVal == OmUpdateResultSuccess ) {
+        om_config_set(cfg,OM_CFG_APP_VER_HASH,update_header->hash->hash);
+    }
+    
+    om_config_set(cfg,OM_CFG_UPDATE_LAST_RESULT,retVal);
     
     // doesn't matter what happened...we're not taking up space needlessly
     om_storage_delete_import_archive(stg);

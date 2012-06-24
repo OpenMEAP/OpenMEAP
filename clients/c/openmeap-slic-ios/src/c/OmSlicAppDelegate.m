@@ -62,6 +62,10 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 	
 	NSLog(@"in OmSlicAppDelegate::didFinishLaunchingWithOptions");
 	
+    if( [NSURLProtocol registerClass:[OmSlicJsApiProtocol class]] == NO ) {
+		NSLog(@"-- failed to register OmSlicJsApiProtocol");
+	}
+    
 	// load in current configuration
 	om_props_ptr props = om_props_acquire("slic-config");
 	om_prefs_ptr prefs = om_prefs_acquire("slic-prefs");
@@ -104,71 +108,32 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 	NSLog(@"-- dev uuid checked");
 	
 	NSLog(@"in OmSlicAppDelegate::applicationDidBecomeActive");
-	[self reload];
+	[self initializeView];
 	
     return YES;
 }
 
 
 - (void)applicationWillResignActive:(UIApplication *)application {
-    /*
-     Sent when the application is about to move from active to inactive state. 
-	 This can occur for certain types of temporary interruptions 
-	 (such as an incoming phone call or SMS message) or when the user quits 
-	 the application and it begins the transition to the background state.
-     Use this method to pause ongoing tasks, disable timers, and throttle down 
-	 OpenGL ES frame rates. Games should use this method to pause the game.
-     */
+
 	NSLog(@"in OmSlicAppDelegate::applicationWillResignActive");
 
-    if( self.loginViewController!=nil && self.loginViewController==self.window.rootViewController ) {
+    if( self.loginViewController!=nil 
+        && self.loginViewController==self.window.rootViewController ) {
         [self.loginViewController cancel:self];
     }
-    
-	[NSURLProtocol unregisterClass:[OmSlicJsApiProtocol class]];
 }
 
 
-- (void)applicationDidEnterBackground:(UIApplication *)application {
-    /*
-     Use this method to release shared resources, save user data, invalidate timers, 
-	 and store enough application state information to restore your application to its 
-	 current state in case it is terminated later. 
-     If your application supports background execution, 
-	 called instead of applicationWillTerminate: when the user quits.
-     */
-	NSLog(@"in OmSlicAppDelegate::applicationDidEnterBackground");
-	[NSURLProtocol unregisterClass:[OmSlicJsApiProtocol class]];
-}
-
-
-- (void)applicationWillEnterForeground:(UIApplication *)application {
-    /*
-     Called as part of  transition from the background to the inactive state: 
-	 here you can undo many of the changes made on entering the background.
-     */
-	
+- (void)applicationWillEnterForeground:(UIApplication *)application {    
 	// for now, we'll re-initialize the view
 	// each time the application is foregrounded
 	NSLog(@"in OmSlicAppDelegate::applicationWillEnterForeground");
-	[self reload];
-}
-
-
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-    /*
-     Restart any tasks that were paused (or not yet started) while the application was inactive. 
-	 If the application was previously in the background, optionally refresh the user interface.
-     */
-}
-
-
-- (void)applicationWillTerminate:(UIApplication *)application {
-    /*
-     Called when the application is about to terminate.
-     See also applicationDidEnterBackground:.
-     */
-	[NSURLProtocol unregisterClass:[OmSlicJsApiProtocol class]];
+    if(self.viewController!=nil) {
+        [self reloadView];
+    } else {
+        [self initializeView];
+    }
 }
 
 
@@ -212,22 +177,6 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
     }
     om_free(d);
     return dMode==1 ? YES : NO;
-}
-
-- (void) reload {
-    NSLog(@"in OmSlicAppDelegate::reload");
-    
-    readyForUpdateCheck=FALSE;
-    
-    // insure that a stale update isn't lying about
-    [self.viewController setUpdateHeaderJSON:nil];
-    if( self.updateHeader!=OM_NULL ) {
-        om_update_release_update_header(self.updateHeader);
-        self.updateHeader=OM_NULL;
-    }
-    
-    // setup the view
-    [self performSelectorOnMainThread:@selector(initializeView) withObject:nil waitUntilDone:YES];
 }
 
 - (void) showAlert:(NSString*)message withTitle:(NSString*)title {
@@ -288,24 +237,11 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 }
 
 - (BOOL) initializeView {
-	
-    // make sure the screen is blanked out, in-case they are returning to a running instance
-    if(self.window.rootViewController!=nil) {
-        if( [self.window.rootViewController isViewLoaded]) {
-            self.window.rootViewController.view.hidden=TRUE;
-        }
-        //[self.window.rootViewController release];
-        self.window.rootViewController = nil;
-    }
     
 	NSLog(@"in OmSlicAppDelegate::initializeView");
-	
-	if( [NSURLProtocol registerClass:[OmSlicJsApiProtocol class]] == NO ) {
-		NSLog(@"-- failed to register OmSlicJsApiProtocol");
-	}
     
     // this should be flipped to true exclusively at the end of the om_update_perform() func
-    int *updated = om_config_get(config,OM_CFG_APP_UPDATED);
+    /*int *updated = om_config_get(config,OM_CFG_APP_UPDATED);
     int cachePolicy = NSURLRequestUseProtocolCachePolicy;
 	if( updated!=OM_NULL && *updated==1 ) {
         *updated=0;
@@ -315,7 +251,7 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 		cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
         
         [self clearWebCache];
-	}
+	}*/
 	
 	// Set the view controller as the window's root view controller and display.
 	self.viewController = [[OmSlicViewController alloc] init];
@@ -323,7 +259,7 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
         [self.viewController setUpdateHeader:self->updateHeader];
     }
     
-    self.viewController.cachePolicy = cachePolicy;
+    self.viewController.cachePolicy = NSURLRequestUseProtocolCachePolicy;//cachePolicy;
 	self.viewController.appDelegate = self;
 	self.viewController.view;
     self.window.rootViewController = self.viewController;
@@ -331,6 +267,23 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 	[self.window makeKeyAndVisible];
 	
 	return YES;
+}
+
+- (void) reloadView {
+    NSLog(@"in OmSlicAppDelegate::reload");
+    
+    readyForUpdateCheck=FALSE;
+    
+    // insure that a stale update isn't lying about
+    [self.viewController setUpdateHeaderJSON:nil];
+    if( self.updateHeader!=OM_NULL ) {
+        om_update_release_update_header(self.updateHeader);
+        self.updateHeader=OM_NULL;
+    }
+    
+    // setup the view
+    [self.viewController clear];
+    [self.viewController setupWebView];
 }
 
 - (void) restoreToWebView {
@@ -387,7 +340,7 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
                     self.updateHeader=OM_NULL;
                     self.viewController.updateHeaderJSON=nil;
                     
-                    [self reload];
+                    [self reloadView];
                 }
             } else {
                 

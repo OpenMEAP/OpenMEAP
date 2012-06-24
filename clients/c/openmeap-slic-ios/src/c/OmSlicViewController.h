@@ -51,6 +51,8 @@
 @property (retain,nonatomic) NSString * updateHeaderJSON;
 
 - (void)setUpdateHeader:(om_update_header_ptr)header;
+- (void)clear;
+- (void)setupWebView;
 -(NSString*) executeJavascriptInMainThread:(NSString *)javascript;
 -(NSString*) executeJavascriptInMainThread:(NSString *)javascript waitUntilDone:(Boolean)waitTil;
 -(NSString*) executeJSCallbackInMainThread:(NSString *)callbackJS withArguments:(NSArray*)args waitUntilDone:(Boolean)waitTil;
