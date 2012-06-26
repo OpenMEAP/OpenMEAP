@@ -44,60 +44,6 @@
 	[self setupWebView];
 }
 
-- (void)setupWebView {
-    
-    if( self.appDelegate==nil ) {
-        self.appDelegate = [OmSlicAppDelegate globalInstance];
-    }
-	om_storage_ptr stg = (om_storage_ptr)(self.appDelegate.storage);
-	char * baseUrlChars = om_storage_get_current_assets_prefix(stg);
-	
-	char * indexHtmlPath = om_string_format("%s%c%s",baseUrlChars,OM_FS_FILE_SEP,"index.html");
-	NSURL * indexHtmlUrl = [NSURL fileURLWithPath:[NSString stringWithUTF8String:indexHtmlPath]];
-    NSLog(@"--index url %@",indexHtmlUrl); 
-    
-	char * bundledStorage = om_storage_get_bundleresources_path(stg);
-	char * jsApiPath = om_string_format("%s%c%s",bundledStorage,OM_FS_FILE_SEP,"openmeap-ios-api.js");
-	char * strJsApi = om_storage_file_get_contents(stg,jsApiPath);
-    if( strJsApi==OM_NULL ) {
-        [[OmSlicAppDelegate globalInstance] showAlert:@"openmeap-ios-api.js is missing from the resource bundle." withTitle:@"Resource Error"];
-    }
-	om_free(jsApiPath);
-	om_free(bundledStorage);
-    
-	// TODO: check for null return and handle appropriately
-	
-	[[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookieAcceptPolicy:NSHTTPCookieAcceptPolicyAlways];
-	[self executeJavascriptInMainThread:[NSString stringWithUTF8String:strJsApi]];
-    om_free(strJsApi);
-	
-	NSURLRequest * request = [NSURLRequest requestWithURL:indexHtmlUrl
-		cachePolicy:self.cachePolicy
-		timeoutInterval:10.0f];
-    
-	[((UIWebView*)self.view) loadRequest:request];
-    
-    // kick off the update check in a different thread
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-	dispatch_async(queue, ^{ 
-        NSLog(@"--about to check for update");
-        @synchronized([OmSlicAppDelegate class]) {
-            
-            OmSlicAppDelegate *appDel = [OmSlicAppDelegate globalInstance];
-            
-            // wait for the api to notify that it has been loaded
-            // but only 5 seconds...as there may be an IMMEDIATE update
-            // pushed by the customer to fix the app.
-            long count = 0;
-            while( appDel.readyForUpdateCheck==FALSE && count<500 ) {
-                [NSThread sleepForTimeInterval:.01];
-                count++;
-            }
-            [appDel performUpdateCheck];
-        } 
-    });
-}
-
 
 // Override to allow orientations other than the default portrait orientation.
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
@@ -128,29 +74,94 @@
 #pragma mark -
 #pragma mark WebView interaction
 
-- (void)setUpdateHeader:(om_update_header_ptr)header {
+- (void)setupWebView {
+    
+    if( self.appDelegate==nil ) {
+        self.appDelegate = [OmSlicAppDelegate globalInstance];
+    }
+	om_storage_ptr stg = (om_storage_ptr)(self.appDelegate.storage);
+	char * baseUrlChars = om_storage_get_current_assets_prefix(stg);
+	
+	char * indexHtmlPath = om_string_format("%s%c%s",baseUrlChars,OM_FS_FILE_SEP,"index.html");
+	NSURL * indexHtmlUrl = [NSURL fileURLWithPath:[NSString stringWithUTF8String:indexHtmlPath]];
+    NSLog(@"--index url %@",indexHtmlUrl); 
+    
+	char * bundledStorage = om_storage_get_bundleresources_path(stg);
+	char * jsApiPath = om_string_format("%s%c%s",bundledStorage,OM_FS_FILE_SEP,"openmeap-ios-api.js");
+	char * strJsApi = om_storage_file_get_contents(stg,jsApiPath);
+    if( strJsApi==OM_NULL ) {
+        [[OmSlicAppDelegate globalInstance] showAlert:@"openmeap-ios-api.js is missing from the resource bundle." withTitle:@"Resource Error"];
+    }
+	om_free(jsApiPath);
+	om_free(bundledStorage);
+    
+	// TODO: check for null return and handle appropriately
+	
+	[[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookieAcceptPolicy:NSHTTPCookieAcceptPolicyAlways];
+	[self executeJavascriptInMainThread:[NSString stringWithUTF8String:strJsApi]];
+    om_free(strJsApi);
+	
+	NSURLRequest * request = [NSURLRequest requestWithURL:indexHtmlUrl
+                                              cachePolicy:self.cachePolicy
+                                          timeoutInterval:10.0f];
+    
+	[((UIWebView*)self.view) loadRequest:request];
+    
+    // kick off the update check in a different thread
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+	dispatch_async(queue, ^{ 
+        NSLog(@"--about to check for update");
+        @synchronized([OmSlicAppDelegate class]) {
+            
+            // wait for the api to notify that it has been loaded
+            // but only 5 seconds...as there may be an IMMEDIATE update
+            // pushed by the customer to fix the app.
+            long count = 0;
+            while( self.appDelegate.readyForUpdateCheck==FALSE && count<500 ) {
+                [NSThread sleepForTimeInterval:.01];
+                count++;
+            }
+            self.appDelegate.viewController=self;
+            if( [self.appDelegate isTimeForUpdateCheck] ) {
+                [self.appDelegate performUpdateCheck];
+            }
+        } 
+    });
+}
+
+
+- (void)setUpdateHeader:(om_update_header_ptr)header withError:(om_update_check_error_ptr)error {
     
     NSLog(@"in OmSlicViewController::setUpdateHeader:header");
+    
+    char * js = OM_NULL;
     
     if( header != nil ) {
         
         char * jsonUpdateHeader = om_update_header_to_json(OmSlicAppDelegate.globalInstance.storage,header);
         self.updateHeaderJSON=[NSString stringWithUTF8String:jsonUpdateHeader];
         om_free(jsonUpdateHeader);
+        js = om_string_format("if(OpenMEAP.updates.onUpdate!='undefined'){OpenMEAP.updates.onUpdate(%s);};",[self.updateHeaderJSON UTF8String]);
         
-        char * js = om_string_format("if(OpenMEAP_onUpdateCheck!='undefined'){OpenMEAP_onUpdateCheck(%s);};",[self.updateHeaderJSON UTF8String]);
-        NSLog(@"--%@",[NSString stringWithUTF8String:js]);
-        [self executeJavascriptInMainThread:[NSString stringWithUTF8String:js]];
-        om_free(js);
+    } else if( error == nil ) {
+        
+        self.updateHeaderJSON=[NSString stringWithUTF8String:"null"];
+        js = om_string_format("if(OpenMEAP.updates.onNoUpdate!='undefined'){OpenMEAP.updates.onNoUpdate();};");
+        
     } else {
-        char * js = om_string_format("if(OpenMEAP_onUpdateCheck!='undefined'){OpenMEAP_onUpdateCheck(null);};");
+        
+        self.updateHeaderJSON=[NSString stringWithUTF8String:"null"];
+        js = om_string_format("if(OpenMEAP.updates.onCheckError!='undefined'){OpenMEAP.updates.onCheckError({code:\"%s\",message:\"%s\"});};",error->code,error->message);
+    }
+    
+    if(js!=OM_NULL) {
         NSLog(@"--%@",[NSString stringWithUTF8String:js]);
         [self executeJavascriptInMainThread:[NSString stringWithUTF8String:js]];
-        om_free(js);
     }
+    om_free(js);
 }
 
--(NSString*) executeJSCallbackInMainThread:(NSString *)callbackJS withArguments:(NSArray*)args waitUntilDone:(Boolean)waitTil {
+-(NSString*) executeJavascriptCallbackInMainThread:(NSString *)callbackJS withArguments:(NSArray*)args waitUntilDone:(Boolean)waitTil {
     int r = rand();
     NSString *argsStr = [args componentsJoinedByString:@","];
     char *str = om_string_format("var func%X = %s; func%X(%s); delete func%X;",r,[callbackJS UTF8String],r,[argsStr UTF8String],r);
@@ -165,6 +176,8 @@
 
 -(NSString*) executeJavascriptInMainThread:(NSString *)javascript waitUntilDone:(Boolean)waitTil {
 	
+    NSLog(@"in executeJavascriptInMainThread");
+    
 	SEL sel = @selector(stringByEvaluatingJavaScriptFromString:);
 	
 	NSMethodSignature * mySignature = [UIWebView instanceMethodSignatureForSelector:sel];
@@ -181,10 +194,13 @@
 	[inv performSelectorOnMainThread:@selector(invokeWithTarget:) withObject:view waitUntilDone:waitTil];
     
     if( waitTil==YES ) {
-        // TODO: figure out how to get this to work, once i need it.
-        //NSString **result;
-        //[inv getReturnValue:result];
-        //return *result;
+        /*NSString *result;
+        [inv getReturnValue:&result];
+        if(result==nil) {
+            NSLog(@"--execute javascript failed");
+        } else {
+            NSLog(@"--returned %@",result);
+        }*/
         return nil;
     } else {
         return nil;

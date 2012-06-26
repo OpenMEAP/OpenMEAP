@@ -74,8 +74,9 @@ public class AndroidSLICConfig extends SLICConfig {
     public String getAssetsBaseUrl() {
     	String rootPath = getAssetsRootPath();
     	if( shouldUseAssetsOrSdCard() ) {
-    		if( assetsOnExternalStorage() )
+    		if( assetsOnExternalStorage() ) {
     			return "content://com.android.htmlfileprovider/" + rootPath;
+    		}
     		return "file:///android_asset/" + rootPath;
     	} else return FileContentProvider.getBaseUri() + rootPath;
     }

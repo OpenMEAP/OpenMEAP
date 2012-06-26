@@ -164,7 +164,7 @@ char * om_update_connreq_create_post(om_update_connreq_ptr request) {
 	return ret;
 }
 
-om_update_header_ptr om_update_check(om_config_ptr cfg) {
+om_update_check_result_ptr om_update_check(om_config_ptr cfg) {
 	
 	om_error_clear();
 	
@@ -199,8 +199,8 @@ om_update_header_ptr om_update_check(om_config_ptr cfg) {
 		return OM_NULL;
 	}
 	
-	om_update_connresp_ptr updateResponse = om_update_parse_connresp(response->result);
-	if( !updateResponse || om_error_get_code()!=OM_ERR_NONE ) {
+	om_update_check_result_ptr updateResult = om_update_parse_check_result(response->result);
+	if( !updateResult || om_error_get_code()!=OM_ERR_NONE ) {
 		
 		om_update_release_connreq(request);
 		om_net_release_response(response);
@@ -218,24 +218,18 @@ om_update_header_ptr om_update_check(om_config_ptr cfg) {
 	om_free(postData);
 	
 	// TODO: determine if the lack of an auth_token represents an error
-	if( updateResponse->auth_token!=OM_NULL ) {
-		om_config_set(cfg,OM_CFG_AUTH_LAST_TOKEN,updateResponse->auth_token);
-	}
+	if( updateResult->response!=OM_NULL ) {
+        
+        if( updateResult->response->auth_token!=OM_NULL ) {
+            om_config_set(cfg,OM_CFG_AUTH_LAST_TOKEN,updateResult->response->auth_token);
+        }
+                
+        om_uint32 lastCheck = om_time(0);
+        om_config_set(cfg,OM_CFG_UPDATE_LAST_CHECK,&lastCheck);
 	
-	// we need to set the update struct member to null
-	// so taht the update connresp release function will
-	// not free it for us
-	if( updateResponse->update!=OM_NULL ) {
-		ret = updateResponse->update;
-		updateResponse->update=OM_NULL;
-	}
+    }
 	
-	om_uint32 lastCheck = om_time(0);
-	om_config_set(cfg,OM_CFG_UPDATE_LAST_CHECK,&lastCheck);
-	
-	om_update_release_connresp(updateResponse);
-	
-	return ret;
+	return updateResult;
 }
 
 void om_update_release_connreq(om_update_connreq_ptr ptr) {
@@ -266,6 +260,26 @@ om_update_connreq_ptr om_update_create_connreq(om_config_ptr cfg) {
 		return OM_NULL;
 	}
 	return ptr;
+}
+
+void om_update_release_check_result(om_update_check_result_ptr result) {
+    if(result->response!=OM_NULL) {
+        om_update_release_connresp(result->response);
+        result->response=OM_NULL;
+    }
+    if(result->error!=OM_NULL) {
+        om_update_release_check_error(result->error);
+        result->error=OM_NULL;
+    }
+    om_free(result);
+}
+
+void om_update_release_check_error(om_update_check_error_ptr error) {
+    om_free(error->code);
+    error->code=OM_NULL;
+    om_free(error->message);
+    error->message=OM_NULL;
+    om_free(error);
 }
 
 void om_update_release_connresp(om_update_connresp_ptr connresp) {
@@ -390,21 +404,21 @@ om_update_header_ptr __om_update_header_from_cJSON(cJSON *jsonHeader) {
     return header;
 }
 
-om_update_connresp_ptr om_update_parse_connresp(char *json) {
+om_update_check_result_ptr om_update_parse_check_result(char *json) {
+    
+    om_update_check_result_ptr result = OM_NULL;
+    cJSON *resultJson = cJSON_Parse(json);
+    if( resultJson==NULL ) {
+        return result;
+    }
+    result = om_malloc(sizeof(om_update_check_result));
+    
+    cJSON *errorJson = cJSON_GetObjectItem(resultJson,"error");
+    cJSON *connRespJson = cJSON_GetObjectItem(resultJson,"connectionOpenResponse");
     
     om_update_header_ptr header = OM_NULL;
-    om_update_connresp_ptr response = OM_NULL;
-    
-    cJSON *result = cJSON_Parse(json);
-    if( result==NULL ) {
-        return response;
-    }
-    
-    cJSON *error = cJSON_GetObjectItem(result,"error");
-    cJSON *connRespJson = cJSON_GetObjectItem(result,"connectionOpenResponse");
-    
     if( connRespJson!=NULL ) {
-        response = om_malloc(sizeof(om_update_connresp));
+        om_update_connresp_ptr response = om_malloc(sizeof(om_update_connresp));
         cJSON *updateJson = cJSON_GetObjectItem(connRespJson,"update");
         if( updateJson!=NULL ) {
             header = __om_update_header_from_cJSON(updateJson);
@@ -414,10 +428,24 @@ om_update_connresp_ptr om_update_parse_connresp(char *json) {
         if( authTokenJson!=NULL ) {
             response->auth_token = om_string_copy(authTokenJson->valuestring);
         }
+        result->response = response;
     }
     
-    cJSON_Delete(result);    
-    return response;
+    if( errorJson!=NULL ) {
+        om_update_check_error_ptr error = om_malloc(sizeof(om_update_check_error));
+        cJSON *code = cJSON_GetObjectItem(errorJson,"code");
+        if(code!=NULL) {
+            error->code=om_string_copy(code->valuestring);
+        }
+        cJSON *message = cJSON_GetObjectItem(errorJson,"message");
+        if(code!=NULL) {
+            error->code=om_string_copy(code->valuestring);
+        }
+        result->error = error;
+    }
+    
+    cJSON_Delete(resultJson);    
+    return result;
 }
 
 om_update_header_ptr om_update_header_from_json(const char *strJsonUpdateHeader) {

@@ -46,22 +46,38 @@ if( typeof OpenMEAP_Core!="undefined" ) {
 			{ return OpenMEAP_Core.clearCache(); },
 		setTitle:function(text) 
 			{ return OpenMEAP_Core.setTitle(text); },
-		doToast:function(text,duration)
-			{ return OpenMEAP_Core.doToast(text,duration); },
+		doToast:function(text,isLong)
+			{ return OpenMEAP_Core.doToast(text,isLong); },
 		getDeviceType:function()
 			{ return OpenMEAP_Core.getDeviceType(); },
 		getPreferences:function(name)
 			{ return OpenMEAP_Core.getPreferences(name); },
 		isTimeForUpdateCheck:function()
 			{ return OpenMEAP_Core.isTimeForUpdateCheck(); },
-		checkForUpdates:function(callback)
-			{ return OpenMEAP_Core.checkForUpdates(callback+' '); },
+		checkForUpdates:function()
+			{ return OpenMEAP_Core.checkForUpdates(); },
+        /**
+         * Request that the container perform an update.
+         * @param header The update header passed into OpenMEAP.updates.onUpdate(header)
+         */
 		performUpdate:function(header,stateChangeCallback)
 			{ return OpenMEAP_Core.performUpdate(OpenMEAP.utils.toJSON(header),stateChangeCallback+' '); },
+        /**
+         * Force a reload of the application.  This would be done,
+         * generally, after a javascript mediated REQUIRED or OPTIONAL
+         * update.
+         */
 		reload:function() 
 			{ OpenMEAP_Core.reload(); },
+        /**
+         * Notify the container that callback overrides are available
+         * and to proceed with the update check, if it's time.
+         * There is a time-out for this, so if an IMMEDIATE update is
+         * pushed, then the update will proceed after the configured 
+         * time-out, should this method not have been called.
+         */
         notifyReadyForUpdateCheck:function()
-            { alert("ready");OpenMEAP_Core.notifyReadyForUpdateCheck(); }
+            { OpenMEAP_Core.notifyReadyForUpdateCheck(); }
 	});
 } else {
 	/**
@@ -77,7 +93,7 @@ if( typeof OpenMEAP_Core!="undefined" ) {
 		setTitle:function(text) { 
 			document.title=text; 
 		},
-		doToast:function(text,duration) { 
+		doToast:function(text,isLong) { 
 			alert(text); 
 		},
 		getDeviceType:function() { 
@@ -120,7 +136,7 @@ if( typeof OpenMEAP_Core!="undefined" ) {
 		},
 		isTimeForUpdateCheck:function()
 			{ return false; },
-		checkForUpdates:function(callback)
+		checkForUpdates:function()
 			{ return; },
 		performUpdate:function(header,stateChangeCallback)
 			{ return; },
@@ -242,21 +258,13 @@ if( OpenMEAP.config.deviceType=='Browser' ) {
  * to be overridden
  */
 OpenMEAP.updates={
-	onUpdate:function(update) {
-		var update
-		if( update == null ) {
-			OpenMEAP.updates.onNoUpdate();
-			return;
-		}
-		if( typeof update.error == 'object' ) {
-			OpenMEAP.updates.onCheckError(update.error);
-			return;
-		}
-		if( OpenMEAP.updates.onAvailable(update) ) {
-			OpenMEAP.performUpdate(update,function(data) {
-				OpenMEAP.updates.onStateChange(data);
-			});
-		}
+
+    // The following three are called on every check
+
+    onUpdate:function(update) {
+		OpenMEAP.performUpdate(update,function(data) {
+            OpenMEAP.updates.onStateChange(data);
+        });
 	},
     onNoUpdate:function() {
         //OpenMEAP.doToast('no update');
@@ -264,28 +272,25 @@ OpenMEAP.updates={
 	onCheckError:function(error) {
 		OpenMEAP.doToast("An error occurred checking for an update\n\n"+error.type+':'+error.message);
 	},
-	onAvailable:function(update) {
-		OpenMEAP.doToast('Performing update of type '+update.type);
-		return true;
-	},
+    
 	/**
-	 * The on-state-change callback used by OpenMEAP.updates.onInit(),
+	 * A default on-state-change callback used by OpenMEAP.updates.onUpdate(update)
 	 * when calling OpenMEAP.performUpdate(updateData,onStateChangeCallBack)
 	 */
 	onStateChange:function(data) {
 		if( data.complete == true ) {
-			this.onComplete(data);
+			this.onUpdateComplete(data);
 		} else if( ! data.error ) {
-			this.onIncrement(data);
+			this.onUpdateIncrement(data);
 		} else {
-			this.onError(data);
+			this.onUpdateError(data);
 		}
 	},
 	/**
 	 * Called by OpenMEAP.updates.onStatusChange(),
 	 * when the archive download has completed.
 	 */
-	onComplete:function(data) {
+	onUpdateComplete:function(data) {
 		var callbackLoc = document.getElementById("update-callback");
 		if( callbackLoc ) {
 			var total = data.update.installNeeds - data.update.storageNeeds;
@@ -298,7 +303,7 @@ OpenMEAP.updates={
 	 * Called by OpenMEAP.updates.onStateChange(), 
 	 * each percent the application archive download completes.
 	 */
-	onIncrement:function(data) {
+	onUpdateIncrement:function(data) {
 		var callbackLoc = document.getElementById("update-callback");
 		if( callbackLoc ) {
 			var total = data.update.installNeeds - data.update.storageNeeds;
@@ -309,7 +314,7 @@ OpenMEAP.updates={
 	 * Called by OpenMEAP.updates.onStateChange(), 
 	 * when an error has occurred.
 	 */
-	onError:function(data) {
+	onUpdateError:function(data) {
 		OpenMEAP.doToast(data.error.type+":"+data.error.message);
 	}
 };

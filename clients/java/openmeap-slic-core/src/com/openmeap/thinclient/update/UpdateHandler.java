@@ -71,6 +71,14 @@ public class UpdateHandler {
 		this.setLocalStorage(storage);
 	}
 	
+	private void setLocalStorage(LocalStorage storage2) {
+		this.storage = storage2;
+	}
+
+	private void setSLICConfig(SLICConfig config2) {
+		this.config = config2;
+	}
+
 	public void handleUpdate() throws WebServiceException {
     	UpdateHeader update = checkForUpdate();
     	if( update!=null ) {
@@ -218,15 +226,8 @@ public class UpdateHandler {
 		// then we'll just update the app version, delete internal storage and return
 		String versionId = updateHeader.getVersionIdentifier();
 		if( config.isVersionOriginal(versionId).booleanValue() ) {
-			config.setApplicationVersion(versionId);
-			config.setArchiveHash(updateHeader.getHash().getValue());
-			try {
-				storage.resetStorage();
-			} catch(LocalStorageException lse) {
-				throw new UpdateException(UpdateResult.IO_EXCEPTION,"Could not reset storage",lse);
-			}
-     		config.setLastUpdateResult(UpdateResult.SUCCESS.toString());
-     		return;
+			_revertToOriginal(update, eventHandler);
+			return;
 		}
 		
 		if( ! deviceHasEnoughSpace(update).booleanValue() ) {
@@ -241,7 +242,7 @@ public class UpdateHandler {
 			}
 		} catch( Exception ioe ) {
 			// TODO: whether this is a deal breaker or not should be configurable.  client should have the ability to override default behavior.  default behavior should be informative
-			throw new UpdateException(UpdateResult.IO_EXCEPTION,"May need more space to install than is available",ioe);
+			throw new UpdateException(UpdateResult.IO_EXCEPTION,"An issue occurred downloading the archive",ioe);
 		} 
 		
 		if( ! archiveIsValid(update).booleanValue() ) {
@@ -277,6 +278,8 @@ public class UpdateHandler {
 		if( eventHandler!=null ) { 
 			update.setComplete(true);
         	eventHandler.onStatusChange(update);
+        } else {
+        	activity.restart();
         }
 	}
 	
@@ -395,54 +398,45 @@ public class UpdateHandler {
 		return true;
 	}
 	
-	public void initialize(final OmWebView webView) {
+	public void initialize(OmWebView webView) {
         
         // if this application is configured to fetch updates,
         // then check for them now
+		activity.setReadyForUpdateCheck(false);
 		Boolean shouldPerformUpdateCheck = activity.getConfig().shouldPerformUpdateCheck();
         if( shouldPerformUpdateCheck!=null && shouldPerformUpdateCheck.equals(Boolean.TRUE) ) {
-        	
-        	activity.runOnUiThread(new Runnable() {
-        		public void run() {
-        			if( webView!=null ) {
-        				webView.clearView();
-        			}
-        		}
-        	});
-        	new Thread(new Runnable(){
-        		public void run() {
-        			UpdateHeader update = null;
-        			WebServiceException err = null;
-		        	try {
-		        		update = checkForUpdate();
-		        	} catch( WebServiceException wse ) {
-		        		err = wse;
-		        	}
-		        	if( update!=null && update.getType()==UpdateType.IMMEDIATE ) {
-		        		try {
-		        			handleUpdate(update);
-		        			storage.setupSystemProperties();
-		        			update=null;
-		        		} catch( Exception e ) {
-		            		err = new WebServiceException(WebServiceException.TypeEnum.CLIENT_UPDATE,e.getMessage(),e);
-		            	}
-		        	}
-		        	activity.runOnUiThread(new InitializeWebView(update, err));
-        		}
-        	}).start();
+        	webView = webView!=null?webView:activity.createDefaultWebView();
+        	activity.runOnUiThread(new InitializeWebView(webView));
+        	new Thread(new UpdateCheck(webView)).start();
         } else {
-        	activity.runOnUiThread(new InitializeWebView(null, null));
+        	activity.runOnUiThread(new InitializeWebView(webView));
         }
+	}
+	
+	private void _revertToOriginal(UpdateStatus update, StatusChangeHandler eventHandler) throws UpdateException {
+		config.setApplicationVersion(update.getUpdateHeader().getVersionIdentifier());
+		config.setArchiveHash(update.getUpdateHeader().getHash().getValue());
+		try {
+			storage.resetStorage();
+		} catch(LocalStorageException lse) {
+			throw new UpdateException(UpdateResult.IO_EXCEPTION,"Could not reset storage",lse);
+		}
+ 		config.setLastUpdateResult(UpdateResult.SUCCESS.toString());
+ 		if( eventHandler!=null ) { 
+			update.setComplete(true);
+        	eventHandler.onStatusChange(update);
+        } else {
+        	activity.restart();
+        }
+ 		return;
 	}
     
 	private static String SOURCE_ENCODING = FormConstants.CHAR_ENC_DEFAULT;
 	private static String CONTENT_TYPE = FormConstants.CONT_TYPE_HTML;
     private class InitializeWebView implements Runnable {
-    	UpdateHeader update=null;
-    	WebServiceException err=null;
-    	public InitializeWebView(UpdateHeader update, WebServiceException err) {
-    		this.update=update;
-    		this.err=err;
+    	private OmWebView webView;
+		public InitializeWebView(OmWebView webView) {
+    		this.webView = webView;
     	}
     	public void run() {
 	    	// here after, everything is handled by the html and javascript
@@ -451,15 +445,9 @@ public class UpdateHandler {
 	        	if( justUpdated!=null && justUpdated.booleanValue()==true ) {
 	        		config.setApplicationUpdated(Boolean.FALSE);
 	        	}
-	        	OmWebView webView = activity.createDefaultWebView();
-	        	if( justUpdated!=null && justUpdated.booleanValue() ) {
-	        		webView.clearCache(true);
-	        		webView = activity.createDefaultWebView();
-	        	}
 	        	activity.setWebView(webView);
 	        	String baseUrl = config.getAssetsBaseUrl();
 	        	String pageContent = activity.getRootWebPageContent();
-	        	webView.setUpdateHeader(update, err, storage.getBytesFree());
 	        	webView.loadDataWithBaseURL(baseUrl, pageContent, CONTENT_TYPE, SOURCE_ENCODING, null);
         		activity.setContentView(webView);
 	        } catch( Exception e ) {
@@ -467,20 +455,50 @@ public class UpdateHandler {
 	        }
 	    }
     }
-	
-	/* ACCESSORS BELOW HERE */
-	
-	public void setLocalStorage(LocalStorage storage) {
-		this.storage = storage;
-	}
-	public LocalStorage getLocalStorage() {
-		return this.storage;
-	}
-	
-	public void setSLICConfig(SLICConfig config) {
-		this.config = config;
-	}
-	public SLICConfig getSLICConfig() {
-		return this.config;
-	}
+    
+    private class UpdateCheck implements Runnable {
+    	final private OmWebView webView;
+    	public UpdateCheck(OmWebView webView) {
+    		this.webView = webView;
+    	}
+		public void run() {
+			int count=0;
+			while(activity.getReadyForUpdateCheck() && count<500) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					;
+				}
+				count++;
+			}
+			UpdateHeader update = null;
+			WebServiceException err = null;
+        	try {
+        		update = checkForUpdate();
+        	} catch( WebServiceException wse ) {
+        		err = wse;
+        	}
+        	if( update!=null && update.getType()==UpdateType.IMMEDIATE ) {
+        		try {
+        			activity.runOnUiThread(new Runnable(){
+        				public void run() {
+        					activity.doToast("MANDATORY UPDATE\n\nThere is an immediate update.  The application will restart.  We apologise for any inconvenience.", true);
+        					webView.clearView();
+        				}
+        			});
+        			handleUpdate(update);
+        			storage.setupSystemProperties();
+        			update=null;
+        		} catch( Exception e ) {
+            		err = new WebServiceException(WebServiceException.TypeEnum.CLIENT_UPDATE,e.getMessage(),e);
+            	}
+        	} else {
+        		try {
+					webView.setUpdateHeader(update, err, storage.getBytesFree());
+				} catch (LocalStorageException e) {
+					throw new GenericRuntimeException(e);
+				}
+        	}
+		}
+    }
 }

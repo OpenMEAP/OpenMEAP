@@ -35,8 +35,6 @@
 @synthesize viewController;
 @synthesize loginViewController;
 
-@synthesize updateHeader;
-
 @synthesize config;
 @synthesize storage;
 
@@ -51,7 +49,6 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 - (OmSlicAppDelegate*) init {
     self = [super init];
 	__globalOmSlicAppDelegateInstance = self;
-    self->updateHeader = OM_NULL;
     return self;
 }
 
@@ -107,9 +104,6 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 	} else om_free(uuid);
 	NSLog(@"-- dev uuid checked");
 	
-	NSLog(@"in OmSlicAppDelegate::applicationDidBecomeActive");
-	[self performSelectorOnMainThread:@selector(initializeView) withObject:self waitUntilDone:NO];
-	
     return YES;
 }
 
@@ -152,10 +146,6 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 	om_prefs_release(prefs);
 	om_config_release(self.config);
 	om_storage_release(self.storage);
-	if( self.updateHeader!=OM_NULL ) {
-        om_update_release_update_header(self.updateHeader);
-        self.updateHeader=OM_NULL;
-    }
     [viewController release];
     [window release];
     [super dealloc];
@@ -236,6 +226,8 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
     
 	NSLog(@"in OmSlicAppDelegate::initializeView");
     
+    readyForUpdateCheck=FALSE;
+    
     // this should be flipped to true exclusively at the end of the om_update_perform() func
     int *updated = om_config_get(config,OM_CFG_APP_UPDATED);
     int cachePolicy = NSURLRequestUseProtocolCachePolicy;
@@ -251,9 +243,6 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 	
 	// Set the view controller as the window's root view controller and display.
 	self.viewController = [[OmSlicViewController alloc] init];
-    if( self->updateHeader!=OM_NULL ) {
-        [self.viewController setUpdateHeader:self->updateHeader];
-    }
     
     self.viewController.cachePolicy = cachePolicy;
 	self.viewController.appDelegate = self;
@@ -261,7 +250,7 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
     self.window.rootViewController = self.viewController;
     
 	[self.window makeKeyAndVisible];
-	
+    
 	return YES;
 }
 
@@ -286,57 +275,59 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 // STUFF I SHOULD MOVE OUT //
 //~~~~~~~~~~~~~~~~~~~~~~~~~//
 
+-(BOOL) isTimeForUpdateCheck {
+    return om_update_decision(self.config)==OM_TRUE;
+}
+
 /*!
  * @return NO if an IMMEDIATE update failed, else YES
  */
 - (BOOL) performUpdateCheck {
-    
-    if( self->updateHeader!=OM_NULL ) {
-        om_update_release_update_header(self->updateHeader);
-        self->updateHeader=OM_NULL;
+
+    NSLog(@"-- making update check");
+    om_update_check_result_ptr result = om_update_check(self->config);
+    om_update_header_ptr updateHeader = OM_NULL;
+    if(result!=OM_NULL && result->response!=OM_NULL && result->response->update!=OM_NULL) {
+        updateHeader = result->response->update;
     }
     
-	if( om_update_decision(self.config)==OM_TRUE ) {
-		
-		NSLog(@"-- making update check");
-		self->updateHeader = om_update_check(self->config);
+    // TODO: if there is no network connectivity, then i need to communicate that with the client.
+    
+    if( updateHeader!=OM_NULL ) {
         
-        // TODO: if there is no network connectivity, then i need to communicate that with the client.
-        
-		if( self->updateHeader!=OM_NULL ) {
+        if( updateHeader->type==OM_UPDATE_TYPE_IMMEDIATE ) {
             
-            if( self->updateHeader->type==OM_UPDATE_TYPE_IMMEDIATE ) {
-                
-                // TODO: show IMMEDIATE update intercepting screen, kill webview
-                
-                NSLog(@"-- performing IMMEDIATE update");
-                const char * updateResult = om_update_perform(self->config,self->storage,self->updateHeader);
-                
-                if( updateResult!=OmUpdateResultSuccess ) {
-                    
-                    NSLog(@"-- performing IMMEDIATE update failed");
-                    om_update_release_update_header(self->updateHeader);
-                    self.updateHeader=OM_NULL;
-                    self.viewController.updateHeaderJSON=nil;
-                    
-                    return NO;
-                } else {
-                    
-                    NSLog(@"-- performing IMMEDIATE update succeeded");
-                    om_update_release_update_header(self->updateHeader);
-                    self.updateHeader=OM_NULL;
-                    self.viewController.updateHeaderJSON=nil;
-                    
-                    [self reloadView];
-                }
+            // TODO: show IMMEDIATE update intercepting screen, kill webview
+            [self showAlert:@"There is an immediate update.  The application will restart.  We apologise for any inconvenience." withTitle:@"MANDATORY UPDATE"];
+            
+            NSLog(@"-- performing IMMEDIATE update");
+            const char * updateResult = om_update_perform(self->config,self->storage,updateHeader);
+            
+            if( updateResult!=OmUpdateResultSuccess ) {
+                return NO;
             } else {
-                
-                [self.viewController setUpdateHeader:self->updateHeader];
+                [self reloadView];
             }
-		} else {
-            [self.viewController setUpdateHeader:nil];
+        } else {
+            [self.viewController setUpdateHeader:updateHeader withError:result->error];
         }
-	}
+        
+        om_update_release_check_result(result);
+    } else if(om_error_get_code()!=OM_ERR_NONE) {
+        
+        char * errMesg = om_string_copy(om_error_get_message());
+        char * errCode = om_string_format("%u",om_error_get_code());
+        om_update_check_error_ptr error = om_malloc(sizeof(om_update_check_error));
+        error->message=errMesg;
+        error->code=errCode;
+        [self.viewController setUpdateHeader:nil withError:error];
+        om_free(errMesg);
+        om_free(errCode);
+        om_free(error);
+    } else {
+        
+        [self.viewController setUpdateHeader:nil withError:nil];
+    }
     
     return YES;
 }

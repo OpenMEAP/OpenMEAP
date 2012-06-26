@@ -103,6 +103,7 @@ OM_EXPORT om_http_response_ptr om_net_do_http_get_to_file_output_stream(const ch
 	} 
 	// connection failed
 	else {
+
 		om_error_set(OM_ERR_NET_CONN,[[error domain] UTF8String]);
 		return OM_NULL;
 	}
@@ -124,11 +125,15 @@ om_http_response_ptr om_net_do_http_post(const char *url, const char *post_data)
 	[outputStream open];
 	OmSlicConnectionHandler *connHandler = [OmSlicConnectionHandler initWithRequest:request outputStream:outputStream];
 	if( __download(connHandler) < 0 ) {
-		//[[OmSlicAppDelegate globalInstance] showAlert:@"Failed to fetch update header" withTitle:@"Update Error"];
+        NSError *error = connHandler.error;
+        if(error!=OM_NULL) {
+            
+            om_error_set(OM_ERR_NET_CONN,[[error domain] UTF8String]);
+            return OM_NULL;
+        }
 		return OM_NULL;
 	}
-	
-	NSError *error = connHandler.error;
+    
 	NSHTTPURLResponse *response = connHandler.response;	
 	NSData *urlData=[outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
 	NSString *data=[[NSString alloc]initWithData:urlData encoding:NSUTF8StringEncoding];

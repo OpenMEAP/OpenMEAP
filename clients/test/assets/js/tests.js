@@ -1,17 +1,36 @@
 function testNonImmediateUpdates() {
-    document.body.innerHTML="<h6>Update Check Callback</h6><div id=\"updateCallback\">No update</div>";
+    document.body.innerHTML="<h6>Update Check Callback</h6><div id=\"update-callback\">No update</div>";
     checks = 0;
     interval = setInterval(function() {
         checks++;
         if(OpenMEAP_update!='undefined') {
             clearInterval(interval);
             if(OpenMEAP_update!=null) {
-                OpenMEAP.updates.onUpdate(OpenMEAP_update);
+                OpenMEAP.updates.originalOnUpdate(OpenMEAP_update);
             } else {
-                window.document.getElementById('updateCallback').innerHTML = "No update after "+checks+" check(s)";
+                document.getElementById('update-callback').innerHTML = "Update check returned no update.";
             }
+        } else {
+            document.getElementById('update-callback').innerHTML = "No update after "+checks+" check(s)";
         }
     },250);
+}
+
+function testJavascriptUpdates() {
+    document.body.innerHTML="<h6>Javascript Updates API Tests</h6><div id=\"update-callback\"></div>";
+    setTimeout(function() {
+        var isTime = OpenMEAP.isTimeForUpdateCheck();
+    },1000);
+    OpenMEAP.updates.onUpdate=OpenMEAP.updates.originalOnUpdate;
+    OpenMEAP.updates.onNoUpdate=function() {
+        OpenMEAP_update = null;
+    }
+    OpenMEAP.updates.onCheckError=function(error) {
+        OpenMEAP_updateError = error;
+        OpenMEAP.doToast(error.code+': '+error.message);
+    }
+    OpenMEAP.checkForUpdates();
+    var isTime = OpenMEAP.isTimeForUpdateCheck();
 }
     
 function testPreferences() {
@@ -53,17 +72,18 @@ function runTests() {
                 testPrefs.remove("evalOnInit");
                 eval(evalOnInit);
             } catch(e) {
-                alert(evalOnInit);
-                alert(e);
+                OpenMEAP.doToast(evalOnInit);
+                OpenMEAP.doToast(e);
             }
         } else {
             var innerHtml = "typeof(OpenMEAP) = "+typeof(OpenMEAP)+"<br/>";
             innerHtml = "<a href=\"javascript:testPreferences();\">Test Preferences</a><br/>";
             innerHtml += "<a href=\"javascript:testNonImmediateUpdates();\">Test Non-IMMEDIATE Updates</a><br/>";
+            innerHtml += "<a href=\"javascript:testJavascriptUpdates();\">Test Javascript Update Checks</a><br/>";
             document.body.innerHTML=innerHtml;
         }
     } catch(e) {
-        alert(e);
+        OpenMEAP.doToast(e);
     }
 }
 

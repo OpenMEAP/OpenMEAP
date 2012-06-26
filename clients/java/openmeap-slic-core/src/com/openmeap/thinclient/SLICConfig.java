@@ -192,7 +192,7 @@ abstract public class SLICConfig {
     }
 	
 	public String getPackagedAppRoot() {
-		return "assets:///"+this.getProperty("com.openmeap.slic.packagedAppRoot");
+		return /*"assets:///"+*/this.getProperty("com.openmeap.slic.packagedAppRoot");
 	}
 	
 	/*
