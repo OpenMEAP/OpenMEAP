@@ -82,7 +82,7 @@ public final class OpenMEAPScreen extends MainScreen implements OmWebView
 		}
     }
     
-    public BrowserField createBrowserField() throws IOException {
+    private BrowserField createBrowserField() throws IOException {
     	
     	BrowserField browserField = new BrowserField();
     	handler = new AssetsRequestHandler(browserField,activity.getBaseUrl());

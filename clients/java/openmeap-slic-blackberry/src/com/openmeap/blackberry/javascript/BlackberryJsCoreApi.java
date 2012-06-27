@@ -106,7 +106,7 @@ public class BlackberryJsCoreApi extends Scriptable {
 		});
 		functions.put("checkForUpdates", new ScriptableFunction() {
 			public Object invoke(Object thiz, Object[] args) throws Exception {
-				jsApi.checkForUpdates((String)args[0]);
+				jsApi.checkForUpdates();
 				return null;
 			}
 		});
@@ -119,6 +119,12 @@ public class BlackberryJsCoreApi extends Scriptable {
 		functions.put("reload", new ScriptableFunction() {
 			public Object invoke(Object thiz, Object[] args) throws Exception {
 				jsApi.reload();
+				return null;
+			}
+		});
+		functions.put("notifyReadyForUpdateCheck", new ScriptableFunction() {
+			public Object invoke(Object thiz, Object[] args) throws Exception {
+				jsApi.notifyReadyForUpdateCheck();
 				return null;
 			}
 		});

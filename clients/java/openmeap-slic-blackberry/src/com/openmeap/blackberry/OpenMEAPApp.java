@@ -64,12 +64,19 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 	private LocalStorage localStorage;
 	private UpdateHandler updateHandler;
 	private OpenMEAPScreen webView;
+	private boolean readyForUpdateCheck = false;
+	static private OpenMEAPApp instance;
+	
+	public static OpenMEAPApp getInstance() {
+		return instance;
+	}
 	
 	public static void main(String[] args)
-    {
+    {		
         // Create a new instance of the application and make the currently
         // running thread the application's event dispatch thread.
 		OpenMEAPApp theApp = new OpenMEAPApp();
+		CodeModuleManager.addListener(theApp, new ApplicationDeleteCleanup());
         theApp.enterEventDispatcher();
     }
 	
@@ -79,6 +86,8 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
      * @throws IOException 
      */
     public OpenMEAPApp() {
+    	
+    	instance = this;
     	
     	DigestInputStreamFactory.setDigestInputStreamForName("MD5", Md5DigestInputStream.class);
     	DigestInputStreamFactory.setDigestInputStreamForName("SHA1", Sha1DigestInputStream.class);
@@ -110,8 +119,6 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 	    }  
     	
     	localStorage = new LocalStorageImpl(config);
-    	
-    	CodeModuleManager.addListener(this, new ApplicationDeleteCleanup((BlackberrySLICConfig)config,(LocalStorageImpl)localStorage));
     	
     	updateHandler = new UpdateHandler(this,config,localStorage);
     	
@@ -227,5 +234,13 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 				is.close();
 			}
 		}
+	}
+
+	public void setReadyForUpdateCheck(boolean state) {
+		readyForUpdateCheck = state;
+	}
+
+	public boolean getReadyForUpdateCheck() {
+		return readyForUpdateCheck;
 	}
 }

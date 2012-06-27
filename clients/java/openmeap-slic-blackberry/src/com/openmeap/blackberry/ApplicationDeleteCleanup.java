@@ -10,12 +10,9 @@ public class ApplicationDeleteCleanup implements CodeModuleListener {
 	LocalStorageImpl storage;
 	BlackberrySLICConfig config;
 	
-	ApplicationDeleteCleanup(BlackberrySLICConfig cfg, LocalStorageImpl stg) {
-		storage = stg;
-		config = cfg;
-	}
-	
 	public void moduleDeletionsPending(String[] moduleNames) {
+		storage = (LocalStorageImpl) OpenMEAPApp.getInstance().getStorage();
+		config = (BlackberrySLICConfig) OpenMEAPApp.getInstance().getConfig();
 		try {
 			if(!config.isVersionOriginal(config.getApplicationVersion()).booleanValue()) {
 				

@@ -9,8 +9,8 @@ import javax.microedition.io.InputConnection;
 
 public class AssetsInputConnection implements InputConnection {
 
-	private static String ASSETS_PREFIX = "assets://";
-	private static String FILES_PREFIX = "file://";
+	public static String ASSETS_PREFIX = "assets://";
+	public static String FILES_PREFIX = "file://";
 	
 	private String path;
 	
@@ -28,7 +28,7 @@ public class AssetsInputConnection implements InputConnection {
 
 	public InputStream openInputStream() throws IOException {
 		if(path.startsWith(ASSETS_PREFIX)) {
-			return System.class.getResourceAsStream(path.substring(ASSETS_PREFIX.length()));
+			return System.class.getResourceAsStream("/"+path.substring(ASSETS_PREFIX.length()));
 		} else if(path.startsWith(FILES_PREFIX)) {
 			return Connector.openInputStream(path);
 		}

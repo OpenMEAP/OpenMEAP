@@ -404,12 +404,10 @@ public class UpdateHandler {
         // then check for them now
 		activity.setReadyForUpdateCheck(false);
 		Boolean shouldPerformUpdateCheck = activity.getConfig().shouldPerformUpdateCheck();
+		webView = webView!=null ? webView : activity.createDefaultWebView();
+		activity.runOnUiThread(new InitializeWebView(webView));
         if( shouldPerformUpdateCheck!=null && shouldPerformUpdateCheck.equals(Boolean.TRUE) ) {
-        	webView = webView!=null?webView:activity.createDefaultWebView();
-        	activity.runOnUiThread(new InitializeWebView(webView));
         	new Thread(new UpdateCheck(webView)).start();
-        } else {
-        	activity.runOnUiThread(new InitializeWebView(webView));
         }
 	}
 	
