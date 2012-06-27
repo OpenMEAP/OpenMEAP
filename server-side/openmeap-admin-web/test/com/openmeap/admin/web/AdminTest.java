@@ -63,7 +63,7 @@ import com.openmeap.util.Utils;
  */
 public class AdminTest {
 	
-	final static private String APP_NAME = "Integration Test Application";
+	final static private String APP_NAME = "OpenMEAP Development Application";
 	final static private String APP_DESC = "This application has been created programmatically in order to test the functions of the administrative console";
 	final static private Integer APP_DEPL_LEN = 10;
 	final static private String APP_ADMINS = "default-admin";

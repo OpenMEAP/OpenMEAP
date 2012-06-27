@@ -73,8 +73,9 @@ public class JsApiCoreImpl implements JsApiCore {
 		doToast(mesg,Boolean.TRUE); 
 	}
  
-	public void doToast(String mesg, Boolean isLong) {
-		activity.doToast(mesg,isLong.booleanValue());
+	public void doToast(final String mesg, final Boolean isLong) {
+		boolean longOne = isLong==null?true:isLong.booleanValue();
+		activity.doToast(mesg,longOne);
 	}
 	
 	public String getDeviceType() {
@@ -89,24 +90,20 @@ public class JsApiCoreImpl implements JsApiCore {
 		return this.activity.getConfig().isTimeForUpdateCheck();
 	}
 	
-	public void checkForUpdates(String callBack) {
+	public void checkForUpdates() {
 	
-		if( callBack == null || callBack.equals("undefined") ) {
-			return;
-		}
-		
-		// TODO: checkForUpdates() needs to branch off into a separate thread, immediately returning control to the calling script.
 		UpdateHeader updateHeader = null;
 		WebServiceException err = null;
 		try {
-	    	updateHeader = updateHandler.checkForUpdate();
-	    	webView.setUpdateHeader(updateHeader,err,activity.getStorage().getBytesFree());
-		} catch( WebServiceException e ) {
-			err = e;
+			try {
+		    	updateHeader = updateHandler.checkForUpdate();
+		    	webView.setUpdateHeader(updateHeader,err,activity.getStorage().getBytesFree());
+			} catch( WebServiceException e ) {
+				webView.setUpdateHeader(null,e,activity.getStorage().getBytesFree());
+			}
 		} catch (LocalStorageException e) {
 			;
 		}
-		webView.executeJavascriptFunction(callBack,new String[]{"window.update"});
 	}
 
 	/**
@@ -146,6 +143,10 @@ public class JsApiCoreImpl implements JsApiCore {
 			});
 		}
 	}	
+	
+	public void notifyReadyForUpdateCheck() {
+		activity.setReadyForUpdateCheck(true);
+	}
 	
 	////////////
 }

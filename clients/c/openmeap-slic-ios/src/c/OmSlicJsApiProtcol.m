@@ -32,6 +32,7 @@
 #pragma mark Call-back functions for the C Core API
 
 void ios_update_callback_func(om_update_callback_info_ptr callbackInfo) {
+    
     OmSlicAppDelegate *appDel = [OmSlicAppDelegate globalInstance];
     OmSlicViewController *viewController = appDel.viewController;
     
@@ -39,7 +40,7 @@ void ios_update_callback_func(om_update_callback_info_ptr callbackInfo) {
     NSString *js = [NSString stringWithUTF8String:callbackInfo->javascript];
     NSArray *jsArgs = [NSArray arrayWithObject:[NSString stringWithUTF8String:updateStatusJson]];
     
-    [viewController executeJSCallbackInMainThread:js
+    [viewController executeJavascriptCallbackInMainThread:js
                                     withArguments:jsArgs
                                     waitUntilDone:YES];
     
@@ -50,6 +51,7 @@ void ios_update_callback_net_download_callback_func_ptr(void *callback_info,
                                                         om_http_response_ptr response, 
                                                         om_uint32 bytes_total, 
                                                         om_uint32 bytes_downloaded) {
+    
     om_update_callback_info_ptr callbackInfo = (om_update_callback_info_ptr)callback_info;
     callbackInfo->update_status->bytes_downloaded = bytes_downloaded;
     ios_update_callback_func(callbackInfo);
@@ -124,7 +126,7 @@ void ios_update_callback_net_download_callback_func_ptr(void *callback_info,
         if( [methodHandler compare:@"application"]==NSOrderedSame ) {
             
             if( [methodName compare:@"reload"]==NSOrderedSame ) {
-                [appDel reload];
+                [appDel reloadView];
                 
             } else if( [methodName compare:@"clearCache"]==NSOrderedSame ) {
                 [appDel clearWebCache];
@@ -140,13 +142,16 @@ void ios_update_callback_net_download_callback_func_ptr(void *callback_info,
                 } else {
                     result=@"\"UNDEFINED\"";
                 }
+            } else if( [methodName compare:@"notifyReadyForUpdateCheck"]==NSOrderedSame ) {
+                NSLog(@"--flipping OmSlicAppDelegate.readyForUpdateCheck to TRUE");
+                appDel.readyForUpdateCheck = TRUE;
             }
         }
 
         else if( [methodHandler compare:@"updates"]==NSOrderedSame ) {
             
             if( [methodName compare:@"isTimeForCheck"]==NSOrderedSame ) {
-                if( om_update_decision(appDel.config) ) {
+                if( [appDel isTimeForUpdateCheck] ) {
                     result = @"true";
                 } else {
                     result = @"false";
@@ -155,19 +160,14 @@ void ios_update_callback_net_download_callback_func_ptr(void *callback_info,
             
             else if( [methodName compare:@"checkForUpdates"]==NSOrderedSame ) {
                 
-                char * decodedCallback = om_string_decodeURI(om_dict_get(queryParams,"callback"));
-                NSString *callBack = [NSString stringWithUTF8String:decodedCallback];
-                [callBack retain];
-                om_free(decodedCallback);
-                
                 // in another thread, call 
-                dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+                /*dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
                 dispatch_async(queue, ^{ 
                     @synchronized([OmSlicJsApiProtocol class]) {
-                        [self performUpdateCheck:callBack];
-                        [callBack release];
+                        
                     } 
-                });
+                });*/
+                [appDel performUpdateCheck];
             }
             
             else if( [methodName compare:@"performUpdate"]==NSOrderedSame ) {
@@ -352,37 +352,6 @@ void ios_update_callback_net_download_callback_func_ptr(void *callback_info,
     om_free(callback_info->javascript);
     om_free(callback_info);
     return nil;
-}
-
-- (NSString *) performUpdateCheck:(NSString *)callBack {
-    
-	// perform updates
-	OmSlicAppDelegate *appDel = [OmSlicAppDelegate globalInstance];
-    
-    if( appDel.updateHeader!=OM_NULL ) {
-        om_update_release_update_header(appDel.updateHeader);
-        appDel.updateHeader=OM_NULL;
-    }
-    
-	if( om_update_decision(appDel.config)==OM_TRUE ) {
-		
-		NSLog(@"-- making update check");
-		appDel.updateHeader = om_update_check(appDel.config);
-		if( appDel.updateHeader!=OM_NULL ) {
-            
-            // set the update in the view
-            char * jsonUpdateHeader = om_update_header_to_json(appDel.storage,appDel.updateHeader);
-            NSString *json = [NSString stringWithUTF8String:jsonUpdateHeader];
-            [appDel.viewController setUpdateHeader:json];
-            
-            // execute the callback
-            OmSlicViewController *viewcontroller = appDel.viewController;
-            NSArray *args = [NSArray arrayWithObject:json];
-            [viewcontroller executeJSCallbackInMainThread:callBack withArguments:args waitUntilDone:YES];
-            [json release];
-            om_free(jsonUpdateHeader);
-		} 
-	}
 }
 
 @end

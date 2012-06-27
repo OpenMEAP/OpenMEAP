@@ -32,12 +32,40 @@
 char * last_message = OM_NULL;
 
 const char *om_error_messages[] = {
+    //OM_ERR_NONE
 	"No error has occurred",
+    //OM_ERR_APP_SVC_CONN,
 	"An error occurred trying to connect to the application management service.",
+    //OM_ERR_MALLOC,      
 	"The application was unable to allocate memory for an operation.",
+    //OM_ERR_STRLEN,
 	"A c-string parameter's length was out of specification.",
-	"A required resource could not be located",
-	"A network connection failed"
+    //OM_ERR_NOTFOUND, 
+	"A required resource could not be located.",
+    //OM_ERR_NET_CONN,  
+	"A network connection failed.",
+    //OM_ERR_NET_DOWNLOAD,
+    "Download failed.",
+    //OM_ERR_XML_PARSE,
+    "Failed to parse xml.",
+    //OM_ERR_FILE_READ,
+    "Failed to read from a file.",
+    //OM_ERR_FILE_WRITE,
+    "Failed to write to a file.",
+    //OM_ERR_FILE_OPEN,
+    "Failed to open a file.",
+    //OM_ERR_FILE_CLOSE,
+    "Failed to close a file.",
+    //OM_ERR_FILE_DELETE,
+    "Failed to delete a file.",
+    //OM_ERR_FILE_SPACE,
+    "File system lacks space for the operation.",
+    //OM_ERR_FILESYS_SPACE_AVAIL,
+    "File system lacks space for the operation.",
+    //OM_ERR_DIR_DEL_RECURSE,
+    "Failed to recursively delete a directory tree.",
+    //OM_ERR_ZIP_GLOBALINFO
+    "Zip file global info is corrupted."
 };
 
 om_error_code om_last_error_code = OM_ERR_NONE;

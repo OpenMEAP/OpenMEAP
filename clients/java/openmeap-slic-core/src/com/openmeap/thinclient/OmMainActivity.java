@@ -43,6 +43,9 @@ public interface OmMainActivity {
 	public UpdateHandler getUpdateHandler();
 	public String getRootWebPageContent() throws IOException;
 	
+	public void setReadyForUpdateCheck(boolean state);
+	public boolean getReadyForUpdateCheck();
+	
 	/**
 	 * Creates the default web view and extends the javascript engine with the JsApiCoreImpl attached at "OpenMEAP_Core";
 	 * @return

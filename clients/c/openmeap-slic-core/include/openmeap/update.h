@@ -53,6 +53,14 @@ typedef struct om_hash_type {
 } om_hash, *om_hash_ptr;
 
 /**
+ * Part of the connection result
+ */
+typedef struct om_update_check_error_type {
+    char *code;
+    char *message;
+} om_update_check_error, *om_update_check_error_ptr;
+
+/**
  * Part of the app mgmt svc response, if an update is available
  */
 typedef struct om_update_header_type {
@@ -71,6 +79,11 @@ typedef struct om_update_connresp_type {
 	char *auth_token;
 	om_update_header_ptr update;
 } om_update_connresp, *om_update_connresp_ptr;
+
+typedef struct om_update_check_result_type {
+    om_update_connresp_ptr response;
+    om_update_check_error_ptr error;
+} om_update_check_result, *om_update_check_result_ptr;
 
 /**
  * Enum for the om_uint32_update_parse_helper() function
@@ -108,7 +121,7 @@ OM_EXPORT om_bool om_update_decision(om_config_ptr cfg);
  * @param cfg A configuration
  * @return Either a pointer to an om_update_header struct or null.
  */
-OM_EXPORT om_update_header_ptr om_update_check(om_config_ptr cfg);
+OM_EXPORT om_update_check_result_ptr om_update_check(om_config_ptr cfg);
 
 /**
  * Takes the om_update_connreq structure and converts it to a POST
@@ -139,6 +152,10 @@ OM_EXPORT void om_update_release_connreq(om_update_connreq_ptr ptr);
 /* **************** *
  * RESPONSE RELATED *
  * **************** */
+
+OM_EXPORT void om_update_release_check_result(om_update_check_result_ptr result);
+
+OM_EXPORT void om_update_release_check_error(om_update_check_error_ptr error);
 
 /**
  * Releases the resources acquired by the response object
@@ -263,5 +280,7 @@ OM_EXPORT const char * om_update_perform_with_callback(om_config_ptr cfg,
  * Parses the xml response from the app mgmt svc into an update header object
  */
 OM_EXPORT om_update_connresp_ptr om_update_parse_connresp(char *resp);
+OM_EXPORT om_update_check_error_ptr om_update_parse_check_error(char *error);
+OM_EXPORT om_update_check_result_ptr om_update_parse_check_result(char *json);
 
 #endif
