@@ -67,13 +67,6 @@
 		<property name="openmeap.slic.blackberry.path" location="${user.dir}"/>
 		<property name="openmeap.slic.absPath" location="${openmeap.slic.blackberry.path}"/>		
 		<property name="openmeap.slic.assets.dest.absPath" location="${openmeap.slic.absPath}/src/${openmeap.slic.packagedAppRoot}"/>
-		
-		<property name="openmeap.slic.blackberry.artifact.release.unsigned.unaligned"
-				value="${openmeap.slic.blackberry.path}/bin/${openmeap.slic.projectName}-release-unsigned.apk"/>
-		<property name="openmeap.slic.blackberry.artifact.release.signed.unaligned"
-				value="${openmeap.slic.blackberry.path}/bin/${openmeap.slic.projectName}-release-signed-unaligned.apk"/>
-		<property name="openmeap.slic.blackberry.artifact.release.signed.aligned"
-				value="${openmeap.slic.blackberry.path}/bin/${openmeap.slic.projectName}-release-signed-aligned.apk"/>
 	</target>
 	
 	<target name="-pre-create-project">			
