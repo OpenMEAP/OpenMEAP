@@ -84,9 +84,9 @@ public class RESTAppMgmtClient implements ApplicationManagementService {
 			}
 			responseText = Utils.readInputStream(httpResponse.getResponseBody(), "UTF-8");
 		} catch (HttpRequestException e) {
-			throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,e);
+			throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,e.getMessage(),e);
 		} catch (IOException e) {
-			throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,e);
+			throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,e.getMessage(),e);
 		}
 		
 		// now we parse the response into a ConnectionOpenResponse object
@@ -99,7 +99,7 @@ public class RESTAppMgmtClient implements ApplicationManagementService {
 					throw new WebServiceException(WebServiceException.TypeEnum.fromValue(result.getError().getCode().value()),result.getError().getMessage());
 				}
 			} catch( JSONException e ) {
-				throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,e);
+				throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,e.getMessage(),e);
 			}
 			response = result.getConnectionOpenResponse();
 		}

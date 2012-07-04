@@ -37,9 +37,11 @@ final public class StringUtils {
 	
 	static public String join(String[] parts, String strDelimiter, int startIdx, int endIdx) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(parts[startIdx]);
-		for(int i=startIdx+1; i<endIdx; i++) {
-			sb.append(strDelimiter);
+		boolean first = true;
+		for(int i=startIdx; i<endIdx; i++) {
+			if(!first) {
+				sb.append(strDelimiter);
+			} else first = false;
 			sb.append(parts[i]);
 		}
 		return sb.toString();

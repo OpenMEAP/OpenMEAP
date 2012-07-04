@@ -40,6 +40,7 @@ import com.openmeap.constants.FormConstants;
 import com.openmeap.digest.DigestInputStreamFactory;
 import com.openmeap.http.HttpRequestExecuterFactory;
 import com.openmeap.thinclient.LocalStorage;
+import com.openmeap.thinclient.LocalStorageException;
 import com.openmeap.thinclient.OmMainActivity;
 import com.openmeap.thinclient.OmWebView;
 import com.openmeap.thinclient.Preferences;
@@ -105,7 +106,7 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
     		if(storageRoot==null) {
     			throw new GenericRuntimeException("com.openmeap.slic.blackberry.localStorageRoot is a required property and should be unique to your application");
     		}
-    		STORAGE_ROOT = STORAGE_ROOT+'/'+storageRoot;
+    		STORAGE_ROOT = STORAGE_ROOT+'/'+storageRoot+'/';
     		
 	    	config = new BlackberrySLICConfig(
 	    			new SharedPreferencesImpl("slic-config"),
@@ -118,7 +119,11 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 	    	throw new GenericRuntimeException(ioe);
 	    }  
     	
-    	localStorage = new LocalStorageImpl(config);
+    	try {
+    		localStorage = new LocalStorageImpl(config);
+    	} catch(LocalStorageException e) {
+    		throw new GenericRuntimeException(e);
+    	}
     	
     	updateHandler = new UpdateHandler(this,config,localStorage);
     	

@@ -461,9 +461,9 @@ public class UpdateHandler {
     	}
 		public void run() {
 			int count=0;
-			while(activity.getReadyForUpdateCheck() && count<500) {
+			while(!activity.getReadyForUpdateCheck() && count<500) {
 				try {
-					Thread.sleep(100);
+					Thread.sleep(10);
 				} catch (InterruptedException e) {
 					;
 				}
@@ -481,7 +481,7 @@ public class UpdateHandler {
         			activity.runOnUiThread(new Runnable(){
         				public void run() {
         					activity.doToast("MANDATORY UPDATE\n\nThere is an immediate update.  The application will restart.  We apologise for any inconvenience.", true);
-        					webView.clearView();
+        					//webView.clearView();
         				}
         			});
         			handleUpdate(update);
@@ -489,6 +489,13 @@ public class UpdateHandler {
         			update=null;
         		} catch( Exception e ) {
             		err = new WebServiceException(WebServiceException.TypeEnum.CLIENT_UPDATE,e.getMessage(),e);
+            		if(activity.getReadyForUpdateCheck()) {
+	            		try {
+	    					webView.setUpdateHeader(null, err, storage.getBytesFree());
+	    				} catch (LocalStorageException e2) {
+	    					throw new GenericRuntimeException(e);
+	    				}
+            		}
             	}
         	} else {
         		try {

@@ -42,7 +42,8 @@ final public class OmWebViewHelper {
 		String js = "void(0);";
 		if( err!=null ) {
 			js = StringUtils.replaceAll(OmWebView.UPDATE_ERROR, "%errorCode", err.getType().toString());
-			js = StringUtils.replaceAll(js, "%errorMessage", err.getMessage());
+			js = StringUtils.replaceAll(js, "%errorMessage", 
+					StringUtils.replaceAll( err.getMessage()!=null?err.getMessage():"", "\"", "" ));
 		} else if(update!=null) {
 			js = StringUtils.replaceAll(OmWebView.UPDATE_NOT_NULL, "%s", new JsUpdateHeader(update,bytesFree).toString());
 		} else {

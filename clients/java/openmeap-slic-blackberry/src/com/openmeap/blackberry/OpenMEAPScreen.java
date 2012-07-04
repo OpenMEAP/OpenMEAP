@@ -104,20 +104,11 @@ public final class OpenMEAPScreen extends MainScreen implements OmWebView
 
 	public void setUpdateHeader(final UpdateHeader update, final WebServiceException err, final Long bytesFree) {
 		final OmWebView webView = this;
-		BrowserFieldListener listener = new BrowserFieldListener() {
-			private boolean firstCall = true;
-			public void documentLoaded(BrowserField browserField, org.w3c.dom.Document document) throws Exception {
-				if(firstCall==true) {
-					activity.runOnUiThread(new Runnable(){
-						public void run() {
-							OmWebViewHelper.setUpdateHeader(webView,update,err,bytesFree);
-						}
-					});
-					firstCall=false;
-				}
+		activity.runOnUiThread(new Runnable(){
+			public void run() {
+				OmWebViewHelper.setUpdateHeader(webView,update,err,bytesFree);
 			}
-    	};
-    	browserField.addListener(listener);
+		});
 	}
 
 	public void performOnResume() {

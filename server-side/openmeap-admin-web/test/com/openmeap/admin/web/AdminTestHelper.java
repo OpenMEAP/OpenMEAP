@@ -52,7 +52,7 @@ import com.openmeap.http.HttpRequestException;
 import com.openmeap.http.HttpRequestExecuter;
 import com.openmeap.http.HttpResponse;
 import com.openmeap.json.JSONObjectBuilder;
-import com.openmeap.util.StringUtils;
+import com.openmeap.util.StringUtilsTest;
 import com.openmeap.util.UUID;
 import com.openmeap.util.Utils;
 import com.openmeap.web.form.ParameterMapBuilder;

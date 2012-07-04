@@ -40,22 +40,19 @@ import com.openmeap.thinclient.SLICConfig;
 import com.openmeap.thinclient.update.UpdateStatus;
 import com.openmeap.thirdparty.net.sf.zipme.ZipEntry;
 import com.openmeap.thirdparty.net.sf.zipme.ZipInputStream;
-import com.openmeap.util.GenericRuntimeException;
 import com.openmeap.util.StringUtils;
 
 public class LocalStorageImpl implements LocalStorage {
 
+	private static String FILE_SCHEME = "file://";
+	private static String FORWARD_SLASH = "/";
 	private static String IMPORT_FILE = "import.zip";
 	private static Hashtable connections = new Hashtable();
 	private SLICConfig config;
 	
-	public LocalStorageImpl(SLICConfig config) {
+	public LocalStorageImpl(SLICConfig config) throws LocalStorageException {
 		this.config=config;
-		try {
-			_createDirs(getStorageRoot());
-		} catch(IOException e) {
-			throw new GenericRuntimeException(e.getMessage(),e);
-		} 
+		_createDirs(getStorageRoot());
 	}
 	
 	public void deleteImportArchive() throws LocalStorageException {
@@ -87,7 +84,7 @@ public class LocalStorageImpl implements LocalStorage {
 
 		ZipInputStream zis = null;
 		InputStream importIs = null;
-		String newPrefix = getStorageRoot()+'/'+status.getUpdateHeader().getHash().getValue();
+		String newPrefix = getStorageRoot()+FORWARD_SLASH+status.getUpdateHeader().getHash().getValue();
 		assertDir(newPrefix);
 		
 		try {
@@ -96,7 +93,7 @@ public class LocalStorageImpl implements LocalStorage {
 		    ZipEntry ze;
 		    while ((ze = zis.getNextEntry()) != null) {
 		    	if( ze.isDirectory() ) {
-		    		assertDir(newPrefix+'/'+ze.getName());
+		    		assertDir(newPrefix+FORWARD_SLASH+ze.getName());
 		    		continue;
 		    	}
 		        OutputStream baos = null;
@@ -128,34 +125,6 @@ public class LocalStorageImpl implements LocalStorage {
 			}
 		}
 	}
-	
-	public void assertDir(String prefix) throws LocalStorageException {
-		FileConnection fc = null;
-		try {
-			fc = (FileConnection)Connector.open(prefix+"/");
-			
-			if( fc.exists() && !fc.isDirectory() ) {
-				fc.delete();
-				fc.close();
-				fc = (FileConnection)Connector.open(prefix+"/");
-			}
-			
-			if( !fc.exists() ) {
-				fc.mkdir();
-			}
-			
-		} catch (IOException e1) {
-			throw new LocalStorageException(e1.getMessage(),e1);
-		} finally {
-			try {
-				if(fc!=null) {
-					fc.close();
-				}
-			} catch(IOException ioe) {
-				throw new LocalStorageException(ioe.getMessage(),ioe);
-			}
-		}
-	}
 
 	public OutputStream getImportArchiveOutputStream()
 			throws LocalStorageException {
@@ -173,7 +142,8 @@ public class LocalStorageImpl implements LocalStorage {
 
 	public OutputStream openFileOutputStream(String prefix, String fileName) throws LocalStorageException {
 		try {
-			String location = prefix+'/'+fileName;
+			_createDirs(prefix);
+			String location = prefix+FORWARD_SLASH+fileName;
 			FileConnection fc = (FileConnection)Connector.open(location);
 			if(!fc.exists()) {
 				fc.create();
@@ -192,7 +162,7 @@ public class LocalStorageImpl implements LocalStorage {
 	
 	public InputStream openFileInputStream(String prefix, String fileName) throws LocalStorageException {
 		try {
-			String location = prefix+'/'+fileName;
+			String location = prefix+FORWARD_SLASH+fileName;
 			FileConnection fc = (FileConnection)Connector.open(location);
 			if(!fc.exists()) {
 				fc.close();
@@ -275,22 +245,47 @@ public class LocalStorageImpl implements LocalStorage {
 		
 	}
 	
-	private void _createDirs(String path) throws IOException {
-		String root = StringUtils.replaceAll(getStorageRoot(),"file://", "");
-		String[] paths = StringUtils.split(root,"/");
-		for(int i=0; i<paths.length; i++) {
-			FileConnection fc = null;
-			String currentPath = StringUtils.join(paths, "/", 0, i);
+	public void assertDir(String prefix) throws LocalStorageException {
+		FileConnection fc = null;
+		String adjustedDir = prefix+(prefix.endsWith(FORWARD_SLASH)?"":FORWARD_SLASH);
+		try {
+			fc = (FileConnection)Connector.open(adjustedDir);
+			
+			if( fc.exists() && !fc.isDirectory() ) {
+				fc.delete();
+				fc.close();
+				fc = (FileConnection)Connector.open(adjustedDir);
+			}
+			
+			if( !fc.exists() ) {
+				fc.mkdir();
+			}
+			
+		} catch (IOException e1) {
+			throw new LocalStorageException(e1.getMessage(),e1);
+		} finally {
 			try {
-				fc = (FileConnection)Connector.open("file:///"+currentPath);
-				if( !fc.exists() ) {
-					fc.mkdir();
-				}
-			} finally {
 				if(fc!=null) {
 					fc.close();
 				}
+			} catch(IOException ioe) {
+				throw new LocalStorageException(ioe.getMessage(),ioe);
 			}
+		}
+	}
+	
+	private void _createDirs(String path) throws LocalStorageException {
+		String root = StringUtils.replaceAll(getStorageRoot(),FILE_SCHEME, "");
+		if(root.startsWith("/")) {
+			root = root.substring(1);
+		}
+		if(root.endsWith("/")) {
+			root = root.substring(0,root.length()-1);
+		}
+		String[] paths = StringUtils.split(root,FORWARD_SLASH);
+		for(int i=1; i<=paths.length; i++) {
+			String currentPath = StringUtils.join(paths, FORWARD_SLASH, 0, i);
+			assertDir(FILE_SCHEME+FORWARD_SLASH+currentPath);
 		}
 	}
 	
@@ -299,10 +294,10 @@ public class LocalStorageImpl implements LocalStorage {
 		Enumeration e = fc.list();
 		while(e.hasMoreElements()) {
 			String path = (String)e.nextElement();
-			if(path.endsWith("/")) {
+			if(path.endsWith(FORWARD_SLASH)) {
 				_recursiveDelete(prefix+path.substring(0,path.length()-1));
 			} else {
-				FileConnection fc2 = (FileConnection)Connector.open(prefix+'/'+path);
+				FileConnection fc2 = (FileConnection)Connector.open(prefix+FORWARD_SLASH+path);
 				fc2.delete();
 			}
 		}
@@ -318,7 +313,7 @@ public class LocalStorageImpl implements LocalStorage {
 	}
 	
 	public static String getImportArchivePath() {
-		return getStorageRootPath()+'/'+"/import.zip";
+		return getStorageRootPath()+FORWARD_SLASH+IMPORT_FILE;
 	}
 
 }

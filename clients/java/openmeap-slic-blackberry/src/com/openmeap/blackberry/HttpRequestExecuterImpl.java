@@ -132,68 +132,71 @@ public class HttpRequestExecuterImpl implements HttpRequestExecuter {
             factory.setPreferredTransportTypes(intTransports);
         }
 		factory.setTransportTypeOptions(TransportInfo.TRANSPORT_TCP_CELLULAR, tcpOptions);
-		factory.setAttemptsLimit(5);
+		factory.setAttemptsLimit(1);
+		factory.setTimeoutSupported(true);
+		factory.setTimeLimit(5000);
 		
 		HttpResponseImpl response = new HttpResponseImpl();
         ConnectionDescriptor cd = factory.getConnection(url);
-        if(cd != null) 
-        {
-        	HttpConnection c = (HttpConnection)cd.getConnection();
-        	
-            OutputConnection oc = (OutputConnection) c;
-            InputConnection ic = (InputConnection) c;
+        if(cd==null) {
+        	throw new HttpRequestException("Could not establish connection to "+url);
+        }
+    	HttpConnection c = (HttpConnection)cd.getConnection();
+    	
+        OutputConnection oc = (OutputConnection) c;
+        InputConnection ic = (InputConnection) c;
+        
+        OutputStream os = null;
+        InputStream is = null;
+        
+        try {
+        		            
+            if(postData==null) {
+            	os = makeGETRequest(url,headers,c);
+            } else {
+            	os = makePOSTRequest(url,headers,postData,c);
+            }
             
-            OutputStream os = null;
-            InputStream is = null;
+            is = ic.openInputStream();
+            int i=0;
+            HttpHeader[] responseHeaders = new HttpHeader[0];
+            while(true) {
+        		String key = c.getHeaderFieldKey(i);
+        		if(key==null) {
+        			break;
+        		}
+        		String value = c.getHeaderField(i);
+        		Arrays.add(responseHeaders, new HttpHeader(key,value));
+            	i++;
+            }
+            response.setStatusCode(c.getResponseCode());
+            response.setHeaders(responseHeaders);
+            response.setResponseBody(is);
+            response.setContentLength(c.getLength());
             
-            try {
-            		            
-	            if(postData==null) {
-	            	os = makeGETRequest(url,headers,c);
-	            } else {
-	            	os = makePOSTRequest(url,headers,postData,c);
-	            }
-	            
-	            is = ic.openInputStream();
-	            int i=0;
-	            HttpHeader[] responseHeaders = new HttpHeader[0];
-	            while(true) {
-            		String key = c.getHeaderFieldKey(i);
-            		if(key==null) {
+            // see if we need to handle a redirect
+            if(response.getStatusCode()==301 || response.getStatusCode()==303) {
+            	for(i=0;i<responseHeaders.length;i++) {
+            		HttpHeader header = responseHeaders[i];
+            		if( header.getKey().equalsIgnoreCase("location") ) {
+            			forwardUrl = header.getValue();
             			break;
             		}
-            		String value = c.getHeaderField(i);
-            		Arrays.add(responseHeaders, new HttpHeader(key,value));
-	            	i++;
-	            }
-	            response.setStatusCode(c.getResponseCode());
-	            response.setHeaders(responseHeaders);
-	            response.setResponseBody(is);
-	            response.setContentLength(c.getLength());
-	            
-	            // see if we need to handle a redirect
-	            if(response.getStatusCode()==301 || response.getStatusCode()==303) {
-	            	for(i=0;i<responseHeaders.length;i++) {
-	            		HttpHeader header = responseHeaders[i];
-	            		if( header.getKey().equalsIgnoreCase("location") ) {
-	            			forwardUrl = header.getValue();
-	            			break;
-	            		}
-	            	}
-	            }
-	            
-            } catch(Exception e) {
-            	throw new HttpRequestException(e);
-            } finally {
-            	if(os!=null) {
-            		try {
-						os.close();
-					} catch (IOException e) {
-						throw new GenericRuntimeException(e);
-					}
             	}
             }
+            
+        } catch(Exception e) {
+        	throw new HttpRequestException(e);
+        } finally {
+        	if(os!=null) {
+        		try {
+					os.close();
+				} catch (IOException e) {
+					throw new GenericRuntimeException(e);
+				}
+        	}
         }
+
         if(forwardUrl==null) {
         	return response;
         } else {
