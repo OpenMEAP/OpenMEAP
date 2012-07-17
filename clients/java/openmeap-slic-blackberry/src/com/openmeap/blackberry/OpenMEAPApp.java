@@ -72,7 +72,7 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 		return instance;
 	}
 	
-	public static void main(String[] args)
+	public static void main(String[] args) throws LocalStorageException
     {		
         // Create a new instance of the application and make the currently
         // running thread the application's event dispatch thread.
@@ -83,10 +83,11 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 	
     /**
      * Creates a new MyApp object
+     * @throws LocalStorageException 
      * @throws JSONException 
      * @throws IOException 
      */
-    public OpenMEAPApp() {
+    public OpenMEAPApp() throws LocalStorageException {
     	
     	instance = this;
     	
@@ -107,6 +108,7 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
     			throw new GenericRuntimeException("com.openmeap.slic.blackberry.localStorageRoot is a required property and should be unique to your application");
     		}
     		STORAGE_ROOT = STORAGE_ROOT+'/'+storageRoot+'/';
+    		LocalStorageImpl.createDirs(STORAGE_ROOT,null);
     		
 	    	config = new BlackberrySLICConfig(
 	    			new SharedPreferencesImpl("slic-config"),

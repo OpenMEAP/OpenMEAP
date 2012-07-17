@@ -4,7 +4,7 @@ rem  Ant
 set ANT_HOME=C:\apache-ant-1.8.3
 
 rem  OpenMEAP
-set ANDROID_SDK_HOME=C:\Users\schang\apps\android-sdk-windows
+set ANDROID_SDK_HOME="C:\Documents and Settings\Man Down\android-sdks"
 set BLACKBERRY_SDK_HOME=C:\eclipse\plugins\net.rim.ejde.componentpack5.0.0_5.0.0.36
 set OPENMEAP_HOME=C:\OpenMEAP
 

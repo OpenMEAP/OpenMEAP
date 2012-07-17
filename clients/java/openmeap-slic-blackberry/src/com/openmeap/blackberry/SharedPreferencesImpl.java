@@ -32,13 +32,12 @@ import java.io.OutputStream;
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 
-
-
 import com.openmeap.constants.FormConstants;
 import com.openmeap.thinclient.Preferences;
 import com.openmeap.thirdparty.org.json.me.JSONException;
 import com.openmeap.thirdparty.org.json.me.JSONObject;
 import com.openmeap.util.GenericRuntimeException;
+import com.openmeap.util.StringUtils;
 import com.openmeap.util.Utils;
 
 public class SharedPreferencesImpl implements Preferences {
@@ -129,7 +128,7 @@ public class SharedPreferencesImpl implements Preferences {
 	
 	private Boolean write() {
 		try {
-			String path = OpenMEAPApp.STORAGE_ROOT+"/"+name+EXTENSION;
+			String path = OpenMEAPApp.STORAGE_ROOT+name+EXTENSION;
 			FileConnection fc = (FileConnection)Connector.open(path);
 			try {
 				if(!fc.exists()) {
@@ -141,7 +140,10 @@ public class SharedPreferencesImpl implements Preferences {
 				} finally {
 					os.close();
 				}
-			} finally {
+			} catch(Exception e) {
+				throw new GenericRuntimeException(e.getMessage(),e);
+			}
+			finally {
 				if(fc!=null) {
 					fc.close();
 				}

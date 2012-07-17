@@ -261,39 +261,80 @@ OpenMEAP.updates={
 
     // The following three are called on every check
 
-    onUpdate:function(update) {
-		OpenMEAP.performUpdate(update,function(data) {
-            OpenMEAP.updates.onStateChange(data);
-        });
+    	/**
+    	 * Called when an update is available.
+    	 *
+    	 * Sample update object:
+    	 * {
+    	 *    hash:               (String) an MD5 hash of the archive,
+    	 *    versionIdentifier:  (String) the version id as in the admin console,
+    	 *    installNeeds:       (Number) storageNeeds + byte size of zip,
+    	 *    storageNeeds:       (Number) bytes,
+    	 *    updateUrl:          (String) the specific update url to fetch from,
+    	 *    type:               (String) "REQUIRED", "OPTIONAL"
+    	 *    spaceAvailable:     (Number) space available on the device in bytes
+    	 * }
+    	 *
+    	 * @param update
+    	 */
+	onUpdate:function(update) {
+		// trigger the update, using the default onStateChange handler
+		OpenMEAP.performUpdate(update,function(updateStatusData) {
+			OpenMEAP.updates.onStateChange(updateStatusData);
+		});
 	},
-    onNoUpdate:function() {
-        //OpenMEAP.doToast('no update');
-    },
+	/**
+	 * Called when no update is available.
+	 */
+	onNoUpdate:function() {
+		//OpenMEAP.doToast('no update');
+	},
+	/**
+	 * Called when an error has occurred during an update or update check.
+	 *
+	 * Sample error object:
+	 * {
+	 *    code:"ERROR_CODE",
+	 *    message:"Error message"
+	 * }
+	 *
+	 * @param error 
+	 */
 	onCheckError:function(error) {
-		OpenMEAP.doToast("An error occurred checking for an update\n\n"+error.type+':'+error.message);
+		OpenMEAP.doToast("An error occurred checking for an update\n\n"
+			+error.code+':'+error.message);
 	},
     
 	/**
 	 * A default on-state-change callback used by OpenMEAP.updates.onUpdate(update)
 	 * when calling OpenMEAP.performUpdate(updateData,onStateChangeCallBack)
 	 */
-	onStateChange:function(data) {
+	onStateChange:function(updateStatusData) {
 		if( data.complete == true ) {
-			this.onUpdateComplete(data);
+			this.onUpdateComplete(updateStatusData);
 		} else if( ! data.error ) {
-			this.onUpdateIncrement(data);
+			this.onUpdateIncrement(updateStatusData);
 		} else {
-			this.onUpdateError(data);
+			this.onUpdateError(updateStatusData);
 		}
 	},
 	/**
 	 * Called by OpenMEAP.updates.onStatusChange(),
 	 * when the archive download has completed.
+	 *
+	 * Sample updateStatusData:
+	 * {
+	 *    bytesDownloaded: (Number) the number of bytes downloaded so-far
+	 *    complete:        (Boolean) true or false
+	 *    error:           error, same as in onCheckError(error)
+	 *    update:          updateHeader, same as in onUpdate(update)
+	 * }
+	 * @param updateStatusData
 	 */
-	onUpdateComplete:function(data) {
+	onUpdateComplete:function(updateStatusData) {
 		var callbackLoc = document.getElementById("update-callback");
 		if( callbackLoc ) {
-			var total = data.update.installNeeds - data.update.storageNeeds;
+			var total = updateStatusData.update.installNeeds - updateStatusData.update.storageNeeds;
 			callbackLoc.innerHTML = callbackLoc.innerText = "done";
 		}
 		OpenMEAP.doToast("Update complete");
@@ -302,19 +343,22 @@ OpenMEAP.updates={
 	/**
 	 * Called by OpenMEAP.updates.onStateChange(), 
 	 * each percent the application archive download completes.
+	 *
+	 *
+	 * @param updateStatusData
 	 */
-	onUpdateIncrement:function(data) {
+	onUpdateIncrement:function(updateStatusData) {
 		var callbackLoc = document.getElementById("update-callback");
 		if( callbackLoc ) {
-			var total = data.update.installNeeds - data.update.storageNeeds;
-			callbackLoc.innerHTML = callbackLoc.innerText = data.bytesDownloaded+"/"+total;
+			var total = updateStatusData.update.installNeeds - updateStatusData.update.storageNeeds;
+			callbackLoc.innerHTML = callbackLoc.innerText = updateStatusData.bytesDownloaded+"/"+total;
 		}
 	},
 	/**
 	 * Called by OpenMEAP.updates.onStateChange(), 
 	 * when an error has occurred.
 	 */
-	onUpdateError:function(data) {
-		OpenMEAP.doToast(data.error.type+":"+data.error.message);
+	onUpdateError:function(updateStatusData) {
+		OpenMEAP.doToast(updateStatusData.error.type+":"+updateStatusData.error.message);
 	}
 };
