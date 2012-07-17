@@ -44,7 +44,7 @@ import com.openmeap.util.StringUtils;
 
 public class LocalStorageImpl implements LocalStorage {
 
-	private static String FILE_SCHEME = "file://";
+	public static String FILE_SCHEME = "file://";
 	private static String FORWARD_SLASH = "/";
 	private static String IMPORT_FILE = "import.zip";
 	private static Hashtable connections = new Hashtable();
@@ -52,7 +52,7 @@ public class LocalStorageImpl implements LocalStorage {
 	
 	public LocalStorageImpl(SLICConfig config) throws LocalStorageException {
 		this.config=config;
-		_createDirs(getStorageRoot());
+		createDirs(getStorageRoot(),null);
 	}
 	
 	public void deleteImportArchive() throws LocalStorageException {
@@ -142,7 +142,7 @@ public class LocalStorageImpl implements LocalStorage {
 
 	public OutputStream openFileOutputStream(String prefix, String fileName) throws LocalStorageException {
 		try {
-			_createDirs(prefix);
+			createDirs(getStorageRoot(),prefix);
 			String location = prefix+FORWARD_SLASH+fileName;
 			FileConnection fc = (FileConnection)Connector.open(location);
 			if(!fc.exists()) {
@@ -245,7 +245,7 @@ public class LocalStorageImpl implements LocalStorage {
 		
 	}
 	
-	public void assertDir(String prefix) throws LocalStorageException {
+	static public void assertDir(String prefix) throws LocalStorageException {
 		FileConnection fc = null;
 		String adjustedDir = prefix+(prefix.endsWith(FORWARD_SLASH)?"":FORWARD_SLASH);
 		try {
@@ -274,14 +274,25 @@ public class LocalStorageImpl implements LocalStorage {
 		}
 	}
 	
-	private void _createDirs(String path) throws LocalStorageException {
-		String root = StringUtils.replaceAll(getStorageRoot(),FILE_SCHEME, "");
+	public static void createDirs(String storageRoot, String path) throws LocalStorageException {
+		
+		// take the scheme off, so we can explode right
+		// also reduce any duplicate // to single /
+		String root = StringUtils.replaceAll(
+				StringUtils.replaceAll(storageRoot,FILE_SCHEME, "") + (path!=null?FORWARD_SLASH+path:""),
+				"//",
+				"/");
+		
+		// cannot start with a slash, going into assertDir
 		if(root.startsWith("/")) {
 			root = root.substring(1);
 		}
+		
+		// cannot end with a slash, going into assertDir
 		if(root.endsWith("/")) {
 			root = root.substring(0,root.length()-1);
 		}
+		
 		String[] paths = StringUtils.split(root,FORWARD_SLASH);
 		for(int i=1; i<=paths.length; i++) {
 			String currentPath = StringUtils.join(paths, FORWARD_SLASH, 0, i);

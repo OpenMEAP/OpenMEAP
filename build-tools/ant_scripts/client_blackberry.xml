@@ -61,7 +61,11 @@
 		<property name="openmeap.slic.providerAuthority" value="${openmeap.slic.package}.fileprovider"/>
 		<property name="openmeap.slic.blackberry.activity" value="MainActivity"/>
 		<property name="openmeap.slic.blackberry.projectName" value="${openmeap.slic.projectName}"/>
-		<property name="openmeap.slic.blackberry.target" value="Google Inc.:Google APIs:8"/>
+		<property name="openmeap.slic.blackberry.target" value="5.0.0"/>
+		<tstamp>
+			<format property="openmeap.slic.copyRightDate" pattern="yyyy" locale="en,UK"/>
+		</tstamp>
+
 		
 		<!-- generic slic properties -->
 		<property name="openmeap.slic.blackberry.path" location="${user.dir}"/>
@@ -102,10 +106,10 @@
 			<arg value="-convertpng"/> 
 			<arg value="-nomain"/>
 			<arg value="-quiet"/>
-			<arg value="codename=deliverables/Standard/5.0.0/${openmeap.slic.blackberry.projectName}"/> 
+			<arg value="codename=deliverables/Standard/${openmeap.slic.blackberry.target}/${openmeap.slic.blackberry.projectName}"/> 
 			<arg value="-sourceroot=${openmeap.home}/clients/java/openmeap-slic-blackberry/src;${openmeap.home}/clients/java/openmeap-slic-core/src;${openmeap.home}/java-shared/openmeap-shared/src;${openmeap.home}/clients/java/openmeap-slic-blackberry/res;${openmeap.slic.absPath}/src;${openmeap.slic.absPath}/res"/>
 			<arg value="-import=${blackberry.sdk.home}/components/lib/net_rim_api.jar"/>
-			<arg value="deliverables/Standard/5.0.0/${openmeap.slic.blackberry.projectName}.rapc"/>
+			<arg value="deliverables/Standard/${openmeap.slic.blackberry.target}/${openmeap.slic.blackberry.projectName}.rapc"/>
 			<arg value="${openmeap.slic.absPath}/bin"/>
 		</exec>
 	</target>
@@ -129,8 +133,9 @@
 		<copy file="${openmeap.project.build}/template/blackberry/BlackBerry_App_Descriptor.xml" 
 						tofile="${openmeap.slic.blackberry.path}/BlackBerry_App_Descriptor.xml" overwrite="true"/>
 		
-		<copy file="${openmeap.project.build}/template/blackberry/deliverables/Standard/5.0.0/@@PROJECT_NAME@@.rapc" 
-						tofile="${openmeap.slic.blackberry.path}/deliverables/Standard/5.0.0/${openmeap.slic.projectName}.rapc" overwrite="true"/>
+		<mkdir dir="${openmeap.slic.blackberry.path}/deliverables/Standard/${openmeap.slic.blackberry.target}"/>
+		<copy file="${openmeap.project.build}/template/blackberry/deliverables/Standard/@@PROJECT_NAME@@.rapc" 
+						tofile="${openmeap.slic.blackberry.path}/deliverables/Standard/${openmeap.slic.blackberry.target}/${openmeap.slic.projectName}.rapc" overwrite="true"/>
 						
 		<copy file="${openmeap.project.build}/template/blackberry/deliverables/Standard/@@PROJECT_NAME@@.alx" 
 						tofile="${openmeap.slic.blackberry.path}/deliverables/Standard/${openmeap.slic.projectName}.alx" overwrite="true"/>
@@ -141,9 +146,8 @@
 		<replace dir="${openmeap.slic.blackberry.path}" includes="**/*">
 			<replacefilter token="@@OPENMEAP_HOME@@" value="${openmeap.home.relative}"/>
 			<replacefilter token="@@PROJECT_NAME@@" value="${openmeap.slic.blackberry.projectName}"/>
-			
+			<replacefilter token="@@openmeap.slic.projectName@@" value="${openmeap.slic.blackberry.projectName}"/>
 			<replacefilter token="@@openmeap.slic.package@@" value="${openmeap.slic.package}"/>
-			<replacefilter token="@@openmeap.slic.providerAuthority@@" value="${openmeap.slic.providerAuthority}"/>
 			<replacefilter token="@@openmeap.slic.pullUpdates@@" value="${openmeap.slic.pullUpdates}"/>
 			<replacefilter token="@@openmeap.slic.updateFrequency@@" value="${openmeap.slic.updateFrequency}"/>
 			<replacefilter token="@@openmeap.slic.appTitle@@" value="${openmeap.slic.appTitle}"/>
@@ -158,6 +162,8 @@
 			<replacefilter token="@@openmeap.slic.blackberry.localStorageRoot@@" value="${openmeap.slic.blackberry.localStorageRoot}"/>
 			<replacefilter token="@@openmeap.slic.vendor@@" value="${openmeap.slic.vendor}"/>
 			<replacefilter token="@@openmeap.slic.blackberry.localStorageRoot@@" value="${openmeap.slic.blackberry.localStorageRoot}"/>
+			<replacefilter token="@@openmeap.slic.blackberry.target@@" value="${openmeap.slic.blackberry.target}"/>
+			<replacefilter token="@@openmeap.slic.copyRightDate@@" value="${openmeap.slic.copyRightDate}"/>
 		</replace>
 		
 	</target>

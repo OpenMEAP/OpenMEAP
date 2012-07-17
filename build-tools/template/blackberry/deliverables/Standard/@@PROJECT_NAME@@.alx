@@ -1,10 +1,10 @@
 <loader version="1.0">
-	<application id="OpenMEAPSLICBlackberryTest">
+	<application id="@@PROJECT_NAME@@">
 		<name >
-			
+			@@openmeap.slic.blackberry.name@@
 		</name>
 		<description >
-			
+			@@openmeap.slic.blackberry.description@@
 		</description>
 		<version >
 			@@openmeap.slic.appVersion@@
@@ -13,19 +13,17 @@
 			@@openmeap.slic.vendor@@
 		</vendor>
 		<copyright >
-			Copyright (c) 2012 @@openmeap.slic.vendor@@
+			Copyright (c) @@openmeap.slic.copyRightDate@@ @@openmeap.slic.vendor@@
 		</copyright>
-		<fileset Java="1.54" _blackberryVersion="[5.0.0)">
+		<fileset Java="1.54" _blackberryVersion="[@@openmeap.slic.blackberry.target@@)">
 			<directory >
-				5.0.0
+				@@openmeap.slic.blackberry.target@@
 			</directory>
 			<files >
 				@@PROJECT_NAME@@.cod
-
 			</files>
-
 		</fileset>
-		<application id="OpenMEAPSLICBlackberryOutputFileName">
+		<!--<application id="OpenMEAPSLICBlackberryOutputFileName">
 			<name >
 				
 			</name>
@@ -39,16 +37,16 @@
 				@@openmeap.slic.vendor@@
 			</vendor>
 			<copyright >
-				Copyright (c) 2012 @@openmeap.slic.vendor@@
+				Copyright (c) @@openmeap.slic.copyRightDate@@ @@openmeap.slic.vendor@@
 			</copyright>
-			<fileset Java="1.54" _blackberryVersion="[5.0.0)">
+			<fileset Java="1.54" _blackberryVersion="[@@openmeap.slic.blackberry.target@@)">
 				<directory >
-					5.0.0
+					@@openmeap.slic.blackberry.target@@
 				</directory>
 				<files >
 					OpenMEAPSLICBlackberryOutputFileName.cod
 				</files>
 			</fileset>
-		</application>
+		</application>-->
 	</application>
 </loader>
