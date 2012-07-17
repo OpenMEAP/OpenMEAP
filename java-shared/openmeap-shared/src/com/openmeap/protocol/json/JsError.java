@@ -24,11 +24,12 @@
 
 package com.openmeap.protocol.json;
 
+
 import com.openmeap.protocol.dto.Error;
+import com.openmeap.thirdparty.org.json.me.JSONException;
+import com.openmeap.thirdparty.org.json.me.JSONObject;
 import com.openmeap.util.GenericRuntimeException;
 
-import org.json.me.JSONException;
-import org.json.me.JSONObject;
 
 public class JsError {
 	private String type;

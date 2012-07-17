@@ -1,0 +1,54 @@
+<loader version="1.0">
+	<application id="OpenMEAPSLICBlackberryTest">
+		<name >
+			
+		</name>
+		<description >
+			
+		</description>
+		<version >
+			@@openmeap.slic.appVersion@@
+		</version>
+		<vendor >
+			@@openmeap.slic.vendor@@
+		</vendor>
+		<copyright >
+			Copyright (c) 2012 @@openmeap.slic.vendor@@
+		</copyright>
+		<fileset Java="1.54" _blackberryVersion="[5.0.0)">
+			<directory >
+				5.0.0
+			</directory>
+			<files >
+				@@PROJECT_NAME@@.cod
+
+			</files>
+
+		</fileset>
+		<application id="OpenMEAPSLICBlackberryOutputFileName">
+			<name >
+				
+			</name>
+			<description >
+				
+			</description>
+			<version >
+				1.0.0
+			</version>
+			<vendor >
+				@@openmeap.slic.vendor@@
+			</vendor>
+			<copyright >
+				Copyright (c) 2012 @@openmeap.slic.vendor@@
+			</copyright>
+			<fileset Java="1.54" _blackberryVersion="[5.0.0)">
+				<directory >
+					5.0.0
+				</directory>
+				<files >
+					OpenMEAPSLICBlackberryOutputFileName.cod
+				</files>
+			</fileset>
+		</application>
+	</application>
+</loader>

@@ -27,8 +27,6 @@ package com.openmeap.thinclient;
 import java.io.IOException;
 import java.util.Hashtable;
 
-import org.json.me.JSONException;
-import org.json.me.JSONObject;
 import org.xml.sax.InputSource;
 
 import com.openmeap.constants.UrlParamConstants;
@@ -42,6 +40,8 @@ import com.openmeap.protocol.dto.ConnectionOpenRequest;
 import com.openmeap.protocol.dto.ConnectionOpenResponse;
 import com.openmeap.protocol.dto.Result;
 import com.openmeap.protocol.dto.UpdateNotification;
+import com.openmeap.thirdparty.org.json.me.JSONException;
+import com.openmeap.thirdparty.org.json.me.JSONObject;
 import com.openmeap.util.StringUtils;
 import com.openmeap.util.Utils;
 
@@ -84,9 +84,9 @@ public class RESTAppMgmtClient implements ApplicationManagementService {
 			}
 			responseText = Utils.readInputStream(httpResponse.getResponseBody(), "UTF-8");
 		} catch (HttpRequestException e) {
-			throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,e);
+			throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,e.getMessage(),e);
 		} catch (IOException e) {
-			throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,e);
+			throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,e.getMessage(),e);
 		}
 		
 		// now we parse the response into a ConnectionOpenResponse object
@@ -99,7 +99,7 @@ public class RESTAppMgmtClient implements ApplicationManagementService {
 					throw new WebServiceException(WebServiceException.TypeEnum.fromValue(result.getError().getCode().value()),result.getError().getMessage());
 				}
 			} catch( JSONException e ) {
-				throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,e);
+				throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,e.getMessage(),e);
 			}
 			response = result.getConnectionOpenResponse();
 		}

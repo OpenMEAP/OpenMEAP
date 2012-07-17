@@ -55,6 +55,10 @@ abstract public class SLICConfig {
 	
 	abstract public String getAssetsBaseUrl();
 	
+	/**
+	 * TODO: rename to applicationInstallationUuid
+	 * @return
+	 */
 	public String getDeviceUuid() {
 		String uuid = getProperty("com.openmeap.slic.deviceUuid");
 		if( StringUtils.isEmpty(uuid) ) {
@@ -188,7 +192,7 @@ abstract public class SLICConfig {
     }
 	
 	public String getPackagedAppRoot() {
-		return this.getProperty("com.openmeap.slic.packagedAppRoot");
+		return /*"assets:///"+*/this.getProperty("com.openmeap.slic.packagedAppRoot");
 	}
 	
 	/*

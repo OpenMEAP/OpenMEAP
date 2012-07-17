@@ -27,10 +27,12 @@ package com.openmeap.blackberry;
 import java.io.IOException;
 import java.io.InputStream;
 
+
+import net.rim.device.api.system.CodeModuleManager;
 import net.rim.device.api.ui.Screen;
 import net.rim.device.api.ui.UiApplication;
+import net.rim.device.api.ui.component.Status;
 
-import org.json.me.JSONException;
 
 import com.openmeap.blackberry.digest.Md5DigestInputStream;
 import com.openmeap.blackberry.digest.Sha1DigestInputStream;
@@ -38,16 +40,18 @@ import com.openmeap.constants.FormConstants;
 import com.openmeap.digest.DigestInputStreamFactory;
 import com.openmeap.http.HttpRequestExecuterFactory;
 import com.openmeap.thinclient.LocalStorage;
+import com.openmeap.thinclient.LocalStorageException;
 import com.openmeap.thinclient.OmMainActivity;
 import com.openmeap.thinclient.OmWebView;
 import com.openmeap.thinclient.Preferences;
 import com.openmeap.thinclient.SLICConfig;
 import com.openmeap.thinclient.javascript.Orientation;
 import com.openmeap.thinclient.update.UpdateHandler;
+import com.openmeap.thirdparty.fr.free.ichir.mahieddine.Properties;
+import com.openmeap.thirdparty.org.json.me.JSONException;
 import com.openmeap.util.GenericRuntimeException;
 import com.openmeap.util.Utils;
 
-import fr.free.ichir.mahieddine.Properties;
 
 /**
  * This class extends the UiApplication class, providing a
@@ -55,12 +59,27 @@ import fr.free.ichir.mahieddine.Properties;
  */
 public class OpenMEAPApp extends UiApplication implements OmMainActivity
 {
-	public static final String STORAGE_ROOT = "file:///store/home/user";
+	public static String STORAGE_ROOT = "file:///store/home/user";
 	
 	private SLICConfig config;
 	private LocalStorage localStorage;
 	private UpdateHandler updateHandler;
 	private OpenMEAPScreen webView;
+	private boolean readyForUpdateCheck = false;
+	static private OpenMEAPApp instance;
+	
+	public static OpenMEAPApp getInstance() {
+		return instance;
+	}
+	
+	public static void main(String[] args)
+    {		
+        // Create a new instance of the application and make the currently
+        // running thread the application's event dispatch thread.
+		OpenMEAPApp theApp = new OpenMEAPApp();
+		CodeModuleManager.addListener(theApp, new ApplicationDeleteCleanup());
+        theApp.enterEventDispatcher();
+    }
 	
     /**
      * Creates a new MyApp object
@@ -68,6 +87,8 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
      * @throws IOException 
      */
     public OpenMEAPApp() {
+    	
+    	instance = this;
     	
     	DigestInputStreamFactory.setDigestInputStreamForName("MD5", Md5DigestInputStream.class);
     	DigestInputStreamFactory.setDigestInputStreamForName("SHA1", Sha1DigestInputStream.class);
@@ -77,18 +98,34 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
     		InputStream stream = System.class.getResourceAsStream('/'+SLICConfig.PROPERTIES_FILE);
     		Properties properties = new Properties();
     		properties.load(stream);
+    		
+    		// we want everything for this installation instance
+        	// to go under it's own directory in /store/home/user
+        	// so that it's easy to wipe later.
+    		String storageRoot = (String)properties.getProperties().get("com.openmeap.slic.blackberry.localStorageRoot");
+    		if(storageRoot==null) {
+    			throw new GenericRuntimeException("com.openmeap.slic.blackberry.localStorageRoot is a required property and should be unique to your application");
+    		}
+    		STORAGE_ROOT = STORAGE_ROOT+'/'+storageRoot+'/';
+    		
 	    	config = new BlackberrySLICConfig(
 	    			new SharedPreferencesImpl("slic-config"),
 	    			properties.getProperties()
 	    		);
+	    	
 	    } catch(JSONException jse) {
 	    	throw new GenericRuntimeException(jse);
 	    } catch(IOException ioe) {
 	    	throw new GenericRuntimeException(ioe);
-	    }
+	    }  
     	
-    	localStorage = new LocalStorageImpl(config);    
-    	updateHandler = new UpdateHandler(webView,this,config,localStorage);
+    	try {
+    		localStorage = new LocalStorageImpl(config);
+    	} catch(LocalStorageException e) {
+    		throw new GenericRuntimeException(e);
+    	}
+    	
+    	updateHandler = new UpdateHandler(this,config,localStorage);
     	
 		updateHandler.initialize(webView);
     }
@@ -145,6 +182,7 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 			OmWebView webView;
 			public void run() {
 				pushScreen((Screen)webView);
+				((Screen)webView).setFocus();
 			}
 			public Runnable construct(OmWebView webView) {
 				this.webView = webView;
@@ -171,12 +209,22 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
     	return config.getAssetsBaseUrl();
     }
     
-    public void doToast(String mesg, boolean isLong) {
-		
+    public void doToast(final String mesg, boolean isLong) {
+    	runOnUiThread(new Runnable(){
+			public void run() {
+				Status.show(mesg);
+			}   		
+    	});
 	}
 	
 	public void restart() {
-		
+		runOnUiThread(new Runnable(){
+			public void run() {
+				popScreen(webView);
+				webView=null;
+				updateHandler.initialize(webView);
+			}
+		});
 	}
 	
 	public String getRootWebPageContent() throws IOException {
@@ -191,5 +239,13 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 				is.close();
 			}
 		}
+	}
+
+	public void setReadyForUpdateCheck(boolean state) {
+		readyForUpdateCheck = state;
+	}
+
+	public boolean getReadyForUpdateCheck() {
+		return readyForUpdateCheck;
 	}
 }

@@ -41,7 +41,7 @@
 	<variableList>
 		<variable>
 			<name>OPENMEAP_HOME</name>
-			<value>file:/c:/OpenMEAP</value>
+			<value>file:/C:/OpenMEAP</value>
 		</variable>
 	</variableList>
 </projectDescription>

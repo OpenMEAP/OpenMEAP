@@ -32,21 +32,28 @@ import java.io.OutputStream;
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 
-import org.json.me.JSONException;
-import org.json.me.JSONObject;
+
 
 import com.openmeap.constants.FormConstants;
 import com.openmeap.thinclient.Preferences;
+import com.openmeap.thirdparty.org.json.me.JSONException;
+import com.openmeap.thirdparty.org.json.me.JSONObject;
 import com.openmeap.util.GenericRuntimeException;
 import com.openmeap.util.Utils;
 
 public class SharedPreferencesImpl implements Preferences {
 
-	private final static String CONNECTION = OpenMEAPApp.STORAGE_ROOT+"/";
 	private final static String EXTENSION = ".prefs";
+	private String connectionOverride = null;
 	
 	private JSONObject values;
 	private String name;
+	
+	public SharedPreferencesImpl(String connectionOverride, String name) throws IOException, JSONException {
+		this.connectionOverride = connectionOverride;
+		this.name = name;
+		load();
+	}
 	
 	public SharedPreferencesImpl(String name) throws IOException, JSONException {
 		this.name = name;
@@ -77,7 +84,8 @@ public class SharedPreferencesImpl implements Preferences {
 
 	public Boolean clear() {
 		try {
-			FileConnection fc = (FileConnection)Connector.open(CONNECTION+name+EXTENSION);
+			String connection = connectionOverride==null ? OpenMEAPApp.STORAGE_ROOT : connectionOverride;
+			FileConnection fc = (FileConnection)Connector.open(connection+"/"+name+EXTENSION);
 			try {
 				if( fc.exists() ) {
 					try {
@@ -98,7 +106,7 @@ public class SharedPreferencesImpl implements Preferences {
 	}
 
 	private void load() throws IOException, JSONException {
-		FileConnection fc = (FileConnection)Connector.open(CONNECTION+name+EXTENSION);
+		FileConnection fc = (FileConnection)Connector.open(OpenMEAPApp.STORAGE_ROOT+"/"+name+EXTENSION);
 		try {
 			if(fc.exists()) {
 				InputStream is = fc.openInputStream();
@@ -121,7 +129,7 @@ public class SharedPreferencesImpl implements Preferences {
 	
 	private Boolean write() {
 		try {
-			String path = CONNECTION+name+EXTENSION;
+			String path = OpenMEAPApp.STORAGE_ROOT+"/"+name+EXTENSION;
 			FileConnection fc = (FileConnection)Connector.open(path);
 			try {
 				if(!fc.exists()) {

@@ -164,7 +164,7 @@ char * om_update_connreq_create_post(om_update_connreq_ptr request) {
 	return ret;
 }
 
-om_update_header_ptr om_update_check(om_config_ptr cfg) {
+om_update_check_result_ptr om_update_check(om_config_ptr cfg) {
 	
 	om_error_clear();
 	
@@ -199,8 +199,8 @@ om_update_header_ptr om_update_check(om_config_ptr cfg) {
 		return OM_NULL;
 	}
 	
-	om_update_connresp_ptr updateResponse = om_update_parse_connresp(response->result);
-	if( !updateResponse || om_error_get_code()!=OM_ERR_NONE ) {
+	om_update_check_result_ptr updateResult = om_update_parse_check_result(response->result);
+	if( !updateResult || om_error_get_code()!=OM_ERR_NONE ) {
 		
 		om_update_release_connreq(request);
 		om_net_release_response(response);
@@ -218,24 +218,18 @@ om_update_header_ptr om_update_check(om_config_ptr cfg) {
 	om_free(postData);
 	
 	// TODO: determine if the lack of an auth_token represents an error
-	if( updateResponse->auth_token!=OM_NULL ) {
-		om_config_set(cfg,OM_CFG_AUTH_LAST_TOKEN,updateResponse->auth_token);
-	}
+	if( updateResult->response!=OM_NULL ) {
+        
+        if( updateResult->response->auth_token!=OM_NULL ) {
+            om_config_set(cfg,OM_CFG_AUTH_LAST_TOKEN,updateResult->response->auth_token);
+        }
+                
+        om_uint32 lastCheck = om_time(0);
+        om_config_set(cfg,OM_CFG_UPDATE_LAST_CHECK,&lastCheck);
 	
-	// we need to set the update struct member to null
-	// so taht the update connresp release function will
-	// not free it for us
-	if( updateResponse->update!=OM_NULL ) {
-		ret = updateResponse->update;
-		updateResponse->update=OM_NULL;
-	}
+    }
 	
-	om_uint32 lastCheck = om_time(0);
-	om_config_set(cfg,OM_CFG_UPDATE_LAST_CHECK,&lastCheck);
-	
-	om_update_release_connresp(updateResponse);
-	
-	return ret;
+	return updateResult;
 }
 
 void om_update_release_connreq(om_update_connreq_ptr ptr) {
@@ -266,6 +260,26 @@ om_update_connreq_ptr om_update_create_connreq(om_config_ptr cfg) {
 		return OM_NULL;
 	}
 	return ptr;
+}
+
+void om_update_release_check_result(om_update_check_result_ptr result) {
+    if(result->response!=OM_NULL) {
+        om_update_release_connresp(result->response);
+        result->response=OM_NULL;
+    }
+    if(result->error!=OM_NULL) {
+        om_update_release_check_error(result->error);
+        result->error=OM_NULL;
+    }
+    om_free(result);
+}
+
+void om_update_release_check_error(om_update_check_error_ptr error) {
+    om_free(error->code);
+    error->code=OM_NULL;
+    om_free(error->message);
+    error->message=OM_NULL;
+    om_free(error);
 }
 
 void om_update_release_connresp(om_update_connresp_ptr connresp) {
@@ -390,21 +404,21 @@ om_update_header_ptr __om_update_header_from_cJSON(cJSON *jsonHeader) {
     return header;
 }
 
-om_update_connresp_ptr om_update_parse_connresp(char *json) {
+om_update_check_result_ptr om_update_parse_check_result(char *json) {
+    
+    om_update_check_result_ptr result = OM_NULL;
+    cJSON *resultJson = cJSON_Parse(json);
+    if( resultJson==NULL ) {
+        return result;
+    }
+    result = om_malloc(sizeof(om_update_check_result));
+    
+    cJSON *errorJson = cJSON_GetObjectItem(resultJson,"error");
+    cJSON *connRespJson = cJSON_GetObjectItem(resultJson,"connectionOpenResponse");
     
     om_update_header_ptr header = OM_NULL;
-    om_update_connresp_ptr response = OM_NULL;
-    
-    cJSON *result = cJSON_Parse(json);
-    if( result==NULL ) {
-        return response;
-    }
-    
-    cJSON *error = cJSON_GetObjectItem(result,"error");
-    cJSON *connRespJson = cJSON_GetObjectItem(result,"connectionOpenResponse");
-    
     if( connRespJson!=NULL ) {
-        response = om_malloc(sizeof(om_update_connresp));
+        om_update_connresp_ptr response = om_malloc(sizeof(om_update_connresp));
         cJSON *updateJson = cJSON_GetObjectItem(connRespJson,"update");
         if( updateJson!=NULL ) {
             header = __om_update_header_from_cJSON(updateJson);
@@ -414,10 +428,24 @@ om_update_connresp_ptr om_update_parse_connresp(char *json) {
         if( authTokenJson!=NULL ) {
             response->auth_token = om_string_copy(authTokenJson->valuestring);
         }
+        result->response = response;
     }
     
-    cJSON_Delete(result);    
-    return response;
+    if( errorJson!=NULL ) {
+        om_update_check_error_ptr error = om_malloc(sizeof(om_update_check_error));
+        cJSON *code = cJSON_GetObjectItem(errorJson,"code");
+        if(code!=NULL) {
+            error->code=om_string_copy(code->valuestring);
+        }
+        cJSON *message = cJSON_GetObjectItem(errorJson,"message");
+        if(code!=NULL) {
+            error->code=om_string_copy(code->valuestring);
+        }
+        result->error = error;
+    }
+    
+    cJSON_Delete(resultJson);    
+    return result;
 }
 
 om_update_header_ptr om_update_header_from_json(const char *strJsonUpdateHeader) {
@@ -451,12 +479,12 @@ const const char * __om_update_check_revert_to_original(om_config_ptr cfg, om_st
 			retVal=OmUpdateResultSuccess;
 		}
 		
-		// clear out the 'a' or 'b' flag
+		// clear out the current storage location
 		om_prefs_remove(cfg->prefs,om_config_map_to_str(OM_CFG_CURRENT_STORAGE));
 	} 
 	
 	om_free(origVersionId);
-	return OM_NULL;
+	return retVal;
 }
 
 const char * __om_update_import_check_space(om_config_ptr cfg, om_storage_ptr stg, om_update_header_ptr update, 
@@ -603,15 +631,14 @@ const char * om_update_perform_with_callback(om_config_ptr cfg,
 {
     om_uint32 * lastTime = om_config_get(cfg,OM_CFG_UPDATE_LAST_ATTEMPT);
     om_uint32 * pendingTimeout = om_config_get(cfg,OM_CFG_UPDATE_PENDING_TIMEOUT);
-    om_uint32 tim = time(0);
+    om_uint32 currentTime = time(0);
     char * lastUpdateResult = om_config_get(cfg,OM_CFG_UPDATE_LAST_RESULT);
     om_uint32 timeoutTime = 0;    
     
-	if( lastUpdateResult!=OM_NULL 
-            && strcmp(lastUpdateResult,OmUpdateResultPending)==0        
-            && lastTime!=OM_NULL 
+	if( lastUpdateResult!=OM_NULL && lastTime!=OM_NULL 
             && (timeoutTime = *lastTime + *pendingTimeout)
-            && tim < timeoutTime
+            && currentTime < timeoutTime
+            && strcmp(lastUpdateResult,OmUpdateResultPending)==0
        ) {
         om_free(lastUpdateResult);
         om_free(lastTime);
@@ -625,12 +652,12 @@ const char * om_update_perform_with_callback(om_config_ptr cfg,
     }
 	
 	const char * retVal = OmUpdateResultSuccess;
-	const char * r;
+	const char * r=0;
 	
-	if( om_config_set(cfg,OM_CFG_UPDATE_LAST_ATTEMPT,&tim) ) {
+	if( om_config_set(cfg,OM_CFG_UPDATE_LAST_ATTEMPT,&currentTime) ) {
 		if( 
 			// check to see if we're just reverting to the original version
-			(r=__om_update_check_revert_to_original(cfg,stg,update_header,callback,callback_info))==0
+			__om_update_check_revert_to_original(cfg,stg,update_header,callback,callback_info)==0
 			   
 			// make sure there is enough space for the update
 			&& (r=__om_update_import_check_space(cfg,stg,update_header,callback,callback_info))==OmUpdateResultSuccess
@@ -644,20 +671,17 @@ const char * om_update_perform_with_callback(om_config_ptr cfg,
 			// flip-flop storage and unzip the import archive into it
 			// and update the config to point to the new version
 			&& (r=__om_update_import_unzip(cfg,stg,update_header,callback,callback_info))==OmUpdateResultSuccess
-			) {
-				if( callback_info!=OM_NULL && callback!=OM_NULL ) {
-					
-					callback_info->update_status->complete=OM_TRUE;
-					callback_info->update_status->error_type=OM_NULL;
-					callback(callback_info);
-				}
-			} 
+			) {} 
+            if( callback_info!=OM_NULL && callback!=OM_NULL ) {
+                
+                callback_info->update_status->complete=OM_TRUE;
+                callback_info->update_status->error_type=OM_NULL;
+                callback(callback_info);
+            }
 			retVal = r;
 	} else {
 		retVal = OmUpdateResultPlatform;
 	}
-	
-	om_config_set(cfg,OM_CFG_UPDATE_LAST_RESULT,retVal);
 	
 	if( retVal == OmUpdateResultSuccess ) {
 		
@@ -672,9 +696,18 @@ const char * om_update_perform_with_callback(om_config_ptr cfg,
         om_storage_reset_storage(stg);
         char * unzip_location = __om_localstorage_path_for_update(stg,update_header);
         om_config_set(cfg,OM_CFG_CURRENT_STORAGE,unzip_location);
-        om_config_set(cfg,OM_CFG_APP_VER_HASH,update_header->hash->hash);
         om_free(unzip_location);
 	}
+    
+    // it's possible that we've reverted to the original version
+    // in which case the current retVal will be 0 at this point
+    // so we need to correct that.
+    retVal = retVal==0?OmUpdateResultSuccess:retVal;
+    if( retVal == OmUpdateResultSuccess ) {
+        om_config_set(cfg,OM_CFG_APP_VER_HASH,update_header->hash->hash);
+    }
+    
+    om_config_set(cfg,OM_CFG_UPDATE_LAST_RESULT,retVal);
     
     // doesn't matter what happened...we're not taking up space needlessly
     om_storage_delete_import_archive(stg);

@@ -32,8 +32,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import org.json.me.JSONException;
-import org.json.me.JSONObject;
+import com.openmeap.thirdparty.org.json.me.JSONException;
+import com.openmeap.thirdparty.org.json.me.JSONObject;
 import org.junit.Assert;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -52,7 +52,7 @@ import com.openmeap.http.HttpRequestException;
 import com.openmeap.http.HttpRequestExecuter;
 import com.openmeap.http.HttpResponse;
 import com.openmeap.json.JSONObjectBuilder;
-import com.openmeap.util.StringUtils;
+import com.openmeap.util.StringUtilsTest;
 import com.openmeap.util.UUID;
 import com.openmeap.util.Utils;
 import com.openmeap.web.form.ParameterMapBuilder;

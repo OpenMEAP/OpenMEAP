@@ -24,11 +24,12 @@
 
 package com.openmeap.protocol.json;
 
-import org.json.me.JSONException;
-import org.json.me.JSONObject;
+
 
 import com.openmeap.json.JSONObjectBuilder;
 import com.openmeap.protocol.dto.UpdateHeader;
+import com.openmeap.thirdparty.org.json.me.JSONException;
+import com.openmeap.thirdparty.org.json.me.JSONObject;
 import com.openmeap.util.GenericRuntimeException;
 
 public class JsUpdateHeader {

@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.me.JSONObject;
+import com.openmeap.thirdparty.org.json.me.JSONObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -63,7 +63,7 @@ import com.openmeap.util.Utils;
  */
 public class AdminTest {
 	
-	final static private String APP_NAME = "Integration Test Application";
+	final static private String APP_NAME = "OpenMEAP Development Application";
 	final static private String APP_DESC = "This application has been created programmatically in order to test the functions of the administrative console";
 	final static private Integer APP_DEPL_LEN = 10;
 	final static private String APP_ADMINS = "default-admin";
@@ -149,7 +149,7 @@ public class AdminTest {
 		String returnBody = Utils.readInputStream(helper.postGlobalSettings(originalSettings).getResponseBody(),FormConstants.CHAR_ENC_DEFAULT);
 		logger.info(returnBody);
 		
-		//modelManager.getModelService().clearPersistenceContext();
+		modelManager.getModelService().clearPersistenceContext();
 		GlobalSettings insertedSettings = modelManager.getGlobalSettings();
 		
 		JSONObjectBuilder job = new JSONObjectBuilder();

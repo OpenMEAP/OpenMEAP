@@ -41,7 +41,9 @@ final public class OmWebViewHelper {
 	final static public void setUpdateHeader(OmWebView webView, UpdateHeader update, WebServiceException err, Long bytesFree) {
 		String js = "void(0);";
 		if( err!=null ) {
-			js = StringUtils.replaceAll(OmWebView.UPDATE_ERROR, "%s", WebServiceException.toJSON(err));
+			js = StringUtils.replaceAll(OmWebView.UPDATE_ERROR, "%errorCode", err.getType().toString());
+			js = StringUtils.replaceAll(js, "%errorMessage", 
+					StringUtils.replaceAll( err.getMessage()!=null?err.getMessage():"", "\"", "" ));
 		} else if(update!=null) {
 			js = StringUtils.replaceAll(OmWebView.UPDATE_NOT_NULL, "%s", new JsUpdateHeader(update,bytesFree).toString());
 		} else {

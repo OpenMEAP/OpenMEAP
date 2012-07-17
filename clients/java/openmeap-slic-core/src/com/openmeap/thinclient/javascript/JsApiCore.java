@@ -70,22 +70,20 @@ public interface JsApiCore {
 	
 	/**
 	 * Connect to Application management and check for available updates.
-	 * 
-	 * callBack should be of the form: <code>function(updateHeader) { ... }</code>.
-	 * If a new deployment is available, the <code>updateHeader</code> passed in will be of the form:
-	 * <code>
-	 * 	{
-	 * 	};
-	 * </code>
-	 * 
-	 * @param callBack Javascript to execute when done checking.  Should accept a single object parameter 
 	 */
-	public void checkForUpdates(String callBack);
+	public void checkForUpdates();
 	
 	/**
 	 * @param updateHeader The update to perform
 	 * @param statusCallBack a javascript function to pass status information back to
 	 */
 	public void performUpdate(final String header, final String statusCallBack);
+	
+	/**
+	 * Reloads the application
+	 */
+	public void reload();
+	
+	public void notifyReadyForUpdateCheck();
 }
 

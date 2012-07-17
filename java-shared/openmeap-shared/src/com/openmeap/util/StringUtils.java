@@ -35,6 +35,22 @@ final public class StringUtils {
 		return string==null || string.trim().length()==0;
 	}
 	
+	static public String join(String[] parts, String strDelimiter, int startIdx, int endIdx) {
+		StringBuffer sb = new StringBuffer();
+		boolean first = true;
+		for(int i=startIdx; i<endIdx; i++) {
+			if(!first) {
+				sb.append(strDelimiter);
+			} else first = false;
+			sb.append(parts[i]);
+		}
+		return sb.toString();
+	}
+	
+	static public String join(String[] parts, String strDelimiter) {
+		return join(parts,strDelimiter,0,parts.length);
+	}
+	
 	static public String[] split(String strString, String strDelimiter)
 	{
 		int iOccurrences = 0;

@@ -32,6 +32,5 @@ OM_EXPORT void ios_update_callback_func(om_update_callback_info_ptr update_statu
 @interface OmSlicJsApiProtocol : NSURLProtocol {
 }
 
-- (NSString *) performUpdateCheck:(NSString *)callBack;
 
 @end

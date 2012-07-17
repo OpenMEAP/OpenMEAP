@@ -29,11 +29,10 @@ import com.openmeap.protocol.dto.UpdateHeader;
 
 public interface OmWebView {
 	
-	static public String INSURE_OPENMEAP = "if(typeof OpenMEAP=='undefined') { OpenMEAP={data:{},config:{},persist:{cookie:{}}}; };";
-	static public String UPDATE_ERROR = INSURE_OPENMEAP+"window.OpenMEAP.data.update={error:%s};";
-	static public String UPDATE_NOT_NULL = INSURE_OPENMEAP+"window.OpenMEAP.data.update=%s;";
-	static public String UPDATE_NULL = INSURE_OPENMEAP+"window.OpenMEAP.data.update=null;";
-	
+	static public String INSURE_OPENMEAP = "if(typeof OpenMEAP=='undefined') { OpenMEAP={data:{},config:{},persist:{cookie:{}},updates:{}}; };";
+	static public String UPDATE_ERROR    = "if(OpenMEAP.updates.onCheckError!='undefined'){OpenMEAP.updates.onCheckError({code:\"%errorCode\",message:\"%errorMessage\"});}";
+	static public String UPDATE_NOT_NULL = "if(OpenMEAP.updates.onUpdate!='undefined'){OpenMEAP.updates.onUpdate(%s);}";
+	static public String UPDATE_NULL     = "if(OpenMEAP.updates.onNoUpdate!='undefined'){OpenMEAP.updates.onNoUpdate();}";
 	
 	public void clearCache(boolean arg0);
 	

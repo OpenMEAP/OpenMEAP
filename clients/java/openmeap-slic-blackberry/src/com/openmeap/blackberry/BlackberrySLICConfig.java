@@ -38,9 +38,13 @@ public class BlackberrySLICConfig extends SLICConfig {
 	public String getAssetsBaseUrl() {
 		// storage location will be null until the first successful update
     	if( shouldUseAssetsOrSdCard().booleanValue() ) {
-   			return getPackagedAppRoot();
+   			return AssetsInputConnection.ASSETS_PREFIX+getPackagedAppRoot();
     	} else {
     		return getStorageLocation();
     	}
+	}
+	
+	public Preferences getPreferences() {
+		return preferences;
 	}
 }

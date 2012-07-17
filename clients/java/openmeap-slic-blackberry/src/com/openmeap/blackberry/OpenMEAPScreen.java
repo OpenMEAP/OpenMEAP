@@ -46,6 +46,7 @@ import net.rim.device.api.browser.field2.BrowserField;
 import net.rim.device.api.browser.field2.BrowserFieldConfig;
 import net.rim.device.api.browser.field2.BrowserFieldConnectionManager;
 import net.rim.device.api.browser.field2.BrowserFieldController;
+import net.rim.device.api.browser.field2.BrowserFieldListener;
 import net.rim.device.api.browser.field2.BrowserFieldRequest;
 import net.rim.device.api.browser.field2.ProtocolController;
 import net.rim.device.api.ui.container.MainScreen;
@@ -81,7 +82,7 @@ public final class OpenMEAPScreen extends MainScreen implements OmWebView
 		}
     }
     
-    public BrowserField createBrowserField() throws IOException {
+    private BrowserField createBrowserField() throws IOException {
     	
     	BrowserField browserField = new BrowserField();
     	handler = new AssetsRequestHandler(browserField,activity.getBaseUrl());
@@ -141,8 +142,8 @@ public final class OpenMEAPScreen extends MainScreen implements OmWebView
 	public void clearCache(boolean arg0) {
 		
 	}
-	
+
 	public void clearView() {
-		
+		super.deleteAll();
 	}
 }

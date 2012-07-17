@@ -81,6 +81,7 @@ public class MainActivity extends Activity implements OmMainActivity,LoginFormLa
 	private WebView webView = null;
 	private LocalStorageImpl storage = null;
 	private LoginFormCallback loginFormCallback = null;
+	private boolean readyForUpdateCheck = false;
 	
     /** 
      * Called when the activity is first created. 
@@ -123,7 +124,7 @@ public class MainActivity extends Activity implements OmMainActivity,LoginFormLa
         }
         
         storage = new LocalStorageImpl(this);
-        updateHandler = new UpdateHandler(null,this,config,storage);
+        updateHandler = new UpdateHandler(this,config,storage);
 
         setupWindowTitle();
     }
@@ -247,7 +248,8 @@ public class MainActivity extends Activity implements OmMainActivity,LoginFormLa
     			String path = config.getAssetsBaseUrl()+DIRECTORY_INDEX;
     			inputStream = getContentResolver().openInputStream(Uri.parse(path));
     		} else {
-    			inputStream = getAssets().open(config.getAssetsRootPath()+DIRECTORY_INDEX);
+    			String rootPath = config.getAssetsRootPath()+DIRECTORY_INDEX;
+    			inputStream = getAssets().open(rootPath);
     		}
     	} else inputStream = openFileInput(FileContentProvider.getInternalStorageFileName(DIRECTORY_INDEX));
     	return Utils.readInputStream(inputStream,SOURCE_ENCODING);
@@ -357,5 +359,12 @@ public class MainActivity extends Activity implements OmMainActivity,LoginFormLa
 
 	public void setWebView(OmWebView webView) {
 		this.webView = (WebView)webView;
+	}
+	
+	public void setReadyForUpdateCheck(boolean ready) {
+		this.readyForUpdateCheck = ready;
+	}
+	public boolean getReadyForUpdateCheck() {
+		return readyForUpdateCheck;
 	}
 }

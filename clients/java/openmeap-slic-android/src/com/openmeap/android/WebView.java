@@ -83,4 +83,10 @@ public class WebView extends android.webkit.WebView implements OmWebView {
 	public void executeJavascriptFunction(String callBack, String[] arguments) {
 		OmWebViewHelper.executeJavascriptFunction(this,callBack,arguments);
 	}
+	
+	@Override
+	public void clearView() {
+		super.clearView();
+		runJavascript("document.body.innerHTML=\"\";");
+	}
 }

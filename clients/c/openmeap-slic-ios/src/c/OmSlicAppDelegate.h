@@ -38,22 +38,24 @@
 	om_config_ptr config;
 	om_storage_ptr storage;
     
-    om_update_header_ptr updateHeader;
+    BOOL readyForUpdateCheck;
 }
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) IBOutlet OmSlicViewController *viewController;
 @property (nonatomic, retain) IBOutlet OmSlicLoginViewController *loginViewController;
 
-@property (nonatomic) om_update_header_ptr updateHeader;
-
 @property (nonatomic) om_storage_ptr storage;
 @property (nonatomic) om_config_ptr config;
 
+@property (nonatomic) BOOL readyForUpdateCheck;
+
 + (OmSlicAppDelegate*)globalInstance;
 - (void) showAlert:(NSString*)message withTitle:(NSString*)title;
-- (void) reload;
+- (void) reloadView;
 - (void) clearWebCache;
+- (BOOL) isTimeForUpdateCheck;
+- (BOOL) performUpdateCheck;
 
 @end
 
