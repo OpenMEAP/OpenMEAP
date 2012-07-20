@@ -23,7 +23,7 @@
 The following is a quick-start set of instructions for setting up an
 OpenMEAP development environment in Eclipse for Java EE developers.
 
-1) Install the Android SDK
+1) Install the Android SDK and the BlackBerry Plugin using the 5.0 SDK
 
 2) Create a new workspace in Eclipse (not at openmeap home)
 
@@ -42,14 +42,17 @@ OpenMEAP development environment in Eclipse for Java EE developers.
   source package unzipped
 - Add an "android.sdk.home" property entry pointing to where you have the 
   android sdk installed.
+- Add an "blackberry.sdk.home" property entry pointing to where you have the 
+  blackberry sdk installed. ex. /eclipse/plugins/net.rim.ejde.componentpack5.0.0_5.0.0.36
+_ You must also update your home variable path in openmeap-slic-blackberry under openmeap-slic-core 
+and point it the the openmeap src folder
 
 7) Correct/verify the Android SDK location
 Still in workspace preferences, select the Android tab
 correct the Android sdk location, if this wasn't covered by the ADT install
 
-8) Install the Apache Tomcat 5.5 server runtime (required by admin and services)
-- Download and unzip Apache Tomcat 5.5 somewhere you are comfortable with it 
-  living
+8) Install the Apache Tomcat 5.5, 6.0 or 7.0 server runtime (required by admin and services)
+- Download and unzip Apache Tomcat somewhere you are comfortable with it living
 - Open workspace preferences, expand "Server", select "Runtime environments"
 - Click "Add"
 - Select "Apache 5.5"
@@ -74,18 +77,10 @@ correct the Android sdk location, if this wasn't covered by the ADT install
 
 For the least pain, import and build the projects in groups in the order below
 	
-	openmeap-shared
-	openmeap-shared-jdk5
-	openmeap-shared-serverside
-	
-	openmeap-admin-web
-	openmeap-services-web
-	
-	openmeap-slic-core
-	openmeap-slic-android
-	openmeap-slic-android-test (not used yet)
-	
-	banking-web
+    openmeap-shared, openmeap-shared-serverside, openmeap-shared-jdk5
+    openmeap-admin-web, openmeap-services-web
+    openmeap-slic-core, openmeap-slic-android
+    openmeap-slic-blackberry 
 
 For each grouping above, do the following:
 	- Right-click on the "Package Explorer" pane,

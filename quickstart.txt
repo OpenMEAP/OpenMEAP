@@ -21,9 +21,7 @@
  ###############################################################################
  
 
-OpenMEAP was created in 
-	xCode 4.2
-	Eclipse IDE for Java EE Developers (w/ the IvyDE plugin)
+OpenMEAP was created in xCode 4.2 Eclipse IDE for Java EE Developers (w/ the IvyDE plugin)
 http://www.eclipse.org/
 http://ant.apache.org/ivy/ivyde/
 
@@ -63,22 +61,22 @@ The resulting artifacts will end up in ${OPENMEAP_HOME}/build-tools/dist
 	
 Create an arbitrarily located/named directory for new SLICs
 
-	$ mkdir ~/om_client
-	$ cd ~/om_client
+	$ mkdir ~/om_slic
+	$ cd ~/om_slic
 
 Copy over the client.properties template provided
 
-	om_client $ cp $OPENMEAP_HOME/build-tools/template/client.properties .
+	om_slic $ cp $OPENMEAP_HOME/build-tools/template/client.properties .
 
 Correct the properties to match your environment
 
-	om_client $ vi client.properties
+	om_slic $ vi client.properties
 	
 Create the assets folder (whatever you updated client.properties with)
 and copy in the openmeap.js
 
-	om_client $ mkdir assets
-	om_client $ cd assets
+	om_slic $ mkdir assets
+	om_slic $ cd assets
 	assets $ cp ${OPENMEAP_HOME}/clients/shared/javascript/openmeap.js .
 	
 Create DHTML application
@@ -89,7 +87,9 @@ Create DHTML application
 
 List what you can do (illustrative, here, only)
 
-	om_client $ om_ios.sh -p
+	om_slic $ om_android.sh -p
+	om_slic $ om_blackberry.sh -p
+	om_slic $ om_ios.sh -p
 	
 Publish the shared and slic-core projects to the local repository.
 The openmeap-shared and openmeap-slic-core project artifacts must be available
@@ -105,25 +105,30 @@ changed.
 
 Create and build your iOS project.  Opens and runs in xCode 4.2
 
-	om_client $ om_ios.sh create-project -propertyfile client.properties
-	om_client $ om_ios.sh build-debug -propertyfile client.properties
+	om_slic $ om_ios.sh create-project -propertyfile client.properties
+	om_slic $ om_ios.sh build-debug -propertyfile client.properties
 
 Create and build your android project.  Install to a device using adb
 See the android docs for how to do this.  The build.xml in the android
 SLIC directory is what was created by the android sdk.
 
-	om_client $ om_android.sh create-project -propertyfile client.properties
-	om_client $ om_android.sh build-debug -propertyfile client.properties
+	om_slic $ om_android.sh create-project -propertyfile client.properties
+	om_slic $ om_android.sh build-debug -propertyfile client.properties
+
+Create and build your BlackBerry project
+
+	om_slic $ om_blackberry.sh create-project -propertyfile client.properties
+	om_slic $ om_blackberry.sh build-debug -propertyfile client.properties
 
 +==================	
 *) Import Android SLIC projects into Eclipse
 
 In order to import an Android project into into Eclipse,
-you must first make sure to import the openmeap-shared, openmeap-shared-jdk5, openmeap-slic-core,
+you must first make sure to import the openmeap-shared, openmeap-shared-jdk5, openmeap-slic-core, 
 and openmeap-slic-android projects into the target workspace.
 
-Because you must import these, you must also specify the openmeap.home
-and android.sdk.home ant properties as mentioned in the quickstart-eclipse.txt
+Because you must import these, you must also specify the openmeap.home and android.sdk.home 
+ant properties as mentioned in the quickstart-eclipse.txt
 file.
 
 Next you must choose you must create a New Android project, 
@@ -131,6 +136,31 @@ then select to create from existing source.  The source root
 must be whereever you directed the command-line script to create
 the SLIC.
  
++==================	
+*) Import Blackberry SLIC projects into Eclipse
 
+In order to import an Blackberry project into into Eclipse,
+you must first make sure to import the openmeap-shared, openmeap-slic-core,
+and openmeap-slic-blackberry projects into the target workspace.
+
+Because you must import these, you must also specify the openmeap.home 
+and blackberry.sdk.home ant properties as mentioned in the quickstart-eclipse.txt
+file.
+
+Next you must choose you must create a New Blackberry project, 
+then select to create from existing source.  The source root
+must be whereever you directed the command-line script to create
+the SLIC.
+
+Next, you'll need to do this for the openmeap-slic-blackberry project too,
+create 3 "Build Path"->"Link Source" folders.  The first time, click "Variables" and
+create OPENMEAP_HOME.  Then select OPENMEAP_HOME and click "Extend...".
+The first time, select java-shared/openmeap-shared/src and then rename
+the "Folder Name" to "openmeap-shared".  Do the same for
+clients/java/openmeap-slic-core and clients/java/openmeap-slic-blackberry.
+
+The final step is to correct the "JRE System Library" library in the project.
+Just right-click, select properties, and select the 5.0.0 Blackberry runtime
+from the "Alternate JRE:" drop-down.
 
 
