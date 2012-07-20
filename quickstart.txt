@@ -100,6 +100,7 @@ changed.
 	$ . ./${OPENMEAP_HOME}/build-tools/scripts/setEnv.sh
 	$ cd ./${OPENMEAP_HOME}/build-tools
 	$ ant publish-local-shared
+	$ ant publish-local-shared-jdk5
 	$ ant publish-local-slic-core
 
 Create and build your iOS project.  Opens and runs in xCode 4.2
@@ -118,7 +119,7 @@ SLIC directory is what was created by the android sdk.
 *) Import Android SLIC projects into Eclipse
 
 In order to import an Android project into into Eclipse,
-you must first make sure to import the openmeap-shared, openmeap-slic-core,
+you must first make sure to import the openmeap-shared, openmeap-shared-jdk5, openmeap-slic-core,
 and openmeap-slic-android projects into the target workspace.
 
 Because you must import these, you must also specify the openmeap.home

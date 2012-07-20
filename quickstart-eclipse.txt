@@ -75,6 +75,7 @@ correct the Android sdk location, if this wasn't covered by the ADT install
 For the least pain, import and build the projects in groups in the order below
 	
 	openmeap-shared
+	openmeap-shared-jdk5
 	openmeap-shared-serverside
 	
 	openmeap-admin-web
