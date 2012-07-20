@@ -1,6 +1,6 @@
-In the spirit of friendship, we give to you, OpenMEAP 1.2.x beta
+OpenMEAP 1.2.x beta
 
-Please see COPYING for license information.  =)
+Please see COPYING for license information.
 
 We continue to look forward to engaging the community 
 for feedback on the direction of the project.
