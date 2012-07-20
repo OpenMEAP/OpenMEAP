@@ -32,19 +32,30 @@ public class UpdateType implements Enum {
     final static public UpdateType REQUIRED = new UpdateType("REQUIRED");
     final static public UpdateType OPTIONAL = new UpdateType("OPTIONAL");
     final static public UpdateType IMMEDIATE = new UpdateType("IMMEDIATE");
-    
+    final static private UpdateType[] constants = new UpdateType[] {
+	    	REQUIRED,OPTIONAL,IMMEDIATE
+	    };
     private final String value;
     private UpdateType(String v) {
         value = v;
     }
+    public Enum[] getStaticConstants() {
+    	return (Enum[])constants;
+    }
     public String value() {
         return value;
     }
+    public int hashCode() {
+    	return value.hashCode();
+    }
+    public boolean equals(Object o) {
+    	return o.hashCode()==value.hashCode();
+    }
     static public UpdateType[] values() {
-    	return (UpdateType[])EnumUtils.values(UpdateType.class);
+    	return constants;
     }
     static public UpdateType fromValue(String v) {
-    	return (UpdateType)EnumUtils.fromValue(UpdateType.class, v);
+    	return (UpdateType)EnumUtils.fromValue(REQUIRED, v);
     }
 
 }

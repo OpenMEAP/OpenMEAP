@@ -24,21 +24,22 @@
 
 package com.openmeap.protocol;
 
-import java.lang.reflect.Field;
-
+import com.openmeap.json.Enum;
+import com.openmeap.json.EnumUtils;
 import com.openmeap.protocol.dto.ErrorCode;
-import com.openmeap.protocol.dto.HashAlgorithm;
+import com.openmeap.util.GenericException;
+
 
 /**
  * Provides a bridge to the xml generated type errorcode enum
  * 
  * @author schang
  */
-public class WebServiceException extends Exception {
+public class WebServiceException extends GenericException {
 
 	public TypeEnum type = null;
 	
-	static public class TypeEnum {
+	static public class TypeEnum implements Enum {
 		static final public TypeEnum CLIENT = new TypeEnum("CLIENT");
 		static final public TypeEnum CLIENT_CONNECTION = new TypeEnum("CLIENT_CONNECTION");
 		static final public TypeEnum CLIENT_UPDATE = new TypeEnum("CLIENT_UPDATE");
@@ -47,33 +48,37 @@ public class WebServiceException extends Exception {
 		static final public TypeEnum MISSING_PARAMETER = new TypeEnum("MISSING_PARAMETER");
 		static final public TypeEnum DATABASE_ERROR = new TypeEnum("DATABASE_ERROR");
 		static final public TypeEnum UNDEFINED = new TypeEnum("UNDEFINED");
-		private String name;
+		static final private TypeEnum[] constants = new TypeEnum[] {
+			CLIENT,
+			CLIENT_CONNECTION,
+			CLIENT_UPDATE,
+			APPLICATION_NOTFOUND,
+			APPLICATION_VERSION_NOTFOUND,
+			MISSING_PARAMETER,
+			DATABASE_ERROR,
+			UNDEFINED
+		};
+		public String toString() {
+			return value();
+		}
+		public Enum[] getStaticConstants() {
+			return constants;
+		}
+		private String value;
 		private TypeEnum(String name) {
-			this.name = name;
+			this.value = name;
 		};
 		public boolean equals(Object o) {
 			return this.hashCode()==o.hashCode();
 		}
 		public int hashCode() {
-			return this.name.hashCode();
+			return this.value.hashCode();
 		}
 		public String value() {
-			return name;
+			return value;
 		}
 		public static TypeEnum fromValue(String v) {
-	    	Field[] fields = TypeEnum.class.getDeclaredFields();
-	    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
-	    		Field field = fields[fieldIdx];
-	    		try {
-		    		if( ((TypeEnum)field.get(null)).value().equals(v) ) {
-		    			return (TypeEnum)field.get(null);
-						
-		    		}
-	    		} catch(Exception e) {
-	    			throw new IllegalArgumentException(v);
-	    		}
-	    	}
-	    	throw new IllegalArgumentException(v);
+	    	return (TypeEnum)EnumUtils.fromValue((Enum)UNDEFINED, v);
 	    }
 		public ErrorCode asErrorCode() {
 			if( APPLICATION_NOTFOUND.equals(this) ) {
@@ -117,6 +122,6 @@ public class WebServiceException extends Exception {
 		if(wse==null) {
 			return "null";
 		}
-		return "{type:\""+wse.getType().toString()+"\",message:\""+wse.toString().replace("\"","\\\"")+"\"}";
+		return "{type:\""+wse.getType().toString()+"\",message:\""+wse.toString().replace('"','\'')+"\"}";
 	}
 }

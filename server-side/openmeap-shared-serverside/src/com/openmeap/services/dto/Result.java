@@ -24,8 +24,10 @@
 
 package com.openmeap.services.dto;
 
+import com.openmeap.json.Enum;
 import com.openmeap.json.EnumUtils;
 import com.openmeap.json.HasJSONProperties;
+import com.openmeap.json.JSONGetterSetter;
 import com.openmeap.json.JSONProperty;
 
 /**
@@ -37,6 +39,7 @@ public class Result implements HasJSONProperties {
 	static public class Status implements com.openmeap.json.Enum {
 		static final public Status SUCCESS=new Status("SUCCESS");
 		static final public Status FAILURE=new Status("FAILURE");
+		static final private Status[] constants = new Status[]{SUCCESS,FAILURE};
 	    private final String value;
 	    private Status(String v) {
 	        value = v;
@@ -45,19 +48,41 @@ public class Result implements HasJSONProperties {
 	        return value;
 	    }
 	    static public Status[] values() {
-	    	return (Status[])EnumUtils.values(Status.class);
+	    	return constants;
 	    }
 	    static public Status fromValue(String v) {
-	    	return (Status)EnumUtils.fromValue(Status.class, v);
+	    	return (Status)EnumUtils.fromValue(Status.SUCCESS, v);
 	    }
+		@Override
+		public Enum[] getStaticConstants() {
+			return constants;
+		}
 	};
 	
 	private Status resultStatus;
 	private String message;
 	
 	static final private JSONProperty[] jsonProperties = new JSONProperty[] {
-		new JSONProperty("getStatus"),
-		new JSONProperty("getMessage")
+		new JSONProperty("status",Status.class,
+			new JSONGetterSetter(){
+				public Object getValue(Object src) {
+					return ((Result)src).getStatus();
+				}
+				@Override
+				public void setValue(Object dest, Object value) {
+					((Result)dest).setStatus(Status.fromValue((String)value));
+				}
+		}),
+		new JSONProperty("message",String.class,
+			new JSONGetterSetter(){
+				public Object getValue(Object src) {
+					return ((Result)src).getMessage();
+				}
+				@Override
+				public void setValue(Object dest, Object value) {
+					((Result)dest).setMessage((String)value);
+				}
+		})
 	};
 	@Override
 	public JSONProperty[] getJSONProperties() {

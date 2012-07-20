@@ -26,23 +26,17 @@ package com.openmeap.android;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Authenticator;
 import java.util.Properties;
-
-import org.apache.http.auth.AuthScope;
-import org.apache.http.client.CredentialsProvider;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -53,26 +47,31 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.openmeap.android.javascript.JsApiCoreImpl;
-import com.openmeap.protocol.WebServiceException;
-import com.openmeap.protocol.dto.UpdateHeader;
-import com.openmeap.protocol.dto.UpdateType;
+import com.openmeap.constants.FormConstants;
+import com.openmeap.digest.DigestInputStreamFactory;
+import com.openmeap.digest.Md5DigestInputStream;
+import com.openmeap.digest.Sha1DigestInputStream;
+import com.openmeap.http.CredentialsProviderFactory;
+import com.openmeap.http.HttpRequestExecuter;
+import com.openmeap.http.HttpRequestExecuterFactory;
+import com.openmeap.http.HttpRequestExecuterImpl;
 import com.openmeap.thinclient.FirstRunCheck;
 import com.openmeap.thinclient.LoginFormCallback;
 import com.openmeap.thinclient.LoginFormLauncher;
+import com.openmeap.thinclient.OmMainActivity;
+import com.openmeap.thinclient.OmWebView;
 import com.openmeap.thinclient.Preferences;
 import com.openmeap.thinclient.SLICConfig;
+import com.openmeap.thinclient.javascript.JsApiCoreImpl;
+import com.openmeap.thinclient.javascript.Orientation;
 import com.openmeap.thinclient.update.UpdateHandler;
-import com.openmeap.util.CredentialsProviderFactory;
-import com.openmeap.util.HttpRequestExecuter;
-import com.openmeap.util.HttpRequestExecuterFactory;
-import com.openmeap.util.HttpRequestExecuterImpl;
 import com.openmeap.util.Utils;
 
-public class MainActivity extends Activity implements LoginFormLauncher {
+public class MainActivity extends Activity implements OmMainActivity,LoginFormLauncher {
 	
-	private static String SOURCE_ENCODING = "utf-8";
+	private static String SOURCE_ENCODING = FormConstants.CHAR_ENC_DEFAULT;
 	private static String DIRECTORY_INDEX = "index.html";
 	
 	private static final int LOGIN_DIALOG = 1;
@@ -82,6 +81,7 @@ public class MainActivity extends Activity implements LoginFormLauncher {
 	private WebView webView = null;
 	private LocalStorageImpl storage = null;
 	private LoginFormCallback loginFormCallback = null;
+	private boolean readyForUpdateCheck = false;
 	
     /** 
      * Called when the activity is first created. 
@@ -92,6 +92,8 @@ public class MainActivity extends Activity implements LoginFormLauncher {
         
         CredentialsProviderFactory.setDefaultCredentialsProviderFactory(new OmSlicCredentialsProvider.Factory(this));
         HttpRequestExecuterFactory.setDefaultType(HttpRequestExecuterImpl.class);
+        DigestInputStreamFactory.setDigestInputStreamForName("md5", Md5DigestInputStream.class);
+        DigestInputStreamFactory.setDigestInputStreamForName("sha1", Sha1DigestInputStream.class);
         
         // setup the SLICConfig instance 
         Preferences prefs = new SharedPreferencesImpl(getSharedPreferences(SLICConfig.PREFERENCES_FILE,MODE_PRIVATE));
@@ -110,7 +112,7 @@ public class MainActivity extends Activity implements LoginFormLauncher {
 	        WifiManager wifiManager = (WifiManager)o;
 	        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 	        if( wifiInfo!=null && wifiInfo.getMacAddress()!=null ) {
-	        	Runnable firstRunCheck = new FirstRunCheck(config,wifiInfo.getMacAddress());
+	        	Runnable firstRunCheck = new FirstRunCheck(config,wifiInfo.getMacAddress(),HttpRequestExecuterFactory.newDefault());
 	        	new Thread(firstRunCheck).start();
 	        }
         }
@@ -122,7 +124,7 @@ public class MainActivity extends Activity implements LoginFormLauncher {
         }
         
         storage = new LocalStorageImpl(this);
-        updateHandler = new UpdateHandler(config,storage);
+        updateHandler = new UpdateHandler(this,config,storage);
 
         setupWindowTitle();
     }
@@ -143,7 +145,7 @@ public class MainActivity extends Activity implements LoginFormLauncher {
       // or keyboard hiding from causing the WebView activity to restart.
     }
 	
-	public void restart() throws NameNotFoundException {
+	public void restart() {
 		Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage( getBaseContext().getPackageName() );
 		i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(i);
@@ -159,6 +161,30 @@ public class MainActivity extends Activity implements LoginFormLauncher {
     
     public UpdateHandler getUpdateHandler() {
 		return updateHandler;
+	}
+    
+    public Preferences getPreferences(String name) {
+    	return new SharedPreferencesImpl(this.getSharedPreferences(name, 0));
+    }
+    
+    public Orientation getOrientation() {
+    	Configuration config = getResources().getConfiguration();
+		return config.orientation == Configuration.ORIENTATION_LANDSCAPE ? Orientation.LANDSCAPE : 
+			config.orientation == Configuration.ORIENTATION_PORTRAIT ? Orientation.PORTRAIT :
+				config.orientation == Configuration.ORIENTATION_SQUARE ? Orientation.SQUARE :
+					Orientation.UNDEFINED;
+    }
+    
+    public void doToast(String mesg, boolean isLong) {
+    	Context context = getApplicationContext();
+		CharSequence text = mesg;
+		int duration = isLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT;
+		Toast toast = Toast.makeText(context, text, duration);
+		toast.show();
+    }
+
+	public void setTitle(String title) {
+		super.setTitle(title);
 	}
     
     /*
@@ -205,74 +231,8 @@ public class MainActivity extends Activity implements LoginFormLauncher {
         FileContentProvider.setProviderAuthority(config.getProviderAuthority());        
         storage.setupSystemProperties();
         
-        final MainActivity thisActivity = this;
-        
-        // if this application is configured to fetch updates,
-        // then check for them now 
-        if( config.shouldPerformUpdateCheck() ) {
-        	
-        	runOnUiThread(new Runnable() {
-        		public void run() {
-        			if( webView!=null ) {
-        				webView.clearView();
-        			}
-        		}
-        	});
-        	new Thread(new Runnable(){
-        		public void run() {
-        			UpdateHeader update = null;
-        			WebServiceException err = null;
-		        	try {
-		        		update = updateHandler.checkForUpdate();
-		        	} catch( WebServiceException wse ) {
-		        		err = wse;
-		        	}
-		        	if( update!=null && update.getType()==UpdateType.IMMEDIATE ) {
-		        		try {
-		        			updateHandler.handleUpdate(update);
-		        			storage.setupSystemProperties();
-		        			update=null;
-		        		} catch( Exception e ) {
-		            		err = new WebServiceException(WebServiceException.TypeEnum.CLIENT_UPDATE,e);
-		            	}
-		        	}
-		        	runOnUiThread(new InitializeWebView(update, err));
-        		}
-        	}).start();
-        } else {
-        	runOnUiThread(new InitializeWebView(null, null));
-        }
+        updateHandler.initialize(webView);
 	}
-    
-    private class InitializeWebView implements Runnable {
-    	UpdateHeader update=null;
-    	WebServiceException err=null;
-    	public InitializeWebView(UpdateHeader update, WebServiceException err) {
-    		this.update=update;
-    		this.err=err;
-    	}
-    	public void run() {
-	    	// here after, everything is handled by the html and javascript
-	        try {
-	        	Boolean justUpdated = config.getApplicationUpdated();
-	        	if( justUpdated!=null && justUpdated==true ) {
-	        		config.setApplicationUpdated(false);
-	        	}
-	        	String baseUrl = config.getAssetsBaseUrl();
-	        	String pageContent = getRootWebPageContent();
-	        	webView = createDefaultWebView();
-	        	if( justUpdated!=null && justUpdated ) {
-	        		webView.clearCache(true);
-	        		webView = createDefaultWebView();
-	        	}
-	        	webView.setUpdateHeader(update, err, storage.getBytesFree());
-	        	webView.loadDataWithBaseURL(baseUrl, pageContent, "text/html", SOURCE_ENCODING, null);
-	            setContentView(webView);
-	        } catch( Exception e ) {
-	        	throw new RuntimeException(e);
-	        }
-	    }
-    }
     
 	/**
      * Loads in the content of the index document page to load into the WebView
@@ -280,7 +240,7 @@ public class MainActivity extends Activity implements LoginFormLauncher {
      * @return The content of the index document
      * @throws IOException
      */
-    protected String getRootWebPageContent() throws IOException {
+    public String getRootWebPageContent() throws IOException {
     	InputStream inputStream = null;
     	// storage location will be null until the first successful update
     	if( config.shouldUseAssetsOrSdCard() ) {
@@ -288,7 +248,8 @@ public class MainActivity extends Activity implements LoginFormLauncher {
     			String path = config.getAssetsBaseUrl()+DIRECTORY_INDEX;
     			inputStream = getContentResolver().openInputStream(Uri.parse(path));
     		} else {
-    			inputStream = getAssets().open(config.getAssetsRootPath()+DIRECTORY_INDEX);
+    			String rootPath = config.getAssetsRootPath()+DIRECTORY_INDEX;
+    			inputStream = getAssets().open(rootPath);
     		}
     	} else inputStream = openFileInput(FileContentProvider.getInternalStorageFileName(DIRECTORY_INDEX));
     	return Utils.readInputStream(inputStream,SOURCE_ENCODING);
@@ -310,14 +271,14 @@ public class MainActivity extends Activity implements LoginFormLauncher {
     /**
      * Creates the default WebView where we'll run javascript and render content
      */
-    private WebView createDefaultWebView() {
+    public WebView createDefaultWebView() {
     	
     	WebView webView = new com.openmeap.android.WebView(this,this);
     	
     	// make sure javascript and our api is available to the webview
         webView.getSettings().setJavaScriptEnabled(true);
         JsApiCoreImpl jsApi = new JsApiCoreImpl(this,webView,updateHandler);
-        webView.addJavascriptInterface(jsApi, "OpenMEAP_Core");
+        webView.addJavascriptInterface(jsApi, JS_API_NAME);
         
         // make sure the web view fills the viewable area
         webView.setLayoutParams( new LinearLayout.LayoutParams(	
@@ -382,4 +343,28 @@ public class MainActivity extends Activity implements LoginFormLauncher {
     	
     	return dialog;
     }
+
+	public void setContentView(OmWebView webView) {
+		runOnUiThread(new Runnable(){
+			OmWebView webView;
+			public void run() {
+				setContentView((View)webView);
+			}
+			public Runnable construct(OmWebView webView) {
+				this.webView = webView;
+				return this;
+			}
+		}.construct(webView));			
+	}
+
+	public void setWebView(OmWebView webView) {
+		this.webView = (WebView)webView;
+	}
+	
+	public void setReadyForUpdateCheck(boolean ready) {
+		this.readyForUpdateCheck = ready;
+	}
+	public boolean getReadyForUpdateCheck() {
+		return readyForUpdateCheck;
+	}
 }

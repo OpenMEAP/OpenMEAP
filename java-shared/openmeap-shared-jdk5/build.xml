@@ -28,6 +28,8 @@
 	<property name="openmeap.project.current.file.ivy" value="${openmeap.project.shared-jdk5}/ivy.xml"/>
 	<property name="openmeap.project.current.dist" value="${openmeap.project.shared-jdk5.dist.jar}"/>
 	<property name="openmeap.project.current.dist.ext" value="jar"/>
+	<property name="openmeap.ivy.cachepath.conf" value="core"/>
+	<property name="openmeap.ivy.retrieve.conf" value="core"/>
 
 	<!-- BEGIN CLEAN SECTION +++++++++++++++++++++++++++++++++++++ -->
 	

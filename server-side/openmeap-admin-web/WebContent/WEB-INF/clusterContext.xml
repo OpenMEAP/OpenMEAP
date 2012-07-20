@@ -29,34 +29,23 @@
   http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services-2.0.xsd
   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 	
-	<bean id="modelServiceRefreshNotifier" class="com.openmeap.model.event.notifier.ModelServiceRefreshNotifier">
-		<property name="modelManager" ref="modelManager"/>
-		<property name="httpRequestExecuter">
-			<bean class="com.openmeap.util.HttpRequestExecuterFactory" factory-method="newDefault"/>
+	<bean id="clusterNodeHealthCheck" class="com.openmeap.cluster.ClusterNodeHealthCheckThread">
+		<property name="modelManager">	
+			<bean class="com.openmeap.model.ModelManagerImpl">
+				<property name="modelService">
+					<bean class="com.openmeap.model.ModelServiceImpl">
+						<property name="entityManager">
+							<bean factory-bean="www_entityManagerFactory" factory-method="createEntityManager"/>
+						</property>
+					</bean>
+				</property>
+			</bean>
 		</property>
-	</bean>
-	
-	<bean id="archiveUploadNotifier" class="com.openmeap.model.event.notifier.ArchiveFileUploadNotifier">
-		<property name="modelManager" ref="modelManager"/>
 		<property name="httpRequestExecuter">
-			<bean class="com.openmeap.util.HttpRequestExecuterFactory" factory-method="newDefault"/>
+			<bean class="com.openmeap.http.HttpRequestExecuterFactory" factory-method="newDefault"/>
 		</property>
-	</bean>
-	
-	<bean id="deploymentDeleteNotifier" class="com.openmeap.model.event.notifier.DeploymentDeleteNotifier">
-		<property name="archiveDeleteNotifier" ref="archiveDeleteNotifier"/>
-		<property name="archiveDeleteHandler" ref="archiveDeleteHandler"/>
-	</bean>
-	
-	<bean id="archiveDeleteNotifier" class="com.openmeap.model.event.notifier.ArchiveFileDeleteNotifier">
-		<property name="modelManager" ref="modelManager"/>
-		<property name="httpRequestExecuter">
-			<bean class="com.openmeap.util.HttpRequestExecuterFactory" factory-method="newDefault"/>
-		</property>
-	</bean>
-	
-	<bean id="archiveDeleteHandler" class="com.openmeap.model.event.handler.ArchiveFileDeleteHandler">
-		<property name="modelManager" ref="modelManager"/>
+		<property name="checkInterval" value="2000"/>
+		<property name="restartInterval" value="30000"/>
 	</bean>
 	
 </beans>

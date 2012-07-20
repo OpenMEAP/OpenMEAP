@@ -24,6 +24,15 @@
 
 package com.openmeap.model.dto;
 
+import java.io.File;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+import java.util.Arrays;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,7 +41,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
-import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -42,17 +50,10 @@ import org.apache.commons.lang.StringUtils;
 import com.openmeap.constants.FormConstants;
 import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
-import com.openmeap.model.AbstractModelEntity;
-import com.openmeap.model.ModelEntity;
+import com.openmeap.json.JSONGetterSetter;
+import com.openmeap.model.event.AbstractModelEntity;
 import com.openmeap.web.form.Parameter;
 import com.openmeap.web.form.Validation;
-
-import java.io.File;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Do not instantiate this, get it from the ModelManager
@@ -67,11 +68,56 @@ public class GlobalSettings extends AbstractModelEntity implements HasJSONProper
 	private Integer maxFileUploadSize = 1000000;
 	
 	static final private JSONProperty[] jsonProperties = new JSONProperty[] {
-		new JSONProperty("getExternalServiceUrlPrefix"),
-		new JSONProperty("getMaxFileUploadSize"),
-		new JSONProperty("getServiceManagementAuthSalt"),
-		new JSONProperty("getTemporaryStoragePath"),
-		new JSONProperty("getClusterNodes")
+		new JSONProperty("externalServiceUrlPrefix",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((GlobalSettings)src).getExternalServiceUrlPrefix();
+			}
+			public void setValue(Object dest, Object value) {
+				((GlobalSettings)dest).setExternalServiceUrlPrefix((String)value);
+			}
+		}),
+		new JSONProperty("maxFileUploadSize",Integer.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((GlobalSettings)src).getMaxFileUploadSize();
+			}
+			public void setValue(Object dest, Object value) {
+				((GlobalSettings)dest).setMaxFileUploadSize((Integer)value);
+			}
+		}),
+		new JSONProperty("serviceManagementAuthSalt",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((GlobalSettings)src).getServiceManagementAuthSalt();
+			}
+			public void setValue(Object dest, Object value) {
+				((GlobalSettings)dest).setServiceManagementAuthSalt((String)value);
+			}
+		}),
+		new JSONProperty("temporaryStoragePath",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((GlobalSettings)src).getTemporaryStoragePath();
+			}
+			public void setValue(Object dest, Object value) {
+				((GlobalSettings)dest).setTemporaryStoragePath((String)value);
+			}
+		}),
+		new JSONProperty("clusterNodes",ClusterNode[].class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				List<ClusterNode> nodes = ((GlobalSettings)src).getClusterNodes();
+				if(nodes==null) {
+					return null;
+				} else {
+					return nodes.toArray(new ClusterNode[1]);
+				}
+			}
+			public void setValue(Object dest, Object value) {
+				ClusterNode[] values = (ClusterNode[])value;
+				Vector vec = new Vector();
+				for(int i=0;i<values.length;i++) {
+					vec.addElement(values[i]);
+				}					
+				((GlobalSettings)dest).setClusterNodes(vec);
+			}
+		})
 	};
 	@Override @Transient
 	public JSONProperty[] getJSONProperties() {
@@ -178,7 +224,7 @@ public class GlobalSettings extends AbstractModelEntity implements HasJSONProper
 	public Boolean addClusterNode(ClusterNode node){
 		
 		if(clusterNodes==null) {
-			clusterNodes = new ArrayList<ClusterNode>();
+			clusterNodes = new Vector<ClusterNode>();
 		}
 		if(!clusterNodes.contains(node)) {
 			clusterNodes.add(node);
@@ -189,7 +235,7 @@ public class GlobalSettings extends AbstractModelEntity implements HasJSONProper
 	public Boolean removeClusterNode(ClusterNode node){
 		
 		if(clusterNodes==null) {
-			clusterNodes = new ArrayList<ClusterNode>();
+			clusterNodes = new Vector<ClusterNode>();
 		}
 		if(clusterNodes.contains(node)) {
 			return clusterNodes.remove(node);

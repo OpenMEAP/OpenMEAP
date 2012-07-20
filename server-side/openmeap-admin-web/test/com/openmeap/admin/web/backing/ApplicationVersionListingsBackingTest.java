@@ -41,6 +41,7 @@ import com.openmeap.model.ModelTestUtils;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.web.ProcessingUtils;
 import com.openmeap.web.html.Anchor;
+import com.openmeap.digest.DigestInputStreamFactory;
 
 public class ApplicationVersionListingsBackingTest {
 	
@@ -52,6 +53,8 @@ public class ApplicationVersionListingsBackingTest {
 			ModelTestUtils.createModel(null);
 			modelManager = ModelTestUtils.createModelManager();
 		}
+		DigestInputStreamFactory.setDigestInputStreamForName("md5", com.openmeap.digest.Md5DigestInputStream.class);
+		DigestInputStreamFactory.setDigestInputStreamForName("sha1", com.openmeap.digest.Sha1DigestInputStream.class);
 	}
 	
 	@AfterClass static public void afterClass() {

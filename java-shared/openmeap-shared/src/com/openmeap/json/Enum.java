@@ -25,11 +25,11 @@
 package com.openmeap.json;
 
 /**
- * Have to have this in refactoring from 1.5 compliance to 1.4,
- * so that I can treat enums essentially the same as in 1.5.
+ * Basically, this is so I can share a bunch of code with Blackberry.
  * @author schang
  */
 public interface Enum {
 	// an Enum class must have a static fromValue method
 	String value();
+	Enum[] getStaticConstants();
 }

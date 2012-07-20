@@ -37,10 +37,10 @@ import org.slf4j.LoggerFactory;
 import com.openmeap.cluster.ClusterNotificationException;
 import com.openmeap.event.Event;
 import com.openmeap.event.EventHandlingException;
+import com.openmeap.event.EventNotificationException;
 import com.openmeap.event.ProcessingEvent;
 import com.openmeap.model.InvalidPropertiesException;
 import com.openmeap.model.ModelEntity;
-import com.openmeap.model.ModelServiceEventNotifier;
 import com.openmeap.model.ModelServiceOperation;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationArchive;
@@ -56,7 +56,7 @@ import com.openmeap.model.event.handler.ArchiveFileDeleteHandler;
  * the application archive from the file-system. 
  * @author schang
  */
-public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deployment> {
+public class DeploymentDeleteNotifier extends AbstractModelServiceEventNotifier<Deployment> {
 	
 	private Logger logger = LoggerFactory.getLogger(DeploymentDeleteNotifier.class);
 	private ArchiveFileDeleteNotifier archiveDeleteNotifier = null;
@@ -70,67 +70,54 @@ public class DeploymentDeleteNotifier implements ModelServiceEventNotifier<Deplo
 		}
 		return false;
 	}
-
+	
 	@Override
-	public <E extends Event<Deployment>> void notify(final E event, List<ProcessingEvent> events) throws ClusterNotificationException {
-		
+	public <E extends Event<Deployment>> void onAfterOperation(E event, List<ProcessingEvent> events) throws EventNotificationException {
+	//public <E extends Event<Deployment>> void onInCommitBeforeCommit(E event, List<ProcessingEvent> events) throws EventNotificationException {
+	
 		Deployment deployment2Delete = (Deployment)event.getPayload();
-		ApplicationVersion version = deployment2Delete.getApplicationVersion();
-		Application app = version.getApplication();
+		ApplicationArchive archive = deployment2Delete.getApplicationArchive();
 		
 		// if there are any other deployments with this hash,
-		//   then we cannot yet delete it's archive.
-		int versionCount = 0;
-		for( Deployment deployment : app.getDeployments() ) {
-			if( deployment.getId()==null || !deployment.getId().equals(deployment2Delete.getId()) ) {
-				if( deployment.getHash().equals(deployment2Delete.getHash()) 
-						&& deployment.getHashAlgorithm().equals(deployment2Delete.getHashAlgorithm()) ) {
-					return;
-				}
-			}
-			if( deployment.getApplicationVersion().getPk().equals(version.getPk()) ) {
-				versionCount++;
+		//   then we cannot yet delete it's archive yet at all.
+		List<Deployment> deployments = archiveDeleteHandler.getModelManager().getModelService().findDeploymentsByApplicationArchive(archive);
+		if(deployments.size()!=0) {
+			return;
+		} else {
+			int deplCount = archiveDeleteHandler.getModelManager().getModelService().countDeploymentsByHashAndHashAlg(archive.getHash(), archive.getHashAlgorithm());
+			if(deplCount==0) {
+				// use the archive delete notifier to cleanup to cluster nodes
+				archiveDeleteNotifier.notify(new ModelEntityEvent(ModelServiceOperation.DELETE,archive), events);
 			}
 		}
-		
-		// OK TO CLEANUP CLUSTER FILE SYSTEM
-		
-		// use the archive delete notifier to cleanup to cluster nodes
-		ApplicationArchive archive = new ApplicationArchive();
-		archive.setHash(deployment2Delete.getHash());
-		archive.setHashAlgorithm(deployment2Delete.getHashAlgorithm());
-		archiveDeleteNotifier.notify(new ModelEntityEvent(ModelServiceOperation.DELETE,archive), events);
 		
 		// if there are any application versions with this archive, 
 		//   then we cannot delete it's archive.
-		for( String versionId : app.getVersions().keySet() ) {
-			version = app.getVersions().get(versionId);
-			archive = version.getArchive();
-			if( version.getActiveFlag().equals(Boolean.TRUE)
-					&& archive.getHash().equals(deployment2Delete.getHash()) 
-					&& archive.getHashAlgorithm().equals(deployment2Delete.getHashAlgorithm()) ) {
-				return;
-			} 
+		List<ApplicationVersion> versions = archiveDeleteHandler.getModelManager().getModelService().findVersionsByApplicationArchive(archive);
+		if(versions.size()!=0) {
+			return;
 		}
 		
-		// OK TO CLEANUP LOCAL FILE SYSTEM
+		// OK TO DELETE THIS APPLICATION'S COPY OF THE ARCHIVE, 
+		// but possibly not the archive file...as it may be in use by another app
 		
 		// use the archive delete handler to cleanup localhost
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("archive", archive);
 		try {
-			GlobalSettings settings = archiveDeleteHandler.getModelManager().getGlobalSettings();
-			archiveDeleteHandler.setFileSystemStoragePathPrefix(settings.getTemporaryStoragePath());
-			archiveDeleteHandler.handle(new MapPayloadEvent(map));
+			int archivesWithHashAndAlg = archiveDeleteHandler.getModelManager().getModelService().countApplicationArchivesByHashAndHashAlg(archive.getHash(), archive.getHashAlgorithm());
+			if(archivesWithHashAndAlg==1) {
+				
+				// use the delete handler to cleanup the admin servers copy
+				GlobalSettings settings = archiveDeleteHandler.getModelManager().getGlobalSettings();
+				archiveDeleteHandler.setFileSystemStoragePathPrefix(settings.getTemporaryStoragePath());
+				archiveDeleteHandler.handle(new MapPayloadEvent(map));
+			}			
+			archiveDeleteHandler.getModelManager().delete(archive,events);
 		} catch (EventHandlingException e) {
-			throw new ClusterNotificationException(e);
+			throw new ClusterNotificationException("An event handling exception occured",e);
 		}
 		
-		// if all other deployments using the version of this deployment have been deleted,
-		// and this version is inactive...then delete this version.
-		if( versionCount==1 ) {
-			archiveDeleteHandler.getModelManager().delete(version,events);
-		}
 	}
 
 	public ArchiveFileDeleteNotifier getArchiveDeleteNotifier() {

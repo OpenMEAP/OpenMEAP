@@ -31,7 +31,10 @@ public class HashAlgorithm implements Enum {
 
 	static final public HashAlgorithm MD5 = new HashAlgorithm("MD5");
 	static final public HashAlgorithm SHA1 = new HashAlgorithm("SHA1");
-
+	static final private HashAlgorithm[] constants = new HashAlgorithm[] {
+				MD5,
+				SHA1
+			};
     private final String value;
     private HashAlgorithm(String v) {
         value = v;
@@ -39,11 +42,13 @@ public class HashAlgorithm implements Enum {
     public String value() {
         return value;
     }
+    public Enum[] getStaticConstants() {
+    	return constants;
+    }
     static public HashAlgorithm[] values() {
-    	return (HashAlgorithm[])EnumUtils.values(HashAlgorithm.class);
+    	return (HashAlgorithm[])MD5.getStaticConstants();
     }
     static public HashAlgorithm fromValue(String v) {
-    	return (HashAlgorithm)EnumUtils.fromValue(HashAlgorithm.class, v);
+    	return (HashAlgorithm)EnumUtils.fromValue(MD5, v);
     }
-
 }

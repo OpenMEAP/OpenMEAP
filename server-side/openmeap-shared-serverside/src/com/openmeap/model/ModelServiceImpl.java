@@ -24,24 +24,26 @@
 
 package com.openmeap.model;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
-import com.openmeap.cluster.ClusterNotificationException;
-import com.openmeap.event.EventNotificationException;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.openmeap.event.ProcessingEvent;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.Deployment;
-import com.openmeap.model.event.ModelEntityEvent;
-import com.openmeap.model.event.ModelEntityModifyEvent;
-import com.openmeap.model.event.handler.*;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.*;
-import javax.persistence.*;
 
 /**
  * Intended to basically pass-through to the entity manager.
@@ -56,43 +58,71 @@ public class ModelServiceImpl implements ModelService
 {
 	private Logger logger = LoggerFactory.getLogger(ModelServiceImpl.class);
 	
-	@PersistenceContext(name="openmeap-jpa")
 	private EntityManager entityManager = null;
+	
+	/**
+	 * Number of times to retry refreshing a model entity before failing the operation.
+	 * Using SQLite, sometimes the database file is locked by another process.
+	 */
+	private int numberOfRefreshRetries=3;
+	
+	/**
+	 * Amount of time to wait between each refresh retry.
+	 */
+	private int refreshRetryInterval=250;
 	
 	public void clearPersistenceContext() {
 		entityManager.clear();
 	}
 	
 	@Override
-	public <T extends ModelEntity> T saveOrUpdate(T obj) throws PersistenceException {
-		T obj2Persist = obj;
+	public <T extends ModelEntity> T saveOrUpdate(T entity) throws PersistenceException {
+		T entityToReturn = entity;
 		try {
-			entityManager.getTransaction().begin();
 			// if we haven't loaded this object yet,
 			// then attempt to do so
-			if( ! entityManager.contains(obj2Persist) ) {
-				obj2Persist = entityManager.merge(obj);
+			if( ! entityManager.contains(entity) ) {
+				entityToReturn = entityManager.merge(entity);
 			}
-			entityManager.persist(obj2Persist);
-			entityManager.getTransaction().commit();
-			this._refresh(obj2Persist);
+			entityManager.persist(entityToReturn);
 		} catch( PersistenceException pe ) {
-			if( entityManager.isOpen() && entityManager.getTransaction().isActive() ) {
-				entityManager.getTransaction().rollback();
-			}
 			throw new PersistenceException(pe);
 		}
-		return obj2Persist;
+		return entityToReturn;
 	}
 	
 	@Override
 	public <T extends ModelEntity> void delete(T obj2Delete) throws PersistenceException {		
 		_delete(obj2Delete,null);		
 	}
-	
+
 	@Override
-	public <T extends ModelEntity> void refresh(T obj2Refresh) throws PersistenceException {
-		this._refresh(obj2Refresh);
+	public <T extends ModelEntity> void refresh(T entity) throws PersistenceException {
+		int numRetries = numberOfRefreshRetries;
+		boolean notSuccessful = false;
+		do {
+			try{
+				if(entity!=null) {
+					this._refresh(entity);
+				}
+			} catch(Exception e) {
+				Throwable t = ExceptionUtils.getRootCause(e);
+				if(!(t instanceof SQLException)) {
+					throw new PersistenceException(e);
+				}
+				logger.warn("Unable to refresh model entity, "+numRetries+" left.  "+t.getMessage());
+				numRetries--;
+				notSuccessful=true;
+				try {
+					Thread.sleep(refreshRetryInterval);
+				} catch (InterruptedException e1) {
+					throw new PersistenceException("Thread sleep interrupted during the refresh retry interval: "+e1.getMessage(),e1);
+				}
+			}
+		} while(notSuccessful && numRetries!=0);
+		if(numRetries==0) {
+			throw new PersistenceException("Unable to refresh model entity.  "+numberOfRefreshRetries+" retries failed");
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -131,7 +161,8 @@ public class ModelServiceImpl implements ModelService
 	@Override
 	public ApplicationVersion findAppVersionByNameAndId(String appName, String identifier) {
 		Query q = entityManager.createQuery("select distinct av "
-				+"from ApplicationVersion av inner join fetch av.application a "
+				+"from ApplicationVersion av "
+				+"inner join fetch av.application a "
 				+"where av.identifier=:identifier "
 				+"and a.name=:name");
 		q.setParameter("name", appName);
@@ -145,17 +176,49 @@ public class ModelServiceImpl implements ModelService
 	}
 	
 	@Override
-	public List<Deployment> findDeploymentsByNameAndId(String appName, String identifier) {
+	public List<Deployment> findDeploymentsByApplication(Application app) {
 		Query q = entityManager.createQuery("select d "
-				+"from Deployment d inner join fetch d.applicationVersion av inner join fetch d.application a "
-				+"where av.identifier=:identifier "
-				+"and a.name=:name ");
-		q.setParameter("name", appName);
-		q.setParameter("identifier", identifier);
+				+"from Deployment d "
+				+"inner join fetch d.applicationArchive aa "
+				+"inner join d.application a "
+				+"where a.name=:name");
+		q.setParameter("name", app.getName());
 		try {
 			@SuppressWarnings(value={"unchecked"})
 			List<Deployment> deployments = (List<Deployment>)q.getResultList();
 			return deployments;
+		} catch( NoResultException nre ) {
+			return null;
+		}
+	}
+	
+	@Override
+	public List<Deployment> findDeploymentsByApplicationArchive(ApplicationArchive archive) {
+		Query q = entityManager.createQuery("select distinct d "
+				+"from Deployment d "
+				+"inner join fetch d.applicationArchive aa "
+				+"where aa.id=:id" );
+		q.setParameter("id", archive.getId());
+		try {
+			@SuppressWarnings(value={"unchecked"})
+			List<Deployment> deployments = (List<Deployment>)q.getResultList();
+			return deployments;
+		} catch( NoResultException nre ) {
+			return null;
+		}
+	}
+	
+	@Override
+	public List<ApplicationVersion> findVersionsByApplicationArchive(ApplicationArchive archive) {
+		Query q = entityManager.createQuery("select distinct av "
+				+"from ApplicationVersion av "
+				+"inner join fetch av.archive aa "
+				+"where aa.id=:id " );
+		q.setParameter("id", archive.getId());
+		try {
+			@SuppressWarnings(value={"unchecked"})
+			List<ApplicationVersion> versions = (List<ApplicationVersion>)q.getResultList();
+			return versions;
 		} catch( NoResultException nre ) {
 			return null;
 		}
@@ -178,35 +241,104 @@ public class ModelServiceImpl implements ModelService
 	}
 	
 	@Override
-	public List<ApplicationArchive> findApplicationArchivesByHashAndAlgorithm(String hash, String hashAlgorithm) {
-		Query q = entityManager.createQuery("select distinct ar "
-				+"from ApplicationArchive ar join fetch ar.version "
-				+"where ar.hash=:hash "
-				+"and ar.hashAlgorithm=:hashAlgorithm");
-		q.setParameter("hash", hash);
-		q.setParameter("hashAlgorithm", hashAlgorithm);
+	public ApplicationArchive getApplicationArchiveByDeployment(Deployment depl) {
+		Query q = entityManager.createQuery("select distinct aa "
+				+"from ApplicationArchive aa, Deployment d  "
+				+"where d.applicationArchive=aa and d.id=:id ");
+		q.setParameter("id", depl.getId());
 		q.setMaxResults(1);
 		try {
-			List<ApplicationArchive> o = (List<ApplicationArchive>)q.getResultList();
-			return (List<ApplicationArchive>)o;
+			Object o = q.getSingleResult();
+			return ((ApplicationArchive)o);
 		} catch( NoResultException nre ) {
 			return null;
 		}
 	}
 	
-	public <E extends ModelEntity, T extends ModelEntity> List<T> getOrderedDeployments(E entity, String listMethod, Comparator<T> comparator) {
+	@Override
+	public ApplicationArchive findApplicationArchiveByHashAndAlgorithm(Application app, String hash, String hashAlgorithm) {
+		Query q = entityManager.createQuery("select distinct ar "
+				+"from ApplicationArchive ar "
+				+"join fetch ar.application app "
+				+"where ar.hash=:hash "
+				+"and ar.hashAlgorithm=:hashAlgorithm "
+				+"and app.id=:appId");
+		q.setParameter("hash", hash);
+		q.setParameter("hashAlgorithm", hashAlgorithm);
+		q.setParameter("appId",app.getId());
+		q.setMaxResults(1);
+		try {
+			ApplicationArchive o = (ApplicationArchive)q.getSingleResult();
+			return (ApplicationArchive)o;
+		} catch( NoResultException nre ) {
+			return null;
+		}
+	}
+	
+	@Override
+	public int countDeploymentsByHashAndHashAlg(String hash, String hashAlg) {
+		Query q = entityManager.createQuery("select count(d) "
+				+"from Deployment d "
+				+"left join d.applicationArchive aa "
+				+"where aa.hash=:hash "
+				+"and aa.hashAlgorithm=:hashAlgorithm");
+		q.setParameter("hash", hash);
+		q.setParameter("hashAlgorithm", hashAlg);
+		try {
+			Number ret = (Number)q.getSingleResult();
+			return ret.intValue();
+		} catch( NoResultException nre ) {
+			return 0;
+		}
+	}
+	
+	@Override
+	public int countVersionsByHashAndHashAlg(String hash, String hashAlg) {
+		Query q = entityManager.createQuery("select count(av) "
+				+"from ApplicationVersion av "
+				+"left join av.archive ar "
+				+"where ar.hash=:hash "
+				+"and ar.hashAlgorithm=:hashAlgorithm");
+		q.setParameter("hash", hash);
+		q.setParameter("hashAlgorithm", hashAlg);
+		try {
+			Number ret = (Number)q.getSingleResult();
+			return ret.intValue();
+		} catch( NoResultException nre ) {
+			return 0;
+		}
+	}
+	
+	@Override
+	public int countApplicationArchivesByHashAndHashAlg(String hash, String hashAlg) {
+		Query q = entityManager.createQuery("select count(ar) "
+				+"from ApplicationArchive ar "
+				+"where ar.hash=:hash "
+				+"and ar.hashAlgorithm=:hashAlgorithm ");
+		q.setParameter("hash", hash);
+		q.setParameter("hashAlgorithm", hashAlg);
+		try {
+			Number ret = (Number)q.getSingleResult();
+			return ret.intValue();
+		} catch( NoResultException nre ) {
+			return 0;
+		}
+	}
+	
+	@Override
+	public <E extends ModelEntity, T extends ModelEntity> List<T> getOrdered(E entity, String listMethod, Comparator<T> comparator) {
 		EntityManager entityManager = getEntityManager(); 
 		entityManager.getTransaction().begin();
 		entityManager.merge(entity);
-		List<T> depls;
+		List<T> ents;
 		try {
-			depls = (List<T>) entity.getClass().getMethod(listMethod).invoke(entity);
+			ents = (List<T>) entity.getClass().getMethod(listMethod).invoke(entity);
 		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
-		Collections.sort( depls, comparator );
+		Collections.sort( ents, comparator );
 		entityManager.getTransaction().commit();
-		return depls;
+		return ents;
 	}
 	
 	// ACCESSORS
@@ -218,22 +350,27 @@ public class ModelServiceImpl implements ModelService
 		return entityManager;
 	}
 	
+	/**
+	 * Amount of time to wait between each refresh retry.
+	 */
+	public void setRefreshRetryInterval(int refreshRetryInterval) {
+		this.refreshRetryInterval = refreshRetryInterval;
+	}
+
+	/**
+	 * Number of times to retry refreshing a model entity before failing the operation.
+	 * Using SQLite, sometimes the database file is locked by another process.
+	 */
+	public void setNumberOfRefreshRetries(int numberOfRefreshRetries) {
+		this.numberOfRefreshRetries = numberOfRefreshRetries;
+	}
+	
 	// PRIVATE METHODS
 	
-	private <T extends ModelEntity> void _delete(T obj2Delete, List<ProcessingEvent> events) throws PersistenceException {		
+	private <T extends ModelEntity> void _delete(T entity, List<ProcessingEvent> events) throws PersistenceException {		
 		// give the event notifiers an opportunity to act, prior to deletion
-		try {
-			entityManager.getTransaction().begin();
-			this._refresh(obj2Delete);
-			obj2Delete.remove();
-			entityManager.remove(obj2Delete);
-			entityManager.getTransaction().commit();
-		} catch( PersistenceException pe ) {
-			if( entityManager.isOpen() && entityManager.getTransaction().isActive() ) {
-				entityManager.getTransaction().rollback();
-			}
-			throw new PersistenceException(pe);
-		}			
+		entity.remove();
+		entityManager.remove(entity);
 	}
 	
 	private void _refresh(ModelEntity obj2Refresh) {
@@ -241,5 +378,25 @@ public class ModelServiceImpl implements ModelService
 			entityManager.merge(obj2Refresh);
 		}
 		entityManager.refresh(obj2Refresh);
+	}
+
+	@Override
+	public ModelService begin() {
+		entityManager.getTransaction().begin();
+		return this;
+	}
+
+	@Override
+	public ModelService commit() {
+		entityManager.getTransaction().commit();
+		return this;
+	}
+
+	@Override
+	public ModelService rollback() {
+		if( entityManager.isOpen() && entityManager.getTransaction().isActive() ) {
+			entityManager.getTransaction().rollback();
+		}
+		return this;
 	}
 }

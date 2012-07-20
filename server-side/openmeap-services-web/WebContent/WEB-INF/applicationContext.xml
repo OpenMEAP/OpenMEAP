@@ -35,6 +35,15 @@
 		<property name="searchSystemEnvironment" value="true"/>
 		<property name="ignoreUnresolvablePlaceholders" value="true"/>
 	</bean>
+	
+	<bean id="digestInputStreamFactory" class="com.openmeap.digest.DigestInputStreamFactory">
+		<property name="staticDigests">
+		    <map>
+		        <entry key="MD5" value="com.openmeap.digest.Md5DigestInputStream"/>
+		        <entry key="SHA1" value="com.openmeap.digest.Sha1DigestInputStream"/>
+		    </map>
+		</property>
+	</bean>
 
 	<import resource="classpath:/META-INF/persistenceContext.xml"/>
 	<import resource="clusterContext.xml"/>

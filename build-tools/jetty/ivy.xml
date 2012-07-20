@@ -35,9 +35,14 @@
 	</configurations>
 	
 	<dependencies>
+	    <dependency org="org.mortbay.jetty" name="jetty" rev="6.1.9" conf="core->default" />
 		<dependency org="org.mortbay.jetty" name="jetty-ant" rev="6.1.9" conf="core->default" />
-		<dependency org="org.mortbay.jetty" name="jetty" rev="6.1.9" conf="core->default" />
-		<dependency org="javax.servlet" name="servlet-api" rev="3.0-alpha-1" conf="core->default"/>
+		<dependency org="org.mortbay.jetty" name="jetty-util" rev="6.1.9" conf="core->default" />
+		<dependency org="org.mortbay.jetty" name="jetty-naming" rev="6.1.9" conf="core->default" />
+		<dependency org="org.mortbay.jetty" name="servlet-api-2.5" rev="6.1H.8" conf="core->default"/>
+		<dependency org="org.mortbay.jetty" name="jsp-2.1" rev="6.1.11" conf="core->default"/>
+		<dependency org="org.mortbay.jetty" name="jsp-api-2.1" rev="6.1.11" conf="core->default"/>
+		<dependency org="org.eclipse.jdt" name="core" rev="3.1.1" conf="core->default"/>
 	</dependencies>
 	
 </ivy-module>

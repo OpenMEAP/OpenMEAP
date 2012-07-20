@@ -108,7 +108,7 @@
 				else="${android.sdk.home}tools/jarsigner">
 			<os family="windows"/>
 		</condition>
-		<exec dir="${openmeap.slic.absPath}" executable="${jarsigner}">
+		<exec dir="${openmeap.slic.absPath}" executable="${jarsigner}" failonerror="yes">
 			<arg value="-verbose"/>
 			<arg value="-keystore"/><arg value="${openmeap.slic.android.keyStore}"/>
 			<arg value="-storepass"/><arg value="${openmeap.slic.android.keyStorePassword}"/>
@@ -122,7 +122,7 @@
 				else="${android.sdk.home}tools/zipalign">
 			<os family="windows"/>
 		</condition>
-		<exec dir="${openmeap.slic.absPath}" executable="${zipalign}">
+		<exec dir="${openmeap.slic.absPath}" executable="${zipalign}" failonerror="yes">
 			<arg value="-v"/>
 			<arg value="4"/>
 			<arg value="${openmeap.slic.android.artifact.release.signed.unaligned}"/>
@@ -186,7 +186,7 @@
 				else="${android.sdk.home}/tools/android">
 			<os family="windows"/>
 		</condition>
-		<exec dir="." executable="${android}">
+		<exec dir="." executable="${android}" failonerror="yes">
 			<arg value="create"/><arg value="project"/>
 			<arg value="--target"/><arg value="${openmeap.slic.android.target}"/>
 			<arg value="--path"/><arg value="${openmeap.slic.android.path}"/>
@@ -194,7 +194,7 @@
 			<arg value="--package"/><arg value="${openmeap.slic.package}"/>
 			<arg value="--name"/><arg value="${openmeap.slic.android.projectName}"/>
 		</exec>
-		<exec dir="." executable="${android}">
+		<exec dir="." executable="${android}" failonerror="yes">
 			<arg value="update"/><arg value="project"/>
 			<arg value="--target"/><arg value="${openmeap.slic.android.target}"/>
 			<arg value="--path"/><arg value="${openmeap.slic.android.path}"/>

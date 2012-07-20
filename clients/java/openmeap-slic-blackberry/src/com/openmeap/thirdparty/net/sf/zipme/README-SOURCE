@@ -1,0 +1,82 @@
+==================================================================
+zipME source release README
+ - Last updated: July 30, 2007 (for release 0.9)
+==================================================================
+
+zipME is a pure Java zip compression library for Java ME CLDC/MIDP
+applications.
+
+This library is mostly compatible with the java.util.zip package
+in Java SE/CDC, so that an application can easily handle a zip file
+in the same manner as that in Java SE/CDC.
+
+This library is useful because the CLDC/MIDP doesn't officially
+support the java.util.zip package or any of alternative zip
+compression/uncompression libraries.
+
+This release contains the following parts:
+
+ - README-SOURCE - this file
+ - LICENSE - license information
+ - COPYING - the General Public License version 2
+ - build.xml - Ant build script
+ - src/ - source code for zipME
+ - lib/ - zipME library
+ - javadoc/ - javadoc for zipME
+
+See the LICENSE file for more details on license information.
+
+See the Javadoc for more details on the API.
+
+For more information on zipME, please visit the project web site:
+http://zipme.sourceforge.net/
+
+------------------------------------------------------------------
+Required Software
+------------------------------------------------------------------
+
+In order to build the zipME library and develop a MIDP application
+using zipME, the following software are required:
+
+ - Java SE JDK 5.0
+   http://java.sun.com/javase/downloads/index_jdk5.jsp
+
+ - Ant 1.2 or later
+   http://ant.apache.org/
+
+ - Sun Java Wireless Toolkit (WTK) 2.5 for CLDC
+   http://java.sun.com/products/sjwtoolkit/download-2_5.html
+
+------------------------------------------------------------------
+How to Build zipME Library
+------------------------------------------------------------------
+
+1. Setup the build environment
+
+ Download the zipME source release and unzip it. You will find
+ 'build.xml' file under the top directory. Edit the build.xml and
+ change the value of the 'wtk.home' property to your WTK's home.
+
+2. Building the zipME library
+
+ Under the directory where build.xml is located, run 'ant build'
+ or just 'ant'. You will find 'zipme.jar' file is created under
+ the 'lib' directory.
+
+ To clean up the build, run 'ant clean'.
+
+------------------------------------------------------------------
+How to Use zipME Library
+------------------------------------------------------------------
+
+1. Installing the zipME library to WTK's project
+
+ Copy 'zipme.jar' file into WTK's 'apps/<your_project_name>/lib'
+ directory, where <your_project_name> is your MIDP application's
+ project directory.
+
+2. Building a MIDP application using zipME
+
+ Write application code that calls API in the net.sf.zipme.*
+ package, and build it using WTK. zipME only requires the CLDC 1.0
+ and the MIDP 1.0 API.

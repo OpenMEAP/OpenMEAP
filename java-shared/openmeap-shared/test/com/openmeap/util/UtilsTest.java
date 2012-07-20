@@ -24,45 +24,38 @@
 
 package com.openmeap.util;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Hashtable;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 import com.openmeap.constants.FormConstants;
 
 
 public class UtilsTest extends TestCase {
-	public void testGetDocument() throws Exception {
-		// just validate that we can parse an xml document
-		String testXml = "<?xml version=\"1.0\"?><rootNode><childNode attribute=\"one\"/></rootNode>";
-		InputStream is = new BufferedInputStream(new ByteArrayInputStream(testXml.getBytes()));
-		Document d = Utils.getDocument(is);
-		Node rootNode = d.getFirstChild();
-		Node childNode = rootNode.getFirstChild();
-		Assert.assertTrue(rootNode.getNodeName().compareTo("rootNode")==0);
-		Assert.assertTrue(childNode.getNodeName().compareTo("childNode")==0);
-		Assert.assertTrue(childNode.getAttributes().getNamedItem("attribute").getNodeValue().compareTo("one")==0);
-	}
 	public void testReadInputStream() throws Exception {
 		String testXml = "<?xml version=\"1.0\"?><rootNode><childNode attribute=\"one\"/></rootNode>";
-		InputStream is = new BufferedInputStream(new ByteArrayInputStream(testXml.getBytes()));
+		InputStream is = new ByteArrayInputStream(testXml.getBytes());
 		String result = Utils.readInputStream(is,FormConstants.CHAR_ENC_DEFAULT);
-		Assert.assertTrue(result.compareTo(testXml+System.getProperty("line.separator"))==0);
+		Assert.assertTrue(result.compareTo(testXml)==0);
 	}
 	public void testReplaceFields() {
 		String template = "${TEST} and ${ANOTHER_TEST} making sure that ${TEST} gets replace.";
-		String result = "test and test making sure that test gets replace.";
-		Map parms = new HashMap();
+		String expected = "test and test making sure that test gets replace.";
+		Hashtable parms = new Hashtable();
 		parms.put("TEST", "test");
 		parms.put("ANOTHER_TEST", "test");
-		Assert.assertTrue(Utils.replaceFields(parms,template).compareTo(result)==0);
+		String result = Utils.replaceFields(parms,template);
+		Assert.assertEquals(expected,result);
+	}
+	public void testReadLine() throws Exception {
+		String lines = "One\r\n2\r\n\r\n";
+		InputStream is = new ByteArrayInputStream(lines.getBytes());
+		Assert.assertEquals("One",Utils.readLine(is, "utf-8"));
+		Assert.assertEquals("2",Utils.readLine(is, "utf-8"));
+		Assert.assertEquals("",Utils.readLine(is, "utf-8"));
+		is.close();
 	}
 }

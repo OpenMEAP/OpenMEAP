@@ -1,0 +1,10 @@
+MIDlet-Name: @@PROJECT_NAME@@
+MIDlet-Version: @@openmeap.slic.appVersion@@
+MIDlet-Vendor: @@openmeap.slic.vendor@@
+MIDlet-Jar-URL: @@PROJECT_NAME@@.jar
+MIDlet-Jar-Size: 0
+MicroEdition-Profile: MIDP-2.0
+MicroEdition-Configuration: CLDC-1.1
+MIDlet-1: ,img/icon.png,
+RIM-MIDlet-Flags-1: 0
+

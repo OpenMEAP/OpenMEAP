@@ -76,17 +76,33 @@ public interface ModelService {
 	 */
 	public <T extends ModelEntity> List<T> findAll(Class<T> clazz);
 
+	/*
+	 * APPLICATION SPECIFIC
+	 */
+	
 	public Application findApplicationByName(String name);
-	
 	public ApplicationVersion findAppVersionByNameAndId(String appName, String identifier);
+	public List<Deployment> findDeploymentsByApplication(Application app);
 	
-	public List<Deployment> findDeploymentsByNameAndId(String appName, String identifier);
-	
-	public List<ApplicationArchive> findApplicationArchivesByHashAndAlgorithm(String hash, String hashAlgorithm);
-	
+	public List<Deployment> findDeploymentsByApplicationArchive(ApplicationArchive archive);
+	public List<ApplicationVersion> findVersionsByApplicationArchive(ApplicationArchive archive);
+	public ApplicationArchive findApplicationArchiveByHashAndAlgorithm(Application app, String hash, String hashAlgorithm);
 	public Deployment getLastDeployment(Application app);
+	public ApplicationArchive getApplicationArchiveByDeployment(Deployment depl);
+	
+	/*
+	 * ACROSS ALL APPLICATIONS
+	 */
+	
+	public int countDeploymentsByHashAndHashAlg(String hash, String hashAlg);
+	public int countVersionsByHashAndHashAlg(String hash, String hashAlg);
+	public int countApplicationArchivesByHashAndHashAlg(String hash, String hashAlg);
 	
 	public void clearPersistenceContext();
 	
-	<E extends ModelEntity, T extends ModelEntity> List<T> getOrderedDeployments(E entity, String listMethod, Comparator<T> comparator);
+	public ModelService begin();
+	public ModelService commit();
+	public ModelService rollback();
+	
+	<E extends ModelEntity, T extends ModelEntity> List<T> getOrdered(E entity, String listMethod, Comparator<T> comparator);
 }

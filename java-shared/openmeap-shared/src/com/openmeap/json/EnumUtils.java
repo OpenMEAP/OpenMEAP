@@ -1,64 +1,39 @@
+/*
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011-2012 OpenMEAP, Inc.                                   #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the LGPLv3                                                #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU Lesser General Public License as published #
+ #    by the Free Software Foundation, either version 3 of the License, or     #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU Lesser General Public License for more details.                      #
+ #                                                                             #
+ #    You should have received a copy of the GNU Lesser General Public License #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+ */
+
 package com.openmeap.json;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.openmeap.protocol.dto.HashAlgorithm;
-
 abstract public class EnumUtils {
-	
-   final static public Object[] values(Class enumClass) {
-    	List list = new ArrayList();
-    	Field[] fields = HashAlgorithm.class.getDeclaredFields();
-    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
-    		try {
-    			Field field = fields[fieldIdx];
-    			if(!Modifier.isPublic(field.getModifiers())) {
-    				continue;
-    			}
-    			Object value;
-    			try {
-    				value = field.get(null);
-    			} catch (NullPointerException e) {
-    				continue;
-    			}
-    			if( ! (Modifier.isStatic(field.getModifiers()) && enumClass.isAssignableFrom(value.getClass()) ) ) {
-        			continue;
-        		}
-    			list.add(value);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			} 
-    	}
-    	return (Object[])list.toArray((Object[]) Array.newInstance(enumClass, list.size()));
-    }
 
-    final static public Enum fromValue(Class enumClass, String v) {
-    	Field[] fields = enumClass.getDeclaredFields();
-    	for( int fieldIdx=0; fieldIdx<fields.length; fieldIdx++ ) {
-    		Field field = fields[fieldIdx];
-    		try {
-    			if( ! (Modifier.isPublic(field.getModifiers()) && Modifier.isStatic(field.getModifiers())) ) {
-    				continue;
-    			}
-    			Object value;
-    			try {
-    				value = field.get(null);
-    			} catch(NullPointerException e) {
-    				continue;
-    			}
-    			if( ! enumClass.isAssignableFrom(value.getClass()) ) {
-    				continue;
-    			}
-	    		if( ((Enum)value).value().equals(v) ) {
-	    			return (Enum)value;
-	    		}
-    		} catch(Exception e) {
-    			throw new IllegalArgumentException(v);
-    		}
+    final static public Enum fromValue(Enum enumObject, String v) {
+
+    	Enum[] constants = enumObject.getStaticConstants();
+    	for( int fieldIdx=0; fieldIdx<constants.length; fieldIdx++ ) {
+    		Enum field = constants[fieldIdx];
+			if( field.value().equals(v) ) {
+				return field;
+			}
     	}
     	throw new IllegalArgumentException(v);
     }

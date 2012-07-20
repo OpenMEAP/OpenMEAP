@@ -26,8 +26,8 @@ package com.openmeap.model.dto;
 
 import javax.persistence.*;
 
-import com.openmeap.model.AbstractModelEntity;
 import com.openmeap.model.ModelEntity;
+import com.openmeap.model.event.AbstractModelEntity;
 
 import java.lang.reflect.Method;
 import java.util.Date;
@@ -43,7 +43,6 @@ public class ApplicationInstallation extends AbstractModelEntity {
 	private String uuid;
 	private ApplicationVersion applicationVersion; 
 	private Date deploymentDate;
-	private String authToken;
 	private Date authDate;
 	
 	/**

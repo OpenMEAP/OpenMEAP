@@ -1,16 +1,39 @@
+/*
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011-2012 OpenMEAP, Inc.                                   #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the LGPLv3                                                #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU Lesser General Public License as published #
+ #    by the Free Software Foundation, either version 3 of the License, or     #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU Lesser General Public License for more details.                      #
+ #                                                                             #
+ #    You should have received a copy of the GNU Lesser General Public License #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+ */
+
 package com.openmeap.thinclient.update;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.NoSuchAlgorithmException;
 import java.util.Date;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
-import com.openmeap.util.HttpResponse;
-
+import com.openmeap.constants.FormConstants;
+import com.openmeap.http.HttpRequestException;
+import com.openmeap.http.HttpRequestExecuter;
+import com.openmeap.http.HttpRequestExecuterFactory;
+import com.openmeap.http.HttpResponse;
 import com.openmeap.protocol.ApplicationManagementService;
 import com.openmeap.protocol.WebServiceException;
 import com.openmeap.protocol.dto.Application;
@@ -19,12 +42,14 @@ import com.openmeap.protocol.dto.ConnectionOpenRequest;
 import com.openmeap.protocol.dto.ConnectionOpenResponse;
 import com.openmeap.protocol.dto.SLIC;
 import com.openmeap.protocol.dto.UpdateHeader;
+import com.openmeap.protocol.dto.UpdateType;
 import com.openmeap.thinclient.AppMgmtClientFactory;
 import com.openmeap.thinclient.LocalStorage;
+import com.openmeap.thinclient.LocalStorageException;
+import com.openmeap.thinclient.OmMainActivity;
+import com.openmeap.thinclient.OmWebView;
 import com.openmeap.thinclient.SLICConfig;
-import com.openmeap.util.HttpRequestException;
-import com.openmeap.util.HttpRequestExecuter;
-import com.openmeap.util.HttpRequestExecuterFactory;
+import com.openmeap.util.GenericRuntimeException;
 import com.openmeap.util.Utils;
 
 /**
@@ -36,14 +61,24 @@ public class UpdateHandler {
 	
 	private SLICConfig config = null;
 	private LocalStorage storage = null;
+	private OmMainActivity activity = null;
 	private Object interruptLock = new Object();
-	private Boolean interrupt = Boolean.valueOf(false);
+	private Boolean interrupt = Boolean.FALSE;
 	
-	public UpdateHandler(SLICConfig config, LocalStorage storage) {
+	public UpdateHandler(OmMainActivity activity, SLICConfig config, LocalStorage storage) {
+		this.activity = activity;
 		this.setSLICConfig(config);
 		this.setLocalStorage(storage);
 	}
 	
+	private void setLocalStorage(LocalStorage storage2) {
+		this.storage = storage2;
+	}
+
+	private void setSLICConfig(SLICConfig config2) {
+		this.config = config2;
+	}
+
 	public void handleUpdate() throws WebServiceException {
     	UpdateHeader update = checkForUpdate();
     	if( update!=null ) {
@@ -54,7 +89,7 @@ public class UpdateHandler {
 	public UpdateHeader checkForUpdate() throws WebServiceException {
 		// we'll go ahead and flip the flag that we tried to update now
     	// at the beginning of our intent
-		config.setLastUpdateAttempt(Long.valueOf(new Date().getTime()));
+		config.setLastUpdateAttempt(new Long(new Date().getTime()));
 		
 		// put together the communication coordination request
     	ConnectionOpenRequest request = getConnectionOpenRequest();
@@ -132,7 +167,13 @@ public class UpdateHandler {
 		        public void run() {
 		        	try {
 		            	_handleUpdate(update,eventHandler);
-		        	} catch( UpdateException ue ) {
+		        	} catch( Exception e ) {
+		        		UpdateException ue = null;
+		        		if(e instanceof UpdateException ) {
+							ue = (UpdateException)e;
+						} else {
+							ue = new UpdateException(UpdateResult.UNDEFINED,e.getMessage(),e);
+						}
 		        		config.setLastUpdateResult(ue.getUpdateResult().toString());
 		        		update.setError(ue);
 		        		eventHandler.onStatusChange(update);
@@ -143,22 +184,28 @@ public class UpdateHandler {
 		} else {
 			try {
 				_handleUpdate(update,eventHandler);
-			} catch(UpdateException ue) {
-				config.setLastUpdateResult(ue.getUpdateResult().toString());
-				throw new RuntimeException(ue);
+			} catch(Exception e) {
+				UpdateException ue = null;
+        		if(e instanceof UpdateException ) {
+					ue = (UpdateException)e;
+				} else {
+					ue = new UpdateException(UpdateResult.UNDEFINED,e.getMessage(),e);
+				}
+        		config.setLastUpdateResult(ue.getUpdateResult().toString());
+        		throw new GenericRuntimeException(ue.getMessage(),ue);
 			}
 		}
 	}
 	
 	public void clearInterruptFlag() {
 		synchronized(interruptLock) {
-			interrupt = Boolean.valueOf(false);
+			interrupt = Boolean.FALSE;
 		}
 	}
 	
 	public void interruptRunningUpdate() {
 		synchronized(interruptLock) {
-			interrupt = Boolean.valueOf(true);
+			interrupt = Boolean.TRUE;
 		}
 	}
 	
@@ -179,11 +226,8 @@ public class UpdateHandler {
 		// then we'll just update the app version, delete internal storage and return
 		String versionId = updateHeader.getVersionIdentifier();
 		if( config.isVersionOriginal(versionId).booleanValue() ) {
-			config.setApplicationVersion(versionId);
-			config.setArchiveHash(updateHeader.getHash().getValue());
-     		storage.resetStorage();
-     		config.setLastUpdateResult(UpdateResult.SUCCESS.toString());
-     		return;
+			_revertToOriginal(update, eventHandler);
+			return;
 		}
 		
 		if( ! deviceHasEnoughSpace(update).booleanValue() ) {
@@ -196,54 +240,58 @@ public class UpdateHandler {
 			if( ! downloadToArchive(update, eventHandler).booleanValue() ) {
 				return;
 			}
-		} catch( IOException ioe ) {
+		} catch( Exception ioe ) {
 			// TODO: whether this is a deal breaker or not should be configurable.  client should have the ability to override default behavior.  default behavior should be informative
-			throw new UpdateException(UpdateResult.IO_EXCEPTION,"May need more space to install than is available",ioe);
+			throw new UpdateException(UpdateResult.IO_EXCEPTION,"An issue occurred downloading the archive",ioe);
 		} 
 		
-		try {
-			 
-			if( ! archiveIsValid(update).booleanValue() ) {
-				throw new UpdateException(UpdateResult.HASH_MISMATCH,"hash value of update does not match file hash value");
-			}
-				
-			
-			installArchive(update);
-			
-			config.setLastUpdateResult(UpdateResult.SUCCESS.toString());
-			
-			// at this point, the archive should be of no use to us
-			storage.deleteImportArchive();
-			
-			// delete the content at the old internal storage prefix
-			// TODO: decide whether this should be done pending notifying of the update or not
-			config.setApplicationVersion(update.getUpdateHeader().getVersionIdentifier());
-			config.setArchiveHash(update.getUpdateHeader().getHash().getValue());
-			
-			storage.resetStorage();
-			
-			String newPrefix = "com.openmeap.storage."+update.getUpdateHeader().getHash().getValue();
-			config.setStorageLocation(newPrefix);
-
-			config.setApplicationUpdated(Boolean.TRUE);
-			
-			if( eventHandler!=null ) { 
-				update.setComplete(true);
-	        	eventHandler.onStatusChange(update);
-	        }
-
-		} catch( IOException ioe ) {
-			// TODO: leave it up the customer to determine how to handle this.
-			throw new UpdateException(UpdateResult.IO_EXCEPTION,"An IOException occurred",ioe);
-		} catch( NoSuchAlgorithmException nsae ) {
-			throw new UpdateException(UpdateResult.PLATFORM,"The Java platform of the device does not support the hash algorithm used.",nsae);
+		if( ! archiveIsValid(update).booleanValue() ) {
+			throw new UpdateException(UpdateResult.HASH_MISMATCH,"hash value of update does not match file hash value");
 		}
+			
+		
+		installArchive(update);
+		
+		// at this point, the archive should be of no use to us
+		try {
+			storage.deleteImportArchive();
+		} catch(LocalStorageException lse) {
+			throw new UpdateException(UpdateResult.IO_EXCEPTION,"Could not delete import archive",lse);
+		}
+		
+		try {
+			storage.resetStorage();
+		} catch(LocalStorageException lse) {
+			throw new UpdateException(UpdateResult.IO_EXCEPTION,"Could not reset storage",lse);
+		}
+		
+		config.setLastUpdateResult(UpdateResult.SUCCESS.toString());
+		
+		config.setApplicationVersion(update.getUpdateHeader().getVersionIdentifier());
+		config.setArchiveHash(update.getUpdateHeader().getHash().getValue());
+		
+		String newPrefix = storage.getStorageRoot()+update.getUpdateHeader().getHash().getValue();
+		config.setStorageLocation(newPrefix);
+
+		config.setApplicationUpdated(Boolean.TRUE);
+		
+		if( eventHandler!=null ) { 
+			update.setComplete(true);
+        	eventHandler.onStatusChange(update);
+        } else {
+        	activity.restart();
+        }
 	}
 	
-	public Boolean deviceHasEnoughSpace(UpdateStatus update) {
+	public Boolean deviceHasEnoughSpace(UpdateStatus update) throws UpdateException {
 		// test to make sure the device has enough space for the installation
-		Long avail = storage.getBytesFree();
-		return Boolean.valueOf(avail.compareTo(update.getUpdateHeader().getInstallNeeds()) > 0); 
+		Long avail;
+		try {
+			avail = storage.getBytesFree();
+		} catch (LocalStorageException e) {
+			throw new UpdateException(UpdateResult.IO_EXCEPTION,"Could not determine the number of bytes available",e);
+		}
+		return new Boolean(avail.longValue() > update.getUpdateHeader().getInstallNeeds().longValue()); 
 	}
 	
 	/**
@@ -253,7 +301,7 @@ public class UpdateHandler {
 	 * @return true if completed, false if interrupted
 	 * @throws IOException
 	 */
-	public Boolean downloadToArchive(UpdateStatus update, StatusChangeHandler eventHandler) throws UpdateException, IOException {
+	public Boolean downloadToArchive(UpdateStatus update, StatusChangeHandler eventHandler) throws UpdateException {
 		// download the file to import.zip
 		OutputStream os = null;
 		InputStream is = null;
@@ -262,7 +310,7 @@ public class UpdateHandler {
 		try {
 			updateRequestResponse = requester.get(update.getUpdateHeader().getUpdateUrl());
 		} catch(HttpRequestException e){
-			throw new IOException(e);
+			throw new UpdateException(UpdateResult.IO_EXCEPTION,"An issue occurred fetching the update archive",e);
 		}
 		if( updateRequestResponse.getStatusCode()!=200 )
 			throw new UpdateException(UpdateResult.RESPONSE_STATUS_CODE,"Status was "+updateRequestResponse.getStatusCode()+", expecting 200" );
@@ -294,9 +342,17 @@ public class UpdateHandler {
 		        	}
 	        	}
 	        }
+		} catch(IOException lse) {
+			throw new UpdateException(UpdateResult.IO_EXCEPTION,lse.getMessage(),lse);
+		} catch(LocalStorageException lse) {
+			throw new UpdateException(UpdateResult.IO_EXCEPTION,lse.getMessage(),lse);
 		} finally {
-			os.close();
-			is.close();
+			try {
+				storage.closeOutputStream(os);
+				storage.closeInputStream(is);
+			} catch (LocalStorageException e) {
+				throw new UpdateException(UpdateResult.IO_EXCEPTION,e.getMessage(),e);
+			}
 			
 			// have to hang on to the requester till the download is complete,
 			// so that we can retain control over when the connection manager shut's down
@@ -305,87 +361,149 @@ public class UpdateHandler {
 		return Boolean.TRUE;
 	}
 	
-	public Boolean archiveIsValid(UpdateStatus update) throws IOException, NoSuchAlgorithmException {
-		// validate the zip file against the hash of the response
-		InputStream fis = storage.getImportArchiveInputStream();
+	public Boolean archiveIsValid(UpdateStatus update) throws UpdateException {
 		try {
-			String hashValue = Utils.hashInputStream(
-					update.getUpdateHeader().getHash().getAlgorithm().value(), fis);
-			
-			// TODO: handle hash validation failure differently
-			
-			if( !hashValue.equals(update.getUpdateHeader().getHash().getValue()) ) {
-				return Boolean.FALSE;
+			// validate the zip file against the hash of the response
+			InputStream fis = null;
+			try {
+				fis = storage.getImportArchiveInputStream();
+				String hashValue = Utils.hashInputStream(update.getUpdateHeader().getHash().getAlgorithm().value(), fis);
+				if( !hashValue.equals(update.getUpdateHeader().getHash().getValue()) ) {
+					return Boolean.FALSE;
+				}
+				return Boolean.TRUE;
+			} finally {
+				storage.closeInputStream(fis);
 			}
-			return Boolean.TRUE;
-		} finally {
-			fis.close();
+		} catch(Exception e) {
+			throw new UpdateException(UpdateResult.UNDEFINED,"The archive failed validation",e);
 		}
 	}
 	
-	public void installArchive(UpdateStatus update) throws UpdateException, IOException {
-		
-		// at this point, we've verified that:
-		//   1) we have enough space on the device
-		//   2) the archive downloaded is what was expected
-
-		ZipInputStream zis = null;
-		String newPrefix = "com.openmeap.storage."+update.getUpdateHeader().getHash().getValue();
+	public void installArchive(UpdateStatus update) throws UpdateException {
 		try {
-			zis = new ZipInputStream( storage.getImportArchiveInputStream() );
-		    ZipEntry ze;
-		    while ((ze = zis.getNextEntry()) != null) {
-		    	if( ze.isDirectory() )
-		    		continue;
-		        FileOutputStream baos = storage.openFileOutputStream(newPrefix,ze.getName());
-		        try {
-		        	byte[] buffer = new byte[1024];
-		        	int count;
-		        	while ((count = zis.read(buffer)) != -1) {
-		        		baos.write(buffer, 0, count);
-		        	}
-		        }
-		        catch( Exception e ) {
-		        	;// TODO: something, for the love of god.
-		        }
-		        finally {
-		        	baos.close();
-		        }
-		    }
-		} catch( IOException e ) {
-			
-			// delete the recently unzipped assets
-			
-			throw new UpdateException(UpdateResult.IMPORT_UNZIP,"Failed to extract import archive.",e);
-		} finally {
-			if( zis!=null )
-				zis.close();
+			storage.unzipImportArchive(update);
+		} catch (LocalStorageException e) {
+			throw new UpdateException(UpdateResult.IO_EXCEPTION,"The archive failed to install",e);
 		}
 	}
 	
 	private boolean hasUpdatePendingTimedOut() {
 		Integer pendingTimeout = config.getUpdatePendingTimeout();
 		Long lastAttempt = config.getLastUpdateAttempt();
-		Long currentTime = Long.valueOf(new Date().getTime());
+		Long currentTime = new Long(new Date().getTime());
 		if( lastAttempt!=null ) {
 			return currentTime.longValue() > lastAttempt.longValue()+(pendingTimeout.intValue()*1000);
 		}
 		return true;
 	}
 	
-	/* ACCESSORS BELOW HERE */
+	public void initialize(OmWebView webView) {
+        
+        // if this application is configured to fetch updates,
+        // then check for them now
+		activity.setReadyForUpdateCheck(false);
+		Boolean shouldPerformUpdateCheck = activity.getConfig().shouldPerformUpdateCheck();
+		webView = webView!=null ? webView : activity.createDefaultWebView();
+		activity.runOnUiThread(new InitializeWebView(webView));
+        if( shouldPerformUpdateCheck!=null && shouldPerformUpdateCheck.equals(Boolean.TRUE) ) {
+        	new Thread(new UpdateCheck(webView)).start();
+        }
+	}
 	
-	public void setLocalStorage(LocalStorage storage) {
-		this.storage = storage;
+	private void _revertToOriginal(UpdateStatus update, StatusChangeHandler eventHandler) throws UpdateException {
+		config.setApplicationVersion(update.getUpdateHeader().getVersionIdentifier());
+		config.setArchiveHash(update.getUpdateHeader().getHash().getValue());
+		try {
+			storage.resetStorage();
+		} catch(LocalStorageException lse) {
+			throw new UpdateException(UpdateResult.IO_EXCEPTION,"Could not reset storage",lse);
+		}
+ 		config.setLastUpdateResult(UpdateResult.SUCCESS.toString());
+ 		if( eventHandler!=null ) { 
+			update.setComplete(true);
+        	eventHandler.onStatusChange(update);
+        } else {
+        	activity.restart();
+        }
+ 		return;
 	}
-	public LocalStorage getLocalStorage() {
-		return this.storage;
-	}
-	
-	public void setSLICConfig(SLICConfig config) {
-		this.config = config;
-	}
-	public SLICConfig getSLICConfig() {
-		return this.config;
-	}
+    
+	private static String SOURCE_ENCODING = FormConstants.CHAR_ENC_DEFAULT;
+	private static String CONTENT_TYPE = FormConstants.CONT_TYPE_HTML;
+    private class InitializeWebView implements Runnable {
+    	private OmWebView webView;
+		public InitializeWebView(OmWebView webView) {
+    		this.webView = webView;
+    	}
+    	public void run() {
+	    	// here after, everything is handled by the html and javascript
+	        try {
+	        	Boolean justUpdated = config.getApplicationUpdated();
+	        	if( justUpdated!=null && justUpdated.booleanValue()==true ) {
+	        		config.setApplicationUpdated(Boolean.FALSE);
+	        	}
+	        	activity.setWebView(webView);
+	        	String baseUrl = config.getAssetsBaseUrl();
+	        	String pageContent = activity.getRootWebPageContent();
+	        	webView.loadDataWithBaseURL(baseUrl, pageContent, CONTENT_TYPE, SOURCE_ENCODING, null);
+        		activity.setContentView(webView);
+	        } catch( Exception e ) {
+	        	throw new GenericRuntimeException(e);
+	        }
+	    }
+    }
+    
+    private class UpdateCheck implements Runnable {
+    	final private OmWebView webView;
+    	public UpdateCheck(OmWebView webView) {
+    		this.webView = webView;
+    	}
+		public void run() {
+			int count=0;
+			while(!activity.getReadyForUpdateCheck() && count<500) {
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					;
+				}
+				count++;
+			}
+			UpdateHeader update = null;
+			WebServiceException err = null;
+        	try {
+        		update = checkForUpdate();
+        	} catch( WebServiceException wse ) {
+        		err = wse;
+        	}
+        	if( update!=null && update.getType()==UpdateType.IMMEDIATE ) {
+        		try {
+        			activity.runOnUiThread(new Runnable(){
+        				public void run() {
+        					activity.doToast("MANDATORY UPDATE\n\nThere is an immediate update.  The application will restart.  We apologise for any inconvenience.", true);
+        					//webView.clearView();
+        				}
+        			});
+        			handleUpdate(update);
+        			storage.setupSystemProperties();
+        			update=null;
+        		} catch( Exception e ) {
+            		err = new WebServiceException(WebServiceException.TypeEnum.CLIENT_UPDATE,e.getMessage(),e);
+            		if(activity.getReadyForUpdateCheck()) {
+	            		try {
+	    					webView.setUpdateHeader(null, err, storage.getBytesFree());
+	    				} catch (LocalStorageException e2) {
+	    					throw new GenericRuntimeException(e);
+	    				}
+            		}
+            	}
+        	} else {
+        		try {
+					webView.setUpdateHeader(update, err, storage.getBytesFree());
+				} catch (LocalStorageException e) {
+					throw new GenericRuntimeException(e);
+				}
+        	}
+		}
+    }
 }

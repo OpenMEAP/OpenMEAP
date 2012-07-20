@@ -24,15 +24,21 @@
 
 package com.openmeap.model.event.notifier;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import mockit.NonStrictExpectations;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.openmeap.digest.DigestInputStreamFactory;
+import com.openmeap.digest.Md5DigestInputStream;
+import com.openmeap.digest.Sha1DigestInputStream;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.ModelManagerImpl;
 import com.openmeap.model.ModelService;
@@ -46,17 +52,10 @@ import com.openmeap.util.MockHttpRequestExecuter;
 
 public class ModelServiceRefreshNotifierTest {
 	
-	/*@BeforeClass static public void beforeClass() {
-		if( modelManager == null ) {
-			ModelTestUtils.resetTestDb();
-			ModelTestUtils.createModel(null);
-			modelManager = ModelTestUtils.createModelManager();
-		}
+	@BeforeClass static public void beforeClass() {
+		DigestInputStreamFactory.setDigestInputStreamForName("MD5", Md5DigestInputStream.class);
+		DigestInputStreamFactory.setDigestInputStreamForName("SHA1", Sha1DigestInputStream.class);
 	}
-	
-	@AfterClass static public void afterClass() {
-		ModelTestUtils.resetTestDb();
-	}*/
 	
 	@mockit.MockClass(realClass=ModelManagerImpl.class)
 	class MockModelManager extends ModelManagerImpl {
@@ -75,6 +74,7 @@ public class ModelServiceRefreshNotifierTest {
 		final ModelManager modelManager = new MockModelManager();
 		final GlobalSettings globalSettings = new GlobalSettings();
 		globalSettings.setServiceManagementAuthSalt(UUID.randomUUID().toString());
+
 		ClusterNode clusterNode = new ClusterNode();
 		clusterNode.setServiceWebUrlPrefix("http://www.openmeap.com/openmeap-services-web");
 		globalSettings.addClusterNode(clusterNode);

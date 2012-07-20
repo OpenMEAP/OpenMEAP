@@ -27,6 +27,7 @@ package com.openmeap.model.dto;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,12 +43,21 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.StringUtils;
 
 import com.openmeap.json.HasJSONProperties;
+import com.openmeap.json.JSONGetterSetter;
 import com.openmeap.json.JSONProperty;
-import com.openmeap.model.AbstractModelEntity;
-import com.openmeap.model.ModelEntity;
+import com.openmeap.model.event.AbstractModelEntity;
 
 @Entity @Table(name="cluster_node")
 public class ClusterNode extends AbstractModelEntity implements HasJSONProperties {
+	
+	/**
+	 * Status resulting from the health check 
+	 */
+	public static enum Status {
+		CONNECT_ERROR,
+		GOOD,
+		ERROR
+	}
 	
 	/**
 	 * This is the url to the deployment of openmeap-service-web.war
@@ -57,10 +67,33 @@ public class ClusterNode extends AbstractModelEntity implements HasJSONPropertie
 	private String serviceWebUrlPrefix;
 	private String fileSystemStoragePathPrefix;
 	private Long id;
+	private Status lastStatus;
+	private String lastStatusMessage;
+	private Date lastStatusCheck;
+	
+	public ClusterNode() {}
+	public ClusterNode(String serviceUrl, String prefix) {
+		this.serviceWebUrlPrefix=serviceUrl;
+		this.fileSystemStoragePathPrefix=prefix;
+	}
 	
 	static final private JSONProperty[] jsonProperties = new JSONProperty[] {
-		new JSONProperty("getServiceWebUrlPrefix"),
-		new JSONProperty("getFileSystemStoragePathPrefix")
+		new JSONProperty("serviceWebUrlPrefix",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((ClusterNode)src).getServiceWebUrlPrefix();
+			}
+			public void setValue(Object dest, Object value) {
+				((ClusterNode)dest).setServiceWebUrlPrefix((String)value);
+			}
+		}),
+		new JSONProperty("fileSystemStoragePathPrefix",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((ClusterNode)src).getFileSystemStoragePathPrefix();
+			}
+			public void setValue(Object dest, Object value) {
+				((ClusterNode)dest).setFileSystemStoragePathPrefix((String)value);
+			}
+		})
 	};
 	@Override @Transient
 	public JSONProperty[] getJSONProperties() {
@@ -144,5 +177,26 @@ public class ClusterNode extends AbstractModelEntity implements HasJSONPropertie
 			return false;
 		ClusterNode cn = (ClusterNode)o;
 		return serviceWebUrlPrefix.equals(cn.getServiceWebUrlPrefix());
+	}
+
+	synchronized public void setLastStatus(Status lastStatus) {
+		this.lastStatus = lastStatus;
+	}
+	@Transient synchronized public Status getLastStatus() {
+		return lastStatus;
+	}
+
+	synchronized public void setLastStatusMessage(String lastStatusMessage) {
+		this.lastStatusMessage = lastStatusMessage;
+	}
+	@Transient synchronized public String getLastStatusMessage() {
+		return lastStatusMessage;
+	}
+
+	synchronized public void setLastStatusCheck(Date lastStatusCheck) {
+		this.lastStatusCheck = lastStatusCheck;
+	}
+	@Transient synchronized public Date getLastStatusCheck() {
+		return lastStatusCheck;
 	}
 }

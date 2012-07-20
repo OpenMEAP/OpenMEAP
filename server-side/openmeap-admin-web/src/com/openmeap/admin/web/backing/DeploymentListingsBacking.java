@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,7 +69,6 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 	private Logger logger = LoggerFactory.getLogger(DeploymentListingsBacking.class);
 	
 	private ModelManager modelManager = null;
-	private ArchiveFileUploadNotifier archiveFileUploadNotifier = null;
 
 	public Collection<ProcessingEvent> process(ProcessingContext context, Map<Object,Object> templateVariables, Map<Object, Object> parameterMap) {
 		
@@ -103,24 +103,35 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 			if( version!=null ) {
 				
 				Deployment depl = createDeployment(firstValue("userPrincipalName",parameterMap),version,deploymentType);
-				pushArchiveToClusterForDeployment(depl,events);
 				
 				try {
+					modelManager.begin();
 					depl = modelManager.addModify(depl,events);
+					modelManager.commit(events);
 					events.add( new MessagesEvent("Deployment successfully create!") );
-				} catch (PersistenceException pe) {
+				} catch (Exception pe) {
+					modelManager.rollback();
 					Throwable root = ExceptionUtils.getRootCause(pe);
-					events.add( new MessagesEvent("An exception was thrown creating the deployment: "+root.getMessage()));
-				} catch (InvalidPropertiesException pe) {
-					Throwable root = ExceptionUtils.getRootCause(pe);
-					events.add( new MessagesEvent("An exception was thrown creating the deployment: "+root.getMessage()));
-				}
+					events.add( new MessagesEvent(
+						String.format("An exception was thrown creating the deployment: %s %s",root.getMessage(),ExceptionUtils.getStackTrace(root))));
+				} 
 			}
 		}
 		
 		// making sure to order the deployments by date
 		if( app!=null && app.getDeployments()!=null ) {
-			templateVariables.put("deployments", modelManager.getModelService().getOrderedDeployments(app, "getDeployments", new Deployment.DateComparator()));
+			List<Deployment> deployments = modelManager.getModelService().findDeploymentsByApplication(app);
+			Collections.sort(deployments,new Deployment.DateComparator());
+			templateVariables.put("deployments", deployments);
+			
+			GlobalSettings settings = modelManager.getGlobalSettings();
+			
+			Map<String,String> urls = new HashMap<String,String>();
+			for(Deployment depl : deployments) {
+				urls.put(depl.getApplicationArchive().getHash(), depl.getApplicationArchive().getDownloadUrl(settings));
+			}
+			templateVariables.put("deployments", deployments);
+			templateVariables.put("archiveUrls", urls);
 		}
 		
 		return events;
@@ -130,26 +141,12 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 		GlobalSettings settings = modelManager.getGlobalSettings();
 		Deployment depl = new Deployment();
 		depl.setType( Deployment.Type.valueOf(deploymentType) );
-		depl.setApplicationVersion(version);
-		depl.setHash(version.getArchive().getHash());
-		depl.setHashAlgorithm(version.getArchive().getHashAlgorithm());
-		depl.setDownloadUrl(version.getArchive().getDirectDownloadUrl(settings));
+		depl.setApplicationArchive(version.getArchive());
 		depl.setCreateDate(new java.util.Date());
 		depl.setCreator(creator);
+		depl.setVersionIdentifier(version.getIdentifier());
 		version.getApplication().addDeployment(depl);
 		return depl;
-	}
-	
-	private void pushArchiveToClusterForDeployment(Deployment depl, List<ProcessingEvent> events) {
-		try {
-			ApplicationArchive archive = new ApplicationArchive();
-			archive.setHash(depl.getHash());
-			archive.setHashAlgorithm(depl.getHashAlgorithm());
-			archiveFileUploadNotifier.notify(new ModelEntityEvent(ModelServiceOperation.SAVE_OR_UPDATE,archive), events);
-		} catch (Exception e) {
-			logger.error("An exception occurred pushing the new archive to cluster nodes: {}",e);
-			events.add(new MessagesEvent(String.format("An exception occurred pushing the new archive to cluster nodes: %s",e.getMessage())));
-		}
 	}
 	
 	/*
@@ -158,16 +155,5 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 	
 	public void setModelManager(ModelManager modelManager) {
 		this.modelManager = modelManager;
-	}
-	public ModelManager getModelManager() {
-		return modelManager;
-	}
-	
-	public ArchiveFileUploadNotifier getArchiveFileUploadNotifier() {
-		return archiveFileUploadNotifier;
-	}
-	public void setArchiveFileUploadNotifier(
-			ArchiveFileUploadNotifier archiveFileUploadNotifier) {
-		this.archiveFileUploadNotifier = archiveFileUploadNotifier;
 	}
 }

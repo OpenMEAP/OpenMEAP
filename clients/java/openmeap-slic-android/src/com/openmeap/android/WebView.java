@@ -32,15 +32,17 @@ import java.util.Map;
 import com.openmeap.protocol.WebServiceException;
 import com.openmeap.protocol.dto.UpdateHeader;
 import com.openmeap.protocol.json.JsUpdateHeader;
+import com.openmeap.thinclient.OmMainActivity;
+import com.openmeap.thinclient.OmWebView;
+import com.openmeap.thinclient.OmWebViewHelper;
 
-public class WebView extends android.webkit.WebView {
+public class WebView extends android.webkit.WebView implements OmWebView {
 
-	final static private String INSURE_OPENMEAP = "if(typeof OpenMEAP=='undefined') { OpenMEAP={data:{},config:{},persist:{cookie:{}}}; };";
-	private MainActivity activity; 
+	private OmMainActivity activity; 
 	
 	Map<String,Object> jsInterfaces = new HashMap<String,Object>();
 	
-	public WebView(MainActivity activity, Context context) {
+	public WebView(OmMainActivity activity, Context context) {
 		super(context);
 		this.activity = activity;
 	}
@@ -59,45 +61,32 @@ public class WebView extends android.webkit.WebView {
 		loadUrl(url);
 	}
 	
-	public void setUpdateHeader(UpdateHeader update, WebServiceException err, Long bytesFree) {
-		String js = "void(0);";
-		if( err!=null ) {
-			js = INSURE_OPENMEAP+"window.OpenMEAP.data.update={error:"+WebServiceException.toJSON(err)+"};";
-		} else if(update!=null) {
-			js = INSURE_OPENMEAP+"window.OpenMEAP.data.update="+new JsUpdateHeader(update,bytesFree).toString()+";";
-		} else {
-			js = INSURE_OPENMEAP+"window.OpenMEAP.data.update=null;";
-		}
-		runJavascript(js);
+	public void setUpdateHeader(final UpdateHeader update, final WebServiceException err, final Long bytesFree) {
+		final OmWebView webView = this;
+		activity.runOnUiThread(new Runnable(){
+			public void run() {
+				OmWebViewHelper.setUpdateHeader(webView,update,err,bytesFree);
+			}
+		});
 	}
 
 	public void performOnResume() {
 		activity.getUpdateHandler().clearInterruptFlag();
 		// TODO: call the js callback
 	}
+	
 	public void performOnPause() {
 		activity.getUpdateHandler().interruptRunningUpdate();
 		// TODO: call the js callback
 	}
 	
-	/**
-	 * A convenience method for executing a javascript callback function
-	 * passed in from the customer code.
-	 * 
-	 * Note: the javascript bridge in android doesn't decode a javascript
-	 * function to something usable, so it must be converted to a string
-	 * client-side.
-	 */
-	public void executeJavascriptFunction(String callBack, String... arguments) {
-		Integer random = new Double(Math.random()*10000.0).intValue();
-    	String func = "openMEAP_anon"+random;
-		String str = "var "+func+"="+callBack+"; "+func+"(";
-		int cnt = arguments.length;
-		for( int i=0; i<cnt; i++ ) {
-			str += i!=0 ? ",":"";
-			str += arguments[i];
-		}
-		str += "); "+func+"=undefined;";
-		runJavascript(str);
+	public void executeJavascriptFunction(String callBack, String[] arguments) {
+		OmWebViewHelper.executeJavascriptFunction(this,callBack,arguments);
+	}
+	
+	@Override
+	public void clearView() {
+		super.clearView();
+		runJavascript("document.body.innerHTML=\"\";");
 	}
 }

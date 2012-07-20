@@ -24,9 +24,13 @@
 
 package com.openmeap.util;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.util.Map;
+import java.util.Hashtable;
+
+import com.openmeap.http.HttpRequestException;
+import com.openmeap.http.HttpRequestExecuter;
+import com.openmeap.http.HttpResponse;
+import com.openmeap.http.HttpResponseImpl;
 
 public class MockHttpRequestExecuter implements HttpRequestExecuter {
 	static private int responseCode = 200;
@@ -34,8 +38,8 @@ public class MockHttpRequestExecuter implements HttpRequestExecuter {
 	
 	static private String lastPostXmlData = null;
 	
-	static private Map lastGetData = null;
-	static private Map lastPostData = null;
+	static private Hashtable lastGetData = null;
+	static private Hashtable lastPostData = null;
 	static private String lastPostUrl = null;
 	
 	static public void setResponseCode(int responseCode) {
@@ -44,10 +48,10 @@ public class MockHttpRequestExecuter implements HttpRequestExecuter {
 	static public void setResponseText(String text) {
 		MockHttpRequestExecuter.responseText = text;
 	}
-	static public Map getLastPostData() {
+	static public Hashtable getLastPostData() {
 		return lastPostData;
 	}
-	static public Map getLastGetData() {
+	static public Hashtable getLastGetData() {
 		return lastGetData;
 	}
 	static public String getLastPostUrl() {
@@ -56,18 +60,18 @@ public class MockHttpRequestExecuter implements HttpRequestExecuter {
 	static public String getLastPostXmlData() {
 		return lastPostXmlData;
 	}
-	public HttpResponse postXml(String url, String xmlData) throws HttpRequestException {
+	public HttpResponse postContent(String url, String content, String contentType) throws HttpRequestException {
 		lastPostUrl = url;
-		lastPostXmlData = xmlData;
+		lastPostXmlData = content;
 		return putTogetherResponse();
 	}
-	public HttpResponse postData(String url,Map getData, Map postData) throws HttpRequestException {
+	public HttpResponse postData(String url,Hashtable getData, Hashtable postData) throws HttpRequestException {
 		lastGetData = getData;
 		lastPostData = postData;
 		lastPostUrl = url;
 		return putTogetherResponse();
 	}
-	public HttpResponse postData(String url, Map postData) throws HttpRequestException {
+	public HttpResponse postData(String url, Hashtable postData) throws HttpRequestException {
 		lastPostData = postData;
 		lastPostUrl = url;
 		return putTogetherResponse();
@@ -81,13 +85,13 @@ public class MockHttpRequestExecuter implements HttpRequestExecuter {
 			HttpResponseImpl response = new HttpResponseImpl();
 			response.setContentLength(responseText.length());
 			response.setStatusCode(responseCode);
-			response.setResponseBody(new BufferedInputStream(new ByteArrayInputStream(responseText.getBytes())));
+			response.setResponseBody(new ByteArrayInputStream(responseText.getBytes()));
 			return response;
 		} catch(Exception e) {
 			throw new HttpRequestException(e);
 		}
 	}
-	public HttpResponse get(String url, Map params) throws HttpRequestException {
+	public HttpResponse get(String url, Hashtable params) throws HttpRequestException {
 		lastPostData = lastGetData = params;
 		lastPostUrl = url;
 		return putTogetherResponse();

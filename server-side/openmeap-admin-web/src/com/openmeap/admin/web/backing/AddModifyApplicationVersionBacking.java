@@ -43,6 +43,7 @@ import javax.persistence.PersistenceException;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,7 +156,16 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 				
 				if( ParameterMapUtils.firstValue("deleteConfirm", parameterMap).equals(FormConstants.APPVER_DELETE_CONFIRM_TEXT) ) {
 					
-					modelManager.delete(version, events);
+					try {
+						modelManager.begin();
+						modelManager.delete(version, events);
+						modelManager.commit(events);
+					} catch(Exception e) {
+						modelManager.rollback();
+						String msg = String.format("Unable to delete the version - %s",ExceptionUtils.getRootCauseMessage(e));
+						logger.error(msg,e);
+						events.add( new MessagesEvent(msg) );
+					}
 					
 				} else {
 					
@@ -261,7 +271,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		// then create a new archive for it.
 		if( version.getPk()==null ) {
 			version.setArchive(new ApplicationArchive());
-			version.getArchive().setVersion(version);
+			version.getArchive().setApplication(app);
 			version.setApplication(app);
 		}
 		
@@ -271,14 +281,31 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 			events.add( new MessagesEvent("Application archive could not be created.  Not creating empty version.") );
 		} else {
 			try {
+				modelManager.begin();
 				version.setLastModifier(firstValue("userPrincipalName",parameterMap));
+				
+				ApplicationArchive savedArchive = version.getArchive();
+				version.setArchive(null);
+				savedArchive = modelManager.addModify(savedArchive, events);
+				version.setArchive(savedArchive);
+				
 				version = modelManager.addModify(version,events);
+				app.addVersion(version);				
+				app = modelManager.addModify(app,events);
+				
+				modelManager.commit(events);
+				
 				modelManager.refresh(app,events);
+				
 				events.add( new MessagesEvent("Application version successfully created/modified!") );
 			} catch( InvalidPropertiesException ipe ) {
-				events.add( new MessagesEvent(ipe.getMessage()) );
+				modelManager.rollback();
+				logger.error("Unable to add/modify version "+version.getIdentifier(),ipe);
+				events.add( new MessagesEvent("Unable to add/modify version - "+ipe.getMessage()) );
 			} catch( PersistenceException pe ) {
-				events.add( new MessagesEvent(pe.getMessage()) );								
+				modelManager.rollback();
+				logger.error("Unable to add/modify version "+version.getIdentifier(),pe);
+				events.add( new MessagesEvent("Unable to add/modify version - "+pe.getMessage()) );								
 			}
 		}
 	}
@@ -288,7 +315,7 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		version.setIdentifier(firstValue("identifier",parameterMap));
 		if( version.getArchive()==null ) {
 			version.setArchive(new ApplicationArchive());
-			version.getArchive().setVersion(version);
+			version.getArchive().setApplication(app);
 		}
 		
 		version.setApplication(app);
@@ -313,11 +340,8 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 					try {
 						
 						File tempFile = ServletUtils.tempFileFromFileItem(modelManager.getGlobalSettings().getTemporaryStoragePath(), item);
-						ApplicationArchive archive = new ApplicationArchive();
-						archive.setNewFileUploaded(true);
-						archive.setHash(tempFile.getAbsolutePath());
-						archive.setVersion(version);
-						version.setArchive(archive);
+						ApplicationArchive archive = version.getArchive();
+						archive.setNewFileUploaded(tempFile.getAbsolutePath());
 						archiveUncreated = false;
 					} catch(Exception ioe) {
 						
@@ -337,12 +361,14 @@ public class AddModifyApplicationVersionBacking extends AbstractTemplatedSection
 		// else there was no zip archive uploaded
 		if( archiveUncreated ) {
 			ApplicationArchive archive = version.getArchive();
-			
-			archive.setUrl(firstValue("url",parameterMap));
-			
-			// TODO: this should be selectable
 			archive.setHashAlgorithm(firstValue("hashType",parameterMap));
 			archive.setHash(firstValue("hash",parameterMap));
+			ApplicationArchive arch = modelManager.getModelService().findApplicationArchiveByHashAndAlgorithm(app, archive.getHash(), archive.getHashAlgorithm());
+			if(arch!=null) {
+				version.setArchive(arch);
+				archive = arch;
+			} 
+			archive.setUrl(firstValue("url",parameterMap));
 			if( notEmpty("bytesLength",parameterMap) ) {
 				archive.setBytesLength(Integer.valueOf(firstValue("bytesLength",parameterMap)));
 			}

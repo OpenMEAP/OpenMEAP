@@ -26,33 +26,21 @@ package com.openmeap.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import com.openmeap.digest.DigestException;
+import com.openmeap.digest.DigestInputStreamFactory;
+import com.openmeap.digest.DigestInputStream;
 
-import java.util.Arrays;
-import java.util.Formatter;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Scanner;
-import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-
-import com.openmeap.constants.FormConstants;
-
-abstract public class Utils {
+final public class Utils {
 	
-//	private static Logger logger = LoggerFactory.getLogger(Utils.class);
+	private static String TRUE = "true";
+	
+	private Utils() {}
 	
 	public static void consumeInputStream(InputStream is) throws IOException {
 		byte[] b = new byte[1024];
@@ -69,63 +57,75 @@ abstract public class Utils {
 	 * @return
 	 * @throws IOException
 	 */
-    public static String readInputStream(InputStream inputStream, String fEncoding) throws IOException {
-      StringBuilder text = new StringBuilder();
-      String NL = System.getProperty("line.separator");
-      Scanner scanner = new Scanner(inputStream, fEncoding);
-      try {
-        while (scanner.hasNextLine()){
-          text.append(scanner.nextLine() + NL);
-        }
-      }
-      finally{
-        scanner.close();
-      }
-      return text.toString();
+	public static String readInputStream(InputStream inputStream, String fEncoding) throws IOException {
+		StringBuffer text = new StringBuffer();
+		InputStreamReader scanner = new InputStreamReader(inputStream, fEncoding);
+		try {
+			char[] chars = new char[1024];
+			int numRead;
+			while((numRead=scanner.read(chars))!=(-1)) {
+				text.append(Utils.arraySlice(chars, new char[numRead], 0));
+			} 
+		}
+		finally{
+			scanner.close();
+		}
+		return text.toString();
     }
+	
+	public static String readLine(InputStream is, String encoding) throws IOException {
+		StringBuffer text = new StringBuffer();
+		int read, lastRead;
+		while( (read=is.read())!=(-1) ) {
+			if(read=='\r') {
+				lastRead = read;
+				read=is.read();
+				if(read==(-1)) {
+					text.append((char)lastRead);
+				} else if(read=='\n') {
+					break;
+				} else {
+					text.append((char)lastRead);
+					text.append((char)read);
+				}
+			} else {
+				text.append((char)read);
+			}
+			lastRead = read;
+		} 
+		return text.toString();
+	}
     
-    public static void pipeInputStreamIntoOutputStream(InputStream inputStream, OutputStream outputStream) throws IOException {
+    public static long pipeInputStreamIntoOutputStream(InputStream inputStream, OutputStream outputStream) throws IOException {
     	byte[] bytes = new byte[1024];
         int count = inputStream.read(bytes);
+        long totalCount = 0;
         while( count!=(-1) ) {
         	outputStream.write(bytes,0,count);
-        	count = inputStream.read(bytes);
+        	totalCount += count = inputStream.read(bytes);
         }
+        return totalCount;
     }
     
-    public static String createParamsString(Map params) throws UnsupportedEncodingException {
+    public static String createParamsString(Hashtable params) throws UnsupportedEncodingException {
 	    if( params==null ) {
 			return null;
 		}
-		StringBuilder data = new StringBuilder();
+	    StringBuffer data = new StringBuffer();
 		boolean firstPass = true;
-		Iterator entriesIter = params.entrySet().iterator();
-		while( entriesIter.hasNext() ) { 
-			Map.Entry ent = (Entry) entriesIter.next();
+		Enumeration entriesIter = params.keys();
+		while( entriesIter.hasMoreElements() ) {
+			String key = (String)entriesIter.nextElement();
+			String value = params.get(key).toString();
 			if( !firstPass ) {
 				data.append("&");
 			} else firstPass=false;
-			data.append(URLEncoder.encode((String)ent.getKey(), FormConstants.CHAR_ENC_DEFAULT));
+			data.append(URIEncodingUtil.encodeURIComponent(key));
 			data.append("=");
-			data.append(URLEncoder.encode(ent.getValue().toString(), FormConstants.CHAR_ENC_DEFAULT));
+			data.append(URIEncodingUtil.encodeURIComponent(value));
 		}
 		return data.toString();
 	}
-    
-    /**
-     * Convenience method to parse an input stream into a document
-     * @param inputStream
-     * @return
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws IOException
-     */
-    public static Document getDocument(InputStream inputStream) throws ParserConfigurationException, SAXException, IOException {
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
-		DocumentBuilder db = dbf.newDocumentBuilder();
-		return db.parse(inputStream);
-    }
     
     /**
      * Takes a simple Map<String,String> and replaces all occurrences 
@@ -136,25 +136,32 @@ abstract public class Utils {
      * @param content The template content to replace fields in
      * @return
      */
-    public static String replaceFields(Map variables, String content) {
-    	Iterator variablesIter = variables.entrySet().iterator();
-		while( variablesIter.hasNext() ) {
-			Map.Entry variable = (Entry) variablesIter.next();
-			content = content.replaceAll("\\$\\{"+variable.getKey()+"\\}", (String) variable.getValue());
+    public static String replaceFields(Hashtable variables, String content) {
+    	Enumeration variablesIter = variables.keys();
+		while( variablesIter.hasMoreElements() ) {
+			String key = (String)variablesIter.nextElement();
+			Object variable = (String)variables.get(key);
+			content = StringUtils.replaceAll(content,"${"+key+"}", (String) variable);
 		}
 		return content;
 	}
     
-    public static String hashInputStream(String hashName, InputStream is) throws NoSuchAlgorithmException, IOException {
-    	MessageDigest md = MessageDigest.getInstance(hashName);
-    	try {
-    	  is = new DigestInputStream(is, md);
-    	  byte[] bytes = new byte[1024];
-    	  while( is.read(bytes)==1024 );
+    public static Object[] arraySlice(Object[] source, Object[] dest, int startIdx) {
+    	for(int i=startIdx; i<dest.length; i++) {
+    		dest[i]=source[i];
     	}
-    	finally {
-    	  is.close();
+    	return dest;
+    }
+    public static char[] arraySlice(char[] source, char[] dest, int startIdx) {
+    	for(int i=startIdx; i<dest.length; i++) {
+    		dest[i]=source[i];
     	}
+    	return dest;
+    }
+    
+    public static String hashInputStream(String hashName, InputStream is) throws DigestException {
+    	DigestInputStream md = DigestInputStreamFactory.getDigestInputStream(hashName);
+    	md.setInputStream(is);
     	return byteArray2Hex(md.digest());
     }
     
@@ -167,5 +174,9 @@ abstract public class Utils {
 			sb.append(""+hexChars[highBits]+hexChars[lowBits]);
 		}
 		return sb.toString();
+	}
+	
+	final static public boolean parseBoolean(String string) {
+		return string.equalsIgnoreCase(TRUE);
 	}
 }

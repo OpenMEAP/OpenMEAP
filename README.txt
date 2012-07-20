@@ -1,4 +1,4 @@
-In the spirit of friendship, we give to you, OpenMEAP 1.1.x alpha 
+In the spirit of friendship, we give to you, OpenMEAP 1.2.x alpha 
 
 Please see COPYING for license information.  =)
 

@@ -24,22 +24,52 @@ Parameter Values / Outputs:
 		<legend>Application[#if (application.name)??] - ${application.name}[/#if]</legend>
 		<dl>
 				<dt>Name:</dt>
-				<dd><input type="text" name="name" value="${(application.name?html)!}"/></dd>
+				<dd>
+				<div>
+					This is used by SLIC to identify which application it is requesting updates for.
+					It is important that it does not change after initial deployment (through independent device app stores) of SLIC.
+				</div> 
+				<input type="text" name="name" value="${(application.name?html)!}"/>
+				</dd>
 				<dt>Admins (may modify version admins as well):</dt>
-				<dd><textarea cols="60" rows="3" name="admins">${(application.admins?html)!}</textarea></dd>
+				<dd>
+				<div>
+					Application admins may modify any aspect of the application, including deleting it.
+					The only thing an application admin may not do is remove their own admin privileges.
+				</div>
+				<textarea cols="60" rows="3" name="admins">${(application.admins?html)!}</textarea>
+				</dd>
 				<dt>Version Admins:</dt>
-				<dd><textarea cols="60" rows="3" name="versionAdmins">${(application.versionAdmins?html)!}</textarea></dd>
+				<dd>
+				<div>
+					Version admins may create, modify, and delete application versions.  They may not make deployments.
+				</div>
+					<textarea cols="60" rows="3" name="versionAdmins">${(application.versionAdmins?html)!}</textarea>
+				</dd>
 				<dt>Description:</dt>
 				<dd><textarea cols="60" rows="5" name="description">${(application.description?html)!}</textarea></dd>
 				<dt>Initial Version Identifier:</dt>
-				<dd><input type="text" name="initialVersionIdentifier" value="${(application.initialVersionIdentifier?html)!}"/></dd>
+				<dd>
+				<div>
+					Must be the original version identifier bundled into the SLIC.
+				</div>
+				<input type="text" name="initialVersionIdentifier" value="${(application.initialVersionIdentifier?html)!}"/>
+				</dd>
 				<dt>Deployment History Length:</dt>
-				<dd><input type="text" name="deploymentHistoryLength" value="${(application.deploymentHistoryLength?string.computer)!}"/></dd>
+				<dd>
+				<div>
+					The number of deployments to maintain in the deployment history table.  As old archives fall off the end, 
+					they are deleted from the admin and cluster nodes, if they are not being used by any other versions.
+				</div>
+					<input type="text" name="deploymentHistoryLength" value="${(application.deploymentHistoryLength?string.computer)!}"/>
+				</dd>
 				[#if willProcess]
 				<dt>Submit:</dt>
 				<dd>
-					<input type="hidden" name="submit" value="Submit!">
-					<input type="image" src="/openmeap-admin-web/img/btn/action_submit.gif" name="submit" value="Submit!"/></dd>
+					<input type="hidden" name="submit" value="false">
+					<input type="image" onclick="this.form.submit.value='true';this.form.submit();"
+						src="/openmeap-admin-web/img/btn/action_submit.gif"/>
+					</dd>
 					[#if (application.id)??]
 				<dt>
 					Delete Confirm:<br/>
@@ -49,13 +79,13 @@ Parameter Values / Outputs:
 				<dt>
 					Delete:<br/>
 					<span class="copy">After filling in the "Delete Confirm" field, click here.  Warning: this
-					is not an "undoable" action and will erase, permanently, the version
-					history of the application and all application installation records
-					underneath it.  Only do this if you really, really mean it!</span>
+					is not an "undoable" action and will erase, permanently, the version and deployment
+					history of the application.  Only do this if you really, really mean it!</span>
 				</dt>
 				<dd>
-					<input type="hidden" name="delete" value="Delete!">	
-					<input type="image" src="/openmeap-admin-web/img/btn/action_delete.gif" value="Delete!"/>
+					<input type="hidden" name="delete" value="false">
+					<input type="image" onclick="this.form.delete.value='true';this.form.submit();"
+						src="/openmeap-admin-web/img/btn/action_delete.gif"/>
 				</dd>
 				[/#if]
 		[/#if]

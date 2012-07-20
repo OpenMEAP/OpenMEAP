@@ -27,7 +27,7 @@ OpenMEAP was created in
 http://www.eclipse.org/
 http://ant.apache.org/ivy/ivyde/
 
-OpenMEAP web projects have been tested on Apache Tomcat 5.5 and 6.0
+OpenMEAP web projects have been tested on Apache Tomcat 5.5, 6.0 and 7.0
 http://tomcat.apache.org/
 
 OpenMEAP command-line requires Apache Ant 1.8 or greater.

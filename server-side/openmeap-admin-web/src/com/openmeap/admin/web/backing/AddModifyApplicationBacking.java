@@ -33,6 +33,10 @@ import java.util.Map;
 
 import javax.persistence.PersistenceException;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.openmeap.Authorizer;
 import com.openmeap.admin.web.events.AddSubNavAnchorEvent;
 import com.openmeap.constants.FormConstants;
@@ -59,6 +63,8 @@ import com.openmeap.web.html.Anchor;
 public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking {
 
 	private static String PROCESS_TARGET = ProcessingTargets.ADDMODIFY_APP;
+	
+	private Logger logger = LoggerFactory.getLogger(AddModifyApplicationBacking.class);
 	
 	private ModelManager modelManager = null;
 	
@@ -111,34 +117,58 @@ public class AddModifyApplicationBacking extends AbstractTemplatedSectionBacking
 			
 			app = createApplicationFromParameters(app,parameterMap, events);
 			
-			if( events.size()==0 ) {
-				try {
-					app.setLastModifier(firstValue("userPrincipalName",parameterMap));
-					app = modelManager.addModify(app,events);
-					events.add( new MessagesEvent("Application successfully created/modified!") );
-				} catch( InvalidPropertiesException ipe ) {
-					events.add( new MessagesEvent(ipe.getMessage()) );
-				} catch( PersistenceException pe ) {
-					events.add( new MessagesEvent(pe.getMessage()) );							
+			if( ParameterMapUtils.firstValue("submit",parameterMap).equals("true") ) {
+				
+				if( events.size()==0 ) {
+					try {
+						app.setLastModifier(firstValue("userPrincipalName",parameterMap));
+						modelManager.begin();
+						app = modelManager.addModify(app,events);
+						modelManager.commit(events);
+						events.add( new MessagesEvent("Application successfully created/modified!") );
+					} catch( InvalidPropertiesException e ) {
+						events.add(new MessagesEvent(String.format("Application add/modify failed: %s %s"
+								,ExceptionUtils.getRootCauseMessage(e)
+								,ExceptionUtils.getRootCauseStackTrace(e)[0])));
+						logger.error("Add/Modify application with id "+app.getId()+" failed",e);
+						modelManager.rollback();
+					} catch( PersistenceException e ) {
+						events.add(new MessagesEvent(String.format("Application add/modify failed: %s %s"
+								,ExceptionUtils.getRootCauseMessage(e)
+								,ExceptionUtils.getRootCauseStackTrace(e)[0])));
+						logger.error("Add/Modify application with id "+app.getId()+" failed",e);
+						modelManager.rollback();							
+					}
 				}
+				
+				if( app==null && ParameterMapUtils.notEmpty(FormConstants.APP_ID,parameterMap) )
+					app = modelManager.getModelService().findByPrimaryKey(Application.class, 
+							Long.valueOf(ParameterMapUtils.firstValue(FormConstants.APP_ID, parameterMap)));
+				
 			}
 			
-			if( app==null && ParameterMapUtils.notEmpty(FormConstants.APP_ID,parameterMap) )
-				app = modelManager.getModelService().findByPrimaryKey(Application.class, 
-						Long.valueOf(ParameterMapUtils.firstValue(FormConstants.APP_ID, parameterMap)));
-			
-			if( ParameterMapUtils.notEmpty(FormConstants.DELETE,parameterMap) && ParameterMapUtils.notEmpty("deleteConfirm",parameterMap) ) {
+			if( ParameterMapUtils.notEmpty("delete", parameterMap) && ParameterMapUtils.firstValue("delete",parameterMap).equals("true") ) {
 				
-					if( ParameterMapUtils.firstValue("deleteConfirm", parameterMap).equals(FormConstants.APP_DELETE_CONFIRM_TEXT) ) {
-						
+				if( !ParameterMapUtils.empty("deleteConfirm", parameterMap)
+						&& ParameterMapUtils.firstValue("deleteConfirm", parameterMap).equals(FormConstants.APP_DELETE_CONFIRM_TEXT) ) {
+					try {
+						modelManager.begin();
 						modelManager.delete(app,events);
+						modelManager.commit(events);
 						events.add( new MessagesEvent("Application successfully deleted!") );
 						app = null;
 						// we remove the applicationId parameter, so that the form can populate empty
 						parameterMap.remove(FormConstants.APP_ID);
-					} else {
-						
-						events.add( new MessagesEvent("You must confirm your desire to delete by typing in the delete confirmation message.") );
+					} catch(Exception e) {
+						events.add(new MessagesEvent(String.format("Application delete failed: %s %s"
+								,ExceptionUtils.getRootCauseMessage(e)
+								,ExceptionUtils.getRootCauseStackTrace(e)[0])));
+						logger.error("Deleting application with id "+app.getId()+" failed",e);
+						modelManager.rollback();
+					}
+				} else {
+					
+					events.add( new MessagesEvent("You must confirm your desire to delete by typing in the delete confirmation message.") );
 				}
 			} 
 		}

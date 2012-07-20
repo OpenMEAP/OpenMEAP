@@ -41,14 +41,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.net.URLCodec;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.openmeap.thirdparty.org.json.me.JSONException;
+import com.openmeap.thirdparty.org.json.me.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.openmeap.constants.UrlParamConstants;
+import com.openmeap.digest.DigestException;
 import com.openmeap.json.JSONObjectBuilder;
 import com.openmeap.model.ModelManager;
 import com.openmeap.model.dto.ApplicationArchive;
@@ -66,14 +67,13 @@ import com.openmeap.protocol.dto.ErrorCode;
 import com.openmeap.protocol.dto.Result;
 import com.openmeap.protocol.dto.SLIC;
 import com.openmeap.util.AuthTokenProvider;
+import com.openmeap.util.GenericRuntimeException;
 import com.openmeap.util.Utils;
 
 public class ApplicationManagementServlet extends HttpServlet {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -4989132152150822192L;
+	
 	private Logger logger = LoggerFactory.getLogger(ApplicationManagementServlet.class);
 	private ModelManager modelManager = null;
 	private WebApplicationContext context = null;
@@ -164,10 +164,14 @@ public class ApplicationManagementServlet extends HttpServlet {
 			
 			String auth = request.getParameter(UrlParamConstants.AUTH_TOKEN);
 			com.openmeap.model.dto.Application app = appVersion.getApplication();
-			if( auth==null || ! AuthTokenProvider.validateAuthToken(app.getProxyAuthSalt(), auth) ) {
-				err.setCode(ErrorCode.AUTHENTICATION_FAILURE);
-				err.setMessage("The \"auth\" token presented is not recognized, missing, or empty.");
-				return res;
+			try {
+				if( auth==null || ! AuthTokenProvider.validateAuthToken(app.getProxyAuthSalt(), auth) ) {
+					err.setCode(ErrorCode.AUTHENTICATION_FAILURE);
+					err.setMessage("The \"auth\" token presented is not recognized, missing, or empty.");
+					return res;
+				}
+			} catch (DigestException e) {
+				throw new GenericRuntimeException(e);
 			}
 			
 			hash = appVersion.getArchive().getHash();

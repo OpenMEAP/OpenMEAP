@@ -79,6 +79,7 @@
 	<servlet>
 		<servlet-name>admin</servlet-name>
 		<servlet-class>com.openmeap.admin.web.servlet.AdminServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>admin</servlet-name>

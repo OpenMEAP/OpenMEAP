@@ -46,7 +46,8 @@ import javax.persistence.Transient;
 import com.openmeap.constants.FormConstants;
 import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
-import com.openmeap.model.AbstractModelEntity;
+import com.openmeap.json.JSONGetterSetter;
+import com.openmeap.model.event.AbstractModelEntity;
 import com.openmeap.web.form.Parameter;
 
 @Entity @Table(name="application")
@@ -65,15 +66,64 @@ public class Application extends AbstractModelEntity implements HasJSONPropertie
 	private String lastModifier;
 	
 	static final private JSONProperty[] jsonProperties = new JSONProperty[] {
-		new JSONProperty("getName"),
-		new JSONProperty("getDescription"),
-		new JSONProperty("getAdmins"),
-		new JSONProperty("getVersionAdmins"),
-		new JSONProperty("getDeploymentHistoryLength"),
-		new JSONProperty("getInitialVersionIdentifier"),
-		new JSONProperty("lastModifier")
+		new JSONProperty("name",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((Application)src).getName();
+			}
+			public void setValue(Object dest, Object value) {
+				((Application)dest).setName((String)value);
+			}
+		}),
+		new JSONProperty("description",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((Application)src).getDescription();
+			}
+			public void setValue(Object dest, Object value) {
+				((Application)dest).setDescription((String)value);
+			}
+		}),
+		new JSONProperty("admins",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((Application)src).getAdmins();
+			}
+			public void setValue(Object dest, Object value) {
+				((Application)dest).setAdmins((String)value);
+			}
+		}),
+		new JSONProperty("versionAdmins",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((Application)src).getVersionAdmins();
+			}
+			public void setValue(Object dest, Object value) {
+				((Application)dest).setVersionAdmins((String)value);
+			}
+		}),
+		new JSONProperty("deploymentHistoryLength",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((Application)src).getDeploymentHistoryLength();
+			}
+			public void setValue(Object dest, Object value) {
+				((Application)dest).setDeploymentHistoryLength((Integer)value);
+			}
+		}),
+		new JSONProperty("initialVersionIdentifier",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((Application)src).getInitialVersionIdentifier();
+			}
+			public void setValue(Object dest, Object value) {
+				((Application)dest).setInitialVersionIdentifier((String)value);
+			}
+		}),
+		new JSONProperty("lastModifier",String.class,new JSONGetterSetter(){
+			public Object getValue(Object src) {
+				return ((Application)src).getLastModifier();
+			}
+			public void setValue(Object dest, Object value) {
+				((Application)dest).setLastModifier((String)value);
+			}
+		})
 	};
-	@Override @Transient
+	@Transient @Override
 	public JSONProperty[] getJSONProperties() {
 		return jsonProperties;
 	}
@@ -183,7 +233,7 @@ public class Application extends AbstractModelEntity implements HasJSONPropertie
 	public void setVersions(Map<String,ApplicationVersion> versions) {
 		this.versions = versions;
 	}
-	@OneToMany(mappedBy="application",fetch=FetchType.LAZY,cascade={CascadeType.ALL},targetEntity=ApplicationVersion.class)
+	@OneToMany(mappedBy="application",fetch=FetchType.LAZY,cascade={},targetEntity=ApplicationVersion.class)
 	@MapKey(name="identifier")
 	public Map<String,ApplicationVersion> getVersions() {
 		return versions;
@@ -212,7 +262,7 @@ public class Application extends AbstractModelEntity implements HasJSONPropertie
 	public void setDeployments(List<Deployment> deployments) {
 		this.deployments = deployments;
 	}
-	@OneToMany(mappedBy="application",fetch=FetchType.LAZY,cascade={CascadeType.ALL},targetEntity=Deployment.class)
+	@OneToMany(mappedBy="application",fetch=FetchType.LAZY,cascade={},targetEntity=Deployment.class)
 	public List<Deployment> getDeployments() {
 		return deployments;
 	}	
@@ -221,7 +271,7 @@ public class Application extends AbstractModelEntity implements HasJSONPropertie
 		if( deployments == null ) {
 			deployments = new ArrayList<Deployment>();
 		}
-		deployments.add(d);
+		//deployments.add(d);
 	}
 	public void removeDeployment(Deployment d) {
 		d.setApplication(null);

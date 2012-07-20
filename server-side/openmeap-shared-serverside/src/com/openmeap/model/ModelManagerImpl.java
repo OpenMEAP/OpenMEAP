@@ -24,23 +24,16 @@
 
 package com.openmeap.model;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.lang.reflect.Method;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.zip.ZipFile;
 
 import javax.persistence.PersistenceException;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -49,28 +42,27 @@ import org.springframework.context.ApplicationContextAware;
 
 import com.openmeap.AuthorizationException;
 import com.openmeap.Authorizer;
-import com.openmeap.event.Event;
 import com.openmeap.event.EventNotificationException;
 import com.openmeap.event.MessagesEvent;
 import com.openmeap.event.ProcessingEvent;
-import com.openmeap.model.dto.Application;
-import com.openmeap.model.dto.ApplicationArchive;
-import com.openmeap.model.dto.ApplicationVersion;
+import com.openmeap.file.FileOperationException;
+import com.openmeap.file.FileOperationManager;
 import com.openmeap.model.dto.ClusterNode;
-import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.model.event.ModelEntityEvent;
-import com.openmeap.util.Utils;
-import com.openmeap.util.ZipUtils;
+import com.openmeap.model.event.notifier.ModelServiceEventNotifier;
+import com.openmeap.model.event.notifier.ModelServiceEventNotifier.CutPoint;
 
 /**
  * Handles all business logic related to the model Entity objects. 
+ * 
  * @author schang
  */
 public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 
 	private Collection<ModelServiceEventNotifier> eventNotifiers = null;
 	private ModelService modelService;
+	private FileOperationManager fileManager;
 	private Logger logger = LoggerFactory.getLogger(ModelManagerImpl.class);
 	private ApplicationContext context = null;
 	private Authorizer authorizer = new Authorizer() {
@@ -78,6 +70,7 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 				return Boolean.TRUE;
 			}
 		};
+	private Map<Thread,List<ModelEntityEvent>> eventQueue = new HashMap<Thread,List<ModelEntityEvent>>();
 	
 	public ModelManagerImpl() {}
 	public ModelManagerImpl(ModelService service) {
@@ -85,173 +78,146 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 	}
 	
 	@Override
-	public <T extends ModelEntity> void refresh(T obj2Refresh, List<ProcessingEvent> events) throws PersistenceException {
-		callEventNotifiers(ModelServiceOperation.REFRESH,obj2Refresh,events);
-		modelService.refresh(obj2Refresh);
+	public ModelManager begin() {
+		try {
+			fileManager.begin();
+		} catch (FileOperationException e) {
+			throw new PersistenceException("An exception was thrown creating a file-resource transaction: "+e.getMessage(),e);
+		}
+		modelService.begin();
+		return this;
 	}
 	
 	@Override
-	public <T extends ModelEntity> void delete(T entity, List<ProcessingEvent> events) {
-		
-		if( ApplicationVersion.class.isAssignableFrom(entity.getClass()) ) {
-			deleteApplicationVersion((ApplicationVersion)entity,events);
-			return; 
-		} else if( Application.class.isAssignableFrom(entity.getClass()) ) {
-			deleteApplication((Application)entity,events);
-			return;
-		} else {
-			_delete(entity,events);
-			return;
-		}
+	public ModelManager commit() throws PersistenceException {
+		return commit(null);
 	}
 	
-	public void deleteApplicationVersion(ApplicationVersion version, List<ProcessingEvent> events) {
+	@Override 
+	public ModelManager commit(List<ProcessingEvent> events) throws PersistenceException {
 		
-		ApplicationArchive archive2Delete = null;
-		if( version.getArchive()!=null ) {
-			archive2Delete = new ApplicationArchive();
-			archive2Delete.setHash(version.getArchive().getHash());
-			archive2Delete.setHashAlgorithm(version.getArchive().getHashAlgorithm());
-		}
+		processModelEntityEventQueue(CutPoint.IN_COMMIT_BEFORE_COMMIT, events);
 		
-		Boolean versionInUse = false;
-		if( version.getApplication().getDeployments()!=null ) {
-			for( Deployment depl : version.getApplication().getDeployments() ) {
-				if( depl.getApplicationVersion().getPk().equals(version.getPk()) ) {
-					versionInUse = true;
-				}
+		try {
+			if(fileManager.isTransactionActive()) {
+				fileManager.commit();
 			}
+		} catch (FileOperationException e) {
+			throw new PersistenceException("An exception was thrown commiting a file-resource transaction: "+e.getMessage(),e);
 		}
-		if( versionInUse ) {
+		modelService.commit();
 		
-			version.setActiveFlag(false);
-			try {
-				version = addModify(version,events);
-				refresh(version.getApplication(),events);
-				events.add( new MessagesEvent("Application version successfully set to inactive.  It will be deleted when the last deployment made with it is removed.") );
-			} catch( InvalidPropertiesException ipe ) {
-				events.add( new MessagesEvent(ipe.getMessage()) );
-			} catch( PersistenceException pe ) {
-				events.add( new MessagesEvent(pe.getMessage()) );								
-			}
-		} else {
-			version.getApplication().removeVersion(version);
-			modelService.delete(version);
-			if( archive2Delete!=null ) {
-				maintainFileSystemCleanliness(archive2Delete, events);
-			}
-			events.add( new MessagesEvent("Application version successfully deleted!") );
-		}
-		version=null;
+		processModelEntityEventQueue(CutPoint.IN_COMMIT_AFTER_COMMIT, events);
+		clearModelEntityEventQueue();
+		
+		return this;
 	}
 	
-	public void deleteApplication(Application app, List<ProcessingEvent> events) throws PersistenceException {
-		
-		// flip all the versions to inactive, so they don't prevent archive deletion
-		for( ApplicationVersion appVer : app.getVersions().values() ) {
-			appVer.setActiveFlag(false);
-			try {
-				addModify(appVer,events);
-			} catch (InvalidPropertiesException e) {
-				throw new PersistenceException(e);
+	@Override
+	public void rollback() throws PersistenceException {
+		clearModelEntityEventQueue();
+		try {
+			if(fileManager.isTransactionActive()) {
+				fileManager.rollback();
 			}
+		} catch (FileOperationException e) {
+			throw new PersistenceException("An exception was thrown rolling back a file-resource transaction:"+e.getMessage(),e);
 		}
+		modelService.rollback();
+	}
+	
+	@Override
+	public <T extends ModelEntity> ModelManager refresh(T obj2Refresh, List<ProcessingEvent> events) throws PersistenceException {
 		
-		// call the event notifiers on each deployment that will be deleted
-		Iterator iterator = app.getDeployments().iterator();
-		List<Deployment> depls = new ArrayList<Deployment>();
-		while(iterator.hasNext()) {
-			Deployment depl = (Deployment)iterator.next();
-			depls.add(depl);
-		}
-		iterator = depls.iterator();
-		while(iterator.hasNext()) {
-			Deployment depl = (Deployment)iterator.next();
-			app.removeDeployment(depl);
-			delete(depl,events);
-		}
+		ModelEntityEvent event = new ModelEntityEvent(ModelServiceOperation.REFRESH,obj2Refresh);
 		
-		// iterate over each version, deleting each
-		List<ApplicationVersion> appVers = new ArrayList<ApplicationVersion>();
-		for( ApplicationVersion appVer : app.getVersions().values() ) {
-			appVers.add(appVer);
-		}
-		for( ApplicationVersion appVer : appVers ) {
-			delete(appVer,events);
-			//app.removeVersion(appVer);
-		}
+		stashModelEntityEventTillCommit(event);
+		callEventNotifiers(CutPoint.BEFORE_OPERATION,event,events);
 		
-		modelService.delete(app);
+		modelService.refresh(obj2Refresh);
+		
+		callEventNotifiers(CutPoint.AFTER_OPERATION,event,events);
+		
+		return this;
+	}
+	
+	@Override
+	public <T extends ModelEntity> ModelManager delete(T entity, List<ProcessingEvent> events) {
+		
+		authorize(entity,Authorizer.Action.DELETE);
+		
+		ModelEntityEvent event = new ModelEntityEvent(ModelServiceOperation.DELETE,entity);
+		
+		stashModelEntityEventTillCommit(event);
+		callEventNotifiers(CutPoint.BEFORE_OPERATION,event,events);
+		
+		_delete(entity,events);
+		
+		callEventNotifiers(CutPoint.AFTER_OPERATION,event,events);
+		
+		return this;
 	}
 	
 	@Override
 	public <T extends ModelEntity> T addModify(T entity, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
-		if( ApplicationVersion.class.isAssignableFrom(entity.getClass()) ) {
-			return (T) addModifyApplicationVersion((ApplicationVersion)entity,events);
-		} else if( GlobalSettings.class.isAssignableFrom(entity.getClass()) ) {
-			return (T) addModifyGlobalSettings((GlobalSettings)entity,events);
-		} else if( Deployment.class.isAssignableFrom(entity.getClass()) ) {
-			return (T) addModifyDeployment((Deployment)entity,events);
-		} else return (T) _addModify(entity,events);
+		
+		T revised = entity;
+		
+		authorize(entity,determineCreateUpdateAction(entity));
+		
+		ModelEntityEvent event = new ModelEntityEvent(ModelServiceOperation.SAVE_OR_UPDATE,entity);
+		
+		stashModelEntityEventTillCommit(event);
+		
+		callEventNotifiers(CutPoint.BEFORE_OPERATION,event,events);
+		revised = (T)event.getPayload();
+		
+		revised = (T) _addModify(revised,events);
+		event.setPayload(revised);
+		
+		callEventNotifiers(CutPoint.AFTER_OPERATION,event,events);
+		revised = (T)event.getPayload();
+		
+		validate(revised);
+		
+		return revised;
 	}
 	
-	public Deployment addModifyDeployment(Deployment deployment, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
-		authorizeAndValidate(deployment,determineCreateUpdateAction(deployment));
-		Application app = deployment.getApplication();
-		maintainDeploymentHistoryLength(app,events);
-		return (Deployment)_addModify((ModelEntity)deployment,events);
-	}
-	
-	public ApplicationVersion addModifyApplicationVersion(ApplicationVersion version, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
-		if( version.getArchive()!=null && version.getArchive().getNewFileUploaded() ) {
-			if( processApplicationArchiveFileUpload(version.getArchive(),events)==null ) {
-				throw new PersistenceException("Zip archive failed to process!");
-			}
-		}
-		ApplicationVersion ret = (ApplicationVersion)_addModify((ModelEntity)version, events);
-		modelService.refresh(version.getApplication());
-		return ret;
-	}
-	
-	public GlobalSettings addModifyGlobalSettings(GlobalSettings settings, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
-		
-		if( settings==null || settings.getId()==null || !settings.getId().equals(Long.valueOf(1)) ) {
-			throw new PersistenceException("There can be only 1 instance of GlobalSettings.  "
-					+ "Please first acquire with modelManager.getGlobalSettings(), make modifications, then update.");
-		}
-		
-		if( ! getAuthorizer().may(Authorizer.Action.MODIFY, settings) ) {
-			throw new PersistenceException(new AuthorizationException("The current user does not have sufficient privileges to modify the global settings."));
-		}
-		
-		settings = modelService.saveOrUpdate(settings);
-		callEventNotifiers(ModelServiceOperation.SAVE_OR_UPDATE,settings,events);
-		
-		modelService.refresh(settings);
-		return settings;
-	}
-	
+	@Override
 	public GlobalSettings getGlobalSettings() {
 		GlobalSettings settings = modelService.findByPrimaryKey(GlobalSettings.class,(Long)1L);
+		boolean update = false;
 		if( settings==null ) {
 			settings = new GlobalSettings();
 			settings.setServiceManagementAuthSalt(UUID.randomUUID().toString());
-			settings = modelService.saveOrUpdate(settings);
-			modelService.refresh(settings);
+			update = true;
 		}
 		if( settings.getServiceManagementAuthSalt()==null || settings.getServiceManagementAuthSalt().trim().length()==0 ) {
 			settings.setServiceManagementAuthSalt(UUID.randomUUID().toString());
-			settings = modelService.saveOrUpdate(settings);
-			modelService.refresh(settings);
+			update = true;
+		}
+		if(update) {
+			try {
+				modelService.begin();
+				settings = modelService.saveOrUpdate(settings);
+				modelService.commit();
+			} catch(Exception e) {
+				modelService.rollback();
+				throw new PersistenceException(e);
+			}
 		}
 		return settings;
 	}
 	
+	@Override
 	public ClusterNode getClusterNode() {
 		if( context!=null ) {
 			try {
 				Map<String,String> servicesWebProperties = (Map<String,String>)context.getBean("openmeapServicesWebPropertiesMap");
-				String serviceUrl = (String)servicesWebProperties.get("clusterNodeUrlPrefix");
+				String serviceUrl = null;
+				synchronized(servicesWebProperties) {
+					serviceUrl = (String)servicesWebProperties.get("clusterNodeUrlPrefix");
+				}
 				return this.getGlobalSettings().getClusterNode(serviceUrl);
 			} catch(Exception e) {
 				logger.warn("{}",e);
@@ -285,6 +251,12 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 		return modelService;
 	}
 	
+	public void setFileManager(FileOperationManager fileManager) {
+		this.fileManager = fileManager;
+	}
+	public FileOperationManager getFileManager() {
+		return fileManager;
+	}
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		context = applicationContext;
 	}
@@ -293,245 +265,84 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 	 * PRIVATE METHODS
 	 */
 	
-	public <T extends ModelEntity> void _delete(T entity, List<ProcessingEvent> events) {
+	private <T extends ModelEntity> void _delete(T entity, List<ProcessingEvent> events) {
 		
 		if( ! getAuthorizer().may(Authorizer.Action.DELETE, entity) ) {
 			throw new PersistenceException(new AuthorizationException("The user logged in does not have permissions to DELETE "+entity.getClass().getSimpleName()+" objects."));
 		}
-		callEventNotifiers(ModelServiceOperation.DELETE,entity,events);
-		
 		modelService.delete(entity);
 	}
 	
-	public <T extends ModelEntity> T _addModify(T entity, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
+	private <T extends ModelEntity> T _addModify(T entity, List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
 		
 		authorizeAndValidate(entity,determineCreateUpdateAction(entity));
 		T o = modelService.saveOrUpdate(entity);
-		callEventNotifiers(ModelServiceOperation.SAVE_OR_UPDATE,o,events);
 		return o;
 	}
 	
-	private void callEventNotifiers(ModelServiceOperation op, ModelEntity obj2ActOn, List<ProcessingEvent> events) {
-		// if there are any web-servers out there to notify of the update, then do so
-		if( eventNotifiers!=null ) {
-			for( ModelServiceEventNotifier handler : eventNotifiers ) {
-				try {
-					if( handler.notifiesFor(op,obj2ActOn) ) {
-						handler.notify( new ModelEntityEvent(op,obj2ActOn), events );
-					}
-				} catch( EventNotificationException e ) {
-					String msg = String.format("EventNotificationException occurred: %s",e.getMessage());
-					logger.error(msg);
-					if(events!=null) {
-						events.add(new MessagesEvent(msg));
-					}
-				}
+	private void stashModelEntityEventTillCommit(ModelEntityEvent event) {
+		List<ModelEntityEvent> modelEvents = eventQueue.get(Thread.currentThread());
+		if(modelEvents==null) {
+			modelEvents = new ArrayList<ModelEntityEvent>();
+			eventQueue.put(Thread.currentThread(),modelEvents);
+		}
+		if(!modelEvents.contains(event)) {
+			modelEvents.add(event);
+		}
+	}
+	
+	private void processModelEntityEventQueue(CutPoint cutPoint,List<ProcessingEvent> events) {
+		List<ModelEntityEvent> modelEvents;
+		if( (modelEvents = eventQueue.get(Thread.currentThread()))!=null ) {
+			int size = modelEvents.size();
+			for(int i=0;i<size;i++) {
+				ModelEntityEvent event = modelEvents.get(i);
+				callEventNotifiers(cutPoint,event,events);
 			}
 		}
 	}
 	
-	private void maintainFileSystemCleanliness(ApplicationArchive archive, List<ProcessingEvent> events) {
-		
-		GlobalSettings settings = getGlobalSettings();
-		
-		// check to see if any other archives have this hash and md5
-		List<ApplicationArchive> archives = modelService
-				.findApplicationArchivesByHashAndAlgorithm(archive.getHash(), archive.getHashAlgorithm());
-		
-		// either more than one archive has this file
-		Boolean archiveIsInUseElsewhere = 
-				archives!=null 
-				&& (
-						archives.size()>1
-						|| (
-								archives.size()==1 
-								&& !archives.get(0).getPk().equals(archive.getPk())
-						)
-				);
-		
-		if( !archiveIsInUseElsewhere ) {
-			
-			// delete the web-view
-			try {
-				File oldExplodedPath = archive.getExplodedPath(settings.getTemporaryStoragePath());
-				if( oldExplodedPath!=null && oldExplodedPath.exists() ) {
-					FileUtils.deleteDirectory(oldExplodedPath);
-				}
-			} catch( IOException ioe ) {
-				logger.error("There was an exception deleting the old web-view directory: {}",ioe);
-				events.add(new MessagesEvent(String.format("Upload process will continue.  There was an exception deleting the old web-view directory: %s",ioe.getMessage())));
-			}
-			
-			// delete the zip file
-			File originalFile = archive.getFile(settings.getTemporaryStoragePath());
-			if( originalFile.exists() && !originalFile.delete() ) {
-				String mesg = String.format("Failed to delete old file %s, was different so proceeding anyhow.",originalFile.getName());
-				logger.error(mesg);
-				events.add(new MessagesEvent(mesg));
-			}
+	private void clearModelEntityEventQueue() {
+		List<ModelEntityEvent> modelEvents;
+		if( (modelEvents = eventQueue.get(Thread.currentThread()))!=null ) {
+			eventQueue.remove(Thread.currentThread());
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	private ApplicationArchive processApplicationArchiveFileUpload(ApplicationArchive archive, List<ProcessingEvent> events) {
+	private void callEventNotifiers(CutPoint cutPoint, ModelEntityEvent event, List<ProcessingEvent> events) {
 		
-		GlobalSettings settings = getGlobalSettings();
-		File tempFile = new File(archive.getHash());
-		Long size = tempFile.length();
-		
-		String pathError = settings.validateTemporaryStoragePath();
-		if( pathError!=null ) {
-			logger.error("There is an issue with the global settings temporary storage path: "+settings.validateTemporaryStoragePath()+"\n {}",pathError);
-			events.add( new MessagesEvent("There is an issue with the global settings temporary storage path: "+settings.validateTemporaryStoragePath()+" - "+pathError) );
-			return null;
+		if(eventNotifiers==null) {
+			return;
 		}
 		
-		// determine the md5 hash of the uploaded file
-		// and rename the temp file by the hash
-		FileInputStream is = null;
-		File destinationFile = null;
-		try {	
-			String hashValue = null;
+		for( ModelServiceEventNotifier handler : eventNotifiers ) {
 			try {
-				is = new FileInputStream(tempFile);
-				hashValue = Utils.hashInputStream("MD5", is);
-			} finally {
-				is.close();
-			}
-			
-			// if the archive is pre-existing and not the same,
-			// then determine if the web-view and zip should be deleted
-			// that is, they are not used by any other versions
-			if( archive.getId()!=null && !archive.getHash().equals(hashValue) ) {
 
-				maintainFileSystemCleanliness(archive,events);
-			}
-			
-			archive.setHashAlgorithm("MD5");
-			archive.setHash(hashValue);
-			
-			destinationFile = archive.getFile(settings.getTemporaryStoragePath());
-			
-			// if the upload destination exists, then try to delete and overwrite
-			// even though they are theoretically the same.
-			if( destinationFile.exists() && !destinationFile.delete() ) {
-				String mesg = String.format("Failed to delete old file (theoretically the same anyways, so proceeding) %s",destinationFile.getName());
-				logger.error(mesg);
-				events.add(new MessagesEvent(mesg));
-				if( ! tempFile.delete() ) {
-					mesg = String.format("Failed to delete temporary file %s",tempFile.getName());
-					logger.error(mesg);
-					events.add(new MessagesEvent(mesg));	
+				if( handler.notifiesFor(event.getOperation(),(ModelEntity)event.getPayload()) ) {
+					switch(cutPoint) {
+					case AFTER_OPERATION:
+						handler.onAfterOperation(event, events);
+						break;
+					case BEFORE_OPERATION:
+						handler.onBeforeOperation(event, events);
+						break;
+					case IN_COMMIT_AFTER_COMMIT:
+						handler.onInCommitAfterCommit(event, events);
+						break;
+					case IN_COMMIT_BEFORE_COMMIT:
+						handler.onInCommitBeforeCommit(event, events);
+						break;
+					}
 				}
-			}
-			
-			// if it didn't exist or it was successfully deleted,
-			// then rename the upload to our destination and unzip it
-			// into the web-view directory
-			else if( tempFile.renameTo(destinationFile) ) {
-				
-				String mesg = String.format("Uploaded temporary file %s successfully renamed to %s",tempFile.getName(),destinationFile.getName());
-				logger.debug(mesg);
-				events.add(new MessagesEvent(mesg));
-				unzipFile(archive,destinationFile,events);
-			} else {
-				String mesg = String.format("Failed to renamed file %s to %s",tempFile.getName(),destinationFile.getName());
-				logger.error(mesg);
-				events.add(new MessagesEvent(mesg));
-				return null;
-			}
-		} catch(IOException ioe) {
-			events.add(new MessagesEvent(ioe.getMessage()));
-			return null;
-		} catch(NoSuchAlgorithmException nsae) {
-			events.add(new MessagesEvent(nsae.getMessage()));
-			return null;
-		} 
+			} catch( EventNotificationException e ) {
+				String msg = String.format("EventNotificationException occurred: %s",e.getMessage());
+				logger.error(msg);
+				if(events!=null) {
+					events.add(new MessagesEvent(msg));
 
-		// determine the compressed and uncompressed size of the zip archive
-		try {
-			archive.setBytesLength(size.intValue());
-			ZipFile zipFile = null;
-			try {
-				zipFile = new ZipFile(destinationFile);
-				Integer uncompressedSize = ZipUtils.getUncompressedSize(zipFile).intValue();
-				archive.setBytesLengthUncompressed(new Long(uncompressedSize).intValue());
-			} finally {
-				if(zipFile!=null) {
-					zipFile.close();
 				}
 			}
-		} catch( IOException ioe ) {
-			logger.error("An exception occurred while calculating the uncompressed size of the archive: {}",ioe);
-			events.add(new MessagesEvent(String.format("An exception occurred while calculating the uncompressed size of the archive: %s",ioe.getMessage())));
-			return null;
 		}
-		
-		archive.setUrl(ApplicationArchive.URL_TEMPLATE);
-		archive.setNewFileUploaded(true);
-		
-		return archive;
-	}
-	
-	/**
-	 * 
-	 * @param archive
-	 * @param zipFile
-	 * @param events
-	 * @return TRUE if the file successfully is exploded, FALSE otherwise.
-	 */
-	private Boolean unzipFile(ApplicationArchive archive, File zipFile, List<ProcessingEvent> events) {
-		try {
-			GlobalSettings settings = getGlobalSettings();
-			File dest = archive.getExplodedPath(settings.getTemporaryStoragePath());
-			if( dest.exists() ) {
-				FileUtils.deleteDirectory(dest);
-			}
-			ZipFile file = null;
-			try {
-				file = new ZipFile(zipFile);
-				ZipUtils.unzipFile(file, dest);
-			} finally {
-				file.close();
-			}
-			return Boolean.TRUE;
-		} catch( Exception e ) {
-			logger.error("An exception occurred unzipping the archive to the viewing location: {}",e);
-			events.add(new MessagesEvent(String.format("An exception occurred unzipping the archive to the viewing location: %s",e.getMessage())));
-		}
-		return Boolean.FALSE;
-	}
-	
-	/**
-	 * Trim the deployment history table.  Deleting old archives as we go.
-	 * @param app
-	 * @throws PersistenceException 
-	 * @throws InvalidPropertiesException 
-	 */
-	private Boolean maintainDeploymentHistoryLength(Application app,List<ProcessingEvent> events) throws InvalidPropertiesException, PersistenceException {
-		
-		Integer lengthToMaintain = app.getDeploymentHistoryLength();
-		List<Deployment> deployments = app.getDeployments();
-		if( deployments!=null && deployments.size() > lengthToMaintain ) {
-			
-			Integer currentSize = deployments.size();
-			
-			List<Deployment> newDeployments = new ArrayList<Deployment>(deployments.subList(currentSize-lengthToMaintain,currentSize));
-			List<Deployment> oldDeployments = new ArrayList<Deployment>(deployments.subList(0,currentSize-lengthToMaintain));
-			
-			for( Deployment deployment : oldDeployments ) {
-				delete(deployment,events);
-			}
-			
-			for( Deployment deployment : newDeployments ) {
-				app.getDeployments().add(deployment);
-			}
-			
-			addModify(app,events);
-			
-			return true;
-		}
-		return false;
 	}
 	
 	private Authorizer.Action determineCreateUpdateAction(ModelEntity entity) {
@@ -543,12 +354,18 @@ public class ModelManagerImpl implements ModelManager, ApplicationContextAware {
 	}
 	
 	private void authorizeAndValidate(ModelEntity entity, Authorizer.Action action) throws InvalidPropertiesException {
-		
+		authorize(entity,action);
+		validate(entity);
+	}
+	
+	private void authorize(ModelEntity entity, Authorizer.Action action) {
 		if( ! getAuthorizer().may(action, entity) ) {
 			throw new PersistenceException(new AuthorizationException("The user logged in does not have permissions to "
 					+ action.toString() + " the " + entity.getClass().getSimpleName()));
 		}
-		
+	}
+	
+	private void validate(ModelEntity entity) throws InvalidPropertiesException {
 		Map<Method,String> errors = entity.validate();
 		if( errors!=null ) {
 			throw new InvalidPropertiesException(entity,errors);

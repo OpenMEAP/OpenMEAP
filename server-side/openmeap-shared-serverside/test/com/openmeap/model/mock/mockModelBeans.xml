@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
   http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services-2.0.xsd
   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
-
+    
 	<!--
 	This is the source of all test ModelEntity's, regardless
 	of whether they are put in the SQLite DB or whether they
@@ -72,28 +72,25 @@
 		<property name="id" value="1"/>
 		<property name="type" value="OPTIONAL"/>
 		<property name="application" ref="Application_1"/>
-		<property name="applicationVersion" ref="ApplicationVersion_1"/>
+		<property name="applicationArchive" ref="ApplicationArchive_1"/>
 		<property name="createDate" value="2011/JAN/01"/>
-		<property name="hash" value="123"/>
-		<property name="hashAlgorithm" value="MD5"/>
+		<property name="versionIdentifier" value="ApplicationVersion.identifier.1"/>
 	</bean>
 	<bean id="Application1_Deployment2" class="com.openmeap.model.dto.Deployment">
 		<property name="id" value="2"/>
 		<property name="type" value="REQUIRED"/>
 		<property name="application" ref="Application_1"/>
-		<property name="applicationVersion" ref="ApplicationVersion_1"/>
+		<property name="applicationArchive" ref="ApplicationArchive_1"/>
 		<property name="createDate" value="2011/JAN/02"/>
-		<property name="hash" value="234"/>
-		<property name="hashAlgorithm" value="MD5"/>
+		<property name="versionIdentifier" value="ApplicationVersion.identifier.1"/>
 	</bean>
 	<bean id="Application1_Deployment3" class="com.openmeap.model.dto.Deployment">
 		<property name="id" value="3"/>
 		<property name="type" value="REQUIRED"/>
 		<property name="application" ref="Application_1"/>
-		<property name="applicationVersion" ref="ApplicationVersion_2"/>
+		<property name="applicationArchive" ref="ApplicationArchive_2"/>
 		<property name="createDate" value="2011/JAN/03"/>
-		<property name="hash" value="345"/>
-		<property name="hashAlgorithm" value="MD5"/>
+		<property name="versionIdentifier" value="ApplicationVersion.identifier.2"/>
 	</bean>
 	
 	<bean id="ApplicationVersion_1" class="com.openmeap.model.dto.ApplicationVersion">
@@ -118,7 +115,7 @@
 		<property name="hashAlgorithm" value="SHA1"/>
 		<property name="bytesLength" value="100000"/>
 		<property name="bytesLengthUncompressed" value="100000"/>
-		<property name="version" ref="ApplicationVersion_1" />
+		<property name="application" ref="Application_1" />
 	</bean>
 	<bean id="ApplicationArchive_2" class="com.openmeap.model.dto.ApplicationArchive">
 		<property name="url" value="ApplicationArchive.url.2"/>
@@ -127,7 +124,7 @@
 		<property name="hashAlgorithm" value="MD5"/>
 		<property name="bytesLength" value="100000"/>
 		<property name="bytesLengthUncompressed" value="100000"/>
-		<property name="version" ref="ApplicationVersion_2" />
+		<property name="application" ref="Application_1" />
 	</bean>
 	
 	<bean id="ApplicationInstallation_1" class="com.openmeap.model.dto.ApplicationInstallation">

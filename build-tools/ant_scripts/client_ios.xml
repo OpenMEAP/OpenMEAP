@@ -57,7 +57,7 @@
 		<antcall target="build"/>
 	</target>
 	<target name="build">
-		<exec dir="${openmeap.slic.ios.path}" executable="xcodebuild">
+		<exec dir="${openmeap.slic.ios.path}" executable="xcodebuild" failonerror="yes">
 			<arg value="-project"/><arg value="${openmeap.slic.projectName}.xcodeproj"/>
 			<arg value="-target"/><arg value="${openmeap.slic.projectName}"/>
 			<arg value="-configuration"/><arg value="${build.configuration}"/>
@@ -69,7 +69,7 @@
 	<target name="package" depends="-setup-client-properties">
 		<fail unless="openmeap.slic.ios.mobileProvision" message="openmeap.slic.ios.mobileProvision is a required property for packaging.  It must be the path to the mobileprovision file."/>
 		<fail unless="openmeap.slic.ios.signingEntity" message="openmeap.slic.ios.signingEntity is a required property for packaging.  It must the the name of the signing entity to use."/>
-		<exec dir="${openmeap.slic.ios.path}" executable="xcrun">
+		<exec dir="${openmeap.slic.ios.path}" executable="xcrun" failonerror="yes">
 			<arg value="-sdk"/><arg value="iphoneos"/><arg value="PackageApplication"/>
 			<arg value="${openmeap.slic.ios.path}/build/${build.configuration}-iphoneos/${openmeap.slic.ios.projectName}.app"/>
 			<arg value="-o"/><arg value="${openmeap.slic.ios.distribArtifact}"/>

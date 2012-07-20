@@ -41,4 +41,12 @@ public class ModelEntityEvent<T extends ModelEntity> extends AbstractEvent<T> {
 	public ModelServiceOperation getOperation() {
 		return this.operation;
 	}
+	
+	public int hashCode(ModelEntityEvent o) {
+		return operation.hashCode() + getPayload().hashCode();
+	}
+	
+	public boolean equals(ModelEntityEvent o) {
+		return o.getOperation()==operation && getPayload().equals(o.getPayload());
+	}
 }

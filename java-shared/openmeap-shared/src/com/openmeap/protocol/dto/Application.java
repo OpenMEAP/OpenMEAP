@@ -25,6 +25,7 @@
 package com.openmeap.protocol.dto;
 
 import com.openmeap.json.HasJSONProperties;
+import com.openmeap.json.JSONGetterSetter;
 import com.openmeap.json.JSONProperty;
 
 public class Application implements HasJSONProperties {
@@ -35,10 +36,42 @@ public class Application implements HasJSONProperties {
     protected String hashValue;
 
     private static JSONProperty[] jsonProperties = new JSONProperty[] {
-    	new JSONProperty("getInstallation"),
-    	new JSONProperty("getName"),
-    	new JSONProperty("getVersionId"),
-    	new JSONProperty("getHashValue")
+    	new JSONProperty("installation",ApplicationInstallation.class,
+			new JSONGetterSetter(){
+				public Object getValue(Object src) {
+					return ((Application)src).getInstallation();
+				}
+				public void setValue(Object dest, Object value) {
+					((Application)dest).setInstallation((ApplicationInstallation)value);
+				}
+    		}),
+    	new JSONProperty("name",String.class,
+    		new JSONGetterSetter(){
+				public Object getValue(Object src) {
+					return ((Application)src).getName();
+				}
+				public void setValue(Object dest, Object value) {
+					((Application)dest).setName((String)value);
+				}
+			}),
+    	new JSONProperty("versionId",String.class,
+    		new JSONGetterSetter(){
+				public Object getValue(Object src) {
+					return ((Application)src).getVersionId();
+				}
+				public void setValue(Object dest, Object value) {
+					((Application)dest).setVersionId((String)value);
+				}
+			}),
+    	new JSONProperty("hashValue",String.class,
+    		new JSONGetterSetter(){
+				public Object getValue(Object src) {
+					return ((Application)src).getHashValue();
+				}
+				public void setValue(Object dest, Object value) {
+					((Application)dest).setHashValue((String)value);
+				}
+			})
     };
     public JSONProperty[] getJSONProperties() {
 		return jsonProperties;

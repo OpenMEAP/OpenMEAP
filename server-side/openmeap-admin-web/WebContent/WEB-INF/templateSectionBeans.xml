@@ -145,6 +145,7 @@
 		<property name="sectionBacking">
 			<bean class="com.openmeap.admin.web.backing.GlobalSettingsBacking">
 				<property name="modelManager" ref="modelManager"/>
+				<property name="clusterNodeHealthCheck" ref="clusterNodeHealthCheck"/>
 			</bean>
 		</property>
 	</bean>
@@ -160,7 +161,6 @@
 		<property name="sectionBacking">
 			<bean class="com.openmeap.admin.web.backing.DeploymentListingsBacking">
 				<property name="modelManager" ref="modelManager"/>
-				<property name="archiveFileUploadNotifier" ref="archiveUploadNotifier"/>
 			</bean>
 		</property>
 	</bean>

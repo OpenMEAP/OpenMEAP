@@ -32,13 +32,20 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.persistence.PersistenceException;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.openmeap.Authorizer.Action;
+import com.openmeap.cluster.ClusterNodeHealthCheckThread;
 import com.openmeap.constants.FormConstants;
 import com.openmeap.event.MessagesEvent;
 import com.openmeap.event.ProcessingEvent;
@@ -52,6 +59,9 @@ import com.openmeap.web.ProcessingContext;
 
 public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 	private ModelManager modelManager;
+	private ClusterNodeHealthCheckThread healthChecker;
+	
+	private final static Logger logger = LoggerFactory.getLogger(GlobalSettingsBacking.class); 
 	
 	private final static String PROCESS_TARGET_PARAM     = FormConstants.PROCESS_TARGET;
 	private final static String AUTH_SALT_PARAM          = "authSalt";
@@ -98,12 +108,7 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 			// process the storage path parameter
 			if( !empty(STORAGE_PATH_PARAM,parameterMap) ) {
 				String path = firstValue(STORAGE_PATH_PARAM,parameterMap);
-				File f = new File(path);
-				if( !( f.exists() && f.canWrite() && f.canRead() ) ) {
-					events.add(new MessagesEvent("The temporary local storage path must exist and be readable, writable, and executable by the system user this virtual machine is running as."));
-				} else {
-					settings.setTemporaryStoragePath( path );
-				}
+				settings.setTemporaryStoragePath( path );
 			}
 			
 			// process auth salt
@@ -126,23 +131,39 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 				// make sure there is a map in cluster nodes
 				List<ClusterNode> clusterNodes = settings.getClusterNodes();
 				if( clusterNodes==null ) {
-					clusterNodes = new ArrayList<ClusterNode>();
+					clusterNodes = new Vector<ClusterNode>();
 					settings.setClusterNodes(clusterNodes);
 				} 
 				
 				// iterate over each node configuration, updating the clusterNodes as per input
+				boolean warn = false;
 				for( int i=0; i<end; i++ ) {
+					
 					String thisNodeUrl = clusterNodeUrls[i].trim();
 					String thisNodePath = clusterNodePaths[i].trim();
-					if( thisNodeUrl.length()==0 ) {
-						events.add(new MessagesEvent("A cluster node must specify a service url it is internally accessible via the admin service."));
+					
+					if( thisNodeUrl.length()==0 && warn==false ) {
+						warn=true;
+						events.add(new MessagesEvent("A cluster node must be specified.  The service url must be internally accessible by the administrative service, and should point to the services context.  The rest of settings changes will be applied."));
 						continue;
 					}
-					if( thisNodePath.length()==0 ) {
-						events.add(new MessagesEvent("The cluster node with url "+thisNodeUrl+" should specify a path to store application archives at."));
+				
+					// remove any nodes that no longer appear
+					List<String> urls = Arrays.asList(clusterNodeUrls);
+					List<String> urlsToRemove = new ArrayList<String>();
+					for( ClusterNode node : clusterNodes ) {
+						if( !urls.contains(node.getServiceWebUrlPrefix()) ) {
+							urlsToRemove.add(node.getServiceWebUrlPrefix());
+						}
 					}
-					if( settings.getClusterNode(thisNodeUrl)!=null ) {
-						settings.getClusterNode(thisNodeUrl).setFileSystemStoragePathPrefix(thisNodePath);
+					for( String url : urlsToRemove ) {
+						ClusterNode node = settings.getClusterNode(url);
+						clusterNodes.remove(node);
+						modelManager.delete(node,events);
+					}
+					ClusterNode node = null;
+					if( (node=settings.getClusterNode(thisNodeUrl))!=null ) {
+						node.setFileSystemStoragePathPrefix(thisNodePath);
 					} else {
 						ClusterNode thisNode = new ClusterNode();
 						thisNode.setServiceWebUrlPrefix(thisNodeUrl);
@@ -161,6 +182,7 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 			}
 		
 			try {
+				modelManager.begin();
 				if(toDelete!=null) {
 					for(ClusterNode node : toDelete) {
 						settings.removeClusterNode(node);
@@ -168,11 +190,29 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 					}
 				}
 				modelManager.addModify(settings,events);
+				modelManager.commit(events);
+				modelManager.refresh(settings, events);
 				events.add(new MessagesEvent("The settings were successfully modified."));
-			} catch( InvalidPropertiesException ipe ) {
-				events.add( new MessagesEvent(ipe.getMessage()) );
-			} catch( PersistenceException ipe ) {
-				events.add( new MessagesEvent(ipe.getMessage()) );
+			} catch( InvalidPropertiesException e ) {
+				modelManager.rollback();
+				logger.info("Invalid properties submitted for an application",e);
+				events.add( new MessagesEvent(e.getMessage()) );
+			} catch( PersistenceException e ) {
+				modelManager.rollback();
+				logger.error("An exception occurred commiting the transaction",e);
+				events.add( new MessagesEvent(e.getMessage()) );
+			} 
+			try {
+				healthChecker.refreshSettings();
+				List<Exception> es = healthChecker.checkNowAndWait();
+				if(es.size()>0) {
+					for(Exception e:es) {
+						events.add( new MessagesEvent(e.getMessage()) );
+					}
+				}
+			} catch (InterruptedException e) {
+				logger.error("Exception occurred waiting on the health check thread after updating global settings",e);
+				events.add( new MessagesEvent(e.getMessage()) );
 			}
 		} 
 		
@@ -187,6 +227,22 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 			templateVariables.put(AUTH_SALT_VERIFY_PARAM, settings.getServiceManagementAuthSalt());
 		}
 		if( settings.getClusterNodes()!=null && settings.getClusterNodes().size()>0 ) {
+			if(healthChecker!=null) {
+				for(ClusterNode node:settings.getClusterNodes()) {
+					ClusterNode checkerNode = healthChecker.getSettings().getClusterNode(node.getServiceWebUrlPrefix());
+					if(checkerNode!=null) {
+						synchronized(checkerNode) {
+							node.setLastStatus(checkerNode.getLastStatus());
+							Date date=null;
+							node.setLastStatusCheck(
+									(Date) ((date=checkerNode.getLastStatusCheck())!=null
+									?date.clone()
+									:null));
+							node.setLastStatusMessage(checkerNode.getLastStatusMessage());
+						}
+					}
+				}
+			}
 			templateVariables.put(CLUSTER_NODES_VAR, settings.getClusterNodes());
 		}
 		if( settings.getMaxFileUploadSize()!=null ) {
@@ -205,6 +261,10 @@ public class GlobalSettingsBacking extends AbstractTemplatedSectionBacking {
 	}
 	public void setModelManager(ModelManager modelManager) {
 		this.modelManager = modelManager;
+	}
+	
+	public void setClusterNodeHealthCheck(ClusterNodeHealthCheckThread healthChecker) {
+		this.healthChecker = healthChecker;
 	}
 }
 

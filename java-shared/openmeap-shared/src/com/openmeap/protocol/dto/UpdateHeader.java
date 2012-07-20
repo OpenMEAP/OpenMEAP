@@ -26,75 +26,145 @@ package com.openmeap.protocol.dto;
 
 import com.openmeap.json.HasJSONProperties;
 import com.openmeap.json.JSONProperty;
+import com.openmeap.json.JSONGetterSetter;
 
 public class UpdateHeader implements HasJSONProperties {
 
-    protected Hash hash;
-    protected String versionIdentifier;
-    protected Long installNeeds;
-    protected Long storageNeeds;
-    protected String updateUrl;
-    protected UpdateType type;
-    protected Long spaceAvailable;
+	protected Hash hash;
+	protected String versionIdentifier;
+	protected Long installNeeds;
+	protected Long storageNeeds;
+	protected String updateUrl;
+	protected UpdateType type;
+	protected Long spaceAvailable;
 
-    private static JSONProperty[] jsonProperties = new JSONProperty[] {
-    	new JSONProperty("getHash"),
-    	new JSONProperty("getVersionIdentifier"),
-    	new JSONProperty("getInstallNeeds"),
-    	new JSONProperty("getStorageNeeds"),
-    	new JSONProperty("getUpdateUrl"),
-    	new JSONProperty("getType"),
-    	new JSONProperty("getSpaceAvailable")
-    };
-    public JSONProperty[] getJSONProperties() {
+	private static JSONProperty[] jsonProperties = new JSONProperty[] {
+			new JSONProperty("hash", Hash.class, new JSONGetterSetter() {
+				public Object getValue(Object src) {
+					return ((UpdateHeader) src).getHash();
+				}
+
+				public void setValue(Object dest, Object value) {
+					((UpdateHeader) dest).setHash((Hash) value);
+				}
+			}),
+			new JSONProperty("versionIdentifier", String.class,
+					new JSONGetterSetter() {
+						public Object getValue(Object src) {
+							return ((UpdateHeader) src).getVersionIdentifier();
+						}
+
+						public void setValue(Object dest, Object value) {
+							((UpdateHeader) dest)
+									.setVersionIdentifier((String) value);
+						}
+					}),
+			new JSONProperty("installNeeds", Long.class,
+					new JSONGetterSetter() {
+						public Object getValue(Object src) {
+							return ((UpdateHeader) src).getInstallNeeds();
+						}
+
+						public void setValue(Object dest, Object value) {
+							((UpdateHeader) dest).setInstallNeeds((Long) value);
+						}
+					}),
+			new JSONProperty("storageNeeds", Long.class,
+					new JSONGetterSetter() {
+						public Object getValue(Object src) {
+							return ((UpdateHeader) src).getStorageNeeds();
+						}
+
+						public void setValue(Object dest, Object value) {
+							((UpdateHeader) dest).setStorageNeeds((Long) value);
+						}
+					}),
+			new JSONProperty("updateUrl", String.class, new JSONGetterSetter() {
+				public Object getValue(Object src) {
+					return ((UpdateHeader) src).getUpdateUrl();
+				}
+
+				public void setValue(Object dest, Object value) {
+					((UpdateHeader) dest).setUpdateUrl((String) value);
+				}
+			}),
+			new JSONProperty("type", UpdateType.class, new JSONGetterSetter() {
+				public Object getValue(Object src) {
+					return ((UpdateHeader) src).getType();
+				}
+
+				public void setValue(Object dest, Object value) {
+					((UpdateHeader) dest).setType((UpdateType) UpdateType.fromValue((String)value));
+				}
+			}),
+			new JSONProperty("spaceAvailable", Long.class,
+					new JSONGetterSetter() {
+						public Object getValue(Object src) {
+							return ((UpdateHeader) src).getSpaceAvailable();
+						}
+
+						public void setValue(Object dest, Object value) {
+							((UpdateHeader) dest)
+									.setSpaceAvailable((Long) value);
+						}
+					}) };
+
+	public JSONProperty[] getJSONProperties() {
 		return jsonProperties;
 	}
-    
-    public Hash getHash() {
-        return hash;
-    }
-    public void setHash(Hash value) {
-        this.hash = value;
-    }
 
-    public String getVersionIdentifier() {
-        return versionIdentifier;
-    }
-    public void setVersionIdentifier(String value) {
-        this.versionIdentifier = value;
-    }
+	public Hash getHash() {
+		return hash;
+	}
 
-    public Long getInstallNeeds() {
-        return installNeeds;
-    }
-    public void setInstallNeeds(Long value) {
-        this.installNeeds = value;
-    }
+	public void setHash(Hash value) {
+		this.hash = value;
+	}
 
-    public Long getStorageNeeds() {
-        return storageNeeds;
-    }
-    public void setStorageNeeds(Long value) {
-        this.storageNeeds = value;
-    }
+	public String getVersionIdentifier() {
+		return versionIdentifier;
+	}
 
-    public String getUpdateUrl() {
-        return updateUrl;
-    }
-    public void setUpdateUrl(String value) {
-        this.updateUrl = value;
-    }
+	public void setVersionIdentifier(String value) {
+		this.versionIdentifier = value;
+	}
 
-    public UpdateType getType() {
-        return type;
-    }
-    public void setType(UpdateType value) {
-        this.type = value;
-    }
-    
+	public Long getInstallNeeds() {
+		return installNeeds;
+	}
+
+	public void setInstallNeeds(Long value) {
+		this.installNeeds = value;
+	}
+
+	public Long getStorageNeeds() {
+		return storageNeeds;
+	}
+
+	public void setStorageNeeds(Long value) {
+		this.storageNeeds = value;
+	}
+
+	public String getUpdateUrl() {
+		return updateUrl;
+	}
+
+	public void setUpdateUrl(String value) {
+		this.updateUrl = value;
+	}
+
+	public UpdateType getType() {
+		return type;
+	}
+
+	public void setType(UpdateType value) {
+		this.type = value;
+	}
+
 	public Long getSpaceAvailable() {
 		return spaceAvailable;
 	}
+
 	public void setSpaceAvailable(Long spaceAvailable) {
 		this.spaceAvailable = spaceAvailable;
 	}

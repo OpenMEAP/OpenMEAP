@@ -24,19 +24,18 @@
 
 package com.openmeap.services;
 
-import java.util.Date;
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.openmeap.digest.DigestException;
+import com.openmeap.http.HttpRequestExecuter;
 import com.openmeap.model.ModelManager;
+import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.ApplicationArchive;
 import com.openmeap.model.dto.ApplicationVersion;
 import com.openmeap.model.dto.Deployment;
 import com.openmeap.model.dto.GlobalSettings;
-import com.openmeap.model.dto.Application;
 import com.openmeap.protocol.ApplicationManagementService;
 import com.openmeap.protocol.WebServiceException;
 import com.openmeap.protocol.dto.ConnectionOpenRequest;
@@ -47,6 +46,7 @@ import com.openmeap.protocol.dto.UpdateHeader;
 import com.openmeap.protocol.dto.UpdateNotification;
 import com.openmeap.protocol.dto.UpdateType;
 import com.openmeap.util.AuthTokenProvider;
+import com.openmeap.util.GenericRuntimeException;
 
 /**
  * Server-side implementation of the ApplicationManagementService
@@ -88,15 +88,20 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 		Application application = getApplication(reqAppName,reqAppVerId);
 		
 		// Generate a new auth token for the device to present to the proxy
-		String authToken = AuthTokenProvider.newAuthToken(application.getProxyAuthSalt());
+		String authToken;
+		try {
+			authToken = AuthTokenProvider.newAuthToken(application.getProxyAuthSalt());
+		} catch (DigestException e) {
+			throw new GenericRuntimeException(e);
+		}
 		response.setAuthToken(authToken);
 		
 		// If there is a deployment, 
 		// and the version of that deployment differs in hash value or identifier
 		// then return an update in the response
 		Deployment lastDeployment = modelManager.getModelService().getLastDeployment(application);
-		Boolean reqAppVerDiffers = lastDeployment!=null && !lastDeployment.getApplicationVersion().getIdentifier().equals(reqAppVerId);
-		Boolean reqAppArchHashValDiffers = lastDeployment!=null && reqAppArchHashVal!=null && !lastDeployment.getHash().equals(reqAppArchHashVal);
+		Boolean reqAppVerDiffers = lastDeployment!=null && !lastDeployment.getVersionIdentifier().equals(reqAppVerId);
+		Boolean reqAppArchHashValDiffers = lastDeployment!=null && reqAppArchHashVal!=null && !lastDeployment.getApplicationArchive().getHash().equals(reqAppArchHashVal);
 		
 		// we only send an update if 
 		//   a deployment has been made
@@ -107,11 +112,10 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 			
 			// TODO: I'm not happy with the discrepancies between the model and schema
 			// ...besides, this update header should be encapsulated somewhere else
-			ApplicationVersion currentVersion = lastDeployment.getApplicationVersion();
-			ApplicationArchive currentVersionArchive = currentVersion.getArchive();
+			ApplicationArchive currentVersionArchive = lastDeployment.getApplicationArchive();
 			UpdateHeader uh = new UpdateHeader();
 			
-			uh.setVersionIdentifier(currentVersion.getIdentifier());
+			uh.setVersionIdentifier(lastDeployment.getVersionIdentifier());
 			uh.setInstallNeeds(Long.valueOf(currentVersionArchive.getBytesLength()+currentVersionArchive.getBytesLengthUncompressed())); 
 			uh.setStorageNeeds(Long.valueOf(currentVersionArchive.getBytesLengthUncompressed())); 
 			uh.setType( UpdateType.fromValue(lastDeployment.getType().toString()) );
@@ -148,20 +152,23 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 		ModelManager manager = getModelManager();
 		
 		// we will need to verify that they have the latest version
-		com.openmeap.model.dto.ApplicationVersion appVer = manager.getModelService().findAppVersionByNameAndId(appName,appVersionId);
-		Application application;
-		if( appVer==null ) {
-			application = manager.getModelService().findApplicationByName(appName);
-			if( application==null 
-					|| application.getInitialVersionIdentifier()==null 
-					|| !(application.getInitialVersionIdentifier().equals(appVersionId)) ) {
-				throw new WebServiceException(WebServiceException.TypeEnum.APPLICATION_VERSION_NOTFOUND,
-						"The application "+appName+"(version "+appVersionId+") was not found.");
-			}
-		} else {
-			application = appVer.getApplication();
+		Application application = manager.getModelService().findApplicationByName(appName);
+		if( application==null ) {
+			throw new WebServiceException(WebServiceException.TypeEnum.APPLICATION_NOTFOUND,
+					"The application \""+appName+"\" was not found.");
 		}
-		
+				
 		return application;
+	}
+	
+	private HttpRequestExecuter executer = null;
+	private String serviceUrl = null;
+	@Override
+	public void setServiceUrl(String serviceUrl) {
+		this.serviceUrl = serviceUrl;
+	}
+	@Override
+	public void setHttpRequestExecuter(HttpRequestExecuter executer) {
+		this.executer = executer;
 	}	
 }

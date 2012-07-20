@@ -24,27 +24,29 @@
 
 package com.openmeap.services;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+import com.openmeap.thirdparty.org.json.me.JSONObject;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+
 import com.openmeap.constants.UrlParamConstants;
+import com.openmeap.digest.DigestInputStreamFactory;
 import com.openmeap.json.JSONObjectBuilder;
-import com.openmeap.model.*;
-
-import org.springframework.mock.web.*;
-import org.json.JSONObject;
-import org.junit.*;
-
-import java.util.*;
-import java.io.*;
-import org.w3c.dom.*;
-
-import com.openmeap.services.ServiceManagementServlet;
-import com.openmeap.services.dto.Result;
+import com.openmeap.model.ModelManager;
+import com.openmeap.model.ModelTestUtils;
 import com.openmeap.model.dto.Application;
 import com.openmeap.model.dto.GlobalSettings;
 import com.openmeap.model.event.ModelEntityEventAction;
-import com.openmeap.model.event.ModelEntityModifyEvent;
 import com.openmeap.model.event.handler.ModelServiceRefreshHandler;
+import com.openmeap.services.dto.Result;
 import com.openmeap.util.AuthTokenProvider;
-import com.openmeap.util.Utils;
 
 public class ServletManagementServletTest {
 	

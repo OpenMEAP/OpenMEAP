@@ -30,14 +30,22 @@ public class FormConstants {
 	final static public String USERAGENT_DEFAULT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:9.0.1) Gecko/20100101 Firefox/9.0.1";
 	
 	final static public String CONTENT_TYPE = "Content-Type";
+	final static public String CONTENT_LENGTH = "Content-Length";
 	final static public String CONT_TYPE_DEFAULT = "application/x-www-form-urlencoded";
 	final static public String CONT_TYPE_XML = "text/xml";
+	final static public String CONT_TYPE_JSON = "application/json";
 	final static public String CONT_TYPE_HTML = "text/html";
+	
+	final static public String CONTENT_MD5 = "Content-MD5";
 	
 	final static public String ENCODING_TYPE = "encodingType";
 	final static public String ENCTYPE_MULTIPART_FORMDATA = "multipart/form-data";
 	
 	final static public String CHAR_ENC_DEFAULT = "utf-8";
+	
+	final static public String QUERY_STRING_DELIM = "?";
+	
+	final static public String HTTP_EOL = "\r\n";
 	
 	/*
 	 * Page bean names

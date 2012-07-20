@@ -35,10 +35,10 @@
 @synthesize viewController;
 @synthesize loginViewController;
 
-@synthesize updateHeader;
-
 @synthesize config;
 @synthesize storage;
+
+@synthesize readyForUpdateCheck;
 
 static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 
@@ -49,7 +49,6 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 - (OmSlicAppDelegate*) init {
     self = [super init];
 	__globalOmSlicAppDelegateInstance = self;
-    self->updateHeader = OM_NULL;
     return self;
 }
 
@@ -60,6 +59,10 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 	
 	NSLog(@"in OmSlicAppDelegate::didFinishLaunchingWithOptions");
 	
+    if( [NSURLProtocol registerClass:[OmSlicJsApiProtocol class]] == NO ) {
+		NSLog(@"-- failed to register OmSlicJsApiProtocol");
+	}
+    
 	// load in current configuration
 	om_props_ptr props = om_props_acquire("slic-config");
 	om_prefs_ptr prefs = om_prefs_acquire("slic-prefs");
@@ -101,72 +104,26 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 	} else om_free(uuid);
 	NSLog(@"-- dev uuid checked");
 	
-	NSLog(@"in OmSlicAppDelegate::applicationDidBecomeActive");
-	[self reload];
-	
     return YES;
 }
 
 
 - (void)applicationWillResignActive:(UIApplication *)application {
-    /*
-     Sent when the application is about to move from active to inactive state. 
-	 This can occur for certain types of temporary interruptions 
-	 (such as an incoming phone call or SMS message) or when the user quits 
-	 the application and it begins the transition to the background state.
-     Use this method to pause ongoing tasks, disable timers, and throttle down 
-	 OpenGL ES frame rates. Games should use this method to pause the game.
-     */
+
 	NSLog(@"in OmSlicAppDelegate::applicationWillResignActive");
 
-    if( self.loginViewController!=nil && self.loginViewController==self.window.rootViewController ) {
+    if( self.loginViewController!=nil 
+        && self.loginViewController==self.window.rootViewController ) {
         [self.loginViewController cancel:self];
     }
-    
-	[NSURLProtocol unregisterClass:[OmSlicJsApiProtocol class]];
 }
 
 
-- (void)applicationDidEnterBackground:(UIApplication *)application {
-    /*
-     Use this method to release shared resources, save user data, invalidate timers, 
-	 and store enough application state information to restore your application to its 
-	 current state in case it is terminated later. 
-     If your application supports background execution, 
-	 called instead of applicationWillTerminate: when the user quits.
-     */
-	NSLog(@"in OmSlicAppDelegate::applicationDidEnterBackground");
-	[NSURLProtocol unregisterClass:[OmSlicJsApiProtocol class]];
-}
-
-
-- (void)applicationWillEnterForeground:(UIApplication *)application {
-    /*
-     Called as part of  transition from the background to the inactive state: 
-	 here you can undo many of the changes made on entering the background.
-     */
-	
+- (void)applicationWillEnterForeground:(UIApplication *)application {    
 	// for now, we'll re-initialize the view
 	// each time the application is foregrounded
 	NSLog(@"in OmSlicAppDelegate::applicationWillEnterForeground");
-	[self reload];
-}
-
-
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-    /*
-     Restart any tasks that were paused (or not yet started) while the application was inactive. 
-	 If the application was previously in the background, optionally refresh the user interface.
-     */
-}
-
-
-- (void)applicationWillTerminate:(UIApplication *)application {
-    /*
-     Called when the application is about to terminate.
-     See also applicationDidEnterBackground:.
-     */
-	[NSURLProtocol unregisterClass:[OmSlicJsApiProtocol class]];
+    [self performSelectorOnMainThread:@selector(initializeView) withObject:self waitUntilDone:NO];
 }
 
 
@@ -189,10 +146,6 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 	om_prefs_release(prefs);
 	om_config_release(self.config);
 	om_storage_release(self.storage);
-	if( self.updateHeader!=OM_NULL ) {
-        om_update_release_update_header(self.updateHeader);
-        self.updateHeader=OM_NULL;
-    }
     [viewController release];
     [window release];
     [super dealloc];
@@ -210,29 +163,6 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
     }
     om_free(d);
     return dMode==1 ? YES : NO;
-}
-
-- (void) reload {
-    NSLog(@"in OmSlicAppDelegate::reload");
-
-    // make sure the screen is blanked out, in-case they are returning to a running instance
-    self.window.rootViewController = nil;
-    
-    // insure that a stale update isn't lying about
-    [self.viewController setUpdateHeaderJSON:nil];
-    if( self.updateHeader!=OM_NULL ) {
-        om_update_release_update_header(self.updateHeader);
-        self.updateHeader=OM_NULL;
-    }
-
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-	dispatch_async(queue, ^{ 
-        NSLog(@"--about to check for update");
-        @synchronized([OmSlicAppDelegate class]) {
-            [self performUpdateCheck];
-            [self performSelectorOnMainThread:@selector(initializeView) withObject:nil waitUntilDone:NO];
-        } 
-    });
 }
 
 - (void) showAlert:(NSString*)message withTitle:(NSString*)title {
@@ -293,12 +223,10 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 }
 
 - (BOOL) initializeView {
-	
+    
 	NSLog(@"in OmSlicAppDelegate::initializeView");
-	
-	if( [NSURLProtocol registerClass:[OmSlicJsApiProtocol class]] == NO ) {
-		NSLog(@"-- failed to register OmSlicJsApiProtocol");
-	}
+    
+    readyForUpdateCheck=FALSE;
     
     // this should be flipped to true exclusively at the end of the om_update_perform() func
     int *updated = om_config_get(config,OM_CFG_APP_UPDATED);
@@ -315,11 +243,6 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 	
 	// Set the view controller as the window's root view controller and display.
 	self.viewController = [[OmSlicViewController alloc] init];
-    if( self->updateHeader!=OM_NULL ) {
-        char * jsonUpdateHeader = om_update_header_to_json(self->storage,self->updateHeader);
-        self.viewController.updateHeaderJSON=[NSString stringWithUTF8String:jsonUpdateHeader];
-        om_free(jsonUpdateHeader);
-    }
     
     self.viewController.cachePolicy = cachePolicy;
 	self.viewController.appDelegate = self;
@@ -327,8 +250,16 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
     self.window.rootViewController = self.viewController;
     
 	[self.window makeKeyAndVisible];
-	
+    
 	return YES;
+}
+
+- (void) reloadView {
+    NSLog(@"in OmSlicAppDelegate::reload");
+    
+    readyForUpdateCheck=FALSE;
+
+    [self performSelectorOnMainThread:@selector(initializeView) withObject:self waitUntilDone:NO];
 }
 
 - (void) restoreToWebView {
@@ -344,50 +275,59 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 // STUFF I SHOULD MOVE OUT //
 //~~~~~~~~~~~~~~~~~~~~~~~~~//
 
+-(BOOL) isTimeForUpdateCheck {
+    return om_update_decision(self.config)==OM_TRUE;
+}
+
 /*!
  * @return NO if an IMMEDIATE update failed, else YES
  */
 - (BOOL) performUpdateCheck {
-    
-    if( self->updateHeader!=OM_NULL ) {
-        om_update_release_update_header(self->updateHeader);
-        self->updateHeader=OM_NULL;
+
+    NSLog(@"-- making update check");
+    om_update_check_result_ptr result = om_update_check(self->config);
+    om_update_header_ptr updateHeader = OM_NULL;
+    if(result!=OM_NULL && result->response!=OM_NULL && result->response->update!=OM_NULL) {
+        updateHeader = result->response->update;
     }
     
-	if( om_update_decision(self.config)==OM_TRUE ) {
-		
-		NSLog(@"-- making update check");
-		self->updateHeader = om_update_check(self->config);
+    // TODO: if there is no network connectivity, then i need to communicate that with the client.
+    
+    if( updateHeader!=OM_NULL ) {
         
-        // TODO: if there is no network connectivity, then i need to communicate that with the client.
-        
-		if( self->updateHeader!=OM_NULL ) {
+        if( updateHeader->type==OM_UPDATE_TYPE_IMMEDIATE ) {
             
-            if( self->updateHeader->type==OM_UPDATE_TYPE_IMMEDIATE ) {
-                
-                NSLog(@"-- performing update");
-                const char * updateResult = om_update_perform(self->config,self->storage,self->updateHeader);
-                
-                if( updateResult!=OmUpdateResultSuccess ) {
-                    
-                    NSLog(@"-- performing failed");
-                    om_update_release_update_header(self->updateHeader);
-                    self.updateHeader=OM_NULL;
-                    self.viewController.updateHeaderJSON=nil;
-                    
-                    return NO;
-                } else {
-                    
-                    NSLog(@"-- performing succeeded");
-                    om_update_release_update_header(self->updateHeader);
-                    self.updateHeader=OM_NULL;
-                    self.viewController.updateHeaderJSON=nil;
-                    
-                    [self reload];
-                }
-            } 
-		} 
-	}
+            // TODO: show IMMEDIATE update intercepting screen, kill webview
+            [self showAlert:@"There is an immediate update.  The application will restart.  We apologise for any inconvenience." withTitle:@"MANDATORY UPDATE"];
+            
+            NSLog(@"-- performing IMMEDIATE update");
+            const char * updateResult = om_update_perform(self->config,self->storage,updateHeader);
+            
+            if( updateResult!=OmUpdateResultSuccess ) {
+                return NO;
+            } else {
+                [self reloadView];
+            }
+        } else {
+            [self.viewController setUpdateHeader:updateHeader withError:result->error];
+        }
+        
+        om_update_release_check_result(result);
+    } else if(om_error_get_code()!=OM_ERR_NONE) {
+        
+        char * errMesg = om_string_copy(om_error_get_message());
+        char * errCode = om_string_format("%u",om_error_get_code());
+        om_update_check_error_ptr error = om_malloc(sizeof(om_update_check_error));
+        error->message=errMesg;
+        error->code=errCode;
+        [self.viewController setUpdateHeader:nil withError:error];
+        om_free(errMesg);
+        om_free(errCode);
+        om_free(error);
+    } else {
+        
+        [self.viewController setUpdateHeader:nil withError:nil];
+    }
     
     return YES;
 }
@@ -434,13 +374,7 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
 	withAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge 
 			 andProtectionSpace:(NSURLProtectionSpace *)protectionSpace 
 					 fromThread:(NSThread *)thread {
-	/*
-	 call:
-	 - (void) _doLoginFormForDelegate:(id)delegate 
-	 withAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
-	 andProtectionSpace:(NSURLProtectionSpace*)protectionSpace
-	 fromThread:NSThread *thread
-	 */
+
 	SEL sel = @selector(_doLoginFormForDelegate:withAuthenticationChallenge:andProtectionSpace:fromThread:);
 	NSMethodSignature * mySignature = [OmSlicAppDelegate instanceMethodSignatureForSelector:sel];
 	NSInvocation * inv = [NSInvocation invocationWithMethodSignature:mySignature];

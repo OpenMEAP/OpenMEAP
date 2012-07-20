@@ -1,3 +1,27 @@
+/*
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011-2012 OpenMEAP, Inc.                                   #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the LGPLv3                                                #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU Lesser General Public License as published #
+ #    by the Free Software Foundation, either version 3 of the License, or     #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU Lesser General Public License for more details.                      #
+ #                                                                             #
+ #    You should have received a copy of the GNU Lesser General Public License #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+ */
+
 package com.openmeap.thinclient.javascript;
 
 import com.openmeap.thinclient.Preferences;
@@ -46,22 +70,20 @@ public interface JsApiCore {
 	
 	/**
 	 * Connect to Application management and check for available updates.
-	 * 
-	 * callBack should be of the form: <code>function(updateHeader) { ... }</code>.
-	 * If a new deployment is available, the <code>updateHeader</code> passed in will be of the form:
-	 * <code>
-	 * 	{
-	 * 	};
-	 * </code>
-	 * 
-	 * @param callBack Javascript to execute when done checking.  Should accept a single object parameter 
 	 */
-	public void checkForUpdates(String callBack);
+	public void checkForUpdates();
 	
 	/**
 	 * @param updateHeader The update to perform
 	 * @param statusCallBack a javascript function to pass status information back to
 	 */
 	public void performUpdate(final String header, final String statusCallBack);
+	
+	/**
+	 * Reloads the application
+	 */
+	public void reload();
+	
+	public void notifyReadyForUpdateCheck();
 }
 

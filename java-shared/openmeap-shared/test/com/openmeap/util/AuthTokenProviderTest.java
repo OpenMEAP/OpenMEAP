@@ -24,13 +24,26 @@
 
 package com.openmeap.util;
 
+import java.io.InputStream;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import com.openmeap.digest.DigestException;
+import com.openmeap.digest.DigestInputStream;
+import com.openmeap.digest.DigestInputStreamFactory;
 import com.openmeap.util.AuthTokenProvider;
 
 public class AuthTokenProviderTest extends TestCase {
-	public void test() {
+	public static class MockDigestInputStream implements DigestInputStream {
+		public void setInputStream(InputStream inputStream) {
+		}
+		public byte[] digest() throws DigestException {
+			return new byte[]{(byte)0xde,(byte)0xad,(byte)0xbe,(byte)0xef};
+		}
+	}
+	public void test() throws Exception {
+		DigestInputStreamFactory.setDigestInputStreamForName("sha1", MockDigestInputStream.class);
 		String token = AuthTokenProvider.newAuthToken("testSalt");
 		Assert.assertTrue( AuthTokenProvider.validateAuthToken("testSalt",token));
 	}

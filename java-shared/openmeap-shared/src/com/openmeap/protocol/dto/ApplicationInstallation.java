@@ -25,6 +25,7 @@
 package com.openmeap.protocol.dto;
 
 import com.openmeap.json.HasJSONProperties;
+import com.openmeap.json.JSONGetterSetter;
 import com.openmeap.json.JSONProperty;
 
 public class ApplicationInstallation implements HasJSONProperties {
@@ -32,7 +33,15 @@ public class ApplicationInstallation implements HasJSONProperties {
     protected String uuid;
     
     private static JSONProperty[] jsonProperties = new JSONProperty[] {
-    	new JSONProperty("getUuid")
+    	new JSONProperty("getUuid",String.class,
+    		new JSONGetterSetter(){
+				public Object getValue(Object src) {
+					return ((ApplicationInstallation)src).getUuid();
+				}
+				public void setValue(Object dest, Object value) {
+					((ApplicationInstallation)dest).setUuid((String)value);
+				}
+    		})
     };
     public JSONProperty[] getJSONProperties() {
 		return jsonProperties;

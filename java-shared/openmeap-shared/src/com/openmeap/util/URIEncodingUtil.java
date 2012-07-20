@@ -25,19 +25,20 @@
 package com.openmeap.util;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 
 import com.openmeap.constants.FormConstants;
 
 /**
  * Utility class for JavaScript compatible UTF-8 encoding and decoding.
  * 
- * @see http://stackoverflow.com/questions/607176/java-equivalent-to-javascripts-encodeuricomponent-that-produces-identical-output
- * @author John Topley 
+ * @author schang 
  */
-public class URIEncodingUtil
+final public class URIEncodingUtil
 {
+	private URIEncodingUtil() {}
+	
+	private final static String PERCENT = "%";
+	
 	/**
 	 * Decodes the passed UTF-8 String using an algorithm that's compatible with
 	 * JavaScript's <code>decodeURIComponent</code> function. Returns
@@ -48,25 +49,36 @@ public class URIEncodingUtil
 	 */
 	public static String decodeURIComponent(String s)
 	{
-		if (s == null)
-		{
+		if (s == null) {
 			return null;
 		}
-
-		String result = null;
-
-		try
-		{
-			result = URLDecoder.decode(s, FormConstants.CHAR_ENC_DEFAULT);
+		
+		String result = s;
+		
+		result = StringUtils.replaceAll(result, "+", "%20");
+		result = StringUtils.replaceAll(result, "!", "%21");
+		result = StringUtils.replaceAll(result, "'", "%27");
+		result = StringUtils.replaceAll(result, "(", "%28");
+		result = StringUtils.replaceAll(result, ")", "%29");
+		result = StringUtils.replaceAll(result, "~", "%7E");
+		
+		StringBuffer sb = new StringBuffer();
+		int d = result.length();
+		for(int i=0; i<d; i++ ) {
+			char thisChar = result.charAt(i);
+			if(thisChar=='%') {
+				if(i+2>=d) {
+					throw new URIEncodingException("Expecting an encoded char at index "+i);
+				}
+				char[] chars = new char[]{result.charAt(i+1),result.charAt(i+2)};
+				i+=2;
+				char value = CharUtils.toChar(new String(chars));
+				sb.append(value);
+			} else {
+				sb.append(thisChar);
+			}
 		}
-
-		// This exception should never occur.
-		catch (UnsupportedEncodingException e)
-		{
-			result = s;  
-		}
-
-		return result;
+		return sb.toString();
 	}
 
 	/**
@@ -79,33 +91,29 @@ public class URIEncodingUtil
 	 */
 	public static String encodeURIComponent(String s)
 	{
-		String result = null;
-
-		try
-		{
-			result = URLEncoder.encode(s, FormConstants.CHAR_ENC_DEFAULT)
-			.replaceAll("\\+", "%20")
-			.replaceAll("\\%21", "!")
-			.replaceAll("\\%27", "'")
-			.replaceAll("\\%28", "(")
-			.replaceAll("\\%29", ")")
-			.replaceAll("\\%7E", "~");
+		StringBuffer sb = new StringBuffer();
+		int d = s.length();
+		for(int i=0; i<d; i++ ) {
+			char thisChar = s.charAt(i);
+			if(Character.isDigit(thisChar)
+					||Character.isLowerCase(thisChar)
+					||Character.isUpperCase(thisChar)) {
+				sb.append(thisChar);
+			} else {
+				byte[] thisByte = CharUtils.bytesValue(thisChar);
+				sb.append(PERCENT);
+				sb.append(Utils.byteArray2Hex(thisByte));
+			}
 		}
-
-		// This exception should never occur.
-		catch (UnsupportedEncodingException e)
-		{
-			result = s;
-		}
+		
+		String result = sb.toString();
+		result = StringUtils.replaceAll(result, "%20", "+");
+		result = StringUtils.replaceAll(result, "%21", "!");
+		result = StringUtils.replaceAll(result, "%27", "'");
+		result = StringUtils.replaceAll(result, "%28", "(");
+		result = StringUtils.replaceAll(result, "%29", ")");
+		result = StringUtils.replaceAll(result, "%7E", "~");
 
 		return result;
-	}  
-
-	/**
-	 * Private constructor to prevent this class from being instantiated.
-	 */
-	private URIEncodingUtil()
-	{
-		super();
 	}
 }

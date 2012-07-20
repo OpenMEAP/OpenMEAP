@@ -1,12 +1,33 @@
+/*
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011-2012 OpenMEAP, Inc.                                   #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the LGPLv3                                                #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU Lesser General Public License as published #
+ #    by the Free Software Foundation, either version 3 of the License, or     #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU Lesser General Public License for more details.                      #
+ #                                                                             #
+ #    You should have received a copy of the GNU Lesser General Public License #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+ */
+
 package com.openmeap.thinclient;
 
-import junit.framework.TestCase;
+import java.util.Properties;
+
 import junit.framework.Assert;
-
-import com.openmeap.thinclient.Preferences;
-import com.openmeap.thinclient.SLICConfig;
-
-import java.util.*;
+import junit.framework.TestCase;
 
 public class SLICConfigTest extends TestCase {
 	public void testGetInstance() {
@@ -20,19 +41,24 @@ public class SLICConfigTest extends TestCase {
 		props.put("com.openmeap.slic.appVersion", "appVersion");
 		prefs.put("com.openmeap.slic.deviceType", "deviceType");
 		
-		SLICConfig inst = new SLICConfig(prefs,props);
+		SLICConfig slicConfig = new SLICConfig(prefs,props){
+					public String getAssetsBaseUrl() {
+						return null;
+					}
+				};
 		
-		Assert.assertTrue(inst.getDeviceUuid().compareTo("deviceUuid")==0);
-		Assert.assertTrue(inst.getAppMgmtServiceUrl().compareTo("serviceUrl")==0);
-		Assert.assertTrue(inst.getApplicationName().compareTo("appName")==0);
-		Assert.assertTrue(inst.getApplicationVersion().compareTo("appVersion")==0);
-		Assert.assertTrue(inst.getDeviceType().compareTo("deviceType")==0);
+		Assert.assertTrue(slicConfig.getDeviceUuid().compareTo("deviceUuid")==0);
+		Assert.assertTrue(slicConfig.getAppMgmtServiceUrl().compareTo("serviceUrl")==0);
+		Assert.assertTrue(slicConfig.getApplicationName().compareTo("appName")==0);
+		Assert.assertTrue(slicConfig.getApplicationVersion().compareTo("appVersion")==0);
+		Assert.assertTrue(slicConfig.getDeviceType().compareTo("deviceType")==0);
 		
 		/////////
 		// Verify that the device uuid is generated and stays the same from call to call
 		prefs.put("com.openmeap.slic.deviceUuid", null);
-		Assert.assertTrue(inst.getDeviceUuid().compareTo("deviceUuid")!=0 
-			&& inst.getDeviceUuid().compareTo( inst.getDeviceUuid() )==0
-			&& inst.getDeviceUuid().length()==36 );
+		String uuid = slicConfig.getDeviceUuid();
+		Assert.assertTrue(uuid.compareTo("deviceUuid")!=0 
+			&& uuid.compareTo(slicConfig.getDeviceUuid())==0
+			&& slicConfig.getDeviceUuid().length()==40 );
 	}
 }

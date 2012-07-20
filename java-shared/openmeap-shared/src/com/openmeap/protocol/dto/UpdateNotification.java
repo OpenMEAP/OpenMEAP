@@ -25,33 +25,58 @@
 package com.openmeap.protocol.dto;
 
 import com.openmeap.json.HasJSONProperties;
+import com.openmeap.json.JSONGetterSetter;
 import com.openmeap.json.JSONProperty;
 
 public class UpdateNotification implements HasJSONProperties {
 
-    protected OperationResult result;
-    protected String authToken;
+	protected OperationResult result;
+	protected String authToken;
 
-    private static JSONProperty[] jsonProperties = new JSONProperty[] {
-    	new JSONProperty("getResult"),
-    	new JSONProperty("getAuthToken")
-    };
-    public JSONProperty[] getJSONProperties() {
+	private static JSONProperty[] jsonProperties = new JSONProperty[] {
+			new JSONProperty("result", OperationResult.class,
+					new JSONGetterSetter() {
+
+						public Object getValue(Object src) {
+							return ((UpdateNotification) src).getResult();
+						}
+
+						public void setValue(Object dest, Object value) {
+							((UpdateNotification) dest)
+									.setResult((OperationResult) OperationResult.fromValue((String)value));
+						}
+
+					}),
+			new JSONProperty("authToken", String.class, new JSONGetterSetter() {
+
+				public Object getValue(Object src) {
+					return ((UpdateNotification) src).getAuthToken();
+				}
+
+				public void setValue(Object dest, Object value) {
+					((UpdateNotification) dest).setAuthToken((String) value);
+				}
+
+			}) };
+
+	public JSONProperty[] getJSONProperties() {
 		return jsonProperties;
 	}
-    
-    public OperationResult getResult() {
-        return result;
-    }
-    public void setResult(OperationResult value) {
-        this.result = value;
-    }
 
-    public String getAuthToken() {
-        return authToken;
-    }
-    public void setAuthToken(String value) {
-        this.authToken = value;
-    }
+	public OperationResult getResult() {
+		return result;
+	}
+
+	public void setResult(OperationResult value) {
+		this.result = value;
+	}
+
+	public String getAuthToken() {
+		return authToken;
+	}
+
+	public void setAuthToken(String value) {
+		this.authToken = value;
+	}
 
 }
