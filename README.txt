@@ -13,5 +13,5 @@ free to visit our forums (forum.openmeap.com). For a more up to date
 install guide, please visit our wiki (wiki.openmeap.com).
 
 If you are interested in enhancing/extending/hacking OpenMEAP,
-see use our wiki for instructions on setting up a workspace in Eclipse.
+see our wiki for instructions on setting up a workspace in Eclipse.
 
