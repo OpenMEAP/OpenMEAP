@@ -8,9 +8,10 @@ for feedback on the direction of the project.
 Please see changelog.txt for details about changes/enhancements.
 
 See quickstart.txt for instructions on building the web projects
-and using the command-line interface.
+and using the command-line interface. For questions, please feel
+free to visit our forums (forum.openmeap.com). For a more up to date
+install guide, please visit our wiki (wiki.openmeap.com).
 
 If you are interested in enhancing/extending/hacking OpenMEAP,
-see the quickstart-eclipse.txt for instructions on setting up a
-workspace in Eclipse.
+see use our wiki for instructions on setting up a workspace in Eclipse.
 

@@ -21,7 +21,8 @@
  ###############################################################################
  
 The following is a quick-start set of instructions for setting up an
-OpenMEAP development environment in Eclipse for Java EE developers.
+OpenMEAP development environment in Eclipse for Java EE developers. If you are
+having trouble, please visit wiki.openmeap.com for a more up to date install guide 
 
 1) Install the Android SDK and the BlackBerry Plugin using the 5.0 SDK
 
