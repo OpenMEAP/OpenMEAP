@@ -1,3 +1,6 @@
+OpenMEAP 1.2.1b
+  - Synchronized error handling between the java SLIC and iOS.
+
 OpenMEAP 1.2.0b
   - Blackberry implementation
 
