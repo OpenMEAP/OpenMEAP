@@ -27,6 +27,10 @@
 #include <time.h>
 #include "cJSON.h"
 
+const char * OmUpdateCheckErrorClient = "CLIENT";
+
+const char * OmUpdateResultErrorGeneral = "CLIENT_UPDATE";
+
 const char * OmUpdateResultPending = "PENDING";
 const char * OmUpdateResultSuccess = "SUCCESS";
 const char * OmUpdateResultOutOfSpace = "OUT_OF_SPACE";
@@ -167,9 +171,7 @@ char * om_update_connreq_create_post(om_update_connreq_ptr request) {
 om_update_check_result_ptr om_update_check(om_config_ptr cfg) {
 	
 	om_error_clear();
-	
-	om_update_header_ptr ret = OM_NULL;
-	
+
 	// put together the connection open request and post data
 	om_update_connreq_ptr request = om_update_create_connreq(cfg);
 	char *postData = om_update_connreq_create_post(request);
@@ -192,11 +194,23 @@ om_update_check_result_ptr om_update_check(om_config_ptr cfg) {
 	// post to the service url
 	om_http_response_ptr response = om_net_do_http_post(svcUrl,postData);
 	if( response==OM_NULL || response->status_code!=200 || om_error_get_code()!=OM_ERR_NONE ) {
-		om_update_release_connreq(request);
+        
+		// the post function should have set the appropriate error code
+        om_update_check_result_ptr result = om_malloc(sizeof(om_update_check_result));
+        om_update_check_error_ptr error = om_malloc(sizeof(om_update_check_error));
+        result->error=error;
+        error->code=om_string_copy(OmUpdateCheckErrorClient);
+        if(response!=OM_NULL && response->status_code!=200) {
+            error->message=om_string_format("Posting to the service resulted in a %i status code",response->status_code);
+        } else {
+            error->message=om_string_copy("There was an issue connecting to the service");
+        }
+        
+        om_update_release_connreq(request);
 		om_free(svcUrl);
 		om_free(postData);
-		// the post function should have set the appropriate error code
-		return OM_NULL;
+        
+		return result;
 	}
 	
 	om_update_check_result_ptr updateResult = om_update_parse_check_result(response->result);
@@ -208,7 +222,12 @@ om_update_check_result_ptr om_update_check(om_config_ptr cfg) {
 		om_free(postData);
 		
 		// the parsing function should have set the appropriate error code
-		return OM_NULL;
+        om_update_check_result_ptr result = om_malloc(sizeof(om_update_check_result));
+        om_update_check_error_ptr error = om_malloc(sizeof(om_update_check_error));
+        result->error=error;
+        error->code=om_string_copy(OmUpdateCheckErrorClient);
+        error->message=om_string_copy("Unable to parse response content");
+		return result;
 	}
 	
 	// these are no longer needed and may be freed
@@ -311,6 +330,9 @@ void om_update_status_release(om_update_status_ptr status) {
 	if( status->error_mesg!=OM_NULL ) {
 		om_free(status->error_mesg);
 	}
+    if( status->error_type!=OM_NULL ) {
+        om_free(status->error_type);
+    }
 	om_free(status);
 }
 
@@ -431,6 +453,7 @@ om_update_check_result_ptr om_update_parse_check_result(char *json) {
         result->response = response;
     }
     
+    // parse and pass back a server-side error
     if( errorJson!=NULL ) {
         om_update_check_error_ptr error = om_malloc(sizeof(om_update_check_error));
         cJSON *code = cJSON_GetObjectItem(errorJson,"code");
@@ -474,6 +497,7 @@ const const char * __om_update_check_revert_to_original(om_config_ptr cfg, om_st
 		if( !om_storage_reset_storage(stg) ) {
 			// we tried to delete whatever had been downloaded
 			// but some error occurred during the delete
+            om_error_set(OM_ERR_IO_EXCEPTION,"Could not reset storage");
 			retVal=OmUpdateResultIoException;
 		} else {
 			retVal=OmUpdateResultSuccess;
@@ -509,6 +533,7 @@ const char * __om_update_import_download(om_config_ptr cfg, om_storage_ptr stg,
 	
 	om_file_output_stream_ptr fos = om_storage_get_import_archive_output_stream(stg);
 	if( fos==OM_NULL ) {
+        om_error_set(OM_ERR_NET_CONN,"An issue occurred fetching the update archive");
 		retVal = OmUpdateResultIoException;
 	}
     
@@ -522,7 +547,7 @@ const char * __om_update_import_download(om_config_ptr cfg, om_storage_ptr stg,
     }
     
 	if( resp == OM_NULL ) {
-		om_error_set_code(OM_ERR_NET_CONN);
+		om_error_set(OM_ERR_NET_CONN,"An issue occurred fetching the update archive");
 		retVal = OmUpdateResultIoException;
 	} else if( resp->status_code!=200 ) {
 		om_error_set_format(OM_ERR_NET_DOWNLOAD,"The server returned a status code %i for url %s",resp->status_code,update->update_url);
@@ -549,6 +574,7 @@ const char * __om_update_import_validate(om_config_ptr cfg, om_storage_ptr stg, 
 	om_file_input_stream_ptr fis = om_storage_open_file_input_stream(stg,filePath);
 	om_free(filePath);
 	if( fis==OM_NULL ) {
+        om_error_set(OM_ERR_IO_EXCEPTION,"The archive failed validation");
 		return OmUpdateResultIoException;
 	}
 	
@@ -562,6 +588,10 @@ const char * __om_update_import_validate(om_config_ptr cfg, om_storage_ptr stg, 
 	om_storage_close_file_input_stream(fis);
 	om_free(hashValue);
 	
+    if(retVal==OmUpdateResultHashMismatch) {
+        om_error_set(OM_ERR_HASH_MISMATCH,"The archive integrity check failed");
+    }
+    
 	return retVal;
 }
 
@@ -609,6 +639,7 @@ const char * __om_update_import_unzip(om_config_ptr cfg, om_storage_ptr stg, om_
 	if( retVal==OmUpdateResultImportUnzip || ! om_config_set(cfg,OM_CFG_APP_VER,update->version_id) ) {
         
         om_storage_delete_directory(stg,unzip_location,OM_TRUE);
+        om_error_set(OM_ERR_ZIP_FILE,"The archive failed to install");
         retVal=OmUpdateResultImportUnzip;
 	}
 	
@@ -672,15 +703,10 @@ const char * om_update_perform_with_callback(om_config_ptr cfg,
 			// and update the config to point to the new version
 			&& (r=__om_update_import_unzip(cfg,stg,update_header,callback,callback_info))==OmUpdateResultSuccess
 			) {} 
-            if( callback_info!=OM_NULL && callback!=OM_NULL ) {
-                
-                callback_info->update_status->complete=OM_TRUE;
-                callback_info->update_status->error_type=OM_NULL;
-                callback(callback_info);
-            }
 			retVal = r;
 	} else {
 		retVal = OmUpdateResultPlatform;
+        om_error_set(OM_ERR_PLATFORM,"Unable to store last update attempted timestamp");
 	}
 	
 	if( retVal == OmUpdateResultSuccess ) {
@@ -697,7 +723,14 @@ const char * om_update_perform_with_callback(om_config_ptr cfg,
         char * unzip_location = __om_localstorage_path_for_update(stg,update_header);
         om_config_set(cfg,OM_CFG_CURRENT_STORAGE,unzip_location);
         om_free(unzip_location);
-	}
+	} else {
+        if( callback_info!=OM_NULL && callback!=OM_NULL ) {
+            callback_info->update_status->complete=OM_FALSE;
+            callback_info->update_status->error_type=om_string_copy(retVal);
+            callback_info->update_status->error_mesg=om_string_copy(om_error_get_message());
+            callback(callback_info);
+        }
+    }
     
     // it's possible that we've reverted to the original version
     // in which case the current retVal will be 0 at this point
@@ -712,6 +745,8 @@ const char * om_update_perform_with_callback(om_config_ptr cfg,
     // doesn't matter what happened...we're not taking up space needlessly
     om_storage_delete_import_archive(stg);
 	
+    om_error_clear();
+    
 	return retVal;
 }
 

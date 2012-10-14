@@ -117,6 +117,7 @@
             // but only 5 seconds...as there may be an IMMEDIATE update
             // pushed by the customer to fix the app.
             long count = 0;
+            // TODO: make the timeout here configurable
             while( self.appDelegate.readyForUpdateCheck==FALSE && count<500 ) {
                 [NSThread sleepForTimeInterval:.01];
                 count++;

@@ -44,7 +44,12 @@ enum om_error_codes {
 	OM_ERR_FILE_SPACE,
 	OM_ERR_FILESYS_SPACE_AVAIL, // not enough storage space to perform operation
 	OM_ERR_DIR_DEL_RECURSE,
-	OM_ERR_ZIP_GLOBALINFO
+	OM_ERR_ZIP_GLOBALINFO,
+    OM_ERR_PLATFORM,
+    OM_ERR_HASH_MISMATCH,
+    OM_ERR_IO_EXCEPTION,
+    OM_ERR_INTERRUPTED,
+    OM_ERR_ZIP_FILE
 };
 
 /**

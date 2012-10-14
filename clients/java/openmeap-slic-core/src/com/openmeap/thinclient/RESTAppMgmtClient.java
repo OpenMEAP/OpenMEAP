@@ -80,13 +80,14 @@ public class RESTAppMgmtClient implements ApplicationManagementService {
 		try {
 			httpResponse = requester.postData(serviceUrl, postData);
 			if( httpResponse.getStatusCode()!=200 ) {
-				throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,"posting to the service resulted in a "+httpResponse.getStatusCode()+" status code");
+				throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,"Posting to the service resulted in a "+httpResponse.getStatusCode()+" status code");
 			}
 			responseText = Utils.readInputStream(httpResponse.getResponseBody(), "UTF-8");
-		} catch (HttpRequestException e) {
-			throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,e.getMessage(),e);
-		} catch (IOException e) {
-			throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,e.getMessage(),e);
+		} catch (Exception e) {
+			throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,
+					StringUtils.isEmpty(e.getMessage())
+					? e.getMessage()
+					: "There was an issue connecting to the service",e);
 		}
 		
 		// now we parse the response into a ConnectionOpenResponse object
@@ -99,7 +100,7 @@ public class RESTAppMgmtClient implements ApplicationManagementService {
 					throw new WebServiceException(WebServiceException.TypeEnum.fromValue(result.getError().getCode().value()),result.getError().getMessage());
 				}
 			} catch( JSONException e ) {
-				throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,e.getMessage(),e);
+				throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,"Unable to parse service response content.");
 			}
 			response = result.getConnectionOpenResponse();
 		}

@@ -310,12 +310,12 @@ OpenMEAP.updates={
 	 * when calling OpenMEAP.performUpdate(updateData,onStateChangeCallBack)
 	 */
 	onStateChange:function(updateStatusData) {
-		if( data.complete == true ) {
+		if( updateStatusData.complete == true ) {
 			this.onUpdateComplete(updateStatusData);
-		} else if( ! data.error ) {
+		} else if( ! updateStatusData.error ) {
 			this.onUpdateIncrement(updateStatusData);
 		} else {
-			this.onUpdateError(updateStatusData);
+			this.onUpdateError(updateStatusData.error);
 		}
 	},
 	/**

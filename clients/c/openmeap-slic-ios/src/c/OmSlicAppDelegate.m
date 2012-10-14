@@ -292,7 +292,6 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
     }
     
     // TODO: if there is no network connectivity, then i need to communicate that with the client.
-    
     if( updateHeader!=OM_NULL ) {
         
         if( updateHeader->type==OM_UPDATE_TYPE_IMMEDIATE ) {
@@ -304,7 +303,17 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
             const char * updateResult = om_update_perform(self->config,self->storage,updateHeader);
             
             if( updateResult!=OmUpdateResultSuccess ) {
-                return NO;
+                
+                char * errMesg = om_string_copy(om_error_get_message());
+                char * errCode = om_string_copy(updateResult);
+                om_error_clear();
+                om_update_check_error_ptr error = om_malloc(sizeof(om_update_check_error));
+                error->message=errMesg;
+                error->code=errCode;
+                [self.viewController setUpdateHeader:nil withError:error];
+                om_free(errMesg);
+                om_free(errCode);
+                om_free(error);
             } else {
                 [self reloadView];
             }
@@ -312,11 +321,16 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
             [self.viewController setUpdateHeader:updateHeader withError:result->error];
         }
         
-        om_update_release_check_result(result);
-    } else if(om_error_get_code()!=OM_ERR_NONE) {
+    } else
+    if(result!=OM_NULL && result->error!=OM_NULL) {
+        
+        [self.viewController setUpdateHeader:nil withError:result->error];
+    } else
+    if(om_error_get_code()!=OM_ERR_NONE) {
         
         char * errMesg = om_string_copy(om_error_get_message());
         char * errCode = om_string_format("%u",om_error_get_code());
+        om_error_clear();
         om_update_check_error_ptr error = om_malloc(sizeof(om_update_check_error));
         error->message=errMesg;
         error->code=errCode;
@@ -327,6 +341,10 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
     } else {
         
         [self.viewController setUpdateHeader:nil withError:nil];
+    }
+    
+    if(result) {
+        om_update_release_check_result(result);
     }
     
     return YES;

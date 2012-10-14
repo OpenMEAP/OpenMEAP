@@ -246,7 +246,7 @@ public class UpdateHandler {
 		} 
 		
 		if( ! archiveIsValid(update).booleanValue() ) {
-			throw new UpdateException(UpdateResult.HASH_MISMATCH,"hash value of update does not match file hash value");
+			throw new UpdateException(UpdateResult.HASH_MISMATCH,"The import archive integrity check failed");
 		}
 			
 		
@@ -461,6 +461,7 @@ public class UpdateHandler {
     	}
 		public void run() {
 			int count=0;
+			// TODO: timeout here should be configurable
 			while(!activity.getReadyForUpdateCheck() && count<500) {
 				try {
 					Thread.sleep(10);

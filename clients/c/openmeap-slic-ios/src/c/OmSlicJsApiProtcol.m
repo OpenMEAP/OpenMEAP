@@ -160,13 +160,6 @@ void ios_update_callback_net_download_callback_func_ptr(void *callback_info,
             
             else if( [methodName compare:@"checkForUpdates"]==NSOrderedSame ) {
                 
-                // in another thread, call 
-                /*dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-                dispatch_async(queue, ^{ 
-                    @synchronized([OmSlicJsApiProtocol class]) {
-                        
-                    } 
-                });*/
                 [appDel performUpdateCheck];
             }
             
@@ -346,7 +339,7 @@ void ios_update_callback_net_download_callback_func_ptr(void *callback_info,
     status->update_header = header;
     
     NSLog(@"--calling om_update_perform_with_callback");
-    om_update_perform_with_callback(appDel.config, appDel.storage, header, ios_update_callback_func, callback_info);
+    const char * update_result = om_update_perform_with_callback(appDel.config, appDel.storage, header, ios_update_callback_func, callback_info);
     
     om_update_status_release(status);
     om_free(callback_info->javascript);

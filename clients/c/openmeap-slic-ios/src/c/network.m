@@ -114,6 +114,7 @@ om_http_response_ptr om_net_do_http_post(const char *url, const char *post_data)
 	NSString *post = post_data!=OM_NULL ? [NSString stringWithUTF8String:post_data] : @"";
     NSLog(@"Intending to post %@",post);
 	NSURL *nsUrl=[NSURL URLWithString:[NSString stringWithUTF8String:url]];
+    NSLog(@"to url %@",[nsUrl absoluteString]);
 
 	NSData *postData = [post dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:nsUrl];
