@@ -315,7 +315,7 @@ OpenMEAP.updates={
 		} else if( ! updateStatusData.error ) {
 			this.onUpdateIncrement(updateStatusData);
 		} else {
-			this.onUpdateError(updateStatusData.error);
+			this.onUpdateError(updateStatusData);
 		}
 	},
 	/**

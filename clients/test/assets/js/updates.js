@@ -13,8 +13,8 @@ OpenMEAP.updates.onNoUpdate=function() {
     OpenMEAP.doToast("No update");
     OpenMEAP_update = null;
 }
-OpenMEAP.updates.onUpdateError=function(error) {
-    OpenMEAP.doToast(error.type+' : '+error.message);
+OpenMEAP.updates.onUpdateError=function(update) {
+    OpenMEAP.doToast(update.error.type+' : '+update.error.message);
     OpenMEAP_updateError = error;
 }
 OpenMEAP.updates.onCheckError=function(error) {
