@@ -30,6 +30,15 @@
 	<link rel="stylesheet" href="css/base.css" /> 			
 </head> 
 
-<body> 
-</body> 
+<body>
+    <script>
+        $(document).ready(function(){
+            try {
+                OpenMEAP.notifyReadyForUpdateCheck();
+            } catch(e) {
+                OpenMEAP.doToast("Error\n\n"+e);
+            }
+        });
+    </script>
+</body>
 </html> 

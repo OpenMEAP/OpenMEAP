@@ -10,5 +10,14 @@
 		</div>
 		<div id="mainBodyDiv">&nbsp;</div>
 		<div class="logoutLink" style="clear:both;"><a href="javascript:if(banking) banking.clearVariables();">Logout</a></div>
+        <script>
+        $(document).ready(function(){
+            try {
+                OpenMEAP.notifyReadyForUpdateCheck();
+            } catch(e) {
+                OpenMEAP.doToast("Error\n\n"+e);
+            }
+        });
+        </script>
 	</body>
 </html>
