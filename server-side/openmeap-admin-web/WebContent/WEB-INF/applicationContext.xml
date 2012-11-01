@@ -83,7 +83,7 @@
 		</property>
 		<property name="scriptTags">
 			<list>
-				<bean class="com.openmeap.web.html.ScriptTag"><constructor-arg value="../js/jquery-1.5.2.min.js"/></bean>
+				<bean class="com.openmeap.web.html.ScriptTag"><constructor-arg value="../js/jquery-1.8.2.js"/></bean>
 				<bean class="com.openmeap.web.html.ScriptTag"><constructor-arg value="../js/jquery.tabs.js"/></bean>
 			</list>
 		</property>
