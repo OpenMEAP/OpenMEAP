@@ -726,7 +726,7 @@ const char * om_update_perform_with_callback(om_config_ptr cfg,
 	} else {
         if( callback_info!=OM_NULL && callback!=OM_NULL ) {
             callback_info->update_status->complete=OM_FALSE;
-            callback_info->update_status->error_type=om_string_copy(retVal);
+            callback_info->update_status->error_type=om_string_copy(retVal!=0?retVal:OmUpdateResultPlatform);
             callback_info->update_status->error_mesg=om_string_copy(om_error_get_message());
             callback(callback_info);
         }
