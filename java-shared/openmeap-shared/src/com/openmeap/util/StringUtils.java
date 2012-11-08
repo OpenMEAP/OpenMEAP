@@ -204,7 +204,7 @@ final public class StringUtils {
 		int idx = -1;
 		//Intialize pattern Index
 		int patIdx = 0;
-		//Search source from 0 to first occurrence of pattern
+		//Search source from 0 to first occurrence of pattern.
 		//Set Idx equal to index at which pattern is found.
 		idx = source.indexOf(pattern, patIdx);
 		//If Pattern is found, idx will not be -1 anymore.
