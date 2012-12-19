@@ -1,4 +1,4 @@
-OpenMEAP 1.2.x beta
+OpenMEAP 1.3.x rc1
 
 Please see COPYING for license information.
 
@@ -12,6 +12,6 @@ and using the command-line interface. For questions, please feel
 free to visit our forums (forum.openmeap.com). For a more up to date
 install guide, please visit our wiki (wiki.openmeap.com).
 
-If you are interested in enhancing/extending/hacking OpenMEAP,
+If you are interested in enhancing or extending OpenMEAP,
 see our wiki for instructions on setting up a workspace in Eclipse.
 
