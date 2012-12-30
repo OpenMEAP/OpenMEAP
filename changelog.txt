@@ -1,3 +1,6 @@
+OpenMEAP 1.3.0rc1
+  - Bug fixes.
+
 OpenMEAP 1.2.1b
   - Synchronized error handling between the java SLIC and iOS.
 
