@@ -89,6 +89,10 @@ public class MainActivity extends Activity implements OmMainActivity,LoginFormLa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+	//Get rid of the android title bar
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.main);
         
         CredentialsProviderFactory.setDefaultCredentialsProviderFactory(new OmSlicCredentialsProvider.Factory(this));
         HttpRequestExecuterFactory.setDefaultType(HttpRequestExecuterImpl.class);
@@ -126,7 +130,8 @@ public class MainActivity extends Activity implements OmMainActivity,LoginFormLa
         storage = new LocalStorageImpl(this);
         updateHandler = new UpdateHandler(this,config,storage);
 
-        setupWindowTitle();
+	// Calls the title from client.properties
+        // setupWindowTitle();
     }
     
     public void launchLoginForm(LoginFormCallback credProv) {
@@ -257,7 +262,7 @@ public class MainActivity extends Activity implements OmMainActivity,LoginFormLa
     
     /**
      * Sets up the window title, per the properties
-     */
+     
     private void setupWindowTitle() {
     	if( config.getApplicationTitle()!=null ) {
         	if( config.getApplicationTitle().equals("off") ) {
@@ -266,7 +271,7 @@ public class MainActivity extends Activity implements OmMainActivity,LoginFormLa
         		setTitle(config.getApplicationTitle());
         	}
 		} else setTitle(config.getApplicationName());
-    }
+    }*/
       
     /**
      * Creates the default WebView where we'll run javascript and render content
@@ -279,11 +284,15 @@ public class MainActivity extends Activity implements OmMainActivity,LoginFormLa
         webView.getSettings().setJavaScriptEnabled(true);
         JsApiCoreImpl jsApi = new JsApiCoreImpl(this,webView,updateHandler);
         webView.addJavascriptInterface(jsApi, JS_API_NAME);
+
+        // removes vertical and horizontal scroll bars
+        webView.setVerticalScrollBarEnabled(false);
+        webView.setHorizontalScrollBarEnabled(false);
         
         // make sure the web view fills the viewable area
         webView.setLayoutParams( new LinearLayout.LayoutParams(	
-        		android.view.ViewGroup.LayoutParams.FILL_PARENT, 
-        		android.view.ViewGroup.LayoutParams.WRAP_CONTENT ) );
+        android.view.ViewGroup.LayoutParams.FILL_PARENT, 
+        android.view.ViewGroup.LayoutParams.WRAP_CONTENT ) );
         
         return webView;
     }
