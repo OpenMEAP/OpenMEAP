@@ -9,8 +9,8 @@ Banking.prototype.instantiate = function() {
 	// for development, it's desirable that the application
 	// work within a browser, in isolation from the web-service
 	if( this.isNetworkEnabled() ) {
-		this.urls = {service:"http://dev.openmeap.com:8081/banking-web/interface/"};
-		this.ajaxData = {};//{username:"friend",password:"fr13nd"};
+		this.urls = {service:"http://localhost:8080/banking-web/interface/"};
+		this.ajaxData = {};
 	} else {
 		this.urls = {
 			loginResult:"xml/login-result.xml",

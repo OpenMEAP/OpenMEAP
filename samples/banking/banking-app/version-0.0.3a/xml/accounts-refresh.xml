@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <result>
-	<accounts owner="Jon Schang">
-		<account available="18517.0" posted="18483.0" number="*6323" owner="Jon Schang" type="savings"/>
-		<account available="597.0" posted="631.0" number="*6303" owner="Jon Schang" type="checking"/>
+	<accounts owner="Jon Doe">
+		<account available="18517.0" posted="18483.0" number="*6323" owner="Jon Doe" type="savings"/>
+		<account available="597.0" posted="631.0" number="*6303" owner="Jon Doe" type="checking"/>
 	</accounts>
 </result>
