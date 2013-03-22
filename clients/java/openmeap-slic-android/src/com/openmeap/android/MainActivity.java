@@ -306,8 +306,7 @@ LoginFormLauncher {
         
 		// enable navigator.geolocation
 		webView.getSettings().setGeolocationEnabled(true);
-		webView.getSettings().setGeolocationDatabasePath(
-                                                         "/data/data/com.openmeap.android/databases/");
+		webView.getSettings().setGeolocationDatabasePath("/data/data/com.openmeap/databases/");
         
 		webView.getSettings().setDomStorageEnabled(true);
 		// removes vertical and horizontal scroll bars
