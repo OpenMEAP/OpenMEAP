@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <result xmlns="com.openmeap.samples.banking.model">
-	<transactions account-number="*6303" owner="Jon Schang">
+	<transactions account-number="*6303" owner="Jon Doe">
 		<trans balance="3833.0" amount="1300.0" desc="Celerity" date="2011-03-01+03:00" acct-number="*6303" status="completed" type="deposit"/>
 		<trans balance="1581.0" amount="2000.0" desc="xto SAVINGS(*6323)" date="2011-03-01+03:00" acct-number="*6303" status="completed" type="withdraw"/>
 		<trans balance="1731.0" amount="150.0" desc="xfr SAVINGS(*6323)" date="2011-03-01+03:00" acct-number="*6303" status="completed" type="deposit"/>

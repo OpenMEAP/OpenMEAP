@@ -36,7 +36,7 @@ public class BankingServiceTest {
 	}
 	@Test public void testGetAccounts() {
 		BankingService instance = BankingService.getInstance();
-		LoginResult res = instance.login("Jon Schang", "password");
+		LoginResult res = instance.login("Jon Doe", "password");
 		Assert.assertTrue(res!=null);
 		Assert.assertTrue(res.getAccounts()!=null && res.getAccounts().getAccount().size()==2 );
 		Account checking = res.getAccounts().getAccount().get(0);
@@ -51,7 +51,7 @@ public class BankingServiceTest {
 		JAXBContext jaxbContext = JAXBContext.newInstance("com.openmeap.samples.banking.web.model");
 		Marshaller m = jaxbContext.createMarshaller();
 		Result result = new Result();
-		result.setLoginResult(BankingService.getInstance().login("Jon Schang","password"));
+		result.setLoginResult(BankingService.getInstance().login("Jon Doe","password"));
 		m.marshal(result, System.out);
 	}*/
 }
