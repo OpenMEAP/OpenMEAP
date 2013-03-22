@@ -63,9 +63,9 @@
 	</target>
 	
 	<target name="package-versions" description="Packages up the 3 versions">
-		<package-version file="version-0.0.1a.zip" dir="banking-dhtml/version-0.0.1a"/>
-		<package-version file="version-0.0.2a.zip" dir="banking-dhtml/version-0.0.2a"/>
-		<package-version file="version-0.0.3a.zip" dir="banking-dhtml/version-0.0.3a"/>
+		<package-version file="version-0.0.1a.zip" dir="banking-app/version-0.0.1a"/>
+		<package-version file="version-0.0.2a.zip" dir="banking-app/version-0.0.2a"/>
+		<package-version file="version-0.0.3a.zip" dir="banking-app/version-0.0.3a"/>
 	</target>
 	
 </project>
