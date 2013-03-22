@@ -1,4 +1,4 @@
-OpenMEAP 1.3.x rc1
+OpenMEAP 1.3.0rc2
 
 Please see COPYING for license information.
 

@@ -51,7 +51,7 @@ build and 3 versions to upload into the OpenMEAP Admin interface.
 
 What you call them in the admin interface is up to you, but there must be a
 version with the same identifier as appears in the client.properties file
-(specifically, there must be a version 0.0.0a).  This requirement will change
+(specifically, there must be a version 0.0.1a).  This requirement will change
 in some update prior to the beta release of OpenMEAP.
 
 The following command will 
@@ -68,6 +68,10 @@ The following will build the Android and iOS Banking sample clients
 	
  $ ant build
 	
-To create the 3 versions for uploading into /openmeap-admin-web/interface/
+The following will create 3 versions for uploading into /openmeap-admin-web/interface/
+Before you package the versions, make sure you update banking.js in each app to point 
+to your servers IP address.
 	
  $ ant package-versions
+
+User name for Mobile Banking is Jon Doe
