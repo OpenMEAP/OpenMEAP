@@ -481,7 +481,7 @@ public class UpdateHandler {
         		try {
         			activity.runOnUiThread(new Runnable(){
         				public void run() {
-        					activity.doToast("MANDATORY UPDATE\n\nThere is an immediate update.  The application will restart.  We apologise for any inconvenience.", true);
+        					activity.doToast("MANDATORY UPDATE\n\nThere is an immediate update.  The application will restart once the update is completed", true);
         					//webView.clearView();
         				}
         			});

@@ -203,7 +203,7 @@ om_update_check_result_ptr om_update_check(om_config_ptr cfg) {
         if(response!=OM_NULL && response->status_code!=200) {
             error->message=om_string_format("Posting to the service resulted in a %i status code",response->status_code);
         } else {
-            error->message=om_string_copy("There was an issue connecting to the service");
+            error->message=om_string_copy("There's a problem connecting. Check your network or try again later");
         }
         
         om_update_release_connreq(request);

@@ -253,7 +253,7 @@ public class BankingService {
 		
 		// create the first user and batch of accounts and transactions
 		{
-			currentOwner = "Jon Schang";
+			currentOwner = "Jon Doe";
 			thisSet = new HashMap<Account,Transactions>();
 			accounts.put(currentOwner, thisSet);
 			
