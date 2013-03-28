@@ -99,18 +99,14 @@ LoginFormLauncher {
 		setContentView(R.layout.main);
         
 		CredentialsProviderFactory
-        .setDefaultCredentialsProviderFactory(new OmSlicCredentialsProvider.Factory(
-                                                                                    this));
+        .setDefaultCredentialsProviderFactory(new OmSlicCredentialsProvider.Factory(this));
 		HttpRequestExecuterFactory
         .setDefaultType(HttpRequestExecuterImpl.class);
-		DigestInputStreamFactory.setDigestInputStreamForName("md5",
-                                                             Md5DigestInputStream.class);
-		DigestInputStreamFactory.setDigestInputStreamForName("sha1",
-                                                             Sha1DigestInputStream.class);
+		DigestInputStreamFactory.setDigestInputStreamForName("md5",Md5DigestInputStream.class);
+		DigestInputStreamFactory.setDigestInputStreamForName("sha1",Sha1DigestInputStream.class);
         
 		// setup the SLICConfig instance
-		Preferences prefs = new SharedPreferencesImpl(getSharedPreferences(
-                                                                           SLICConfig.PREFERENCES_FILE, MODE_PRIVATE));
+		Preferences prefs = new SharedPreferencesImpl(getSharedPreferences(SLICConfig.PREFERENCES_FILE, MODE_PRIVATE));
 		try {
 			Properties props = new Properties();
 			props.load(getAssets().open(SLICConfig.PROPERTIES_FILE));
@@ -335,8 +331,8 @@ LoginFormLauncher {
         
 		// make sure the web view fills the viewable area
 		webView.setLayoutParams(new LinearLayout.LayoutParams(
-                                                              android.view.ViewGroup.LayoutParams.FILL_PARENT,
-                                                              android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
+          android.view.ViewGroup.LayoutParams.FILL_PARENT,
+          android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
         
 		return webView;
 	}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="js/openmeap.js"></script>
+<script>
+function clickCounter()
+{
+if(typeof(Storage)!=="undefined")
+  {
+  if (localStorage.clickcount)
+    {
+    localStorage.clickcount=Number(localStorage.clickcount)+1;
+    }
+  else
+    {
+    localStorage.clickcount=1;
+    }
+  document.getElementById("result").innerHTML="You have clicked the button " + localStorage.clickcount + " time(s).";
+  }
+else
+  {
+  document.getElementById("result").innerHTML="Sorry, your browser does not support web storage...";
+  }
+}
+</script>
+</head>
+<body>
+    <div id="update-callback"> </div>
+    <script>
+        try {
+            OpenMEAP.notifyReadyForUpdateCheck();
+        } catch(e) {
+            OpenMEAP.doToast("Error\n"+e);
+        }
+        </script>
+	
+    </div>
+<p><button onclick="clickCounter()" type="button">Click me!</button></p>
+<div id="result"></div>
+<p>Click the button to see the counter increase.</p>
+<p>Close the browser tab (or window), and try again, and the counter will continue to count (is not reset).</p>
+</body>
+</html>
+
+
