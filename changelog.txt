@@ -1,6 +1,5 @@
 OpenMEAP 1.3.0rc2
   - Removing the title and scroll bars on Android
-  - Enabled local and session storage on Android
   - Enabled geo location for Android
   - Fixed Mobile Banking services and quickstart samples
   - Added sample applications for geo location and local storage
