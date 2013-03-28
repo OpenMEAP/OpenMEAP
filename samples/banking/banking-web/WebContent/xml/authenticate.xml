@@ -21,7 +21,7 @@
  #                                                                             #
  ############################################################################### 
  -->
-<response login="true" username="Jon Schang">
+<response login="true" username="Jon Doe">
 	<accounts>
 		<account name='Checking' number='*2398' posted='13221.00' available='13421.00'/>
 		<account name='Savings' number='*3432' posted='133221.00' available='143421.00'/>

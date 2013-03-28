@@ -301,7 +301,7 @@ OpenMEAP.updates={
 	 * @param error 
 	 */
 	onCheckError:function(error) {
-		OpenMEAP.doToast("An error occurred checking for an update\n\n"
+		OpenMEAP.doToast("There's a problem connecting. Check your network or try again later\n\n"
 			+error.code+':'+error.message);
 	},
     

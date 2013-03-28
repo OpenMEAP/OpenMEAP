@@ -87,7 +87,7 @@ public class RESTAppMgmtClient implements ApplicationManagementService {
 			throw new WebServiceException(WebServiceException.TypeEnum.CLIENT,
 					StringUtils.isEmpty(e.getMessage())
 					? e.getMessage()
-					: "There was an issue connecting to the service",e);
+					: "There's a problem connecting. Check your network or try again later",e);
 		}
 		
 		// now we parse the response into a ConnectionOpenResponse object
