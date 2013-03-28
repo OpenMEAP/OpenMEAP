@@ -33,7 +33,7 @@ Banking.prototype.instantiate = function() {
 	// for development, it's desirable that the application
 	// work within a browser, in isolation from the web-service
 	if( this.isNetworkEnabled() ) {
-		this.urls = {service:"http://localhost:8080/banking-web/interface/"};
+		this.urls = {service:"http://192.168.0.1:8080/banking-web/interface/"};
 		this.ajaxData = {};
 	} else {
 		this.urls = {
