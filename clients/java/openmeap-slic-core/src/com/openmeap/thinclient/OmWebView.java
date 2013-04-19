@@ -58,4 +58,6 @@ public interface OmWebView {
 
 	public void clearView();
 	
+	public void loadUrl(String string);
+	
 }

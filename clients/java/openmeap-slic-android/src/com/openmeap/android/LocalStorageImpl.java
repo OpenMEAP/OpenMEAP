@@ -24,16 +24,19 @@
 
 package com.openmeap.android;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import android.app.Activity;
+import android.content.Context;
 
 import com.openmeap.thinclient.LocalStorage;
 import com.openmeap.thinclient.LocalStorageException;
@@ -78,13 +81,65 @@ public class LocalStorageImpl implements LocalStorage {
 			activity.getConfig().clearStorageLocation();
 		}
 	}
-	
+	/**
+	 * Call this method to remove the file and remove the child chain if it is directory.
+	 * @param file: File object
+	 */
+	public void removeFile(File file) {
+		if (file.exists()) {
+			if(file.isDirectory()){
+				//means the file is a directory.
+				if(file.list().length!= 0){
+					//this directory has child files.
+					for( File file1 : file.listFiles() ) {
+						removeFile(file1);
+			 		}
+				}
+				System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+				System.out.println("Went into recurstion before deleting this folder.");
+				
+				try {
+					String deletingFilePath = file.getAbsolutePath();
+					file.delete();
+					System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+					System.out.println("File delted: "+deletingFilePath);
+				} catch (Exception e) {
+					System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+					System.out.println("Exception thrown while deleting old file."+file.getAbsolutePath());
+					System.out.println(e);
+				}
+			}else {
+				try {
+					String deletingFilePath = file.getAbsolutePath();
+					file.delete();
+					System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+					System.out.println("File delted: "+deletingFilePath);
+				} catch (Exception e) {
+					System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+					System.out.println("Exception thrown while deleting old file."+file.getAbsolutePath());
+					System.out.println(e);
+				}
+			}
+		}else {
+			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+			System.out.println("Directory does not exists.");
+		}
+	}
 	public void resetStorage(String prefix) {
-		File storageDir = activity.getFilesDir();
-		for( String file : storageDir.list() ) {
- 			if( file.startsWith(prefix) )
- 				activity.deleteFile(file);
- 		}
+		try {
+			File directory = new File(activity.getFilesDir(),prefix);
+			System.out.println("@@@@@@@@@@@@@@@@@@@@@@"+prefix);
+			removeFile(directory);//actual call for removing the previous hash based webapp from phone memory.
+		} catch (Exception e) {
+			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+			System.out.println("Exception thrown while deleting old hash.");
+			System.out.println(e);
+		}
+//		File storageDir = activity.getFilesDir();
+//		for( String file : storageDir.list() ) {
+// 			if( file.startsWith(prefix) )
+// 				activity.deleteFile(file);
+// 		}
 	}
 
 	public OutputStream openFileOutputStream(String fileName) throws LocalStorageException {
@@ -132,26 +187,86 @@ public class LocalStorageImpl implements LocalStorage {
 
 		ZipInputStream zis = null;
 		String newPrefix = "com.openmeap.storage."+update.getUpdateHeader().getHash().getValue();
+		File hashHolder = null;
+		String hashRootAbsolutePath = "";
+		try {
+			hashHolder = new File(activity.getFilesDir(),newPrefix);
+			hashHolder.mkdir();
+			hashRootAbsolutePath = hashHolder.getAbsolutePath();
+		} catch (Exception e) {
+			System.out.println("Exception thrown while creating hash folder.");
+			System.out.println(e);
+		}
 		try {
 			zis = new ZipInputStream( getImportArchiveInputStream() );
 		    ZipEntry ze;
 		    while ((ze = zis.getNextEntry()) != null) {
-		    	if( ze.isDirectory() )
-		    		continue;
-		        OutputStream baos = openFileOutputStream(newPrefix,ze.getName());
-		        try {
-		        	byte[] buffer = new byte[1024];
-		        	int count;
-		        	while ((count = zis.read(buffer)) != -1) {
-		        		baos.write(buffer, 0, count);
-		        	}
-		        }
-		        catch( Exception e ) {
-		        	;// TODO: something, for the love of god.
-		        }
-		        finally {
-		        	baos.close();
-		        }
+		    	if( ze.isDirectory() ){
+//		    		continue;
+		    		try {
+		    			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+		    			System.out.println("Writing directory structure in phone memory.");
+						File directoryStructure = new File(hashRootAbsolutePath,ze.getName());
+						directoryStructure.mkdirs();
+					} catch (Exception e) {
+						System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+						System.out.println("Exception thrown while writing directory structure.");
+						System.out.println(e);
+					}
+		    	}else {
+		    		try {
+		    			String osSeperator = System.getProperty("file.separator");
+		    			int seperatorLastIndex = ze.getName().lastIndexOf(osSeperator);
+		    			String fileName = ze.getName().substring(seperatorLastIndex+1, ze.getName().length());
+		    			String fileNameParentDirectoryPrefix = "";
+		    			String absolutePathFromPrefix = "";
+		    			if (seperatorLastIndex != -1 && seperatorLastIndex != 0) {
+		    				fileNameParentDirectoryPrefix = ze.getName().substring(0, seperatorLastIndex);
+			    			absolutePathFromPrefix = hashRootAbsolutePath+osSeperator+fileNameParentDirectoryPrefix;	
+						} else {
+							absolutePathFromPrefix = hashRootAbsolutePath+osSeperator;
+						}
+		    			URI osResourePathForThisFile = URI.create(absolutePathFromPrefix);
+		    			File writableFileReference = new File(osResourePathForThisFile.getPath(),fileName);
+		    			OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(writableFileReference.getAbsolutePath(),true),1024);
+				        try {
+				        	byte[] buffer = new byte[1024];
+				        	int count;
+				        	while ((count = zis.read(buffer)) != -1) {
+				        		outputStream.write(buffer, 0, count);
+				        	}
+				        }
+				        catch( Exception e ) {
+							System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+							System.out.println("Exception while writing file contents.");
+							System.out.println(e);
+				        }
+				        finally {
+				        	outputStream.close();
+				        }
+					} catch (Exception e) {
+						System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+						System.out.println("Unknown exception.");
+						System.out.println(e);
+					}
+		    		
+		    	}
+//		    	Commenting following code to make use of file:/// alternate to content://
+		    	
+//		        OutputStream baos = openFileOutputStream(newPrefix,ze.getName());		        
+//		        try {
+//		        	byte[] buffer = new byte[1024];
+//		        	int count;
+//		        	while ((count = zis.read(buffer)) != -1) {
+//		        		baos.write(buffer, 0, count);
+//		        	}
+//		        }
+//		        catch( Exception e ) {
+//		        	;// TODO: something, for the love of god.
+//		        }
+//		        finally {
+//		        	baos.close();
+//		        }
 		    }
 		} catch( Exception e ) {
 			

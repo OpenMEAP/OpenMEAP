@@ -42,6 +42,7 @@ public interface OmMainActivity {
 	public void doToast(String mesg, boolean isLong);
 	public UpdateHandler getUpdateHandler();
 	public String getRootWebPageContent() throws IOException;
+	public String getIndexFilePath(); 
 	
 	public void setReadyForUpdateCheck(boolean state);
 	public boolean getReadyForUpdateCheck();
@@ -54,6 +55,8 @@ public interface OmMainActivity {
 	public void setContentView(OmWebView webView);
 	public void runOnUiThread(Runnable runnable);
 	public void setWebView(OmWebView webView);
+	public String showWebSettings();
+	public void setDatabaseUrl(String baseUrl);
 }
 
 
