@@ -26,7 +26,7 @@ OpenMEAP was created in xCode 4.2 Eclipse IDE for Java EE Developers (w/ the Ivy
 http://www.eclipse.org/
 http://ant.apache.org/ivy/ivyde/
 
-OpenMEAP web projects have been tested on Apache Tomcat 5.5, 6.0 and 7.0 (7.0 default)
+OpenMEAP web projects have been tested on Apache Tomcat 5.5, 6.0 and 7.0
 http://tomcat.apache.org/
 
 OpenMEAP command-line requires Apache Ant 1.8 or greater.
@@ -73,13 +73,14 @@ Correct the properties to match your environment
 
 	om_slic $ vi client.properties
 	
-Create the assets folder under om_slic and copy in the openmeap.js
+Create the assets folder (whatever you updated client.properties with)
+and copy in the openmeap.js
 
 	om_slic $ mkdir assets
 	om_slic $ cd assets
 	assets $ cp ${OPENMEAP_HOME}/clients/shared/javascript/openmeap.js .
 	
-Create HTML5 application
+Create DHTML application
 
 	assets $ vi index.html
 	...
@@ -128,27 +129,29 @@ you must first make sure to import the openmeap-shared, openmeap-shared-jdk5, op
 and openmeap-slic-android projects into the target workspace.
 
 Because you must import these, you must also specify the openmeap.home and android.sdk.home 
-ant properties.
+ant properties as mentioned in the quickstart-eclipse.txt
+file.
 
 Next you must choose you must create a New Android project, 
 then select to create from existing source.  The source root
-must be wherever you directed the command-line script to create
-the SLIC. e.g. om_slic folder
+must be whereever you directed the command-line script to create
+the SLIC.
  
 +==================	
 *) Import Blackberry SLIC projects into Eclipse
 
 In order to import an Blackberry project into into Eclipse,
-you must first make sure to import the openmeap-shared, openmeap-shared-jdk5, openmeap-slic-core,
+you must first make sure to import the openmeap-shared, openmeap-slic-core,
 and openmeap-slic-blackberry projects into the target workspace.
 
-Because you must import these, you must also specify the openmeap.home and blackberry.sdk.home 
-ant properties.
+Because you must import these, you must also specify the openmeap.home 
+and blackberry.sdk.home ant properties as mentioned in the quickstart-eclipse.txt
+file.
 
 Next you must choose you must create a New Blackberry project, 
 then select to create from existing source.  The source root
-must be wherever you directed the command-line script to create
-the SLIC. e.g. om_slic folder
+must be whereever you directed the command-line script to create
+the SLIC.
 
 Next, you'll need to do this for the openmeap-slic-blackberry project too,
 create 3 "Build Path"->"Link Source" folders.  The first time, click "Variables" and
