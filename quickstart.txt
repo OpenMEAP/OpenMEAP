@@ -134,7 +134,7 @@ file.
 
 Next you must choose you must create a New Android project, 
 then select to create from existing source.  The source root
-must be whereever you directed the command-line script to create
+must be wherever you directed the command-line script to create
 the SLIC.
  
 +==================	
@@ -150,7 +150,7 @@ file.
 
 Next you must choose you must create a New Blackberry project, 
 then select to create from existing source.  The source root
-must be whereever you directed the command-line script to create
+must be wherever you directed the command-line script to create
 the SLIC.
 
 Next, you'll need to do this for the openmeap-slic-blackberry project too,
