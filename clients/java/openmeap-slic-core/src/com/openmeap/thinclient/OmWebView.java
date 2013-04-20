@@ -57,5 +57,7 @@ public interface OmWebView {
 	public void loadDataWithBaseURL(String baseUrl, String pageContent, String mimeType, String sourceEncoding, String historyUrl);
 
 	public void clearView();
+
+	public void loadUrl(String string);
 	
 }

@@ -42,6 +42,7 @@ public interface OmMainActivity {
 	public void doToast(String mesg, boolean isLong);
 	public UpdateHandler getUpdateHandler();
 	public String getRootWebPageContent() throws IOException;
+	public String getIndexFilePath();
 	
 	public void setReadyForUpdateCheck(boolean state);
 	public boolean getReadyForUpdateCheck();
