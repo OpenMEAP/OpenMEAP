@@ -55,8 +55,6 @@ public interface OmMainActivity {
 	public void setContentView(OmWebView webView);
 	public void runOnUiThread(Runnable runnable);
 	public void setWebView(OmWebView webView);
-	public String showWebSettings();
-	public void setDatabaseUrl(String baseUrl);
 }
 
 

@@ -82,64 +82,52 @@ public class LocalStorageImpl implements LocalStorage {
 		}
 	}
 	/**
-	 * Call this method to remove the file and remove the child chain if it is directory.
-	 * @param file: File object
+	 * Call this method remove the file.
+	 * @param file: File object referrence.
 	 */
-	public void removeFile(File file) {
-		if (file.exists()) {
-			if(file.isDirectory()){
-				//means the file is a directory.
-				if(file.list().length!= 0){
-					//this directory has child files.
-					for( File file1 : file.listFiles() ) {
-						removeFile(file1);
-			 		}
-				}
-				System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-				System.out.println("Went into recurstion before deleting this folder.");
-				
-				try {
-					String deletingFilePath = file.getAbsolutePath();
-					file.delete();
-					System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-					System.out.println("File delted: "+deletingFilePath);
-				} catch (Exception e) {
-					System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-					System.out.println("Exception thrown while deleting old file."+file.getAbsolutePath());
-					System.out.println(e);
-				}
-			}else {
-				try {
-					String deletingFilePath = file.getAbsolutePath();
-					file.delete();
-					System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-					System.out.println("File delted: "+deletingFilePath);
-				} catch (Exception e) {
-					System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-					System.out.println("Exception thrown while deleting old file."+file.getAbsolutePath());
-					System.out.println(e);
-				}
-			}
-		}else {
-			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			System.out.println("Directory does not exists.");
+	public void removeFile(File file) throws LocalStorageException {
+		try {
+			//Requesting the current file to delete.
+			file.delete();
+		} catch (Exception e) {
+			throw new LocalStorageException("LocalStorageImpl::removeFile()::Exception thrown while deleting the file.",e);
 		}
 	}
+	
+	/**
+	 * Call this method to traverse(Recursively) through directory and delete individual files. 
+	 * @param fileOrDirectory: file or directory referrence.
+	 */
+	public void traverseDirectoryChainAndRemove(File fileOrDirectory) throws LocalStorageException {
+		if (fileOrDirectory.exists()) {
+			if(fileOrDirectory.isDirectory()){
+					//means the fileOrDirectory is a directory.
+					if(fileOrDirectory.list().length!= 0){
+						//this directory has child files.
+						for( File file1 : fileOrDirectory.listFiles() ) {
+							traverseDirectoryChainAndRemove(file1);
+				 		}
+					}
+					//Requesting the current file to delete.
+					removeFile(fileOrDirectory);
+			}else {
+				//Requesting the current file to delete.
+				removeFile(fileOrDirectory);
+			}
+		}else {
+			//requested direcotory does not exist.
+			throw new LocalStorageException("LocalStorageImpl::traverseDirectoryChainAndRemove()::Directory does not exists.");
+		}
+	}
+	
 	public void resetStorage(String prefix) {
 		try {
-			File directory = new File(activity.getFilesDir(),prefix);
-			System.out.println("@@@@@@@@@@@@@@@@@@@@@@"+prefix);
-			removeFile(directory);//actual call for removing the previous hash based webapp from phone memory.
+			File fileOrDirectoryReferrence = new File(activity.getFilesDir(),prefix);
+			//actual call for removing the previous hash based webapp from phone memory.
+			traverseDirectoryChainAndRemove(fileOrDirectoryReferrence);
 		} catch (Exception e) {
-			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			System.out.println("Exception thrown while deleting old hash.");
-			System.out.println(e);
+			;// handle reset storage failure.
 		}
-//		File storageDir = activity.getFilesDir();
-//		for( String file : storageDir.list() ) {
-// 			if( file.startsWith(prefix) )
-// 				activity.deleteFile(file);
-// 		}
 	}
 
 	public OutputStream openFileOutputStream(String fileName) throws LocalStorageException {

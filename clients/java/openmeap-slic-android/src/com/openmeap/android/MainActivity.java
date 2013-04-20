@@ -321,25 +321,31 @@ public class MainActivity extends Activity implements OmMainActivity,
 				return true;
 			}
 		});
-		webView.getSettings().setDatabaseEnabled(true); 
+		
+		//making web database enabled.
+		webView.getSettings().setDatabaseEnabled(true);
+		//making Dom storage enabled.
 		webView.getSettings().setDomStorageEnabled(true);
-		String databasePath = this.getApplicationContext().getDir("local_storage", Context.MODE_PRIVATE).getPath();
-		webView.getSettings().setDatabasePath(databasePath);
+		//requesting to create directory with name "localstorage" in /data/data/.../App_localstorage, 
+		//so that, localstorage related data files saved into that directory.
+		String databasePath = this.getApplicationContext().getDir("localstorage", Context.MODE_PRIVATE).getPath();
+		//setting local storage database path.
+		webView.getSettings().setDatabasePath("/data/data/com.openmeap/databases/");
 		
 		// enable navigator.geolocation
 		webView.getSettings().setGeolocationEnabled(true);
 		webView.getSettings().setGeolocationDatabasePath("/data/data/com.openmeap/databases/");
-
+		
 		// removes vertical and horizontal scroll bars
 		webView.setVerticalScrollBarEnabled(false);
 		webView.setHorizontalScrollBarEnabled(false);
 
+		//WebChromeClient class is set, so that the overridden methods are executed,
+		//when something that might impact a browser UI happens.
 		webView.setWebChromeClient(new WebChromeClient() {
 			@Override
 			public void onGeolocationPermissionsShowPrompt(String origin,
 					Callback callback) {
-				// TODO Auto-generated method stub
-				// super.onGeolocationPermissionsShowPrompt(origin, callback);
 				callback.invoke(origin, true, false);
 			}
 
@@ -444,29 +450,6 @@ public class MainActivity extends Activity implements OmMainActivity,
 		this.webView = (WebView) webView;
 	}
 	
-	public void setDatabaseUrl(String baseUrl) {
-		this.doToast("baseurl:"+baseUrl, true);
-//		this.webView.getSettings().setDatabasePath(baseUrl);
-//		this.webView.getSettings().setDatabasePath("");
-//		try {
-//			FileOutputStream fos = openFileOutput("abc.html", Context.MODE_PRIVATE);
-//			fos.write(baseUrl.getBytes());
-//			fos.close();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//
-//		webView.loadUrl("file://" + getFilesDir().getAbsolutePath()+ "/abc.html");	
-	}
-	
-	public String showWebSettings() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("\nDatabasePath::"+ this.webView.getSettings().getDatabasePath());
-		sb.append("\nIs Domstorage enabled::"+ this.webView.getSettings().getDomStorageEnabled());
-		sb.append("\nIs Javascript enabled::"+ this.webView.getSettings().getJavaScriptEnabled());
-		return sb.toString();
-	}
-
 	public void setReadyForUpdateCheck(boolean ready) {
 		this.readyForUpdateCheck = ready;
 	}
