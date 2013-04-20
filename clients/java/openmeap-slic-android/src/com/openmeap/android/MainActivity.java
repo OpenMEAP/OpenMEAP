@@ -24,6 +24,8 @@
 
 package com.openmeap.android;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -42,15 +44,19 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.webkit.GeolocationPermissions;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.GeolocationPermissions.Callback;
+import android.webkit.WebStorage.QuotaUpdater;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 import com.openmeap.constants.FormConstants;
 import com.openmeap.digest.DigestInputStreamFactory;
@@ -73,40 +79,44 @@ import com.openmeap.thinclient.update.UpdateHandler;
 import com.openmeap.util.Utils;
 
 public class MainActivity extends Activity implements OmMainActivity,
-LoginFormLauncher {
-    
+		LoginFormLauncher {
+
 	private static String SOURCE_ENCODING = FormConstants.CHAR_ENC_DEFAULT;
 	private static String DIRECTORY_INDEX = "index.html";
-    
+
 	private static final int LOGIN_DIALOG = 1;
-    
+
 	private AndroidSLICConfig config = null;
 	private UpdateHandler updateHandler = null;
 	private WebView webView = null;
 	private LocalStorageImpl storage = null;
 	private LoginFormCallback loginFormCallback = null;
 	private boolean readyForUpdateCheck = false;
-    
+
 	/**
 	 * Called when the activity is first created.
 	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        
+
 		// Get rid of the android title bar
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.main);
-        
+
 		CredentialsProviderFactory
-        .setDefaultCredentialsProviderFactory(new OmSlicCredentialsProvider.Factory(this));
+				.setDefaultCredentialsProviderFactory(new OmSlicCredentialsProvider.Factory(
+						this));
 		HttpRequestExecuterFactory
-        .setDefaultType(HttpRequestExecuterImpl.class);
-		DigestInputStreamFactory.setDigestInputStreamForName("md5",Md5DigestInputStream.class);
-		DigestInputStreamFactory.setDigestInputStreamForName("sha1",Sha1DigestInputStream.class);
-        
+				.setDefaultType(HttpRequestExecuterImpl.class);
+		DigestInputStreamFactory.setDigestInputStreamForName("md5",
+				Md5DigestInputStream.class);
+		DigestInputStreamFactory.setDigestInputStreamForName("sha1",
+				Sha1DigestInputStream.class);
+
 		// setup the SLICConfig instance
-		Preferences prefs = new SharedPreferencesImpl(getSharedPreferences(SLICConfig.PREFERENCES_FILE, MODE_PRIVATE));
+		Preferences prefs = new SharedPreferencesImpl(getSharedPreferences(
+				SLICConfig.PREFERENCES_FILE, MODE_PRIVATE));
 		try {
 			Properties props = new Properties();
 			props.load(getAssets().open(SLICConfig.PROPERTIES_FILE));
@@ -115,9 +125,9 @@ LoginFormLauncher {
 			// this is a deal breaker...if we cannot read the properties file,
 			// then the application is fail
 			throw new RuntimeException("The primary configuration file ("
-                                       + SLICConfig.PROPERTIES_FILE + ") could not be opened.");
+					+ SLICConfig.PROPERTIES_FILE + ") could not be opened.");
 		}
-        
+
 		// perform our first-run-check
 		Object o = getSystemService(Context.WIFI_SERVICE);
 		if (o instanceof WifiManager) {
@@ -125,27 +135,27 @@ LoginFormLauncher {
 			WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 			if (wifiInfo != null && wifiInfo.getMacAddress() != null) {
 				Runnable firstRunCheck = new FirstRunCheck(config,
-                                                           wifiInfo.getMacAddress(),
-                                                           HttpRequestExecuterFactory.newDefault());
+						wifiInfo.getMacAddress(),
+						HttpRequestExecuterFactory.newDefault());
 				new Thread(firstRunCheck).start();
 			}
 		}
-        
+
 		if (config.isDevelopmentMode()) {
 			System.setProperty(HttpRequestExecuter.SSL_PEER_NOVERIFY_PROPERTY,
-                               "true");
+					"true");
 		} else {
 			System.setProperty(HttpRequestExecuter.SSL_PEER_NOVERIFY_PROPERTY,
-                               "false");
+					"false");
 		}
-        
+
 		storage = new LocalStorageImpl(this);
 		updateHandler = new UpdateHandler(this, config, storage);
-        
+
 		// Calls the title from client.properties
 		// setupWindowTitle();
 	}
-    
+
 	public void launchLoginForm(LoginFormCallback credProv) {
 		this.loginFormCallback = credProv;
 		this.runOnUiThread(new Runnable() {
@@ -154,45 +164,45 @@ LoginFormLauncher {
 			}
 		});
 	}
-    
+
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 		// We do nothing here. We're only handling this to keep orientation
 		// or keyboard hiding from causing the WebView activity to restart.
 	}
-    
+
 	public void restart() {
 		Intent i = getBaseContext().getPackageManager()
-        .getLaunchIntentForPackage(getBaseContext().getPackageName());
+				.getLaunchIntentForPackage(getBaseContext().getPackageName());
 		i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(i);
 	}
-    
+
 	public AndroidSLICConfig getConfig() {
 		return config;
 	}
-    
+
 	public LocalStorageImpl getStorage() {
 		return storage;
 	}
-    
+
 	public UpdateHandler getUpdateHandler() {
 		return updateHandler;
 	}
-    
+
 	public Preferences getPreferences(String name) {
 		return new SharedPreferencesImpl(this.getSharedPreferences(name, 0));
 	}
-    
+
 	public Orientation getOrientation() {
 		Configuration config = getResources().getConfiguration();
 		return config.orientation == Configuration.ORIENTATION_LANDSCAPE ? Orientation.LANDSCAPE
-        : config.orientation == Configuration.ORIENTATION_PORTRAIT ? Orientation.PORTRAIT
-        : config.orientation == Configuration.ORIENTATION_SQUARE ? Orientation.SQUARE
-        : Orientation.UNDEFINED;
+				: config.orientation == Configuration.ORIENTATION_PORTRAIT ? Orientation.PORTRAIT
+						: config.orientation == Configuration.ORIENTATION_SQUARE ? Orientation.SQUARE
+								: Orientation.UNDEFINED;
 	}
-    
+
 	public void doToast(String mesg, boolean isLong) {
 		Context context = getApplicationContext();
 		CharSequence text = mesg;
@@ -200,22 +210,22 @@ LoginFormLauncher {
 		Toast toast = Toast.makeText(context, text, duration);
 		toast.show();
 	}
-    
+
 	public void setTitle(String title) {
 		super.setTitle(title);
 	}
-    
+
 	/*
 	 * PROTECTED METHODS HERE
 	 */
-    
+
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		if (webView != null) {
 			webView.saveState(outState);
 		}
 	}
-    
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -224,7 +234,7 @@ LoginFormLauncher {
 		}
 		this.initialize();
 	}
-    
+
 	@Override
 	protected void onPause() {
 		if (webView != null) {
@@ -232,29 +242,29 @@ LoginFormLauncher {
 		}
 		super.onPause();
 	}
-    
+
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog = null;
 		switch (id) {
-            case LOGIN_DIALOG:
-                dialog = createLoginFormDialog();
-                break;
+		case LOGIN_DIALOG:
+			dialog = createLoginFormDialog();
+			break;
 		}
 		return dialog;
 	}
-    
+
 	protected void initialize() {
-        
+
 		FileContentProvider.setProviderAuthority(config.getProviderAuthority());
 		storage.setupSystemProperties();
-        
+
 		updateHandler.initialize(webView);
 	}
-    
+
 	/**
 	 * Loads in the content of the index document page to load into the WebView
-	 *
+	 * 
 	 * @return The content of the index document
 	 * @throws IOException
 	 */
@@ -265,107 +275,128 @@ LoginFormLauncher {
 			if (config.assetsOnExternalStorage()) {
 				String path = config.getAssetsBaseUrl() + DIRECTORY_INDEX;
 				inputStream = getContentResolver().openInputStream(
-                                                                   Uri.parse(path));
+						Uri.parse(path));
 			} else {
 				String rootPath = config.getAssetsRootPath() + DIRECTORY_INDEX;
 				inputStream = getAssets().open(rootPath);
 			}
 		} else
 			inputStream = openFileInput(FileContentProvider
-                                        .getInternalStorageFileName(DIRECTORY_INDEX));
+					.getInternalStorageFileName(DIRECTORY_INDEX));
 		return Utils.readInputStream(inputStream, SOURCE_ENCODING);
 	}
-    
+	
+
+	public String getIndexFilePath() {
+		return FileContentProvider.getInternalStorageFileName(DIRECTORY_INDEX);
+	}
+
+
 	/**
 	 * Sets up the window title, per the properties
-	 *
+	 * 
 	 * private void setupWindowTitle() { if( config.getApplicationTitle()!=null
 	 * ) { if( config.getApplicationTitle().equals("off") ) {
 	 * requestWindowFeature(Window.FEATURE_NO_TITLE); } else {
 	 * setTitle(config.getApplicationTitle()); } } else
 	 * setTitle(config.getApplicationName()); }
 	 */
-    
+
 	/**
 	 * Creates the default WebView where we'll run javascript and render content
 	 */
 	public WebView createDefaultWebView() {
-        
+
 		WebView webView = new com.openmeap.android.WebView(this, this);
-        
+
 		// make sure javascript and our api is available to the webview
-        
+
 		JsApiCoreImpl jsApi = new JsApiCoreImpl(this, webView, updateHandler);
 		webView.addJavascriptInterface(jsApi, JS_API_NAME);
-        
+
 		webView.getSettings().setJavaScriptEnabled(true);
-        
+		webView.setWebViewClient(new WebViewClient() {
+			public boolean shouldOverrideUrlLoading(WebView view, String url) {
+				view.loadUrl(url);
+				return true;
+			}
+		});
+		
+		//making web database enabled.
+		webView.getSettings().setDatabaseEnabled(true);
+		//making Dom storage enabled.
+		webView.getSettings().setDomStorageEnabled(true);
+		//requesting to create directory with name "localstorage" in /data/data/.../App_localstorage, 
+		//so that, localstorage related data files saved into that directory.
+		String databasePath = this.getApplicationContext().getDir("localstorage", Context.MODE_PRIVATE).getPath();
+		//setting local storage database path.
+		webView.getSettings().setDatabasePath("/data/data/com.openmeap/databases/");
+		
 		// enable navigator.geolocation
 		webView.getSettings().setGeolocationEnabled(true);
 		webView.getSettings().setGeolocationDatabasePath("/data/data/com.openmeap/databases/");
-        
-		webView.getSettings().setDomStorageEnabled(true);
+		
 		// removes vertical and horizontal scroll bars
 		webView.setVerticalScrollBarEnabled(false);
 		webView.setHorizontalScrollBarEnabled(false);
-        
+
+		//WebChromeClient class is set, so that the overridden methods are executed,
+		//when something that might impact a browser UI happens.
 		webView.setWebChromeClient(new WebChromeClient() {
 			@Override
 			public void onGeolocationPermissionsShowPrompt(String origin,
-                                                           Callback callback) {
-				// TODO Auto-generated method stub
-				//super.onGeolocationPermissionsShowPrompt(origin, callback);
+					Callback callback) {
 				callback.invoke(origin, true, false);
 			}
-            //
-            //			@Override
-            //			public boolean onJsAlert(android.webkit.WebView view, String url,
-            //					String message, JsResult result) {
-            //				// TODO Auto-generated method stub
-            ////				return super.onJsAlert(view, url, message, result);
-            //				return false;
-            //			}
+
+			@Override
+			public void onExceededDatabaseQuota(String url,
+					String databaseIdentifier, long quota,
+					long estimatedDatabaseSize, long totalQuota,
+					QuotaUpdater quotaUpdater) {
+				// TODO Auto-generated method stub
+				super.onExceededDatabaseQuota(url, databaseIdentifier, quota,
+						estimatedDatabaseSize, totalQuota, quotaUpdater);
+			}
 		});
-		
-		
-        
+
 		// make sure the web view fills the viewable area
 		webView.setLayoutParams(new LinearLayout.LayoutParams(
-          android.view.ViewGroup.LayoutParams.FILL_PARENT,
-          android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
-        
+				android.view.ViewGroup.LayoutParams.FILL_PARENT,
+				android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
+
 		return webView;
 	}
-    
+
 	private Dialog createLoginFormDialog() {
-        
+
 		Context mContext = this;
 		final Dialog dialog = new Dialog(mContext);
-        
+
 		LayoutInflater inflater = (LayoutInflater) mContext
-        .getSystemService(LAYOUT_INFLATER_SERVICE);
+				.getSystemService(LAYOUT_INFLATER_SERVICE);
 		final View layout = inflater.inflate(R.layout.login_form,
-                                             (ViewGroup) findViewById(R.id.login_form_container));
-        
+				(ViewGroup) findViewById(R.id.login_form_container));
+
 		dialog.setContentView(layout);
 		dialog.setTitle("Authentication Prompt");
-        
+
 		String infoText = loginFormCallback.getInfoText();
 		TextView infoTextView = (TextView) layout.findViewById(R.id.info);
 		infoTextView.setText(infoText);
-        
+
 		Button proceedButton = (Button) layout.findViewById(R.id.proceed);
 		proceedButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
 				EditText passwordText = (EditText) layout
-                .findViewById(R.id.password);
+						.findViewById(R.id.password);
 				EditText usernameText = (EditText) layout
-                .findViewById(R.id.username);
+						.findViewById(R.id.username);
 				CheckBox rememberBox = (CheckBox) layout
-                .findViewById(R.id.remember);
+						.findViewById(R.id.remember);
 				loginFormCallback.onProceed(usernameText.getEditableText()
-                                            .toString(), passwordText.getEditableText().toString(),
-                                            rememberBox.isChecked());
+						.toString(), passwordText.getEditableText().toString(),
+						rememberBox.isChecked());
 				loginFormCallback = null;
 				if (!rememberBox.isChecked()) {
 					usernameText.setText("");
@@ -374,16 +405,16 @@ LoginFormLauncher {
 				dialog.dismiss();
 			}
 		});
-        
+
 		Button cancelButton = (Button) layout.findViewById(R.id.cancel);
 		cancelButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
 				EditText passwordText = (EditText) layout
-                .findViewById(R.id.password);
+						.findViewById(R.id.password);
 				EditText usernameText = (EditText) layout
-                .findViewById(R.id.username);
+						.findViewById(R.id.username);
 				CheckBox rememberBox = (CheckBox) layout
-                .findViewById(R.id.remember);
+						.findViewById(R.id.remember);
 				loginFormCallback.onCancel();
 				loginFormCallback = null;
 				if (!rememberBox.isChecked()) {
@@ -393,36 +424,36 @@ LoginFormLauncher {
 				dialog.dismiss();
 			}
 		});
-        
+
 		EditText usernameText = (EditText) layout.findViewById(R.id.username);
 		usernameText.requestFocus();
-        
+
 		return dialog;
 	}
-    
+
 	public void setContentView(OmWebView webView) {
 		runOnUiThread(new Runnable() {
 			OmWebView webView;
-            
+
 			public void run() {
 				setContentView((View) webView);
 			}
-            
+
 			public Runnable construct(OmWebView webView) {
 				this.webView = webView;
 				return this;
 			}
 		}.construct(webView));
 	}
-    
+
 	public void setWebView(OmWebView webView) {
 		this.webView = (WebView) webView;
 	}
-    
+	
 	public void setReadyForUpdateCheck(boolean ready) {
 		this.readyForUpdateCheck = ready;
 	}
-    
+
 	public boolean getReadyForUpdateCheck() {
 		return readyForUpdateCheck;
 	}
