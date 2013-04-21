@@ -149,7 +149,5 @@ public final class OpenMEAPScreen extends MainScreen implements OmWebView
     
     public void loadUrl(String string) {
         
-    // TODO Auto-generated method stub
-        
     }
 }

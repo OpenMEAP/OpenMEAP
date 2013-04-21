@@ -252,7 +252,7 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 	}
     
     public String getIndexFilePath() {
-        // TODO Auto-generated method stub
         return null;
+        
     }
 }
