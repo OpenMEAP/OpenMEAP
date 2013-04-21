@@ -250,9 +250,4 @@ public class OpenMEAPApp extends UiApplication implements OmMainActivity
 	public boolean getReadyForUpdateCheck() {
 		return readyForUpdateCheck;
 	}
-    
-    public String getIndexFilePath() {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }
