@@ -1,0 +1,58 @@
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011-2013 OpenMEAP, Inc.                                   #
+ #    Credits to Jonathan Schang & Robert Thacher                              #
+ #                                                                             #
+ #    Released under the LGPLv3                                                #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU Lesser General Public License as published #
+ #    by the Free Software Foundation, either version 3 of the License, or     #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU Lesser General Public License for more details.                      #
+ #                                                                             #
+ #    You should have received a copy of the GNU Lesser General Public License #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ############################################################################### 
+ -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+  http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services-2.0.xsd
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<!-- PAGE BEANS -->
+
+		<bean id="loginPage" scope="prototype" class="com.openmeap.web.GenericDocumentProcessor">
+		<property name="templateTree">
+			<bean class="com.openmeap.web.FreeMarkerSection">
+				<property name="configuration" ref="freeMarkerConfiguration"/>
+				<property name="sectionBacking" ref="layoutSectionBacking"/>
+				<property name="templatePath" value="layout-login.ftl"/>
+				<property name="templateVariables">
+					<map>
+						<entry key="page">
+							<map>
+								<entry key="title" value="OpenMEAP Administrative Interface"/>
+							</map>
+						</entry>
+					</map>
+				</property>
+				<property name="children">
+					<map>
+						<entry key="body"><ref bean="loginSection"/></entry>
+					</map>
+				</property>
+			</bean>
+		</property>
+		<property name="processesFormData" value="false"/>
+	</bean>
+	
+</beans>

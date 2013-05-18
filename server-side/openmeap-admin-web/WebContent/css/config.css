@@ -1,0 +1,27 @@
+/* Custom Font for Headers */
+@import url(../font/mentone-semibold/mentone-semibold.css);
+
+/* Default font */
+body {font-family: tahoma, arial, helvetica, sans-serif;}
+/* Header Font */
+h1, h2, h3, h4, h5, h6, .btn, nav, label {font-family: Mentone-SemiBold, 'Mentone SemiBold', 'Trebuchet MS', sans-serif;}
+
+/* Customize the color of the theme's' header */
+header {background-color: #5e6673}
+
+/* Customize the color of the theme's' navigation. It is recommended to keep the colors of both the primary navigation and submenu's the same */
+nav, #sidebar {background-color: #222936} /* Primary Navigation */
+
+.sf-menu li li, .sf-menu li li li {
+	background: #222936; color: #777;   /* Secondary Navigation back and foreground color */
+        opacity: 0.95;
+}
+.sf-menu li li:hover, .sf-menu li li li:hover {
+    opacity:1;
+}
+
+/* Customize the color of the theme's widget boxes */
+.widget {background-color: #5e6673;}
+
+/* Customize the backgroundcolor of the loginpage */
+#loginpage {background-color: #222936;}
