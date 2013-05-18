@@ -37,31 +37,31 @@ Parameter Values / Outputs:
 					Application admins may modify any aspect of the application, including deleting it.
 					The only thing an application admin may not do is remove their own admin privileges.
 				</div>
-				<textarea cols="60" rows="3" name="admins">${(application.admins?html)!}</textarea>
+				<textarea cols="25%" rows="3" name="admins">${(application.admins?html)!}</textarea>
 				</dd>
 				<dt>Version Admins:</dt>
 				<dd>
 				<div>
-					Version admins may create, modify, and delete application versions.  They may not make deployments.
+                Version admins may create, modify, and delete application versions.  They may not make deployments.
 				</div>
-					<textarea cols="60" rows="3" name="versionAdmins">${(application.versionAdmins?html)!}</textarea>
+					<textarea cols="25%" rows="3" name="versionAdmins">${(application.versionAdmins?html)!}</textarea>
 				</dd>
 				<dt>Description:</dt>
-				<dd><textarea cols="60" rows="5" name="description">${(application.description?html)!}</textarea></dd>
+				<dd><textarea cols="25%" rows="5" name="description">${(application.description?html)!}</textarea></dd>
 				<dt>Initial Version Identifier:</dt>
 				<dd>
 				<div>
-					Must be the original version identifier bundled into the SLIC.
+                Must be the original version identifier bundled into the SLIC.
 				</div>
 				<input type="text" name="initialVersionIdentifier" value="${(application.initialVersionIdentifier?html)!}"/>
 				</dd>
 				<dt>Deployment History Length:</dt>
 				<dd>
 				<div>
-					The number of deployments to maintain in the deployment history table.  As old archives fall off the end, 
-					they are deleted from the admin and cluster nodes, if they are not being used by any other versions.
+                The number of deployments to maintain in the deployment history table.  As old archives fall off the end, 
+                they are deleted from the admin and cluster nodes, if they are not being used by any other versions.
 				</div>
-					<input type="text" name="deploymentHistoryLength" value="${(application.deploymentHistoryLength?string.computer)!}"/>
+                <input type="text" name="deploymentHistoryLength" value="${(application.deploymentHistoryLength?string.computer)!}"/>
 				</dd>
 				[#if willProcess]
 				<dt>Submit:</dt>
@@ -72,7 +72,7 @@ Parameter Values / Outputs:
 					</dd>
 					[#if (application.id)??]
 				<dt>
-					Delete Confirm:<br/>
+                Delete Confirm:<br/>
 					<span class="copy">Type "delete the application" here.</span>
 				</dt>
 				<dd><input type="text" name="deleteConfirm" value=""/></dd>

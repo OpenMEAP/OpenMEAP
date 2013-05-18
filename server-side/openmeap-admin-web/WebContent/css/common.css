@@ -1,148 +1,77 @@
-/*
- ###############################################################################
- #                                                                             #
- #    Copyright (C) 2011-2013 OpenMEAP, Inc.                                   #
- #    Credits to Jonathan Schang & Robert Thacher                              #
- #                                                                             #
- #    Released under the LGPLv3                                                #
- #                                                                             #
- #    OpenMEAP is free software: you can redistribute it and/or modify         #
- #    it under the terms of the GNU Lesser General Public License as published #
- #    by the Free Software Foundation, either version 3 of the License, or     #
- #    (at your option) any later version.                                      #
- #                                                                             #
- #    OpenMEAP is distributed in the hope that it will be useful,              #
- #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
- #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
- #    GNU Lesser General Public License for more details.                      #
- #                                                                             #
- #    You should have received a copy of the GNU Lesser General Public License #
- #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
- #                                                                             #
- ###############################################################################
- */
+/* Structure
+-------------------------------------------------------------------*/
+@import url(reset.css);
+@import url(global.css);
+@import url(typography.css);
+@import url(config.css);
 
-/*-------------------------------------------------------
-OpenMEAP Admin Interface Stylesheet
-Version 1.0
-Author: Lam Nguyen
-lam@openmeap.com
--------------------------------------------------------*/
+html {font-size: 100%;}
+body {font-size: .75em;line-height: 1.5; background: url(../img/bg/bg.png) repeat;}
 
-html {
-    overflow-y: scroll;
+a {text-decoration: none; color: #13436D; cursor: pointer;}
+a:hover {text-decoration: underline}
+
+#actualbody {background: #f1f1f1; border: 1px solid #c2c2c5; border-radius: 0 0 5px 5px; -webkit-border-radius: 0 0 5px 5px; -moz-border-radius: 0 0 5px 5px; padding: 1px 0; margin-bottom: 70px;}
+
+/* Typography
+-------------------------------------------------------------------*/
+h1,h2,h3,h4,h5,h6 {font-weight: normal}
+h1 {font-size: 2em}
+h2 {font-size: 1.8em}
+h3 {font-size: 1.6em}
+h4 {font-size: 1.4em}
+h5 {font-size: 1.2em}
+h6 {font-size: 1em}
+
+p {margin: 17px 0}
+
+/* Header
+-------------------------------------------------------------------*/
+header {background-image: url(../img/bg/header_bg.png); background-repeat: no-repeat; padding-top: 10px}
+
+nav {
+     background-image: url("../img/menu/bg-r.png"); background-repeat: no-repeat; background-position: top right;
+    -moz-border-radius-topleft: 3px;
+    -moz-border-radius-topright: 3px;
+    -moz-border-radius-bottomright: 0px;
+    -moz-border-radius-bottomleft: 0px;
+    -webkit-border-radius: 3px 3px 0px 0px;
+    border-radius: 3px 3px 0px 0px; 
+    margin-top: 25px;
 }
+#navcontainer {background: url("../img/menu/bg.png") repeat-x scroll left top; margin-right: 3px}
 
-body {
-	background: url(../img/bg/header.jpg) repeat-x 0 0;
-	font: 70%/1.4em Helvetica, Arial;
-	margin: 0;
-	
-}
-
-#wrapper {
-	margin: 0 auto;
-}
-
-#header {
-	height: 90px;
+#logo {
+    background: url(../img/logo-OpenMEAP.png) no-repeat;
+    width: 275px; height: 60px; display: block; float: left; margin-top: 0px;
 }
 
+nav ul {float:right}
+nav ul li {float: left;}
+nav ul li a {color: #929292; padding: 18px 8px; font-size: 1em}
+nav ul li a:hover {text-decoration: none}
+nav ul li.sep {border-left: 1px solid #000}
+nav ul li a.ui-tabs-selected, nav ul li a:hover {color:#fff}
+nav ul .icon {height: 20px; width: 20px; margin: 0 auto; display: block}
+nav ul .notification {background: #b01e1e;border-radius: 30px 30px 30px 30px;-moz-border-radius: 30px 30px 30px 30px;-webkit-border-radius: 30px 30px 30px 30px;box-shadow: 1px 1px 1px #333333;color: #E4E4E4;display: block;font-size: 10px;height: 6px;line-height: 4px;padding: 5px;position: absolute;left: 33px;text-align: center;top: 6px;}
 
-#footer {
-	background: url(../img/bg/footer.jpg) repeat-x 0 0 #FFEAF6;
-	display: block;
-	height: 100px;
-}
+nav .sf-menu li.active {background: url(../img/menu/selected.png) no-repeat bottom center;}
+nav ul li.active {opactiy: 0.2}
 
-#content-wrapper {
-}
+#user {width: 225px; float: left; padding: 10px 0 0 10px}
+#user ul {float: left}
+#user li {margin: 0}
+#user strong, #user strong a {color: #fff}
+#user .username {display: block}
+#user li, #user a {color: #777; padding: 0}
 
-.row {
-	display: block;
-	margin-bottom: 25px;
-}
-
-.clearfix {
-	clear: both;
-}
-
-/* =Main Menu
------------------------------------------------------------------------*/
-#main-menu, #support {
-	background: url(../img/bg/tab.png) repeat-x 0 0 transparent;
-    border: 1px solid #C7CEED;
-	min-height: 200px;
-    padding: 0 10px;
-    width: 180px;
-}
-#main-menu h2, #support h2 {
-    color: #003A6F;
-    margin-top: 6px;
-}
-#main-menu ul {
-	margin: 0;
-	padding: 0;
-}
-#main-menu ul li {
-    background: url("../img/icon/plus.gif") no-repeat scroll 0 3px transparent;
-    list-style-type: none;
-    margin: 5px 0;
-	padding: 0 0 0 15px;
-}
-
-.menu-buttons {
-	display: inline-block;
-}
-.menu-buttons img{
-	margin-right: 7px;
-}
-.menu-buttons img.last {
-	margin-right: 0;
-}
-.menu-buttons a img {
-	border: 0;
-}
-
-
-/* = Header
------------------------------------------------------------------------*/
-#header {
-	background: url(../img/logo-OpenMEAP.png) no-repeat 0 25px transparent;
-}
-
-/* = Menu Options
------------------------------------------------------------------------*/
-
-#admin-header, #messages, #main-content {
-	display: inline-block;
-}
-
-#main-content {
-    background: url("../img/bg/tab.png") repeat-x scroll 0 0 transparent;
-    border: 1px solid #C7CEED;
-    min-height: 427px;
-    padding: 0 10px;
-    width: 660px;
-}
-#main-content h2 {
-    color: #003A6F;
-    margin-top: 6px;
-}
-#main-content fieldset {
-	border: none;
-}
-#main-content legend {
-    border-bottom: 1px solid #ECECEC;
-    font-size: 1.35em;
-    font-weight: bold;
-    width: 100%;
-}
+#pagetitle {background: #fff; padding: 10px}
+#pagetitle h1 {font-size: 1.75em; line-height: 1em}
 
 /* =Error Messages
 -------------------------------------------------------*/
 #messages ul {
-	padding-left: 20px;
+	padding-left: 0px;
 }
 
 #messages ul li {
@@ -165,7 +94,7 @@ form span.copy {
 	font-weight: normal;
 }
 form input[type=text] {
-	width: 78%;
+	width: 99%;
 }
 /* =Table - Application List
 -------------------------------------------------------*/
@@ -181,18 +110,255 @@ table.application-list th, table.application-list td, table.application-version 
 }
 
 table.application-list th, table.application-version th {
-	background-color: #cfdbef;
-	color: #003A6F;
+	background-color: #e3e3e3;
+	color: #000000;
 	font-weight: bold;
 	text-align: left;
 }
 
-/* =Footer
-----------------------------------------------------------*/
-#admin-footer {
-    background: url("../img/bg/fiber.gif") repeat scroll 0 0 #90A1B1;
-    color: #FFFFFF;
-    font-weight: bold;
-    height: 30px;
-    padding-top: 10px;
+/* Widgets
+-------------------------------------------------------------------*/
+.widget {margin-top: 15px; margin-bottom: 10px; 
+        background-image: url(../img/menu/title-r.png); background-repeat: no-repeat; background-position: top right;
+        -moz-border-radius:4px;border-radius:4px; -moz-border-radius:4px;
 }
+
+.widget_title {
+    -moz-border-radius-topleft: 4px;-moz-border-radius-topright: 0px;-moz-border-radius-bottomright: 0px;-moz-border-radius-bottomleft: 0px;
+    -webkit-border-radius: 4px 0px 0px 0px; border-radius: 4px 0px 0px 0px;
+    margin-right: 4px;
+    background: url(../img/menu/title.png) top left;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset; -moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset; -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset;
+}
+
+.widget_title h2 {font-size: 1.2em; color: #fff; text-shadow: 0 -1px 0px #000; display: inline; line-height: 2.3em; padding: 0 10px; font-weight: normal}
+.widget_title ul {float: right;}
+.widget_title ul li {float:left; border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px;margin: 5px;}
+
+.widget_title ul li a {display: block;padding: 4px 6px 5px 9px;margin-right: 3px}
+
+.widget_title .ui-tabs-selected {background: url(../img/form/tab-r.png) no-repeat top right; }
+.widget_title .ui-tabs-selected a {background: url(../img/form/tab.png) no-repeat top left; margin-right: 3px;}
+
+.widget_title .ui-tabs-nav li {font-size: 0.87em;font-weight: bold;}
+
+.widget_title .ui-state-default a {color: #aaa}
+.widget_title .ui-state-hover a {text-decoration: none; color: #fff}
+.widget_title .ui-tabs-selected a {color: #fff;}
+
+.ui-toolbar input[type='text'], .ui-toolbar input[type='password'], .ui-toolbar input[type='file'], .ui-toolbar textarea, .ui-toolbar select,
+.widget_options input[type='text'], .widget_options input[type='password'], .widget_options input[type='file'], .widget_options textarea, .widget_options select {margin-bottom: 0px}
+    
+.widget_body {border-radius:0 0 4px 4px;-moz-border-radius:0 0 3px 3px; background: #fff; padding-bottom: 0px; border: 1px solid #c1c1c1;}
+.widget_options {background: #f7f7f7; border-bottom: 1px solid #d4d4d4; padding: 10px}
+
+.widget_content {padding: 10px 10px ;}
+
+/* Tables
+-------------------------------------------------------------------*/
+table {width: 100%}
+caption {background: #525252;color: #FFFFFF;font-weight: bold;line-height: 2em;}
+thead th, thead td {color:#777; font-size: 0.917em; font-weight: bold; vertical-align: middle; padding: 10px 5px}
+td {text-align: left; padding: 5px; vertical-align: middle}
+tbody tr.odd  {background:#f7f7f7}
+tbody tr.even {background:#ededed}
+
+table.simple td:first-child {padding-left: 10px}
+table.simple td:last-child {padding-right: 10px}
+
+table .piped, table .piped a {color:#777; font-size: 0.917em;}
+
+.simple thead {border-bottom: 1px solid #d4d4d4}
+
+/* Form
+-------------------------------------------------------------------*/
+fieldset {border-top: 1px solid #ddd}
+form table td:first-child {padding-left: 10px}
+fieldset legend {font-weight: bold;padding: 5px 0px;}
+
+input[type='text'], input[type='password'], input[type='file'], textarea, select {
+    background-color: #f6f6f6;
+    border: 1px solid #929292;
+    border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px;
+    padding: 6px 5px;
+    
+}
+
+input[type='text'] {width: 99%}
+input.medium {width: 33%}
+input.fifty {width: 50%}
+input.large {width: 95%; width: -moz-available;}
+select {min-width: 20%}
+select.small {padding:2px 1px}
+
+.infobar {color: #8F8F8F; font-size: 0.833em; display: block; padding-bottom: 3px;}
+
+.nested ul, .nested ol {margin-left: 2em}
+
+span.vanadium-advice {margin-left: 15px}
+span.vanadium-invalid {background: url("../img/fugue/cross.png") no-repeat scroll left center transparent; padding:1px 0 1px 18px}
+
+.upload {display: inline}
+.realupload {position: relative;left: -21%;opacity:0;-moz-opacity:0;filter:alpha(opacity:0);z-index:2;width:20%;}
+.fakeupload {background-image:url(../img/form/selectfile.png);background-position: 100% 50%;background-repeat:no-repeat;}
+
+.inputHighlight {color: #959595 !important}
+
+/* Login Page
+-------------------------------------------------------------------*/
+#loginpage {background-image: url(../img/bg/login_bg.png); background-repeat: no-repeat; background-position: top center;}
+#loginpage img {position: relative; top: 170px}
+#login {margin-top: 170px}
+#login .widget_content {width: 85%; margin: 5px auto 10px;}
+#login label {margin-top: 10px; }
+#login label.left {margin-top: 5px}
+#loginpage input[type=text], #loginpage input[type=password] {width:270px; width:-moz-available}
+#login input[type=submit] {padding: 4px 10px; margin: 10px 0 10px}
+
+/* Footer
+-------------------------------------------------------------------*/
+footer {background: #5e6673; color: #fff; font-size: 0.9em;}
+footer a {color: #aaa}
+
+/*** ESSENTIAL STYLES ***/
+
+.sf-menu {
+	line-height:	1.0;
+}
+.sf-menu ul {
+	position:		absolute;
+	top:			-999em;
+	width:			10em; /* left offset of submenus need to match (see below) */
+}
+.sf-menu ul li {
+	width:			100%;
+}
+.sf-menu li:hover {
+	visibility:		inherit; /* fixes IE7 'sticky bug' */
+}
+.sf-menu li {
+	float:			left;
+	position:		relative;
+}
+.sf-menu a {
+	display:		block;
+	position:		relative;
+}
+.sf-menu li:hover ul,
+.sf-menu li.sfHover ul {
+	left:			0;
+	top:			5.7em; /* match top ul list item height */
+	z-index:		99;
+}
+ul.sf-menu li:hover li ul,
+ul.sf-menu li.sfHover li ul {
+	top:			-999em;
+}
+ul.sf-menu li li:hover ul,
+ul.sf-menu li li.sfHover ul {
+	left:			10em; /* match ul width */
+        top:                    0;
+}
+ul.sf-menu li li:hover li ul,
+ul.sf-menu li li.sfHover li ul {
+	top:			-999em;
+}
+ul.sf-menu li li li:hover ul,
+ul.sf-menu li li li.sfHover ul {
+	left:			10em; /* match ul width */
+	top:			0;
+}
+
+/*** SKIN ***/
+
+.sf-menu li li, .sf-menu li li li {opacity: 0.95;}
+.sf-menu li li:hover, .sf-menu li li li:hover {opacity:1;}
+
+.sf-menu li:hover, .sf-menu li.sfHover,
+.sf-menu a:focus, .sf-menu a:hover, .sf-menu a:active {
+	outline:		0;
+}
+
+/*** arrows **/
+.sf-menu a.sf-with-ul {
+	min-width:		1px; /* trigger IE7 hasLayout so spans position accurately */
+}
+.sf-sub-indicator {
+	position:		absolute;
+	display:		block;
+	right:			.75em;
+	top:			1.05em; /* IE6 only */
+	width:			10px;
+	height:			10px;
+	text-indent:            -999em;
+	overflow:		hidden;
+
+}
+a > .sf-sub-indicator {  /* give all except IE6 the correct values */
+	top:			.8em;
+	background-position: 0 -100px; /* use translucent arrow for modern browsers*/
+}
+
+/* point right for anchors in subs */
+.sf-menu ul .sf-sub-indicator {background:		url('../img/arrows-ffffff.png') no-repeat -10px 0; /* 8-bit indexed alpha png. IE6 gets solid image only */}
+.sf-menu ul a > .sf-sub-indicator { background-position:  0 0; }
+/* apply hovers to modern browsers */
+.sf-menu ul a:focus > .sf-sub-indicator,
+.sf-menu ul a:hover > .sf-sub-indicator,
+.sf-menu ul a:active > .sf-sub-indicator,
+.sf-menu ul li:hover > a > .sf-sub-indicator,
+.sf-menu ul li.sfHover > a > .sf-sub-indicator {
+	background-position: -10px 0; /* arrow hovers for modern browsers*/
+}
+
+.sf-menu li li a, .sf-menu li li li a {
+    padding: 10px 10px;
+}
+
+button, .btn, input[type=button], input[type=submit],.ui-button {
+    background: #2981be; /* Old browsers */
+    background: -moz-linear-gradient(top, #2981be 0%, #1b5488 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#2981be), color-stop(100%,#1b5488)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #2981be 0%,#1b5488 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #2981be 0%,#1b5488 100%); /* Opera11.10+ */
+    background: -ms-linear-gradient(top, #2981be 0%,#1b5488 100%); /* IE10+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2981be', endColorstr='#1b5488',GradientType=0 ); /* IE6-9 */
+    background: linear-gradient(top, #2981be 0%,#1b5488 100%); /* W3C */
+
+    -webkit-border-radius: 3px;-moz-border-radius: 3px;-ms-border-radius: 3px;-o-border-radius: 3px;border-radius: 3px;
+
+    -webkit-box-shadow: inset 0 1px 0 0 #5fa1ce, 0 1px 0 0px #e3e3e3;
+    -moz-box-shadow: inset 0 1px 0 0 #5fa1ce, 0 1px 0 0px #e3e3e3;
+    -ms-box-shadow: inset 0 1px 0 0 #5fa1ce, 0 1px 0 0px #e3e3e3;
+    -o-box-shadow: inset 0 1px 0 0 #5fa1ce, 0 1px 0 0px #e3e3e3;
+    box-shadow: inset 0 1px 0 0 #5fa1ce, 0 1px 0 0px #e3e3e3;
+    
+    color: #fff;
+    border: 1px solid #13436d;
+    text-shadow: 0 1px 1px #144570;
+
+    font-weight: bold;
+    line-height: 1;
+    padding: 4px 7px;
+    text-align: center;
+    text-decoration:none;
+    font-family: tahoma, arial, helvetica, sans-serif !important;
+    font-weight: bold !important;
+    
+    margin: 6px 2px;
+  }
+  button:hover, .btn:hover, input[type=button]:hover, input[type=submit]:hover,.ui-button.ui-state-hover {
+    background: #236ea8; /* Old browsers */
+    
+   -webkit-box-shadow: inset 0 1px 0 0 #5a92be, 0 1px 0 0px #e3e3e3;
+    -moz-box-shadow: inset 0 1px 0 0 #5a92be, 0 1px 0 0px #e3e3e3;
+    -ms-box-shadow: inset 0 1px 0 0 #5a92be, 0 1px 0 0px #e3e3e3;
+    -o-box-shadow: inset 0 1px 0 0 #5a92be, 0 1px 0 0px #e3e3e3;
+    box-shadow: inset 0 1px 0 0 #5a92be, 0 1px 0 0px #e3e3e3;
+
+    color: #fff;
+
+    border: 1px solid #13436d;
+    cursor: pointer;
+    text-decoration: none;
+  }

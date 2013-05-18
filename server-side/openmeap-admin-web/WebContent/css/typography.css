@@ -1,0 +1,73 @@
+.msg {border-radius: 4px;-moz-border-radius: 4px;-webkit-border-radius: 4px; padding: 10px; margin: 10px 0;}
+.msg span {padding: 1px 0 1px 25px}
+
+.success {
+    background: #ccebc3; border: 1px solid #8fa489;
+    background: -moz-linear-gradient(top, #ccebc3 0%, #c6e8bc 50%, #bae4ae 51%, #b4e1a7 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ccebc3), color-stop(50%,#c6e8bc), color-stop(51%,#bae4ae), color-stop(100%,#b4e1a7));
+    background: -webkit-linear-gradient(top, #ccebc3 0%,#c6e8bc 50%,#bae4ae 51%,#b4e1a7 100%);
+    background: -o-linear-gradient(top, #ccebc3 0%,#c6e8bc 50%,#bae4ae 51%,#b4e1a7 100%);
+    background: -ms-linear-gradient(top, #ccebc3 0%,#c6e8bc 50%,#bae4ae 51%,#b4e1a7 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ccebc3', endColorstr='#b4e1a7',GradientType=0 );
+    background: linear-gradient(top, #ccebc3 0%,#c6e8bc 50%,#bae4ae 51%,#b4e1a7 100%);
+}
+.success span {background: url(../images/fugue/tick.png) no-repeat center left;}
+
+.failure {
+    background: #ebc8c8; border: 1px solid #a48c8c;
+    background: -moz-linear-gradient(top, #ebc8c8 0%, #e8c2c2 50%, #e4b5b5 51%, #dfadad 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ebc8c8), color-stop(50%,#e8c2c2), color-stop(51%,#e4b5b5), color-stop(100%,#dfadad));
+    background: -webkit-linear-gradient(top, #ebc8c8 0%,#e8c2c2 50%,#e4b5b5 51%,#dfadad 100%);
+    background: -o-linear-gradient(top, #ebc8c8 0%,#e8c2c2 50%,#e4b5b5 51%,#dfadad 100%);
+    background: -ms-linear-gradient(top, #ebc8c8 0%,#e8c2c2 50%,#e4b5b5 51%,#dfadad 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ebc8c8', endColorstr='#dfadad',GradientType=0 );
+    background: linear-gradient(top, #ebc8c8 0%,#e8c2c2 50%,#e4b5b5 51%,#dfadad 100%);
+}
+.failure span {background: url(../images/fugue/cross.png) no-repeat center left;}
+
+.warning {
+    background: #f6efc1; border: 1px solid #aca787;
+    background: -moz-linear-gradient(top, #f6efc1 0%, #f5edb9 50%, #f3e9aa 51%, #f2e7a3 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f6efc1), color-stop(50%,#f5edb9), color-stop(51%,#f3e9aa), color-stop(100%,#f2e7a3));
+    background: -webkit-linear-gradient(top, #f6efc1 0%,#f5edb9 50%,#f3e9aa 51%,#f2e7a3 100%);
+    background: -o-linear-gradient(top, #f6efc1 0%,#f5edb9 50%,#f3e9aa 51%,#f2e7a3 100%);
+    background: -ms-linear-gradient(top, #f6efc1 0%,#f5edb9 50%,#f3e9aa 51%,#f2e7a3 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f6efc1', endColorstr='#f2e7a3',GradientType=0 );
+    background: linear-gradient(top, #f6efc1 0%,#f5edb9 50%,#f3e9aa 51%,#f2e7a3 100%);
+}
+.warning span {background: url(../images/fugue/exclamation.png) no-repeat center left;}
+
+.notice {
+    background: #dae6ee; border: 1px solid #98a1a6;
+    background: -moz-linear-gradient(top, #dae6ee 0%, #d6e3ec 50%, #cddde8 51%, #c8dae6 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#dae6ee), color-stop(50%,#d6e3ec), color-stop(51%,#cddde8), color-stop(100%,#c8dae6));
+    background: -webkit-linear-gradient(top, #dae6ee 0%,#d6e3ec 50%,#cddde8 51%,#c8dae6 100%);
+    background: -o-linear-gradient(top, #dae6ee 0%,#d6e3ec 50%,#cddde8 51%,#c8dae6 100%);
+    background: -ms-linear-gradient(top, #dae6ee 0%,#d6e3ec 50%,#cddde8 51%,#c8dae6 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#dae6ee', endColorstr='#c8dae6',GradientType=0 );
+    background: linear-gradient(top, #dae6ee 0%,#d6e3ec 50%,#cddde8 51%,#c8dae6 100%);
+}
+.notice span {background: url(../images/fugue/information.png) no-repeat center left;}
+
+.settings {
+    background: #ededed; border: 1px solid #a5a5a5;
+    background: -moz-linear-gradient(top, #ededed 0%, #ebebeb 50%, #e7e7e7 51%, #e3e3e3 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ededed), color-stop(50%,#ebebeb), color-stop(51%,#e7e7e7), color-stop(100%,#e3e3e3));
+    background: -webkit-linear-gradient(top, #ededed 0%,#ebebeb 50%,#e7e7e7 51%,#e3e3e3 100%);
+    background: -o-linear-gradient(top, #ededed 0%,#ebebeb 50%,#e7e7e7 51%,#e3e3e3 100%);
+    background: -ms-linear-gradient(top, #ededed 0%,#ebebeb 50%,#e7e7e7 51%,#e3e3e3 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ededed', endColorstr='#e3e3e3',GradientType=0 );
+    background: linear-gradient(top, #ededed 0%,#ebebeb 50%,#e7e7e7 51%,#e3e3e3 100%);
+}
+.settings span {background: url(../images/fugue/gear.png) no-repeat center left;}
+
+/* MOAR */
+
+address {margin: 15px 0 15px 5px; padding-left: 20px; background: url(../images/fugue/address-book.png) no-repeat}
+
+.highlight {background: #FBF176; padding: 1px 2px;}
+.captioned {padding: 5px;} .captioned p {font-style: italic}
+
+.list-tick li, .list-cross li{line-height: 2em}
+.list-tick li {background: url(../images/fugue/tick.png) no-repeat left center;padding-left: 20px;}
+.list-cross li {background: url(../images/fugue/cross.png) no-repeat left center;padding-left: 20px;}

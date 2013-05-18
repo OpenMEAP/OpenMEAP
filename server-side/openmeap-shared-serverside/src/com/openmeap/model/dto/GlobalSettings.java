@@ -65,7 +65,7 @@ public class GlobalSettings extends AbstractModelEntity implements HasJSONProper
 	private List<ClusterNode> clusterNodes = null;
 	private String temporaryStoragePath = null;
 	private String serviceManagementAuthSalt = null;
-	private Integer maxFileUploadSize = 1000000;
+	private Integer maxFileUploadSize = 100000000;
 	
 	static final private JSONProperty[] jsonProperties = new JSONProperty[] {
 		new JSONProperty("externalServiceUrlPrefix",String.class,new JSONGetterSetter(){
