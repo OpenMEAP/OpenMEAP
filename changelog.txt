@@ -3,11 +3,14 @@ OpenMEAP 1.4.0
   - Updates to installers for Mac, Linux and Windows
   - Removing the title bar on Android
 
+OpenMEAP 1.3.3
+  - Enabled OpenMEAP to work with Amazon AWS Marketplace
+
 OpenMEAP 1.3.2
   - Enabled OpenMEAP to work with Citrix's MDX product
 
 OpenMEAP 1.3.1
-  - Enabled OpenMEAP to work on Tomcat 7 (JBoss EWS 2.0) using Redhat's OpenShift platform
+  - Enabled OpenMEAP to work on JBoss EWS 2.0 using Redhat's OpenShift platform
 
 OpenMEAP 1.3.0release
   - Enabled session and local storage for Android
