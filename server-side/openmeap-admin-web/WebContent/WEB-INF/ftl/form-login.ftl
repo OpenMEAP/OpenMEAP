@@ -1,5 +1,5 @@
 [#ftl]
-<h2>Login Page</h2>
+<h2>Login</h2>
 <form method="POST" action="j_security_check">
 	[#if (request.parameterMap.invalidLogin[0])?? && (request.parameterMap.j_username[0])??]
 		<ul>
@@ -7,8 +7,10 @@
 		</ul>
 	[/#if]
 	<table border="0">
-		<tr><td>Enter your user name:</td><td><input type="text" style="width:25em;" name="j_username"/></td></tr>
-		<tr><td>Enter your password:</td><td><input type="password" style="width:25em;" name="j_password"/></td></tr>
+		<label class="block" for="username">Username:</label>
+        <input type="text" name="j_username" class="large"/>
+        <label class="block" for="password">Password:</label>
+        <input type="password" name="j_password" class="large"/>
 	</table>
-	<input type="submit"/>
+	<input type="submit" value="Login"/>
 </form>

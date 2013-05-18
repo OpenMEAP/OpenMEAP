@@ -31,7 +31,7 @@ Parameter Values / Outputs:
 		<legend>Application Version[#if (version.identifier)??]- ${version.identifier!}[/#if]</legend>
 		<dl>
 			<dt>Identifier:</dt><dd><input type="text" name="identifier" value="${(version.identifier?html)!}"/></dd>
-			<dt>Notes:</dt><dd><textarea cols="60" rows="5" name="notes">${(version.notes?html)!}</textarea></dd>
+			<dt>Notes:</dt><dd><textarea cols="25%" rows="5" name="notes">${(version.notes?html)!}</textarea></dd>
 			[#if willProcess]
 			<dt>Upload (have me do all below)</dt><dd><input type="file" name="uploadArchive"/></dd>
 			<dt><input type="image" src="/openmeap-admin-web/img/btn/action_submit.gif" name="submit" value="Submit!"/></dt>
