@@ -22,7 +22,7 @@
  
 If you are having trouble, please visit wiki.openmeap.com for a more up to date install guide 
 
-OpenMEAP was created in xCode 4.2 Eclipse IDE for Java EE Developers (w/ the IvyDE plugin)
+OpenMEAP was created in xCode 4.2 Eclipse Indigo IDE for Java EE Developers (w/ the IvyDE plugin)
 http://www.eclipse.org/
 http://ant.apache.org/ivy/ivyde/
 
