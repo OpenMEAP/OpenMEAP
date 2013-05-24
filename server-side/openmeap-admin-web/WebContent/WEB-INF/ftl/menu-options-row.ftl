@@ -24,6 +24,6 @@
 			<p><a href="http://www.openmeap.com">OpenMEAP Website</a>
 			<p><a href="http://wiki.openmeap.com">OpenMEAP Wiki</a>
 			<p><a href="http://forum.openmeap.com">OpenMEAP Support Forums</a>
-			<p><a href="http://webchat.freenode.net/?randomnick=1?channels=openmeap&amp;uio=d4">OpenMEAP Chat Channel</a></p>
+			<p><a href="http://webchat.freenode.net?channels=openmeap&uio=MTE9MjM20f">OpenMEAP Chat Channel</a></p>
 	</div>			
 </div>			
