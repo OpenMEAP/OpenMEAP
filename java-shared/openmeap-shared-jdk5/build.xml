@@ -49,7 +49,8 @@
 		<javac debug="${openmeap.debug}" debuglevel="${openmeap.debuglevel}" 
 				target="${openmeap.targetJdk}" 
 				source="${openmeap.sourceJdk}" 
-				destdir="bin" 
+				destdir="bin"
+                  includeantruntime="false"
 				classpathref="openmeap.classpath">
 			<src path="src"/>
 		</javac>
