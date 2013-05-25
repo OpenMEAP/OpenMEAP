@@ -1,0 +1,45 @@
+/* Make HTML 5 elements display block-level for consistent styling */  
+header, nav, article, footer, address {display: block;}
+
+/* Navigation */
+.hor-list li {display: inline;}
+.hor-list li li {display: block;}
+
+.piped li:before {content:"|"; padding: 0 5px;}
+.piped li:first-child:before {content:""; padding: 0}
+
+.breadcrumbs li:before {content: "/"; padding: 0 5px;}
+.breadcrumbs li:first-child:before {content:""; padding: 0}
+
+.piped li, .breadcrumbs li {*padding-left: 5px !important;} .piped li:first-child, .breadcrumbs li:first-child {*padding-left: 0 !important}
+
+/* Typography */
+.right {float: right;}
+.left {float: left;}
+.align-left {text-align: left;}
+.align-right {text-align: right;}
+.center {text-align:center;}
+.justify {text-align:justify;}
+strong, b, .bold, .strong {font-weight:bold;}
+em, i,.italic,cite {font-style:italic;}
+.underline {text-decoration:underline;}
+.centered {display: block;margin: 0 auto}
+img.alignleft {float:left;margin:4px 10px 4px 0;}
+img.alignright {float:right;margin:4px 0 4px 10px;}
+.block {display: block}
+ins {font-size: 1em;text-decoration: none;vertical-align: super;}
+code, pre {font-family: "Consolas","Bitstream Vera Sans Mono","Courier New",Courier,monospace;}
+.numbered {list-style: decimal-leading-zero inside;}
+.disc {list-style: disc inside;}
+abbr, acronym {border-bottom: 1px dotted #161a1f}
+
+pre {background: url(../images/code_bg.gif);padding: 20px 10px;border-radius: 1px 1px 1px 1px;box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);display: block;border: 1px solid #E0E0E0;overflow: auto;font-size: 12px;line-height: 20px;margin: 15px 0;white-space: pre-wrap;}
+
+dd {margin-left: 2em;}
+
+/* Footer */
+html, body {height: 100%;}
+#wrap {min-height: 100%}
+#main {overflow:auto; padding-bottom: 50px;}  /* must be same height as the footer */
+footer {position: relative;margin-top: -50px;height: 50px;clear:both;}
+body:before {content:"";height:100%;float:left;width:0;margin-top:-32767px;/* J - negate effect of float*/}
