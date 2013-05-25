@@ -18,7 +18,7 @@ Input params:
 			<option>OPTIONAL</option>
 			<option>IMMEDIATE</option>
 		</select>
-		<input type="submit" name="submit" value="Create a New Deployment!"/>
+		<input type="submit" name="submit" value="Deploy"/>
 	[/#if]
 	<table class="application-version">
 		<tr>

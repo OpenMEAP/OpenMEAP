@@ -91,7 +91,7 @@
 	
 	<bean id="mainOptionsSection" scope="prototype" class="com.openmeap.web.FreeMarkerSection">
 		<property name="configuration" ref="freeMarkerConfiguration"/>
-		<property name="templatePath" value="list-anchors.ftl"/>
+		<property name="templatePath" value="body.ftl"/>
 	</bean>
 	
 	<bean id="mainOptionsRowSection" scope="prototype" class="com.openmeap.web.FreeMarkerSection">

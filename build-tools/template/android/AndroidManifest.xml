@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="@@openmeap.slic.package@@"
       android:versionCode="1"
-      android:versionName="1.3">
+      android:versionName="1.4">
     <uses-sdk android:minSdkVersion="8" />
     
     <uses-permission android:name="android.permission.INTERNET" />
@@ -17,7 +17,8 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.BROADCAST_STICKY" />
 
-    <application android:icon="@drawable/icon" android:label="@string/app_name">
+    <application android:icon="@drawable/icon" android:label="@string/app_name"
+        android:theme="@android:style/Theme.NoTitleBar">
 		<activity android:name="com.openmeap.android.MainActivity"
 				android:configChanges="keyboardHidden|orientation"
                   android:label="@string/app_name">

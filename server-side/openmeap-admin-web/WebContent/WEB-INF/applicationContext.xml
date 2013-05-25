@@ -72,6 +72,7 @@
 	<import resource="templateSectionBeans.xml"/>
 	
 	<!-- PAGE BEANS -->
+	<import resource="loginBeans.xml"/>
 	<import resource="pageBeans.xml"/>
 
 	<bean id="layoutSectionBacking" scope="prototype" class="com.openmeap.web.LayoutBacking">

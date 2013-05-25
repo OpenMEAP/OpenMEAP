@@ -1,4 +1,3 @@
-<?xml version="1.0"?>
 <!--
  ###############################################################################
  #                                                                             #
@@ -20,42 +19,40 @@
  #    You should have received a copy of the GNU Lesser General Public License #
  #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
  #                                                                             #
- ###############################################################################
--->
-<project name="openmeap-slic-core" basedir="." default="dist">
+ ############################################################################### 
+ -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+  http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services-2.0.xsd
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<!-- PAGE BEANS -->
+
+		<bean id="loginPage" scope="prototype" class="com.openmeap.web.GenericDocumentProcessor">
+		<property name="templateTree">
+			<bean class="com.openmeap.web.FreeMarkerSection">
+				<property name="configuration" ref="freeMarkerConfiguration"/>
+				<property name="sectionBacking" ref="layoutSectionBacking"/>
+				<property name="templatePath" value="layout-login.ftl"/>
+				<property name="templateVariables">
+					<map>
+						<entry key="page">
+							<map>
+								<entry key="title" value="OpenMEAP Administrative Interface"/>
+							</map>
+						</entry>
+					</map>
+				</property>
+				<property name="children">
+					<map>
+						<entry key="body"><ref bean="loginSection"/></entry>
+					</map>
+				</property>
+			</bean>
+		</property>
+		<property name="processesFormData" value="false"/>
+	</bean>
 	
-	<property name="openmeap.targetJdk" value="1.2"/>
-	<property name="openmeap.sourceJdk" value="1.2"/>
-	
-	<import file="../../../build-tools/ant_scripts/shared.xml"/>
-	
-	<property name="openmeap.project.current.file.ivy" value="${openmeap.project.slic.java.core}/ivy.xml"/>
-	<property name="openmeap.project.current.dist" value="${openmeap.project.slic.java.core.dist.jar}"/>
-	<property name="openmeap.project.current.dist.ext" value="jar"/>
-	
-	<target name="clean">
-		<delete dir="bin" includes="**/*" excludes="deleteme*.txt" failonerror="false" quiet="true"/>
-		<delete file="${openmeap.project.slic.java.core.dist.jar}" failonerror="false" quiet="true"/>
-	</target> 
-	
-	<target name="compile" depends="resolve">
-		<javac debug="${openmeap.debug}" 
-				debuglevel="${openmeap.debuglevel}" 
-				target="${openmeap.targetJdk}" 
-				source="${openmeap.sourceJdk}"
-				destdir="bin"
-                  includeantruntime="false"
-				classpathref="openmeap.classpath">
-			<src path="src"/>
-		</javac>
-	</target>
-	
-	<target name="export-jar" depends="dist-base,compile">
-		<jar jarfile="${openmeap.project.slic.java.core.dist.jar}" basedir="bin">
-			<manifest/>
-		</jar>
-	</target>
-	
-	<target name="dist" depends="compile,export-jar"/>
-	
-</project>
+</beans>

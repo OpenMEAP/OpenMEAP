@@ -1,4 +1,4 @@
-OpenMEAP 1.3.0 Release
+OpenMEAP 1.4.0 Release
 
 Please see COPYING for license information.
 

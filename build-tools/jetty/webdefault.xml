@@ -35,23 +35,23 @@
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
   <!-- UNCOMMENT TO ACTIVATE
   <context-param>
-    <param-name>org.mortbay.jetty.servlet.SessionDomain</param-name>
+    <param-name>org.eclipse.jetty.servlet.SessionDomain</param-name>
     <param-value>127.0.0.1</param-value>
   </context-param>
 
   <context-param>
-    <param-name>org.mortbay.jetty.servlet.SessionPath</param-name>
+    <param-name>org.eclipse.jetty.servlet.SessionPath</param-name>
     <param-value>/</param-value>
   </context-param>
 
   <context-param>
-    <param-name>org.mortbay.jetty.servlet.MaxAge</param-name>
+    <param-name>org.eclipse.jetty.servlet.MaxAge</param-name>
     <param-value>-1</param-value>
   </context-param>
   -->
 
   <context-param>
-    <param-name>org.mortbay.jetty.webapp.NoTLDJarPattern</param-name>
+    <param-name>org.eclipse.jetty.webapp.NoTLDJarPattern</param-name>
     <param-value>start.jar|ant-.*\.jar|dojo-.*\.jar|jetty-.*\.jar|jsp-api-.*\.jar|junit-.*\.jar|servlet-api-.*\.jar|dnsns\.jar|rt\.jar|jsse\.jar|tools\.jar|sunpkcs11\.jar|sunjce_provider\.jar|xerces.*\.jar</param-value>
   </context-param>
             
@@ -108,7 +108,7 @@
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
   <servlet>
     <servlet-name>default</servlet-name>
-    <servlet-class>org.mortbay.jetty.servlet.DefaultServlet</servlet-class>
+    <servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>
     <init-param>
       <param-name>acceptRanges</param-name>
       <param-value>true</param-value>
@@ -300,7 +300,7 @@
   <!-- Uncomment for dynamic invocation
   <servlet>
     <servlet-name>invoker</servlet-name>
-    <servlet-class>org.mortbay.jetty.servlet.Invoker</servlet-class>
+    <servlet-class>org.eclipse.jetty.servlet.Invoker</servlet-class>
     <init-param>
       <param-name>verbose</param-name>
       <param-value>false</param-value>
@@ -329,7 +329,7 @@
   <!-- ==================================================================== -->
   <!-- Default MIME mappings                                                -->
   <!-- The default MIME mappings are provided by the mime.properties        -->
-  <!-- resource in the org.mortbay.jetty.jar file.  Additional or modified  -->
+  <!-- resource in the org.eclipse.jetty.server.jar file.  Additional or modified  -->
   <!-- mappings may be specified here                                       -->
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
   <!-- UNCOMMENT TO ACTIVATE

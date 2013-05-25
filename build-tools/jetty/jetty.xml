@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
-<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
-<Configure id="Server" class="org.mortbay.jetty.Server">
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
  
     <!-- =========================================================== -->
     <!-- Server Thread Pool                                          -->
     <!-- =========================================================== -->
     <Set name="ThreadPool">
-      <New class="org.mortbay.thread.QueuedThreadPool">
+      <New class="org.eclipse.jetty.util.thread.QueuedThreadPool">
         <!-- initial threads set to 10 -->
         <Set name="minThreads">10</Set>
  
@@ -29,7 +29,7 @@
  
     <Call name="addConnector">
       <Arg>
-          <New class="org.mortbay.jetty.nio.SelectChannelConnector">
+          <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
             <!-- the ip address or domain to bind -->
             <Set name="host"><SystemProperty name="jetty.host" default="127.0.0.1"/></Set>
  
@@ -75,22 +75,22 @@
     <!-- =========================================================== -->
     <Set name="handler">
       <!-- the collection of handlers that will handle the request -->
-      <New id="Handlers" class="org.mortbay.jetty.handler.HandlerCollection">
+      <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
         <Set name="handlers">
-         <Array type="org.mortbay.jetty.Handler">
+         <Array type="org.eclipse.jetty.server.Handler">
            <!-- primarily handles the request and maps the request to a ContextHandler -->
            <Item>
-             <New id="Contexts" class="org.mortbay.jetty.handler.ContextHandlerCollection"/>
+             <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
            </Item>
  
            <!-- The default handler ... handles the request if not yet handled -->
            <Item>
-             <New id="DefaultHandler" class="org.mortbay.jetty.handler.DefaultHandler"/>
+             <New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/>
            </Item>
  
            <!-- The handler for your request logs -->
            <Item>
-             <New id="RequestLog" class="org.mortbay.jetty.handler.RequestLogHandler"/>
+             <New id="RequestLog" class="org.eclipse.jetty.server.handler.RequestLogHandler"/>
            </Item>
          </Array>
         </Set>
@@ -110,9 +110,9 @@
     <!-- =========================================================== -->
     <Call name="addLifeCycle">
       <Arg>
-        <New class="org.mortbay.jetty.deployer.ContextDeployer">
+        <New class="org.eclipse.jetty.deploy.ContextDeployer">
           <!-- the ContextHandlerCollection to modify once a webapp is added or removed (Allows Hot Deployment) -->
-          <Set name="contexts"><Ref id="Contexts"/></Set>
+          <Set name="contexts"></Set>
  
           <!-- the directory which will contain your context.xml files -->
           <Set name="configurationDir"><SystemProperty name="jetty.home" default="."/>/contexts</Set>
@@ -138,9 +138,9 @@
     <!-- =========================================================== -->
     <Call name="addLifeCycle">
       <Arg>
-        <New class="org.mortbay.jetty.deployer.WebAppDeployer">
+        <New class="org.eclipse.jetty.deploy.WebAppDeployer">
           <!-- the ContextHandlerCollection to add the webapps to -->
-          <Set name="contexts"><Ref id="Contexts"/></Set>
+          <Set name="contexts"></Set>
  
           <!-- the directory where all the webapps are located (can be exploded or packaged as war -->
           <Set name="webAppDir"><SystemProperty name="jetty.webapps" default="."/></Set>
@@ -192,9 +192,8 @@
     <!-- contexts configuration (see $(jetty.home)/contexts/test.xml -->
     <!-- for an example).                                            -->
     <!-- =========================================================== -->
-    <Ref id="RequestLog">
-      <Set name="requestLog">
-        <New id="RequestLogImpl" class="org.mortbay.jetty.NCSARequestLog">
+    <Set name="requestLog"></Set>
+        <New id="RequestLogImpl" class="org.eclipse.jetty.server.NCSARequestLog">
           <!-- the output file name of the log file. Name of the file will be date formatted -->
           <Set name="filename"><SystemProperty name="jetty.logs" default="./logs"/>/yyyy_mm_dd.request.log</Set>
  
@@ -216,8 +215,6 @@
           <!-- the timezone of the log -->
           <Set name="LogTimeZone">GMT</Set>
         </New>
-      </Set>
-    </Ref>
  
     <!-- =========================================================== -->
     <!-- extra options                                               -->
