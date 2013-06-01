@@ -506,7 +506,7 @@ public class UpdateHandler {
 				String baseUrl = config.getAssetsBaseUrl();
 				// checking whether initial ArchieveHash is available
 				if (config.getArchiveHash() != null && !config.getArchiveHash().equals("")) {
-					webView.loadUrl("file:///data/data/com.openmeap/files/com.openmeap.storage."+config.getArchiveHash()+"/index.html");
+					webView.loadUrl("file:///"+config.getAssetsBaseUrl()+"/"+config.getStorageLocation()+"/index.html");
 				} else {
 					//means new installation it is,hence, load from assets.
 					webView.loadUrl(baseUrl + "index.html");

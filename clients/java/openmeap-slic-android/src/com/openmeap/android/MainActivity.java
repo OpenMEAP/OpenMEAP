@@ -330,11 +330,11 @@ public class MainActivity extends Activity implements OmMainActivity,
 		//so that, localstorage related data files saved into that directory.
 		String databasePath = this.getApplicationContext().getDir("localstorage", Context.MODE_PRIVATE).getPath();
 		//setting local storage database path.
-		webView.getSettings().setDatabasePath("/data/data/com.openmeap/databases/");
+		webView.getSettings().setDatabasePath("/data/data/" + webView.getContext().getPackageName() + "/databases/");
 		
 		// enable navigator.geolocation
 		webView.getSettings().setGeolocationEnabled(true);
-		webView.getSettings().setGeolocationDatabasePath("/data/data/com.openmeap/databases/");
+		webView.getSettings().setGeolocationDatabasePath("/data/data/" + webView.getContext().getPackageName() + "/databases/");
 		
 		// removes vertical and horizontal scroll bars
 		webView.setVerticalScrollBarEnabled(false);

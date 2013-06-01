@@ -20,148 +20,241 @@
  #                                                                             #
  ###############################################################################
  
-If you are having trouble, please visit wiki.openmeap.com for a more up to date install guide 
+ Please visit our wiki.openmeap.com, forum.openmeap.com or youtube.com/OpenMEAP 
 
-OpenMEAP was created in xCode 4.2 Eclipse IDE for Java EE Developers (w/ the IvyDE plugin)
-http://www.eclipse.org/
-http://ant.apache.org/ivy/ivyde/
+ Software prerequisites
 
-OpenMEAP web projects have been tested on Apache Tomcat 5.5, 6.0 and 7.0
-http://tomcat.apache.org/
+ OpenMEAP was created in Eclipse IDE for Java EE Developers with IvyDE
+    http://www.eclipse.org/
+    http://ant.apache.org/ivy/ivyde/
 
-OpenMEAP command-line requires Apache Ant 1.8 or greater.
-http://ant.apache.org/
+ OpenMEAP web projects default to Apache Tomcat 7.0
+    http://tomcat.apache.org/
 
+ OpenMEAP command-line requires Apache Ant 1.8 or greater.
+    http://ant.apache.org/
 
-+==================
-1) Every shell session
+ OpenMEAP and Ant requires Java 
+    http://www.oracle.com/technetwork/java/javase/downloads/index.html 
 
-Correct the environment variables in this file to match your environment
-(setEnv.bat file if running in Windows)
-
-	$ . ./${OPENMEAP_HOME}/build-tools/scripts/setEnv.sh
-
-+==================
-2) Building the web projects
-	
-Build the web projects (only need to do this once)
-Builds openmeap-admin-web.war and openmeap-services-web.war
-These can be dropped in apache tomcat's webapps directory
-
-You'll need to login to /openmeap-admin-web/interface/ 
-with a user who has the two roles openmeap-admin and openmeap-user
-so, you'll need to update the tomcat-users.xml in tomcat's conf directory
-
-	$ cd ${OPENMEAP_HOME}/build-tools
-	$ ant dist-all-web
-	
-The resulting artifacts will end up in ${OPENMEAP_HOME}/build-tools/dist
-
-+==================
-3) Creating and building clients
-	
-Create an arbitrarily located/named directory for new SLICs
-
-	$ mkdir ~/om_slic
-	$ cd ~/om_slic
-
-Copy over the client.properties template provided
-
-	om_slic $ cp $OPENMEAP_HOME/build-tools/template/client.properties .
-
-Correct the properties to match your environment
-
-	om_slic $ vi client.properties
-	
-Create the assets folder (whatever you updated client.properties with)
-and copy in the openmeap.js
-
-	om_slic $ mkdir assets
-	om_slic $ cd assets
-	assets $ cp ${OPENMEAP_HOME}/clients/shared/javascript/openmeap.js .
-	
-Create DHTML application
-
-	assets $ vi index.html
-	...
-	assets $ cd .. 
-
-List what you can do (illustrative, here, only)
-
-	om_slic $ om_android.sh -p
-	om_slic $ om_blackberry.sh -p
-	om_slic $ om_ios.sh -p
-	
-Publish the shared and slic-core projects to the local repository.
-The openmeap-shared and openmeap-slic-core project artifacts must be available
-within the local ivy repository, in order to perform command-line builds for 
-Android.  This step only needs to be performed when these projects have 
-changed.
-
-	$ . ./${OPENMEAP_HOME}/build-tools/scripts/setEnv.sh
-	$ cd ./${OPENMEAP_HOME}/build-tools
-	$ ant publish-local-shared
-	$ ant publish-local-shared-jdk5
-	$ ant publish-local-slic-core
-
-Create and build your iOS project.  Opens and runs in xCode 4.2
-
-	om_slic $ om_ios.sh create-project -propertyfile client.properties
-	om_slic $ om_ios.sh build-debug -propertyfile client.properties
-
-Create and build your android project.  Install to a device using adb
-See the android docs for how to do this.  The build.xml in the android
-SLIC directory is what was created by the android sdk.
-
-	om_slic $ om_android.sh create-project -propertyfile client.properties
-	om_slic $ om_android.sh build-debug -propertyfile client.properties
-
-Create and build your BlackBerry project
-
-	om_slic $ om_blackberry.sh create-project -propertyfile client.properties
-	om_slic $ om_blackberry.sh build-debug -propertyfile client.properties
-
-+==================	
-*) Import Android SLIC projects into Eclipse
-
-In order to import an Android project into into Eclipse,
-you must first make sure to import the openmeap-shared, openmeap-shared-jdk5, openmeap-slic-core, 
-and openmeap-slic-android projects into the target workspace.
-
-Because you must import these, you must also specify the openmeap.home and android.sdk.home 
-ant properties as mentioned in the quickstart-eclipse.txt
-file.
-
-Next you must choose you must create a New Android project, 
-then select to create from existing source.  The source root
-must be wherever you directed the command-line script to create
-the SLIC.
+ OpenMEAP Apache Ant 1.8 or greater and Java are already pre-installed on Macs
  
-+==================	
-*) Import Blackberry SLIC projects into Eclipse
+=================================================================================
+ 
+ Install Eclipse Plugins 
+ 
+ IvyDE Plugin for Eclipse
 
-In order to import an Blackberry project into into Eclipse,
-you must first make sure to import the openmeap-shared, openmeap-slic-core,
-and openmeap-slic-blackberry projects into the target workspace.
+    Open the Eclipse IDE
+    From the menu Select Help > Install New Software
+    Click the Add button
+    Name: <Leave Blank>
+    Location: http://www.apache.org/dist/ant/ivyde/updatesite
+    Make sure you select show all version and select the non beta version.
+    Check the box next to the IvyDE plugin
+    Click Next until Finish 
 
-Because you must import these, you must also specify the openmeap.home 
-and blackberry.sdk.home ant properties as mentioned in the quickstart-eclipse.txt
-file.
+ ADT Plugin for Eclipse
 
-Next you must choose you must create a New Blackberry project, 
-then select to create from existing source.  The source root
-must be wherever you directed the command-line script to create
-the SLIC.
+    Open the Eclipse IDE
+    From the menu Select Help > Install New Software
+    Click the Add button
+    Name: <Leave Blank>
+    Location: https://dl-ssl.google.com/android/eclipse/
+    Check the box next to the Developer Tools and select the ADT plugin
+    Click Next until Finish 
 
-Next, you'll need to do this for the openmeap-slic-blackberry project too,
-create 3 "Build Path"->"Link Source" folders.  The first time, click "Variables" and
-create OPENMEAP_HOME.  Then select OPENMEAP_HOME and click "Extend...".
-The first time, select java-shared/openmeap-shared/src and then rename
-the "Folder Name" to "openmeap-shared".  Do the same for
-clients/java/openmeap-slic-core and clients/java/openmeap-slic-blackberry.
+ BlackBerry Plugin for Eclipse
 
-The final step is to correct the "JRE System Library" library in the project.
-Just right-click, select properties, and select the 5.0.0 Blackberry runtime
-from the "Alternate JRE:" drop-down.
+    Open the Eclipse IDE
+    From the menu Select Help > Install New Software
+    Click the Add button
+    Name: <Leave Blank>
+    Location: http://www.blackberry.com/developers/jar/win/java
+    Expand the BlackBerry Java Plug-in category and select the BlackBerry SDK 5 and install
+    Click Next until Finish 
+	
+ Google API's
 
+    Go to Android SDK Manager
+    Check Android 2.2 (API 8)
+    Check SDK PLatform and Google APIs
+    Click Install Package 
+	
+=================================================================================
 
+ Path & Environment Variables - Windowws
+
+ Set ANT_HOME
+     Open System Properties -> Advanced -> Environment Variables
+     Create a new system variable
+     Variable name: ANT_HOME
+     Variable value: e.g. C:\apache-ant
+ 
+ Set JAVA_HOME
+     Open System Properties -> Advanced -> Environment Variables
+     Create a new system variable
+     Variable name: JAVA_HOME
+     Variable value: e.g. C:\Program Files\Java\jdk1.7.0_02
+
+ Set OPENMEAP_HOME
+     Open System Properties -> Advanced -> Environment Variables
+     Create a new system variable
+     Variable name: OPENMEAP_HOME
+     Variable value: e.g. C:\Program Files (x86)\OpenMEAP
+
+ Open System Properties -> Advanced -> Environment Variables
+     Under system variables, edit PATH
+     Add ;%ANT_HOME%\bin;%JAVA_HOME%\bin to the end of the PATH value 
+
+ Verify that ANT and Java are installed
+     Open your command-line tool and type ant -v and Java -version
+
+ If you get errors, read the Ant install guide. You may also need to copy the
+ tools.jar file over from the JRE7/lib folder to your JDK/lib folder. 
+
+ Path & Environment Variables - Mac
+
+ Set OpenMEAP Home Path
+    declare -x OPENMEAP_HOME=/Applications/OpenMEAP
+
+ Verify that ANT and Java are installed
+    Open your command-line tool and type ant -v and Java -version
+
+=================================================================================
+
+ Correct the environment variables in this file to match your environment
+
+    OpenMEAP/build-tools/scripts/setEnv.bat - Windows
+    OpenMEAP/build-tools/scripts/setEnv.sh - Mac
+
+ Building the web projects
+
+    $ cd OpenMEAP/build-tools
+    $ %OPENMEAP_HOME%/build-tools/scripts/setEnv.bat - Windows
+    $ . ~/OpenMEAP/build-tools/scripts/setEnv.sh - Mac
+    $ ant dist-all-web
+    $ ant publish-local-slic-core
+	
+ The openmeap-admin-web.war and openmeap-services-web.war files will be located 
+ in /build-tools/dist. These need to be dropped in apache tomcat's webapps 
+ directory if you plan to use the OpenMEAP server.
+
+ Update the tomcat-users.xml in tomcat's conf directory with the info below
+
+    <role rolename="openmeap-admin"/>
+    <role rolename="openmeap-user"/>
+    <user name="admin" password="openmeap" roles="tomcat,openmeap-user,openmeap-admin"/>
+    <user name="user" password="openmeap" roles="openmeap-user"/>
+
+=================================================================================
+
+ Setup for creating and building clients - Using the installer
+
+    cd OpenMEAP/slic
+    edit the client.properties file to match your environment
+
+ Setup for creating and building clients - Using the Github zip
+
+    Create a slic folder
+    Copy the OpenMEAP/build-tools/template/client.properties file to the slic folder
+    Create an assets folder inside of the slice folder
+    Copy the OpenMEAP/samples/banking/banking-app/original/ contents to the assets folder
+    Edit the client.properties file to match your environment
+ 
+ From your slice folder, set the environment variable
+
+    %OPENMEAP_HOME%/build-tools/scripts/setEnv.bat - Windows
+    $ . ~/Applications/OpenMEAP/build-tools/scripts/setEnv.sh - Mac
+
+ Create and build your iOS project
+
+    $ om_ios.sh create-project -propertyfile client.properties - Mac
+ 
+ Create and build your android project 
+
+    $ om_android.bat create-project -propertyfile client.properties - Windows
+    $ om_android.sh create-project -propertyfile client.properties - Mac
+
+ Create and build your BlackBerry project
+
+    $ om_blackberry.bat create-project -propertyfile client.properties - Windows
+    $ om_blackberry.sh create-project -propertyfile client.properties - Mac
+
+ If you build BlackBerry on a Mac, you will need to update the client_blackberry.xml under OpenMEAP/build-tools/ant_scripts and change rapc.exe to rapc.jar 
+	
+=================================================================================
+
+ Import OpenMEAP projects into Eclipse
+
+    Disable to build automatically
+    Open workspace preferences, expand general, select workspace
+    De-select to build automatically 
+
+ Import "build-tools" and configure the Ivy, Ant and Server settings for workshop
+
+ Adding Ivy setting paths
+
+    Open Eclipse "Preferences", expand Ivy, then Settings
+    For "Ivy settings path", Click "Workspace..." and select ivysettings.xml under build-tools
+    For "Property files", Click "Workspace..." and select ant.properties under build-tools 
+
+ Setup the Ant properties
+ 
+    Open workspace preferences, expand "Ant", select "Runtime"
+    Click the "Properties" tab
+    Add an "openmeap.home" property entry pointing to where you have the OpenMEAP source package unzipped.
+    Add an "android.sdk.home" property entry pointing to where you have the Android SDK installed.
+    Add an "blackberry.sdk.home" property entry pointing to where you have the blackberry sdk installed. 
+    ex. Applications/eclipse/plugins/net.rim.ejde.componentpack5.0.0_5.0.0.36
+	 
+ Build the build-tools
+ 
+ Right click the build-tools folder and select build
+
+ Import and build the projects in groups in the order below
+
+    openmeap-shared, openmeap-shared-serverside, openmeap-shared-jdk5
+    openmeap-admin-web, openmeap-services-web, banking-web
+    openmeap-slic-core, openmeap-slic-android
+    openmeap-slic-blackberry (optional) 
+
+ For BlackBerry, you must update your home source path in openmeap-slic-blackberry and point it to 
+ the openmeap src folder. Include projects openmeap-shared, openmeap-shared-jdk5 and openmeap-slic-core 
+ to the Java Build Path. 
+
+ Add BlackBerry's external 
+ 
+    JAR "Applications/eclipse/plugins/net.rim.ejde.componentpack5.0.0_5.0.0.36/components/lib/net_rim_api.jar"
+	
+ The final step is to correct the "JRE System Library" library in the project. Just right-click, select 
+ properties, and select the 5.0.0 Blackberry runtime from the "Alternate JRE:" drop-down.
+
+=================================================================================
+	
+ Deploying OpenMEAP Admin to the Tomcat Server
+
+    In eclipse, add a new server.
+    Select the openmeap-admin-web, openmeap-services-web and banking-web projects
+    Click finish 
+    Create A tmp folder in the root directory before you start the server
+    Start Server
+	
+ login to http://localhost:8080/openmeap-admin-web/interface/ and setup the server
+
+=================================================================================
+ 
+ Importing and building your Android and BlackBerry projects
+
+ For each OS build, do the following:
+
+    Right-click on the "Package Explorer" pane,
+    Select Import, then "Import Existing Android or BlackBerry Project"
+    In "Select root directory" browse to the OpenMEAP/slic folder
+    Select the directory for the SLIC client you created
+    Click finish and clean and build in Eclipse
+    Click run as or debug as Android or BlackBerry Project to run in simulator 
+
+ Exporting your apps to Google Play, Apple App Store or BlackBerry App Store
+
+    Follow the normal steps in Eclipse and Xcode for Enterprise or App Store distribution 
