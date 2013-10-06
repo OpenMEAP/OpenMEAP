@@ -1,3 +1,6 @@
+OpenMEAP 1.4.5
+  - Removed pre BlackBerry code
+
 OpenMEAP 1.4.0
   - Complete redesign of the admin interface
   - Updates to installers for Mac, Linux and Windows

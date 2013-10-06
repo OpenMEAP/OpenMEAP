@@ -5,7 +5,6 @@ set ANT_HOME=C:/Development/apache-ant
 
 rem  OpenMEAP
 set ANDROID_SDK_HOME=C:/Development/android-sdk
-set BLACKBERRY_SDK_HOME=C:/Development/eclipse/plugins/net.rim.ejde.componentpack5.0.0_5.0.0.36
 set OPENMEAP_HOME=C:/Development/OpenMEAP
 
 rem Required on services nodes.  Is used as an identity for a cluster node
