@@ -64,14 +64,13 @@
     Check the box next to the Developer Tools and select the ADT plugin
     Click Next until Finish 
 
- BlackBerry Plugin for Eclipse
+ BlackBerry Plug-in for Android Development Tools
 
     Open the Eclipse IDE
     From the menu Select Help > Install New Software
     Click the Add button
     Name: <Leave Blank>
-    Location: http://www.blackberry.com/developers/jar/win/java
-    Expand the BlackBerry Java Plug-in category and select the BlackBerry SDK 5 and install
+    Location:  http://developer.blackberry.com/android/downloads/eclipseplugin/
     Click Next until Finish 
 	
  Google API's
@@ -101,7 +100,7 @@
      Open System Properties -> Advanced -> Environment Variables
      Create a new system variable
      Variable name: OPENMEAP_HOME
-     Variable value: e.g. C:\Program Files (x86)\OpenMEAP
+     Variable value: e.g. C:\OpenMEAP
 
  Open System Properties -> Advanced -> Environment Variables
      Under system variables, edit PATH
@@ -162,7 +161,7 @@
     Copy the OpenMEAP/samples/banking/banking-app/original/ contents to the assets folder
     Edit the client.properties file to match your environment
  
- From your slice folder, set the environment variable
+ From your slic folder, set the environment variable
 
     %OPENMEAP_HOME%/build-tools/scripts/setEnv.bat - Windows
     $ . ~/Applications/OpenMEAP/build-tools/scripts/setEnv.sh - Mac
@@ -176,12 +175,21 @@
     $ om_android.bat create-project -propertyfile client.properties - Windows
     $ om_android.sh create-project -propertyfile client.properties - Mac
 
- Create and build your BlackBerry project
+Note: if you want to create multiple apps, in your client.properties file, change 
+the name at the end of the naming convention. For example, com.openmeap to com.newappname.
+Once you have completed your changes to the client.properties file, save it as 
+client.properties.newappname. This way, when you want to build this client, you would 
+run these commands below to build for each platform.
 
-    $ om_blackberry.bat create-project -propertyfile client.properties - Windows
-    $ om_blackberry.sh create-project -propertyfile client.properties - Mac
+Mac:
 
- If you build BlackBerry on a Mac, you will need to update the client_blackberry.xml under OpenMEAP/build-tools/ant_scripts and change rapc.exe to rapc.jar 
+om_ios.sh create-project -propertyfile client.properties.newappname
+om_android.sh create-project -propertyfile client.properties.newappname
+
+Windows:
+
+om_ios.bat create-project -propertyfile client.properties.newappname
+om_android.bat create-project -propertyfile client.properties.newappname
 	
 =================================================================================
 
@@ -205,9 +213,7 @@
     Click the "Properties" tab
     Add an "openmeap.home" property entry pointing to where you have the OpenMEAP source package unzipped.
     Add an "android.sdk.home" property entry pointing to where you have the Android SDK installed.
-    Add an "blackberry.sdk.home" property entry pointing to where you have the blackberry sdk installed. 
-    ex. Applications/eclipse/plugins/net.rim.ejde.componentpack5.0.0_5.0.0.36
-	 
+   	 
  Build the build-tools
  
  Right click the build-tools folder and select build
@@ -217,18 +223,6 @@
     openmeap-shared, openmeap-shared-serverside, openmeap-shared-jdk5
     openmeap-admin-web, openmeap-services-web, banking-web
     openmeap-slic-core, openmeap-slic-android
-    openmeap-slic-blackberry (optional) 
-
- For BlackBerry, you must update your home source path in openmeap-slic-blackberry and point it to 
- the openmeap src folder. Include projects openmeap-shared, openmeap-shared-jdk5 and openmeap-slic-core 
- to the Java Build Path. 
-
- Add BlackBerry's external 
- 
-    JAR "Applications/eclipse/plugins/net.rim.ejde.componentpack5.0.0_5.0.0.36/components/lib/net_rim_api.jar"
-	
- The final step is to correct the "JRE System Library" library in the project. Just right-click, select 
- properties, and select the 5.0.0 Blackberry runtime from the "Alternate JRE:" drop-down.
 
 =================================================================================
 	
@@ -242,18 +236,44 @@
 	
  login to http://localhost:8080/openmeap-admin-web/interface/ and setup the server
 
+ See the OpenMEAP wiki for server setup samples. http://wiki.openmeap.com
+
+ Deploy the Welcome.zip app located in samples for your first mobile application
+
 =================================================================================
  
- Importing and building your Android and BlackBerry projects
+ Importing and building your iOS builds in Xcode
 
- For each OS build, do the following:
+ For your iOS build, do the following:
+
+    Browse to the slic folder
+    Select your iOS SLIC directory
+    Open the .xcodeproj
+    Add your icons and build
+    Press run to see in the simulator
+ 
+ Importing and building your Android project
+
+ For Android, do the following:
 
     Right-click on the "Package Explorer" pane,
-    Select Import, then "Import Existing Android or BlackBerry Project"
-    In "Select root directory" browse to the OpenMEAP/slic folder
+    Select Import, then "Import Existing Android Project"
+    In "Select root directory" browse to the slic folder you created
     Select the directory for the SLIC client you created
     Click finish and clean and build in Eclipse
-    Click run as or debug as Android or BlackBerry Project to run in simulator 
+    Click run as or debug as Android to run in simulator 
+
+ Converting and repackaging your Android project to BlackBerry 10
+
+ For BlackBerry 10, do the following:
+
+    In the Package Explorer navigation window, right-click your Android project. Click BlackBerry Tools > Add BlackBerry Nature to Project. 
+    In the Package Explorer navigation window, right-click your Android project. Click on either Run As > Run Configurations or Debug As > Debug Configurations.
+    In the Run Configurations or Debug Configurations window, in the left side navigation window, under BlackBerry Android Application, select your application.
+    Modify the configuration based on your requirements. Make sure to select the correct target device under the Target tab.
+    Click either Run or Debug as BlackBerry to run in simulator.
+
+For more info on the process, please visit http://developer.blackberry.com/android/tools/ for more info.
 
  Exporting your apps to Google Play, Apple App Store or BlackBerry App Store
 
