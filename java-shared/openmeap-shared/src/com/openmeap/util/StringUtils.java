@@ -131,7 +131,6 @@ final public class StringUtils {
 	}
 	
 	/**
-	 * Got this at {@link http://supportforums.blackberry.com/t5/Java-Development/String-Manipulation-split-replace-replaceAll/ta-p/620038}
 	 * 
 	 * @param source
 	 * @param pattern
@@ -181,7 +180,6 @@ final public class StringUtils {
 	}
 	
 	/**
-	 * Got this at {@link http://supportforums.blackberry.com/t5/Java-Development/String-Manipulation-split-replace-replaceAll/ta-p/620038}
 	 * 
 	 * @param source
 	 * @param pattern

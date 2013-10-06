@@ -5,7 +5,6 @@ declare -x ANT_HOME=/usr/share/ant
 
 # OpenMEAP
 declare -x ANDROID_SDK_HOME=/Users/admin/Development/android-sdk-macosx
-declare -x BLACKBERRY_SDK_HOME=/Users/admin/Development/eclipse/plugins/net.rim.ejde.componentpack5.0.0_5.0.0.36
 declare -x OPENMEAP_HOME=/Users/admin/Development/openmeap
 
 # Required on services nodes.  Is used as an identity for a cluster node
