@@ -101,7 +101,7 @@
      Open System Properties -> Advanced -> Environment Variables
      Create a new system variable
      Variable name: OPENMEAP_HOME
-     Variable value: e.g. C:\Program Files (x86)\OpenMEAP
+     Variable value: e.g. C:\OpenMEAP
 
  Open System Properties -> Advanced -> Environment Variables
      Under system variables, edit PATH
@@ -241,6 +241,10 @@
     Start Server
 	
  login to http://localhost:8080/openmeap-admin-web/interface/ and setup the server
+
+ See the OpenMEAP wiki for server setup samples. http://wiki.openmeap.com
+
+ Deploy the Welcome.zip app located in samples for your first mobile application
 
 =================================================================================
  
