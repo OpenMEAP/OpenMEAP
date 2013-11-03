@@ -57,8 +57,8 @@
 		<antcall target="build"/>
 	</target>
 	<target name="build">
-		<exec dir="${openmeap.slic.win.path}" executable="xcodebuild" failonerror="yes">
-			<arg value="-project"/><arg value="${openmeap.slic.projectName}.xcodeproj"/>
+		<exec dir="${openmeap.slic.win.path}" executable="winbuild" failonerror="yes">
+			<arg value="-project"/><arg value="${openmeap.slic.projectName}.csproj"/>
 			<arg value="-target"/><arg value="${openmeap.slic.projectName}"/>
 			<arg value="-configuration"/><arg value="${build.configuration}"/>
 		</exec>
@@ -85,17 +85,17 @@
 		<copy file="${openmeap.slic.icon}" tofile="${openmeap.slic.win.path}/icon.png"/>
 		
 		<!-- Main project files -->
-		<copy file="${openmeap.build.template.win}/@@PROJECT_NAME@@/@@PROJECT_NAME@@-Info.plist" 
-			tofile="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}/${openmeap.slic.win.projectName}-Info.plist" overwrite="true"/>
+		<copy file="${openmeap.build.template.win}/@@PROJECT_NAME@@/@@PROJECT_NAME@@-Info.xml" 
+			tofile="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}/${openmeap.slic.win.projectName}-Info.xml" overwrite="true"/>
 		<copy file="${openmeap.build.template.win}/@@PROJECT_NAME@@/@@PROJECT_NAME@@-Prefix.pch" 
 			tofile="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}/${openmeap.slic.win.projectName}-Prefix.pch" overwrite="true"/>
 		<copy file="${openmeap.build.template.win}/@@PROJECT_NAME@@/main.m" 
 			tofile="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}/main.m" overwrite="true"/>
-		<copy file="${openmeap.build.template.win}/@@PROJECT_NAME@@/slic-config.plist" 
-			tofile="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}/slic-config.plist" overwrite="true"/>
+		<copy file="${openmeap.build.template.win}/@@PROJECT_NAME@@/slic-config.xml" 
+			tofile="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}/slic-config.xml" overwrite="true"/>
 			
-		<copy todir="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}/en.lproj" includeEmptyDirs="true">
-			<fileset dir="${openmeap.build.template.win}/@@PROJECT_NAME@@/en.lproj" includes="*"/>
+		<copy todir="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}/sln" includeEmptyDirs="true">
+			<fileset dir="${openmeap.build.template.win}/@@PROJECT_NAME@@/sln" includes="*"/>
 		</copy>
 		
 		<copy todir="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}.xcodeproj" includeEmptyDirs="true">
