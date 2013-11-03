@@ -1,3 +1,8 @@
+OpenMEAP 1.4.5
+  - Windows Phone alpha implementation
+  - Removal of old java Blackberry project 
+  - Updates to use BlackBerry 10 in Eclipse with Android
+
 OpenMEAP 1.4.0
   - Complete redesign of the admin interface
   - Updates to installers for Mac, Linux and Windows
@@ -12,7 +17,7 @@ OpenMEAP 1.3.2
 OpenMEAP 1.3.1
   - Enabled OpenMEAP to work on JBoss EWS 2.0 using Redhat's OpenShift platform
 
-OpenMEAP 1.3.0release
+OpenMEAP 1.3.0 release
   - Enabled session and local storage for Android
   - Created installers for Mac, Linux and Windows
 

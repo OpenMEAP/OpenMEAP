@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>com.openmeap.slic.pullUpdates</key>
+	<string><![CDATA[@@openmeap.slic.pullUpdates@@]]></string>
+	<key>com.openmeap.slic.developmentMode</key>
+	<string><![CDATA[@@openmeap.slic.developmentMode@@]]></string>
+	<key>com.openmeap.slic.updateFrequency</key>
+	<string><![CDATA[@@openmeap.slic.updateFrequency@@]]></string>
+	<key>com.openmeap.slic.appName</key>
+	<string><![CDATA[@@openmeap.slic.appName@@]]></string>
+	<key>com.openmeap.slic.appTitle</key>
+	<string><![CDATA[@@openmeap.slic.appTitle@@]]></string>
+	<key>com.openmeap.slic.appVersion</key>
+	<string><![CDATA[@@openmeap.slic.appVersion@@]]></string>
+	<key>com.openmeap.slic.appMgmtServiceUrl</key>
+	<string><![CDATA[@@openmeap.slic.appMgmtServiceUrl@@]]></string>
+	<key>com.openmeap.slic.deviceType</key>
+	<string><![CDATA[@@openmeap.slic.deviceType@@]]></string>
+	<key>com.openmeap.slic.packagedAppRoot</key>
+	<string><![CDATA[@@openmeap.slic.packagedAppRoot@@]]></string>
+	<key>com.openmeap.slic.version</key>
+	<string><![CDATA[@@openmeap.slic.version@@]]></string>
+	<key>com.openmeap.slic.updatePendingTimeout</key>
+	<string><![CDATA[@@openmeap.slic.updatePendingTimeout@@]]></string>
+</dict>
+</plist>
+

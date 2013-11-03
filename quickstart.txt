@@ -1,6 +1,6 @@
  ###############################################################################
  #                                                                             #
- #    Copyright (C) 2011-2013 OpenMEAP, Inc.                                   #
+ #    Copyright (C) 2011-2014 OpenMEAP, Inc.                                   #
  #    Credits to Jonathan Schang & Robert Thacher                              #
  #                                                                             #
  #    Released under the LGPLv3                                                #
@@ -27,6 +27,10 @@
  OpenMEAP was created in Eclipse IDE for Java EE Developers with IvyDE
     http://www.eclipse.org/
     http://ant.apache.org/ivy/ivyde/
+
+ OpenMEAP SLIC clients were created in Eclipse, Xcode and WP8
+	http://developer.windowsphone.com/
+	https://developer.apple.com/xcode/
 
  OpenMEAP web projects default to Apache Tomcat 7.0
     http://tomcat.apache.org/
@@ -82,7 +86,7 @@
 	
 =================================================================================
 
- Path & Environment Variables - Windowws
+ Path & Environment Variables - Windows
 
  Set ANT_HOME
      Open System Properties -> Advanced -> Environment Variables
@@ -169,6 +173,10 @@
  Create and build your iOS project
 
     $ om_ios.sh create-project -propertyfile client.properties - Mac
+
+ Create and build your windows phone project 
+
+    $ om_win.bat create-project -propertyfile client.properties - Windows
  
  Create and build your android project 
 
@@ -188,7 +196,7 @@ om_android.sh create-project -propertyfile client.properties.newappname
 
 Windows:
 
-om_ios.bat create-project -propertyfile client.properties.newappname
+om_win.bat create-project -propertyfile client.properties.newappname
 om_android.bat create-project -propertyfile client.properties.newappname
 	
 =================================================================================
@@ -263,6 +271,16 @@ om_android.bat create-project -propertyfile client.properties.newappname
     Click finish and clean and build in Eclipse
     Click run as or debug as Android to run in simulator 
 
+ Importing and building your Windows Phone builds in WP8 SDK
+
+ For your Windows Phone build, do the following:
+
+ Browse to the slic folder
+    Select your Win Phone SLIC directory
+    Open the .csproj
+    Add your icons and build
+    Press run to see in the simulator    
+
  Converting and repackaging your Android project to BlackBerry 10
 
  For BlackBerry 10, do the following:
@@ -275,6 +293,6 @@ om_android.bat create-project -propertyfile client.properties.newappname
 
 For more info on the process, please visit http://developer.blackberry.com/android/tools/ for more info.
 
- Exporting your apps to Google Play, Apple App Store or BlackBerry App Store
+ Exporting your apps to Google Play, Apple App Store, Microsoft App Store or BlackBerry App Store
 
-    Follow the normal steps in Eclipse and Xcode for Enterprise or App Store distribution 
+    Follow the normal steps in Eclipse, Xcode and Windows 8 SDK for Enterprise or App Store distribution 
