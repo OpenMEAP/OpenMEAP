@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <pullUpdates>1</pullUpdates>
+  <developmentMode>1</developmentMode>
+  <updateFrequency>1</updateFrequency>
+  <appName>OpenMEAP</appName>
+  <appTitle>OpenMEAP</appTitle>
+  <appVersion>0.0.1a</appVersion>
+  <appMgmtServiceUrl>http://dev.openmeap.com/openmeap-services-web/application-management</appMgmtServiceUrl>
+  <deviceType>WP8</deviceType>
+  <packagedAppRoot>original/</packagedAppRoot>
+  <version>1.4.0</version>
+  <updatePendingTimeout>300</updatePendingTimeout>
+</root>
