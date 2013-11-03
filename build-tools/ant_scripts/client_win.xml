@@ -30,90 +30,82 @@
 	
 	<target name="-setup-client-properties" depends="-pre-create-project,setup-client-properties">
 		<!-- some device specific properties -->
-		<fail unless="openmeap.slic.projectName" message="openmeap.slic.projectName is a required property for iOS projects."/>
-		<property name="openmeap.slic.ios.projectName" value="${openmeap.slic.projectName}"/>
-		<property name="openmeap.slic.ios.path" value="${user.dir}"/>
-		<property name="openmeap.slic.absPath" location="${openmeap.slic.ios.path}"/>
+		<fail unless="openmeap.slic.projectName" message="openmeap.slic.projectName is a required property for Win Phone projects."/>
+		<property name="openmeap.slic.win.projectName" value="${openmeap.slic.projectName}"/>
+		<property name="openmeap.slic.win.path" value="${user.dir}"/>
+		<property name="openmeap.slic.absPath" location="${openmeap.slic.win.path}"/>
 		<property name="openmeap.slic.assets.dest.absPath" location="${openmeap.slic.absPath}/${openmeap.slic.packagedAppRoot}"/>
-		<property name="openmeap.slic.ios.distribArtifact" value="${openmeap.slic.ios.path}/build/${build.configuration}-iphoneos/${openmeap.slic.ios.projectName}.ipa"/>
-		<property name="openmeap.build.template.ios" value="${openmeap.project.build}/template/ios"/>
+		<property name="openmeap.slic.win.distribArtifact" value="${openmeap.slic.win.path}/build/${build.configuration}-iphoneos/${openmeap.slic.win.projectName}.xap"/>
+		<property name="openmeap.build.template.win" value="${openmeap.project.build}/template/win"/>
 	</target>
 	<target name="-pre-create-project">
 		<!-- device specific properties -->
-		<property name="openmeap.slic.deviceType" value="iOS"/>
-		<property name="openmeap.home.relative" value="${openmeap.home}" basedir="${openmeap.slic.ios.path}" relative="yes" />
+		<property name="openmeap.slic.deviceType" value="WP8"/>
+		<property name="openmeap.home.relative" value="${openmeap.home}" basedir="${openmeap.slic.win.path}" relative="yes" />
 	</target>
 	
 	<target name="build-debug" depends="-setup-client-properties"
-			description="Build an OpenMEAP iOS SLIC using the debug configuration.">
+			description="Build an OpenMEAP Win Phone SLIC using the debug configuration.">
 		<property name="build.configuration" value="Debug"/>
-		<ant dir="${openmeap.slic.ios.path}" antfile="${openmeap.project.build}/ant_scripts/client_ios.xml" target="copy-slic-assets"/>
+		<ant dir="${openmeap.slic.win.path}" antfile="${openmeap.project.build}/ant_scripts/client_win.xml" target="copy-slic-assets"/>
 		<antcall target="build"/>
 	</target>
 	<target name="build-release" depends="-setup-client-properties"
-			description="Build an OpenMEAP iOS SLIC using the release configuration.">
+			description="Build an OpenMEAP Win Phone SLIC using the release configuration.">
 		<property name="build.configuration" value="Release"/>
-		<ant dir="${openmeap.slic.ios.path}" antfile="${openmeap.project.build}/ant_scripts/client_ios.xml" target="copy-slic-assets"/>
+		<ant dir="${openmeap.slic.win.path}" antfile="${openmeap.project.build}/ant_scripts/client_win.xml" target="copy-slic-assets"/>
 		<antcall target="build"/>
 	</target>
 	<target name="build">
-		<exec dir="${openmeap.slic.ios.path}" executable="xcodebuild" failonerror="yes">
+		<exec dir="${openmeap.slic.win.path}" executable="xcodebuild" failonerror="yes">
 			<arg value="-project"/><arg value="${openmeap.slic.projectName}.xcodeproj"/>
 			<arg value="-target"/><arg value="${openmeap.slic.projectName}"/>
 			<arg value="-configuration"/><arg value="${build.configuration}"/>
 		</exec>
 	</target>
 			
-	<target name="package-debug" depends="build-debug,package" description="Build and package an OpenMEAP iOS SLIC using the debug configuration."/>
-	<target name="package-release" depends="build-release,package" description="Build and package an OpenMEAP iOS SLIC using the release configuration."/>
+	<target name="package-debug" depends="build-debug,package" description="Build and package an OpenMEAP Win Phone SLIC using the debug configuration."/>
+	<target name="package-release" depends="build-release,package" description="Build and package an OpenMEAP Win Phone SLIC using the release configuration."/>
 	<target name="package" depends="-setup-client-properties">
-		<fail unless="openmeap.slic.ios.mobileProvision" message="openmeap.slic.ios.mobileProvision is a required property for packaging.  It must be the path to the mobileprovision file."/>
-		<fail unless="openmeap.slic.ios.signingEntity" message="openmeap.slic.ios.signingEntity is a required property for packaging.  It must the the name of the signing entity to use."/>
-		<exec dir="${openmeap.slic.ios.path}" executable="xcrun" failonerror="yes">
+		<fail unless="openmeap.slic.win.mobileProvision" message="openmeap.slic.win.mobileProvision is a required property for packaging.  It must be the path to the mobileprovision file."/>
+		<fail unless="openmeap.slic.win.signingEntity" message="openmeap.slic.win.signingEntity is a required property for packaging.  It must the the name of the signing entity to use."/>
+		<exec dir="${openmeap.slic.win.path}" executable="xcrun" failonerror="yes">
 			<arg value="-sdk"/><arg value="iphoneos"/><arg value="PackageApplication"/>
-			<arg value="${openmeap.slic.ios.path}/build/${build.configuration}-iphoneos/${openmeap.slic.ios.projectName}.app"/>
-			<arg value="-o"/><arg value="${openmeap.slic.ios.distribArtifact}"/>
-			<arg value="--sign"/><arg value="${openmeap.slic.ios.signingEntity}"/>
-			<arg value="--embed"/><arg value="${openmeap.slic.ios.mobileProvision}"/>
+			<arg value="${openmeap.slic.win.path}/build/${build.configuration}-iphoneos/${openmeap.slic.win.projectName}.app"/>
+			<arg value="-o"/><arg value="${openmeap.slic.win.distribArtifact}"/>
+			<arg value="--sign"/><arg value="${openmeap.slic.win.signingEntity}"/>
+			<arg value="--embed"/><arg value="${openmeap.slic.win.mobileProvision}"/>
 			<!--codesign -f -vv -s "$DistributionIdentity" "$APPDIR"-->
 		</exec>
 	</target>
 	
-	<target name="create-project" depends="-setup-client-properties" description="Creates an OpenMEAP iOS SLIC from the specified properties.">
+	<target name="create-project" depends="-setup-client-properties" description="Creates an OpenMEAP Win Phone SLIC from the specified properties.">
 		
-		<mkdir dir="${openmeap.slic.ios.path}/${openmeap.slic.packagedAppRoot}"/>
-		<copy file="${openmeap.slic.icon}" tofile="${openmeap.slic.ios.path}/icon.png"/>
-
-		<!-- Test project files -->
-		<copy file="${openmeap.build.template.ios}/@@PROJECT_NAME@@Tests/@@PROJECT_NAME@@Tests-Info.plist" 
-			tofile="${openmeap.slic.ios.path}/${openmeap.slic.ios.projectName}Tests/${openmeap.slic.ios.projectName}Tests-Info.plist" overwrite="true"/>
-		<copy file="${openmeap.build.template.ios}/@@PROJECT_NAME@@Tests/@@PROJECT_NAME@@Tests.h" 
-			tofile="${openmeap.slic.ios.path}/${openmeap.slic.ios.projectName}Tests/${openmeap.slic.ios.projectName}Tests.h" overwrite="true"/>
-		<copy file="${openmeap.build.template.ios}/@@PROJECT_NAME@@Tests/@@PROJECT_NAME@@Tests.m" 
-			tofile="${openmeap.slic.ios.path}/${openmeap.slic.ios.projectName}Tests/${openmeap.slic.ios.projectName}Tests.m" overwrite="true"/>
+		<mkdir dir="${openmeap.slic.win.path}/${openmeap.slic.packagedAppRoot}"/>
+		<copy file="${openmeap.slic.icon}" tofile="${openmeap.slic.win.path}/icon.png"/>
 		
 		<!-- Main project files -->
-		<copy file="${openmeap.build.template.ios}/@@PROJECT_NAME@@/@@PROJECT_NAME@@-Info.plist" 
-			tofile="${openmeap.slic.ios.path}/${openmeap.slic.ios.projectName}/${openmeap.slic.ios.projectName}-Info.plist" overwrite="true"/>
-		<copy file="${openmeap.build.template.ios}/@@PROJECT_NAME@@/@@PROJECT_NAME@@-Prefix.pch" 
-			tofile="${openmeap.slic.ios.path}/${openmeap.slic.ios.projectName}/${openmeap.slic.ios.projectName}-Prefix.pch" overwrite="true"/>
-		<copy file="${openmeap.build.template.ios}/@@PROJECT_NAME@@/main.m" 
-			tofile="${openmeap.slic.ios.path}/${openmeap.slic.ios.projectName}/main.m" overwrite="true"/>
-		<copy file="${openmeap.build.template.ios}/@@PROJECT_NAME@@/slic-config.plist" 
-			tofile="${openmeap.slic.ios.path}/${openmeap.slic.ios.projectName}/slic-config.plist" overwrite="true"/>
+		<copy file="${openmeap.build.template.win}/@@PROJECT_NAME@@/@@PROJECT_NAME@@-Info.plist" 
+			tofile="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}/${openmeap.slic.win.projectName}-Info.plist" overwrite="true"/>
+		<copy file="${openmeap.build.template.win}/@@PROJECT_NAME@@/@@PROJECT_NAME@@-Prefix.pch" 
+			tofile="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}/${openmeap.slic.win.projectName}-Prefix.pch" overwrite="true"/>
+		<copy file="${openmeap.build.template.win}/@@PROJECT_NAME@@/main.m" 
+			tofile="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}/main.m" overwrite="true"/>
+		<copy file="${openmeap.build.template.win}/@@PROJECT_NAME@@/slic-config.plist" 
+			tofile="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}/slic-config.plist" overwrite="true"/>
 			
-		<copy todir="${openmeap.slic.ios.path}/${openmeap.slic.ios.projectName}/en.lproj" includeEmptyDirs="true">
-			<fileset dir="${openmeap.build.template.ios}/@@PROJECT_NAME@@/en.lproj" includes="*"/>
+		<copy todir="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}/en.lproj" includeEmptyDirs="true">
+			<fileset dir="${openmeap.build.template.win}/@@PROJECT_NAME@@/en.lproj" includes="*"/>
 		</copy>
 		
-		<copy todir="${openmeap.slic.ios.path}/${openmeap.slic.ios.projectName}.xcodeproj" includeEmptyDirs="true">
-			<fileset dir="${openmeap.build.template.ios}/@@PROJECT_NAME@@.xcodeproj" includes="*"/>
+		<copy todir="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}.xcodeproj" includeEmptyDirs="true">
+			<fileset dir="${openmeap.build.template.win}/@@PROJECT_NAME@@.xcodeproj" includes="*"/>
 		</copy>
 		
-		<ant dir="${openmeap.slic.absPath}" antfile="${openmeap.project.build}/ant_scripts/client_ios.xml" target="copy-slic-assets"/>
+		<ant dir="${openmeap.slic.absPath}" antfile="${openmeap.project.build}/ant_scripts/client_win.xml" target="copy-slic-assets"/>
 			
 		<echo>openmeap.slic.pullUpdates: ${openmeap.slic.pullUpdates}</echo>
-		<condition property="openmeap.slic.ios.pullUpdates" value="1" else="0">
+		<condition property="openmeap.slic.win.pullUpdates" value="1" else="0">
 			<or>
 				<equals arg1="true" arg2="${openmeap.slic.pullUpdates}" trim="yes" casesensitive="no"/>
 				<equals arg1="yes" arg2="${openmeap.slic.pullUpdates}" trim="yes" casesensitive="no"/>
@@ -121,23 +113,23 @@
 		</condition>
 		
 		<echo>openmeap.slic.pullUpdates: ${openmeap.slic.developmentMode}</echo>
-		<condition property="openmeap.slic.ios.developmentMode" value="1" else="0">
+		<condition property="openmeap.slic.win.developmentMode" value="1" else="0">
 			<or>
 				<equals arg1="true" arg2="${openmeap.slic.developmentMode}" trim="yes" casesensitive="no"/>
 				<equals arg1="yes" arg2="${openmeap.slic.developmentMode}" trim="yes" casesensitive="no"/>
 			</or>
 		</condition>
 		
-		<replace dir="${openmeap.slic.ios.path}" includes="**/*">
+		<replace dir="${openmeap.slic.win.path}" includes="**/*">
 			<replacefilter token="@@OPENMEAP_HOME@@" value="${openmeap.home.relative}"/>
-			<replacefilter token="@@PROJECT_NAME@@" value="${openmeap.slic.ios.projectName}"/>
+			<replacefilter token="@@PROJECT_NAME@@" value="${openmeap.slic.win.projectName}"/>
 			
 			<replacefilter token="@@openmeap.slic.providerAuthority@@" value="${openmeap.slic.providerAuthority}"/>
-			<replacefilter token="@@openmeap.slic.pullUpdates@@" value="${openmeap.slic.ios.pullUpdates}"/>
+			<replacefilter token="@@openmeap.slic.pullUpdates@@" value="${openmeap.slic.win.pullUpdates}"/>
 			<replacefilter token="@@openmeap.slic.updateFrequency@@" value="${openmeap.slic.updateFrequency}"/>
 			<replacefilter token="@@openmeap.slic.appTitle@@" value="${openmeap.slic.appTitle}"/>
 			<replacefilter token="@@openmeap.slic.packagedAppRoot@@" value="${openmeap.slic.packagedAppRoot}"/>
-			<replacefilter token="@@openmeap.slic.developmentMode@@" value="${openmeap.slic.ios.developmentMode}"/>
+			<replacefilter token="@@openmeap.slic.developmentMode@@" value="${openmeap.slic.win.developmentMode}"/>
 			<replacefilter token="@@openmeap.slic.deviceType@@" value="${openmeap.slic.deviceType}"/>
 			<replacefilter token="@@openmeap.slic.appMgmtServiceUrl@@" value="${openmeap.slic.appMgmtServiceUrl}"/>
 			<replacefilter token="@@openmeap.slic.appName@@" value="${openmeap.slic.appName}"/>
