@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+<!--
+ ###############################################################################
+ #                                                                             #
+ #    Copyright (C) 2011-2014 OpenMEAP, Inc.                                   #
+ #    Credits to Jonathan Schang & Rob Thacher                                 #
+ #                                                                             #
+ #    Released under the LGPLv3                                                #
+ #                                                                             #
+ #    OpenMEAP is free software: you can redistribute it and/or modify         #
+ #    it under the terms of the GNU Lesser General Public License as published #
+ #    by the Free Software Foundation, either version 3 of the License, or     #
+ #    (at your option) any later version.                                      #
+ #                                                                             #
+ #    OpenMEAP is distributed in the hope that it will be useful,              #
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+ #    GNU Lesser General Public License for more details.                      #
+ #                                                                             #
+ #    You should have received a copy of the GNU Lesser General Public License #
+ #    along with OpenMEAP.  If not, see <http://www.gnu.org/licenses/>.        #
+ #                                                                             #
+ ###############################################################################
+-->
+<project xmlns:ivy="antlib:org.apache.ivy.ant" default="help">
+
+	<import file="./shared.xml"/>
+	
+	<property environment="env"/>
+	
+	<target name="-setup-client-properties" depends="-pre-create-project,setup-client-properties">
+		<!-- some device specific properties -->
+		<fail unless="openmeap.slic.projectName" message="openmeap.slic.projectName is a required property for Win Phone projects."/>
+		<property name="openmeap.slic.win.projectName" value="${openmeap.slic.projectName}"/>
+		<property name="openmeap.slic.win.path" value="${user.dir}"/>
+		<property name="openmeap.slic.absPath" location="${openmeap.slic.win.path}"/>
+		<property name="openmeap.slic.assets.dest.absPath" location="${openmeap.slic.absPath}/${openmeap.slic.packagedAppRoot}"/>
+		<property name="openmeap.slic.win.distribArtifact" value="${openmeap.slic.win.path}/build/${build.configuration}-iphoneos/${openmeap.slic.win.projectName}.xap"/>
+		<property name="openmeap.build.template.win" value="${openmeap.project.build}/template/win"/>
+	</target>
+	<target name="-pre-create-project">
+		<!-- device specific properties -->
+		<property name="openmeap.slic.deviceType" value="WP8"/>
+		<property name="openmeap.home.relative" value="${openmeap.home}" basedir="${openmeap.slic.win.path}" relative="yes" />
+	</target>
+	
+	<target name="build-debug" depends="-setup-client-properties"
+			description="Build an OpenMEAP Win Phone SLIC using the debug configuration.">
+		<property name="build.configuration" value="Debug"/>
+		<ant dir="${openmeap.slic.win.path}" antfile="${openmeap.project.build}/ant_scripts/client_win.xml" target="copy-slic-assets"/>
+		<antcall target="build"/>
+	</target>
+	<target name="build-release" depends="-setup-client-properties"
+			description="Build an OpenMEAP Win Phone SLIC using the release configuration.">
+		<property name="build.configuration" value="Release"/>
+		<ant dir="${openmeap.slic.win.path}" antfile="${openmeap.project.build}/ant_scripts/client_win.xml" target="copy-slic-assets"/>
+		<antcall target="build"/>
+	</target>
+	<target name="build">
+		<exec dir="${openmeap.slic.win.path}" executable="winbuild" failonerror="yes">
+			<arg value="-project"/><arg value="${openmeap.slic.projectName}.csproj"/>
+			<arg value="-target"/><arg value="${openmeap.slic.projectName}"/>
+			<arg value="-configuration"/><arg value="${build.configuration}"/>
+		</exec>
+	</target>
+			
+	<target name="package-debug" depends="build-debug,package" description="Build and package an OpenMEAP Win Phone SLIC using the debug configuration."/>
+	<target name="package-release" depends="build-release,package" description="Build and package an OpenMEAP Win Phone SLIC using the release configuration."/>
+	<target name="package" depends="-setup-client-properties">
+		<fail unless="openmeap.slic.win.mobileProvision" message="openmeap.slic.win.mobileProvision is a required property for packaging.  It must be the path to the mobileprovision file."/>
+		<fail unless="openmeap.slic.win.signingEntity" message="openmeap.slic.win.signingEntity is a required property for packaging.  It must the the name of the signing entity to use."/>
+		<exec dir="${openmeap.slic.win.path}" executable="xcrun" failonerror="yes">
+			<arg value="-sdk"/><arg value="iphoneos"/><arg value="PackageApplication"/>
+			<arg value="${openmeap.slic.win.path}/build/${build.configuration}-iphoneos/${openmeap.slic.win.projectName}.app"/>
+			<arg value="-o"/><arg value="${openmeap.slic.win.distribArtifact}"/>
+			<arg value="--sign"/><arg value="${openmeap.slic.win.signingEntity}"/>
+			<arg value="--embed"/><arg value="${openmeap.slic.win.mobileProvision}"/>
+			<!--codesign -f -vv -s "$DistributionIdentity" "$APPDIR"-->
+		</exec>
+	</target>
+	
+	<target name="create-project" depends="-setup-client-properties" description="Creates an OpenMEAP Win Phone SLIC from the specified properties.">
+		
+		<mkdir dir="${openmeap.slic.win.path}/${openmeap.slic.packagedAppRoot}"/>
+		<copy file="${openmeap.slic.icon}" tofile="${openmeap.slic.win.path}/icon.png"/>
+		
+		<!-- Main project files -->
+		<copy file="${openmeap.build.template.win}/@@PROJECT_NAME@@/@@PROJECT_NAME@@-Info.xml" 
+			tofile="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}/${openmeap.slic.win.projectName}-Info.xml" overwrite="true"/>
+		<copy file="${openmeap.build.template.win}/@@PROJECT_NAME@@/@@PROJECT_NAME@@-Prefix.pch" 
+			tofile="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}/${openmeap.slic.win.projectName}-Prefix.pch" overwrite="true"/>
+		<copy file="${openmeap.build.template.win}/@@PROJECT_NAME@@/main.m" 
+			tofile="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}/main.m" overwrite="true"/>
+		<copy file="${openmeap.build.template.win}/@@PROJECT_NAME@@/slic-config.xml" 
+			tofile="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}/slic-config.xml" overwrite="true"/>
+			
+		<copy todir="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}/sln" includeEmptyDirs="true">
+			<fileset dir="${openmeap.build.template.win}/@@PROJECT_NAME@@/sln" includes="*"/>
+		</copy>
+		
+		<copy todir="${openmeap.slic.win.path}/${openmeap.slic.win.projectName}.xcodeproj" includeEmptyDirs="true">
+			<fileset dir="${openmeap.build.template.win}/@@PROJECT_NAME@@.xcodeproj" includes="*"/>
+		</copy>
+		
+		<ant dir="${openmeap.slic.absPath}" antfile="${openmeap.project.build}/ant_scripts/client_win.xml" target="copy-slic-assets"/>
+			
+		<echo>openmeap.slic.pullUpdates: ${openmeap.slic.pullUpdates}</echo>
+		<condition property="openmeap.slic.win.pullUpdates" value="1" else="0">
+			<or>
+				<equals arg1="true" arg2="${openmeap.slic.pullUpdates}" trim="yes" casesensitive="no"/>
+				<equals arg1="yes" arg2="${openmeap.slic.pullUpdates}" trim="yes" casesensitive="no"/>
+			</or>
+		</condition>
+		
+		<echo>openmeap.slic.pullUpdates: ${openmeap.slic.developmentMode}</echo>
+		<condition property="openmeap.slic.win.developmentMode" value="1" else="0">
+			<or>
+				<equals arg1="true" arg2="${openmeap.slic.developmentMode}" trim="yes" casesensitive="no"/>
+				<equals arg1="yes" arg2="${openmeap.slic.developmentMode}" trim="yes" casesensitive="no"/>
+			</or>
+		</condition>
+		
+		<replace dir="${openmeap.slic.win.path}" includes="**/*">
+			<replacefilter token="@@OPENMEAP_HOME@@" value="${openmeap.home.relative}"/>
+			<replacefilter token="@@PROJECT_NAME@@" value="${openmeap.slic.win.projectName}"/>
+			
+			<replacefilter token="@@openmeap.slic.providerAuthority@@" value="${openmeap.slic.providerAuthority}"/>
+			<replacefilter token="@@openmeap.slic.pullUpdates@@" value="${openmeap.slic.win.pullUpdates}"/>
+			<replacefilter token="@@openmeap.slic.updateFrequency@@" value="${openmeap.slic.updateFrequency}"/>
+			<replacefilter token="@@openmeap.slic.appTitle@@" value="${openmeap.slic.appTitle}"/>
+			<replacefilter token="@@openmeap.slic.packagedAppRoot@@" value="${openmeap.slic.packagedAppRoot}"/>
+			<replacefilter token="@@openmeap.slic.developmentMode@@" value="${openmeap.slic.win.developmentMode}"/>
+			<replacefilter token="@@openmeap.slic.deviceType@@" value="${openmeap.slic.deviceType}"/>
+			<replacefilter token="@@openmeap.slic.appMgmtServiceUrl@@" value="${openmeap.slic.appMgmtServiceUrl}"/>
+			<replacefilter token="@@openmeap.slic.appName@@" value="${openmeap.slic.appName}"/>
+			<replacefilter token="@@openmeap.slic.appVersion@@" value="${openmeap.slic.appVersion}"/>
+			<replacefilter token="@@openmeap.slic.version@@" value="${openmeap.revision}"/>
+			<replacefilter token="@@openmeap.slic.updatePendingTimeout@@" value="${openmeap.slic.updatePendingTimeout}"/>
+		</replace>
+	</target>
+	
+</project>
