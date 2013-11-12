@@ -1,7 +1,7 @@
  ###############################################################################
  #                                                                             #
- #    Copyright (C) 2011-2013 OpenMEAP, Inc.                                   #
- #    Credits to Jonathan Schang & Robert Thacher                              #
+ #    Copyright (C) 2011-2014 OpenMEAP, Inc.                                   #
+ #    Credits to Jonathan Schang & Rob Thacher                                 #
  #                                                                             #
  #    Released under the LGPLv3                                                #
  #                                                                             #
@@ -28,6 +28,10 @@
     http://www.eclipse.org/
     http://ant.apache.org/ivy/ivyde/
 
+ OpenMEAP SLIC clients were created in Eclipse, Xcode and WP8
+    http://developer.windowsphone.com/
+    https://developer.apple.com/xcode/
+
  OpenMEAP web projects default to Apache Tomcat 7.0
     http://tomcat.apache.org/
 
@@ -36,8 +40,6 @@
 
  OpenMEAP and Ant requires Java 
     http://www.oracle.com/technetwork/java/javase/downloads/index.html 
-
- OpenMEAP Apache Ant 1.8 or greater and Java are already pre-installed on Macs
  
 =================================================================================
  
@@ -82,7 +84,7 @@
 	
 =================================================================================
 
- Path & Environment Variables - Windowws
+ Path & Environment Variables - Windows
 
  Set ANT_HOME
      Open System Properties -> Advanced -> Environment Variables
@@ -115,10 +117,16 @@
  Path & Environment Variables - Mac
 
  Set OpenMEAP Home Path
-    declare -x OPENMEAP_HOME=/Applications/OpenMEAP
+     export -x OPENMEAP_HOME=/Applications/OpenMEAP
+
+ Add the new version of Ant to current terminal session
+     export PATH=/usr/local/apache-ant/bin:"$PATH"
+
+ Add the new version of Ant to future terminal sessions
+     echo 'export PATH=/usr/local/apache-ant/bin:"$PATH"' >> ~/.profile
 
  Verify that ANT and Java are installed
-    Open your command-line tool and type ant -v and Java -version
+    Open your command-line tool and type ant -v and java -version
 
 =================================================================================
 
@@ -169,6 +177,13 @@
  Create and build your iOS project
 
     $ om_ios.sh create-project -propertyfile client.properties - Mac
+
+ Create and build your windows phone project 
+
+ Note: Please use the Windows project folder under clients/c/openmeap-slic-win to load 
+       the Windows Phone Alpha Project.
+ 	
+    $ om_win.bat create-project -propertyfile client.properties - Windows
  
  Create and build your android project 
 
@@ -188,7 +203,7 @@ om_android.sh create-project -propertyfile client.properties.newappname
 
 Windows:
 
-om_ios.bat create-project -propertyfile client.properties.newappname
+om_win.bat create-project -propertyfile client.properties.newappname
 om_android.bat create-project -propertyfile client.properties.newappname
 	
 =================================================================================
@@ -263,6 +278,16 @@ om_android.bat create-project -propertyfile client.properties.newappname
     Click finish and clean and build in Eclipse
     Click run as or debug as Android to run in simulator 
 
+ Importing and building your Windows Phone builds in WP8 SDK
+
+ For your Windows Phone build, do the following:
+
+ Browse to the slic folder
+    Select your Win Phone SLIC directory
+    Open the .csproj
+    Add your icons and build
+    Press run to see in the simulator    
+
  Converting and repackaging your Android project to BlackBerry 10
 
  For BlackBerry 10, do the following:
@@ -275,6 +300,6 @@ om_android.bat create-project -propertyfile client.properties.newappname
 
 For more info on the process, please visit http://developer.blackberry.com/android/tools/ for more info.
 
- Exporting your apps to Google Play, Apple App Store or BlackBerry App Store
+Exporting your apps to Google Play, Apple App Store, Microsoft App Store or BlackBerry App Store
 
-    Follow the normal steps in Eclipse and Xcode for Enterprise or App Store distribution 
+    Follow the normal steps in Eclipse, Xcode and Windows 8 SDK for Enterprise or App Store distribution 
