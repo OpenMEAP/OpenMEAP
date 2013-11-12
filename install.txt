@@ -180,6 +180,9 @@
 
  Create and build your windows phone project 
 
+ Note: Please use the Windows project folder under clients/c/openmeap-slic-win to load 
+       the Windows Phone Alpha Project.
+ 	
     $ om_win.bat create-project -propertyfile client.properties - Windows
  
  Create and build your android project 
