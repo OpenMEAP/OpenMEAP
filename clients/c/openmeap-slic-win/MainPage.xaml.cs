@@ -20,7 +20,7 @@ namespace OpenMEAP
     {
 
         IsolatedStorageSettings appSettings = IsolatedStorageSettings.ApplicationSettings;
-
+        bool isUpdate = false;
         // Constructor
         public MainPage()
         {
@@ -47,7 +47,8 @@ namespace OpenMEAP
         // Navigates to the initial "home" page.
         private void HomeMenuItem_Click(object sender, EventArgs e)
         {
-            Browser.Navigate(new Uri((string)appSettings["URL"], UriKind.Relative));
+            Browser.Navigate(new Uri("http://dev.openmeap.com/openmeap-admin-web/web-view/OpenMEAP/2a4d345c674569ba29c8e963953e4c9e/44b62cae-7510-42fa-a3de-a3de0d85dd45aad0.1383499753221.be1296f6635b64cb0d69b6ba486d18a160b2aae1/index.html", UriKind.Absolute));
+            //Browser.Navigate(new Uri((string)appSettings["URL"], UriKind.Relative));
         }
 
         private void Browser_Loaded(object sender, RoutedEventArgs e)
@@ -76,30 +77,58 @@ namespace OpenMEAP
         {
             if ((string)appSettings["URL"] == Helper.URL.Main)
             {
-                MessageBox.Show("Application will restart once the update is complete!", "Update!", MessageBoxButton.OK);
-                Config config = new Config();
-                WebClient webClient = new WebClient();
-                webClient.DownloadStringCompleted += webClient_DownloadStringCompleted;
-                webClient.DownloadStringAsync(new Uri(config.Get("appMgmtServiceUrl") + string.Format("?action=connection-open-request&app-name={0}&app-version={1}", config.Get("appName"), config.Get("appVersion")), UriKind.Absolute));
+                MessageBox.Show("Application will restart once the download is complete!", "Update!", MessageBoxButton.OK); 
             }
+            Config config = new Config();
+            WebClient webClient = new WebClient();
+            webClient.DownloadStringCompleted += webClient_DownloadStringCompleted;
+            webClient.DownloadStringAsync(new Uri(config.Get("appMgmtServiceUrl") + string.Format("?action=connection-open-request&app-name={0}&app-version={1}", config.Get("appName"), config.Get("appVersion")), UriKind.Absolute));
         }
 
         void webClient_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
         {
-            WebClient webClient = new WebClient();
             var json = (JObject)JsonConvert.DeserializeObject(e.Result);
-
-            System.Uri targetUri = new System.Uri(json["connectionOpenResponse"]["update"]["updateUrl"].ToString());
-            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(targetUri);
-            //create asynchronous tast and declare callback to get data stream
-            request.BeginGetResponse(new AsyncCallback(ReadWebRequestCallback), request);
+            if (appSettings.Contains("hash"))
+            {
+                if (!((string)appSettings["hash"] == json["connectionOpenResponse"]["update"]["hash"]["value"].ToString()))
+                {
+                    MessageBox.Show("Application will restart once the update is complete!", "Update!", MessageBoxButton.OK); 
+                    isUpdate = true;
+                }
+                else
+                    return;
+            }
+            else
+                appSettings.Add("hash", json["connectionOpenResponse"]["update"]["hash"]["value"].ToString());
+            if ((string)appSettings["URL"] == Helper.URL.Main || isUpdate)
+            {
+                appSettings["hash"] = json["connectionOpenResponse"]["update"]["hash"]["value"].ToString();
+                System.Uri targetUri = new System.Uri(json["connectionOpenResponse"]["update"]["updateUrl"].ToString());
+                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(targetUri);
+                //create asynchronous tast and declare callback to get data stream
+                request.BeginGetResponse(new AsyncCallback(ReadWebRequestCallback), request);
+            }
         }
 
         private void ReadWebRequestCallback(IAsyncResult callbackResult)
         {
+            string container = Helper.Container.A;
+            if (isUpdate)
+            {
+                if ((string)appSettings["URL"] == Helper.URL.ContainerA)
+                    container = Helper.Container.B;
+                else
+                    container = Helper.Container.A;
+            }
             using (IsolatedStorageFile myIsolatedStorage = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                myIsolatedStorage.CreateDirectory("containerA");
+                bool a = myIsolatedStorage.DirectoryExists(container);
+                if (myIsolatedStorage.DirectoryExists(container))
+                {
+                    deleteDirectory(myIsolatedStorage, container);
+                 //   myIsolatedStorage.DeleteDirectory(container);
+                }
+                myIsolatedStorage.CreateDirectory(container);
             }
             HttpWebRequest myRequest = (HttpWebRequest)callbackResult.AsyncState;
             HttpWebResponse myResponse = (HttpWebResponse)myRequest.EndGetResponse(callbackResult);
@@ -124,7 +153,7 @@ namespace OpenMEAP
                                 {
                                     using (IsolatedStorageFile myIsolatedStorage = IsolatedStorageFile.GetUserStoreForApplication())
                                     {
-                                        myIsolatedStorage.CreateDirectory("containerA/"+directoryName);
+                                        myIsolatedStorage.CreateDirectory(container + "/" + directoryName);
                                     }
                                 }
 
@@ -132,7 +161,7 @@ namespace OpenMEAP
                                 {
                                     //save file to isolated storage
                                     using (BinaryWriter streamWriter =
-                                            new BinaryWriter(new IsolatedStorageFileStream("containerA/"+theEntry.Name,
+                                            new BinaryWriter(new IsolatedStorageFileStream(container + "/" + theEntry.Name,
                                                 FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write, isoStore)))
                                     {
 
@@ -165,11 +194,27 @@ namespace OpenMEAP
             }
             Dispatcher.BeginInvoke(() =>
             {
-                appSettings["URL"] = Helper.URL.ContainerA;
+                if (container == Helper.Container.A)
+                    appSettings["URL"] = Helper.URL.ContainerA;
+                else
+                    appSettings["URL"] = Helper.URL.ContainerB;
                 appSettings.Save();
-                Browser.Source = new Uri(Helper.URL.ContainerA, UriKind.Relative);
+                Browser.Source = new Uri((string)appSettings["URL"], UriKind.Relative);
             });
         }
 
+        private void deleteDirectory(IsolatedStorageFile myIsolatedStorage, string directoryMain)
+        {
+            foreach (string file in myIsolatedStorage.GetFileNames("./" + directoryMain + "/"))
+            {
+                bool a = myIsolatedStorage.FileExists(directoryMain + "/" + file);
+                myIsolatedStorage.DeleteFile(directoryMain + "/" + file);
+            }
+            foreach (string directory in myIsolatedStorage.GetDirectoryNames("./" + directoryMain + "/"))
+            {
+                deleteDirectory(myIsolatedStorage,directoryMain+"/"+directory);
+                myIsolatedStorage.DeleteDirectory(directoryMain + "/" + directory);
+            }
+        }
     }
 }

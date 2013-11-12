@@ -15,5 +15,12 @@ namespace OpenMEAP.Source
             public static string ContainerA = "/containerA/index.html";
             public static string ContainerB = "/containerB/index.html";
         }
+
+        public static class Container
+        {
+            // Containers
+            public static string A = "containerA";
+            public static string B = "containerB";
+        }
     }
 }

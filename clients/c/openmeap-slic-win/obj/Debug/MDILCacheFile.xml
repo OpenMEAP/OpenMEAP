@@ -1,5 +1,5 @@
-﻿<xapCache source="C:\Users\CodeTrix\Documents\Visual Studio 2012\Projects\Work\OpenMEAP\OpenMEAP\Bin\Debug\OpenMEAP_Debug_AnyCPU.xap" wasSigned="False" wasTritonized="False" certificateThumbprint="" TimeStampUrl="" signKeyFile="" signKeyPassword="" lastWriteTime="03/11/2013 03:19:03 PM">
-  <file source="C:\Users\CodeTrix\Documents\Visual Studio 2012\Projects\Work\OpenMEAP\OpenMEAP\obj\Debug\OpenMEAP.dll" archivePath="OpenMEAP.dll" lastWriteTime="03/11/2013 03:19:02 PM" />
+﻿<xapCache source="C:\Users\CodeTrix\Documents\Visual Studio 2012\Projects\Work\OpenMEAP\OpenMEAP\Bin\Debug\OpenMEAP_Debug_AnyCPU.xap" wasSigned="False" wasTritonized="False" certificateThumbprint="" TimeStampUrl="" signKeyFile="" signKeyPassword="" lastWriteTime="10/11/2013 03:04:58 AM">
+  <file source="C:\Users\CodeTrix\Documents\Visual Studio 2012\Projects\Work\OpenMEAP\OpenMEAP\obj\Debug\OpenMEAP.dll" archivePath="OpenMEAP.dll" lastWriteTime="10/11/2013 03:04:57 AM" />
   <file source="C:\Users\CodeTrix\Documents\Visual Studio 2012\Projects\Work\OpenMEAP\OpenMEAP\Assets\AlignmentGrid.png" archivePath="Assets\AlignmentGrid.png" lastWriteTime="27/10/2013 07:21:43 AM" />
   <file source="C:\Users\CodeTrix\Documents\Visual Studio 2012\Projects\Work\OpenMEAP\OpenMEAP\Assets\AppBar\appbar.back.rest.png" archivePath="Assets\AppBar\appbar.back.rest.png" lastWriteTime="27/10/2013 07:21:43 AM" />
   <file source="C:\Users\CodeTrix\Documents\Visual Studio 2012\Projects\Work\OpenMEAP\OpenMEAP\Assets\AppBar\appbar.next.rest.png" archivePath="Assets\AppBar\appbar.next.rest.png" lastWriteTime="27/10/2013 07:21:43 AM" />
@@ -13,12 +13,12 @@
   <file source="C:\Users\CodeTrix\Documents\Visual Studio 2012\Projects\Work\OpenMEAP\OpenMEAP\Supporting Files\original\img\splash_tablet.png" archivePath="Supporting Files\original\img\splash_tablet.png" lastWriteTime="27/10/2013 07:38:39 AM" />
   <file source="C:\Users\CodeTrix\Documents\Visual Studio 2012\Projects\Work\OpenMEAP\OpenMEAP\Supporting Files\original\index.html" archivePath="Supporting Files\original\index.html" lastWriteTime="27/10/2013 07:38:39 AM" />
   <file source="C:\Users\CodeTrix\Documents\Visual Studio 2012\Projects\Work\OpenMEAP\OpenMEAP\Supporting Files\original\js\openmeap.js" archivePath="Supporting Files\original\js\openmeap.js" lastWriteTime="27/10/2013 07:38:39 AM" />
-  <file source="C:\Users\CodeTrix\Documents\Visual Studio 2012\Projects\Work\OpenMEAP\OpenMEAP\Supporting Files\slic-config.xml" archivePath="Supporting Files\slic-config.xml" lastWriteTime="03/11/2013 09:54:05 AM" />
+  <file source="C:\Users\CodeTrix\Documents\Visual Studio 2012\Projects\Work\OpenMEAP\OpenMEAP\Supporting Files\slic-config.xml" archivePath="Supporting Files\slic-config.xml" lastWriteTime="10/11/2013 02:50:55 AM" />
   <file source="C:\Users\CodeTrix\Documents\Visual Studio 2012\Projects\Work\OpenMEAP\OpenMEAP\Bin\Debug\AppManifest.xaml" archivePath="AppManifest.xaml" lastWriteTime="03/11/2013 12:19:04 PM" />
   <file source="C:\Users\CodeTrix\Documents\Visual Studio 2012\Projects\Work\OpenMEAP\OpenMEAP\Bin\Debug\Assets\ApplicationIcon.png" archivePath="Assets\ApplicationIcon.png" lastWriteTime="27/10/2013 07:21:43 AM" />
   <file source="C:\Users\CodeTrix\Documents\Visual Studio 2012\Projects\Work\OpenMEAP\OpenMEAP\Bin\Debug\Assets\Tiles\FlipCycleTileMedium.png" archivePath="Assets\Tiles\FlipCycleTileMedium.png" lastWriteTime="27/10/2013 07:21:43 AM" />
   <file source="C:\Users\CodeTrix\Downloads\Compressed\DLL\Json50r6\Bin\Portable40\Newtonsoft.Json.dll" archivePath="Newtonsoft.Json.dll" lastWriteTime="06/06/2013 01:33:22 PM" />
   <file source="C:\Users\CodeTrix\Downloads\Compressed\SharpZipLib.Silverlight.0.86.0.518\Bin\Release\SharpZipLib.WindowsPhone7.dll" archivePath="SharpZipLib.WindowsPhone7.dll" lastWriteTime="13/08/2010 11:59:46 PM" />
   <file source="C:\Users\CodeTrix\Downloads\Compressed\DLL\Json50r6\Bin\Portable40\Newtonsoft.Json.xml" archivePath="Newtonsoft.Json.xml" lastWriteTime="06/06/2013 01:33:22 PM" />
-  <file source="C:\Users\CodeTrix\Documents\Visual Studio 2012\Projects\Work\OpenMEAP\OpenMEAP\Bin\Debug\Properties\WMAppManifest.xml" archivePath="WMAppManifest.xml" lastWriteTime="02/11/2013 02:08:32 PM" />
+  <file source="C:\Users\CodeTrix\Documents\Visual Studio 2012\Projects\Work\OpenMEAP\OpenMEAP\Bin\Debug\Properties\WMAppManifest.xml" archivePath="WMAppManifest.xml" lastWriteTime="03/11/2013 10:24:43 PM" />
 </xapCache>
