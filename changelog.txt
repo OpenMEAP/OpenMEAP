@@ -1,7 +1,11 @@
 OpenMEAP 1.4.5
+<<<<<<< HEAD
   - Windows Phone alpha implementation
   - Removal of old java Blackberry project 
   - Updates to use BlackBerry 10 in Eclipse with Android
+=======
+  - Removed pre BlackBerry code
+>>>>>>> master
 
 OpenMEAP 1.4.0
   - Complete redesign of the admin interface
