@@ -20,7 +20,7 @@
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
                           Loaded="Browser_Loaded"
-                          NavigationFailed="Browser_NavigationFailed" ScriptNotify="Browser_ScriptNotify" LoadCompleted="Browser_LoadCompleted" />
+                          NavigationFailed="Browser_NavigationFailed" ScriptNotify="Browser_ScriptNotify" LoadCompleted="Browser_LoadCompleted" IsScriptEnabled="True" IsGeolocationEnabled="True" />
     </Grid>
 
     <!-- ApplicationBar -->
