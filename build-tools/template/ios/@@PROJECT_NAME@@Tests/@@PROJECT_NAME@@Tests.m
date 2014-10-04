@@ -24,10 +24,6 @@
 
 #import "@@PROJECT_NAME@@Tests.h"
 
-@interface @@PROJECT_NAME@@Tests : SenTestCase
-
-@end
-
 @implementation @@PROJECT_NAME@@Tests
 
 - (void)setUp
