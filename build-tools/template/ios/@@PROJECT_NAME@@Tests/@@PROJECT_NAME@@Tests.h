@@ -22,8 +22,8 @@
  ###############################################################################
  */
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 
-@interface TemplateProjectTests : SenTestCase
+@interface TemplateProjectTests : XCTestCase
 
 @end
