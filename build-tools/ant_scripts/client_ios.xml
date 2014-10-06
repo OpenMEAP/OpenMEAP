@@ -91,6 +91,9 @@
 			tofile="${openmeap.slic.ios.path}/${openmeap.slic.ios.projectName}Tests/${openmeap.slic.ios.projectName}Tests.h" overwrite="true"/>
 		<copy file="${openmeap.build.template.ios}/@@PROJECT_NAME@@Tests/@@PROJECT_NAME@@Tests.m" 
 			tofile="${openmeap.slic.ios.path}/${openmeap.slic.ios.projectName}Tests/${openmeap.slic.ios.projectName}Tests.m" overwrite="true"/>
+		<copy todir="${openmeap.slic.ios.path}/${openmeap.slic.ios.projectName}Tests/en.lproj" includeEmptyDirs="true">
+			<fileset dir="${openmeap.build.template.ios}/@@PROJECT_NAME@@Tests/en.lproj" includes="*"/>
+		</copy>
 		
 		<!-- Main project files -->
 		<copy file="${openmeap.build.template.ios}/@@PROJECT_NAME@@/@@PROJECT_NAME@@-Info.plist" 
