@@ -14,7 +14,6 @@
 		929DE7A714AB571800B9CCFF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 929DE7A614AB571800B9CCFF /* main.m */; };
 		929DE7AE14AB571800B9CCFF /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 929DE7AC14AB571800B9CCFF /* MainStoryboard_iPhone.storyboard */; };
 		929DE7B114AB571800B9CCFF /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 929DE7AF14AB571800B9CCFF /* MainStoryboard_iPad.storyboard */; };
-		929DE7BC14AB571800B9CCFF /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 929DE7BB14AB571800B9CCFF /* SenTestingKit.framework */; };
 		929DE7BD14AB571800B9CCFF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 929DE79A14AB571800B9CCFF /* UIKit.framework */; };
 		929DE7BE14AB571800B9CCFF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 929DE79C14AB571800B9CCFF /* Foundation.framework */; };
 		929DE7C614AB571800B9CCFF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 929DE7C414AB571800B9CCFF /* InfoPlist.strings */; };
@@ -79,8 +78,7 @@
 		929DE7A814AB571800B9CCFF /* @@PROJECT_NAME@@-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "@@PROJECT_NAME@@-Prefix.pch"; sourceTree = "<group>"; };
 		929DE7AD14AB571800B9CCFF /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
 		929DE7B014AB571800B9CCFF /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard_iPad.storyboard; sourceTree = "<group>"; };
-		929DE7BA14AB571800B9CCFF /* @@PROJECT_NAME@@Tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = @@PROJECT_NAME@@Tests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
-		929DE7BB14AB571800B9CCFF /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		929DE7BA14AB571800B9CCFF /* @@PROJECT_NAME@@Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = @@PROJECT_NAME@@Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		929DE7C314AB571800B9CCFF /* @@PROJECT_NAME@@Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "@@PROJECT_NAME@@Tests-Info.plist"; sourceTree = "<group>"; };
 		929DE7C514AB571800B9CCFF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		929DE7C714AB571800B9CCFF /* @@PROJECT_NAME@@Tests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = @@PROJECT_NAME@@Tests.h; sourceTree = "<group>"; };
@@ -151,7 +149,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				929DE7BC14AB571800B9CCFF /* SenTestingKit.framework in Frameworks */,
 				929DE7BD14AB571800B9CCFF /* UIKit.framework in Frameworks */,
 				929DE7BE14AB571800B9CCFF /* Foundation.framework in Frameworks */,
 			);
@@ -163,7 +160,7 @@
 		929DE78B14AB571800B9CCFF = {
 			isa = PBXGroup;
 			children = (
-				929DE7E114AB582D00B9CCFF /* OpenMEAP */,
+				929DE7E114AB582D00B9CCFF /* @@PROJECT_NAME@@ */,
 				929DE7A014AB571800B9CCFF /* @@PROJECT_NAME@@ */,
 				929DE7C114AB571800B9CCFF /* @@PROJECT_NAME@@Tests */,
 				929DE79914AB571800B9CCFF /* Frameworks */,
@@ -175,7 +172,7 @@
 			isa = PBXGroup;
 			children = (
 				929DE79614AB571800B9CCFF /* @@PROJECT_NAME@@.app */,
-				929DE7BA14AB571800B9CCFF /* @@PROJECT_NAME@@Tests.octest */,
+				929DE7BA14AB571800B9CCFF /* @@PROJECT_NAME@@Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -186,7 +183,6 @@
 				929DE79A14AB571800B9CCFF /* UIKit.framework */,
 				929DE79C14AB571800B9CCFF /* Foundation.framework */,
 				929DE79E14AB571800B9CCFF /* CoreGraphics.framework */,
-				929DE7BB14AB571800B9CCFF /* SenTestingKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -206,10 +202,10 @@
 			children = (
 				929DE85314AB63D200B9CCFF /* slic-config.plist */,
 				929DE85014AB60E200B9CCFF /* original */,
-				929DE7A214AB571800B9CCFF /* @@PROJECT_NAME@@-Info.plist */,
+				929DE7A214AB571800B9CCFF /* OpenMEAP-Info.plist */,
 				929DE7A314AB571800B9CCFF /* InfoPlist.strings */,
 				929DE7A614AB571800B9CCFF /* main.m */,
-				929DE7A814AB571800B9CCFF /* @@PROJECT_NAME@@-Prefix.pch */,
+				929DE7A814AB571800B9CCFF /* OpenMEAP-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -233,14 +229,14 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		929DE7E114AB582D00B9CCFF /* OpenMEAP */ = {
+		929DE7E114AB582D00B9CCFF /* @@PROJECT_NAME@@ */ = {
 			isa = PBXGroup;
 			children = (
 				929DE7E714AB589000B9CCFF /* Resources */,
 				929DE7E614AB587D00B9CCFF /* Source */,
 				929DE7E514AB585E00B9CCFF /* Libraries */,
 			);
-			name = OpenMEAP;
+			name = @@PROJECT_NAME@@;
 			sourceTree = "<group>";
 		};
 		929DE7E214AB583E00B9CCFF /* Core */ = {
@@ -402,8 +398,8 @@
 			);
 			name = @@PROJECT_NAME@@Tests;
 			productName = @@PROJECT_NAME@@Tests;
-			productReference = 929DE7BA14AB571800B9CCFF /* @@PROJECT_NAME@@Tests.octest */;
-			productType = "com.apple.product-type.bundle";
+			productReference = 929DE7BA14AB571800B9CCFF /* @@PROJECT_NAME@@Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -411,6 +407,7 @@
 		929DE78D14AB571800B9CCFF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastTestingUpgradeCheck = 0600;
 				LastUpgradeCheck = 0420;
 			};
 			buildConfigurationList = 929DE79014AB571800B9CCFF /* Build configuration list for PBXProject "@@PROJECT_NAME@@" */;
@@ -591,7 +588,7 @@
 					"${OPENMEAP_HOME}/clients/c/openmeap-slic-ios/src/c",
 					"${OPENMEAP_HOME}/clients/c/openmeap-slic-core/include",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				OPENMEAP_HOME = @@OPENMEAP_HOME@@;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -615,7 +612,7 @@
 					"${OPENMEAP_HOME}/clients/c/openmeap-slic-ios/src/c",
 					"${OPENMEAP_HOME}/clients/c/openmeap-slic-core/include",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				OPENMEAP_HOME = @@OPENMEAP_HOME@@;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
@@ -649,34 +646,38 @@
 		929DE7D014AB571800B9CCFF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/@@PROJECT_NAME@@.app/@@PROJECT_NAME@@";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+					"$(inherited)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "@@PROJECT_NAME@@/@@PROJECT_NAME@@-Prefix.pch";
 				INFOPLIST_FILE = "@@PROJECT_NAME@@Tests/@@PROJECT_NAME@@Tests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = octest;
+				WRAPPER_EXTENSION = xctest;
 			};
 			name = Debug;
 		};
 		929DE7D114AB571800B9CCFF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/@@PROJECT_NAME@@.app/@@PROJECT_NAME@@";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+					"$(inherited)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "@@PROJECT_NAME@@/@@PROJECT_NAME@@-Prefix.pch";
 				INFOPLIST_FILE = "@@PROJECT_NAME@@Tests/@@PROJECT_NAME@@Tests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = octest;
+				WRAPPER_EXTENSION = xctest;
 			};
 			name = Release;
 		};
