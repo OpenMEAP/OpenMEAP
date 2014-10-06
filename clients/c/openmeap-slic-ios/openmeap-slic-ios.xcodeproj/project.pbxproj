@@ -121,7 +121,7 @@
 		929562CE143A6F5F00B65337 /* OmSlicLoginViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OmSlicLoginViewController.xib; sourceTree = "<group>"; };
 		929562D1143A6F7D00B65337 /* OmSlicLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OmSlicLoginViewController.m; path = src/c/OmSlicLoginViewController.m; sourceTree = "<group>"; };
 		929562D2143A6F7D00B65337 /* OmSlicLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OmSlicLoginViewController.h; path = src/c/OmSlicLoginViewController.h; sourceTree = "<group>"; };
-		92A93DB513AA81370015D22C /* unit-tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "unit-tests.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		92A93DB513AA81370015D22C /* unit-tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "unit-tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		92A93E3813AA81F40015D22C /* unit-tests-debug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "unit-tests-debug.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		92A93E3A13AA81F40015D22C /* unit-tests-debug-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "unit-tests-debug-Info.plist"; sourceTree = "<group>"; };
 		92A93E6B13AA88CE0015D22C /* harness_AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = harness_AppDelegate.h; path = test/harness/harness_AppDelegate.h; sourceTree = "<group>"; };
@@ -193,7 +193,7 @@
 			isa = PBXGroup;
 			children = (
 				D2AAC07E0554694100DB518D /* libopenmeap_slic_ios.a */,
-				92A93DB513AA81370015D22C /* unit-tests.octest */,
+				92A93DB513AA81370015D22C /* unit-tests.xctest */,
 				92A93E3813AA81F40015D22C /* unit-tests-debug.app */,
 			);
 			name = Products;
@@ -364,8 +364,8 @@
 			);
 			name = "unit-tests";
 			productName = "unit-tests";
-			productReference = 92A93DB513AA81370015D22C /* unit-tests.octest */;
-			productType = "com.apple.product-type.bundle";
+			productReference = 92A93DB513AA81370015D22C /* unit-tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		92A93E3713AA81F40015D22C /* unit-tests-debug */ = {
 			isa = PBXNativeTarget;
@@ -407,6 +407,8 @@
 /* Begin PBXProject section */
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = 1DEB922208733DC00010E9CD /* Build configuration list for PBXProject "openmeap-slic-ios" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -570,6 +572,7 @@
 					"\"$(SRCROOT)/../openmeap-slic-core/build/Debug\"",
 				);
 				PRODUCT_NAME = openmeap_slic_ios;
+				WRAPPER_EXTENSION = "";
 			};
 			name = Debug;
 		};
@@ -594,6 +597,7 @@
 					"\"$(SRCROOT)/../openmeap-slic-core/build/Debug\"",
 				);
 				PRODUCT_NAME = openmeap_slic_ios;
+				WRAPPER_EXTENSION = "";
 			};
 			name = Release;
 		};
@@ -647,14 +651,14 @@
 					"-framework",
 					Foundation,
 					"-framework",
-					SenTestingKit,
+					XCTest,
 					"-framework",
 					UIKit,
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = "unit-tests";
 				SDKROOT = iphoneos;
-				WRAPPER_EXTENSION = octest;
+				WRAPPER_EXTENSION = xctest;
 			};
 			name = Debug;
 		};
@@ -676,14 +680,14 @@
 					"-framework",
 					Foundation,
 					"-framework",
-					SenTestingKit,
+					XCTest,
 					"-framework",
 					UIKit,
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = "unit-tests";
 				SDKROOT = iphoneos;
-				WRAPPER_EXTENSION = octest;
+				WRAPPER_EXTENSION = xctest;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -713,7 +717,7 @@
 					"-framework",
 					UIKit,
 					"-framework",
-					SenTestingKit,
+					XCTest,
 				);
 				PREBINDING = NO;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
