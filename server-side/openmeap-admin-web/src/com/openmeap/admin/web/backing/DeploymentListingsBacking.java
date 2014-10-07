@@ -108,7 +108,7 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 					modelManager.begin();
 					depl = modelManager.addModify(depl,events);
 					modelManager.commit(events);
-					events.add( new MessagesEvent("Deployment successfully completed!”) );
+					events.add( new MessagesEvent("Deployment successfully completed.") );
 				} catch (Exception pe) {
 					modelManager.rollback();
 					Throwable root = ExceptionUtils.getRootCause(pe);
