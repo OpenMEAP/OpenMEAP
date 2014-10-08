@@ -263,7 +263,9 @@
 
 =================================================================================
 	
- Deploying OpenMEAP Admin to the Tomcat Server
+ Installing and Deploying OpenMEAP Admin to the Tomcat Server
+
+    Download and extract Tomcat http://tomcat.apache.org/download-70.cgi
 
     In eclipse, add a new server.
     Select the openmeap-admin-web, openmeap-services-web and banking-web projects
