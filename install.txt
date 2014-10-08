@@ -46,7 +46,7 @@
  Android Development
 
     Windows 7 (32-bit and 64-bit) or Mac OS X 10.6 and above
-    Download and install Android SDK http://developer.android.com
+    Download and install Android SDK https://developer.android.com/sdk/
     Android device
 
  Windows Development
