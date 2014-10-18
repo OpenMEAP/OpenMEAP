@@ -138,7 +138,7 @@
 		<property name="openmeap.slic.developmentMode" value="false"/>
 		<property name="openmeap.slic.icon"            value="${openmeap.project.build}/template/android/icon.png"/>
 		<property name="openmeap.slic.appicon"         value="${openmeap.project.build}/template/ios/icon.png"/>
-		<property name="openmeap.slic.splash"          value="${openmeap.project.build}/template/ios/splash.png"/>
+		<property name="openmeap.slic.splash"          value="${openmeap.project.build}/template/ios/Default-568h@2x.png"/>
 		<property name="openmeap.slic.updatePendingTimeout" value="300"/>
 		
 		<condition property="com.slic.serviceUrlNeeded">

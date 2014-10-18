@@ -83,7 +83,7 @@
 		
 		<mkdir dir="${openmeap.slic.ios.path}/${openmeap.slic.packagedAppRoot}"/>
 		<copy file="${openmeap.slic.appicon}" tofile="${openmeap.slic.ios.path}/icon.png"/>
-		<copy file="${openmeap.slic.splash}" tofile="${openmeap.slic.ios.path}/splash.png"/>
+		<copy file="${openmeap.slic.splash}" tofile="${openmeap.slic.ios.path}/Default-568h@2x.png"/>
 
 		<!-- Test project files -->
 		<copy file="${openmeap.build.template.ios}/@@PROJECT_NAME@@Tests/@@PROJECT_NAME@@Tests-Info.plist" 
