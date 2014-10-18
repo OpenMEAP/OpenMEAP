@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8442CB8419F3017A009A842F /* splash.png in Resources */ = {isa = PBXBuildFile; fileRef = 8442CB8319F3017A009A842F /* splash.png */; };
+		8442CB8619F301AD009A842F /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8442CB8519F301AD009A842F /* Images.xcassets */; };
 		929DE79B14AB571800B9CCFF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 929DE79A14AB571800B9CCFF /* UIKit.framework */; };
 		929DE79D14AB571800B9CCFF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 929DE79C14AB571800B9CCFF /* Foundation.framework */; };
 		929DE79F14AB571800B9CCFF /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 929DE79E14AB571800B9CCFF /* CoreGraphics.framework */; };
@@ -68,6 +70,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8442CB8319F3017A009A842F /* splash.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = splash.png; sourceTree = "<group>"; };
+		8442CB8519F301AD009A842F /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = @@PROJECT_NAME@@/Images.xcassets; sourceTree = "<group>"; };
 		929DE79614AB571800B9CCFF /* @@PROJECT_NAME@@.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = @@PROJECT_NAME@@.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		929DE79A14AB571800B9CCFF /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		929DE79C14AB571800B9CCFF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -84,51 +88,51 @@
 		929DE7C714AB571800B9CCFF /* @@PROJECT_NAME@@Tests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = @@PROJECT_NAME@@Tests.h; sourceTree = "<group>"; };
 		929DE7C814AB571800B9CCFF /* @@PROJECT_NAME@@Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = @@PROJECT_NAME@@Tests.m; sourceTree = "<group>"; };
 		929DE7DE14AB57CC00B9CCFF /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		929DE7E814AB58CC00B9CCFF /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/icon.png"; sourceTree = "<group>"; };
-		929DE7E914AB58CC00B9CCFF /* OmSlicLoginViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = OmSlicLoginViewController.xib; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/OmSlicLoginViewController.xib"; sourceTree = "<group>"; };
-		929DE7EA14AB58CC00B9CCFF /* OmSlicViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = OmSlicViewController.xib; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/OmSlicViewController.xib"; sourceTree = "<group>"; };
-		929DE7EE14AB590100B9CCFF /* OmSlicAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OmSlicAppDelegate.m; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicAppDelegate.m"; sourceTree = "<group>"; };
-		929DE7EF14AB590100B9CCFF /* OmSlicLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OmSlicLoginViewController.h; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicLoginViewController.h"; sourceTree = "<group>"; };
-		929DE7F014AB590100B9CCFF /* OmSlicLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OmSlicLoginViewController.m; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicLoginViewController.m"; sourceTree = "<group>"; };
-		929DE7F114AB590100B9CCFF /* storage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = storage.m; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/storage.m"; sourceTree = "<group>"; };
-		929DE7F214AB590100B9CCFF /* OmSlicViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OmSlicViewController.m; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicViewController.m"; sourceTree = "<group>"; };
-		929DE7F314AB590100B9CCFF /* OmSlicAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OmSlicAppDelegate.h; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicAppDelegate.h"; sourceTree = "<group>"; };
-		929DE7F414AB590100B9CCFF /* OmSlicJsApiProtcol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OmSlicJsApiProtcol.m; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicJsApiProtcol.m"; sourceTree = "<group>"; };
-		929DE7F514AB590100B9CCFF /* OmSlicViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OmSlicViewController.h; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicViewController.h"; sourceTree = "<group>"; };
-		929DE7F614AB590100B9CCFF /* OmSlicConnectionHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OmSlicConnectionHandler.h; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicConnectionHandler.h"; sourceTree = "<group>"; };
-		929DE7F714AB590100B9CCFF /* OmSlicConnectionHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OmSlicConnectionHandler.m; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicConnectionHandler.m"; sourceTree = "<group>"; };
-		929DE7F814AB590100B9CCFF /* network.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = network.m; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/network.m"; sourceTree = "<group>"; };
-		929DE7F914AB590100B9CCFF /* OmSlicJsApiProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OmSlicJsApiProtocol.h; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicJsApiProtocol.h"; sourceTree = "<group>"; };
-		929DE7FA14AB590100B9CCFF /* props.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = props.m; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/props.m"; sourceTree = "<group>"; };
-		929DE7FB14AB590100B9CCFF /* prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = prefs.m; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/prefs.m"; sourceTree = "<group>"; };
-		929DE80514AB591C00B9CCFF /* openmeap-ios-api.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "openmeap-ios-api.js"; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/js/openmeap-ios-api.js"; sourceTree = "<group>"; };
-		929DE80714AB593900B9CCFF /* update.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = update.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/update.c"; sourceTree = "<group>"; };
-		929DE80814AB593900B9CCFF /* storage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = storage.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/storage.c"; sourceTree = "<group>"; };
-		929DE80914AB593900B9CCFF /* storage-default.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "storage-default.c"; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/storage-default.c"; sourceTree = "<group>"; };
-		929DE80A14AB593900B9CCFF /* config.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = config.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/config.c"; sourceTree = "<group>"; };
-		929DE80B14AB593900B9CCFF /* list.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = list.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/list.c"; sourceTree = "<group>"; };
-		929DE80C14AB593900B9CCFF /* string.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = string.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/string.c"; sourceTree = "<group>"; };
-		929DE80D14AB593900B9CCFF /* dict.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dict.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/dict.c"; sourceTree = "<group>"; };
-		929DE80E14AB593900B9CCFF /* digest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = digest.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/digest.c"; sourceTree = "<group>"; };
-		929DE80F14AB593900B9CCFF /* zip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zip.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/zip.c"; sourceTree = "<group>"; };
-		929DE81014AB593900B9CCFF /* mem.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mem.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/mem.c"; sourceTree = "<group>"; };
-		929DE81114AB593900B9CCFF /* openmeap-slic-core.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "openmeap-slic-core.c"; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/openmeap-slic-core.c"; sourceTree = "<group>"; };
-		929DE81214AB593900B9CCFF /* error.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = error.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/error.c"; sourceTree = "<group>"; };
-		929DE81314AB593900B9CCFF /* network.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = network.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/network.c"; sourceTree = "<group>"; };
-		929DE81414AB593900B9CCFF /* prefs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = prefs.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/prefs.c"; sourceTree = "<group>"; };
-		929DE81514AB593900B9CCFF /* props.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = props.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/props.c"; sourceTree = "<group>"; };
-		929DE82614AB598900B9CCFF /* unzip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = unzip.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/minzip-1.01h/unzip.c"; sourceTree = "<group>"; };
-		929DE82714AB598900B9CCFF /* zip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zip.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/minzip-1.01h/zip.c"; sourceTree = "<group>"; };
-		929DE82814AB598900B9CCFF /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ioapi.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/minzip-1.01h/ioapi.c"; sourceTree = "<group>"; };
-		929DE82C14AB599C00B9CCFF /* zip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = zip.h; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/minzip-1.01h/zip.h"; sourceTree = "<group>"; };
-		929DE82D14AB599C00B9CCFF /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = unzip.h; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/minzip-1.01h/unzip.h"; sourceTree = "<group>"; };
-		929DE82E14AB599C00B9CCFF /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ioapi.h; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/minzip-1.01h/ioapi.h"; sourceTree = "<group>"; };
-		929DE83014AB59B500B9CCFF /* cJSON.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cJSON.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/cJSON/cJSON.c"; sourceTree = "<group>"; };
-		929DE83114AB59B500B9CCFF /* cJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cJSON.h; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/cJSON/cJSON.h"; sourceTree = "<group>"; };
-		929DE83414AB59CF00B9CCFF /* sha1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sha1.h; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/digest-sha1/sha1.h"; sourceTree = "<group>"; };
-		929DE83514AB59CF00B9CCFF /* sha1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sha1.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/digest-sha1/sha1.c"; sourceTree = "<group>"; };
-		929DE83814AB59EA00B9CCFF /* md5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = md5.h; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/digest-md5/md5.h"; sourceTree = "<group>"; };
-		929DE83914AB59EA00B9CCFF /* md5.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = md5.c; path = "@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/digest-md5/md5.c"; sourceTree = "<group>"; };
+		929DE7E814AB58CC00B9CCFF /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/icon.png"; sourceTree = "<group>"; };
+		929DE7E914AB58CC00B9CCFF /* OmSlicLoginViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = OmSlicLoginViewController.xib; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/OmSlicLoginViewController.xib"; sourceTree = "<group>"; };
+		929DE7EA14AB58CC00B9CCFF /* OmSlicViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = OmSlicViewController.xib; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/OmSlicViewController.xib"; sourceTree = "<group>"; };
+		929DE7EE14AB590100B9CCFF /* OmSlicAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OmSlicAppDelegate.m; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicAppDelegate.m"; sourceTree = "<group>"; };
+		929DE7EF14AB590100B9CCFF /* OmSlicLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OmSlicLoginViewController.h; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicLoginViewController.h"; sourceTree = "<group>"; };
+		929DE7F014AB590100B9CCFF /* OmSlicLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OmSlicLoginViewController.m; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicLoginViewController.m"; sourceTree = "<group>"; };
+		929DE7F114AB590100B9CCFF /* storage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = storage.m; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/storage.m"; sourceTree = "<group>"; };
+		929DE7F214AB590100B9CCFF /* OmSlicViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OmSlicViewController.m; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicViewController.m"; sourceTree = "<group>"; };
+		929DE7F314AB590100B9CCFF /* OmSlicAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OmSlicAppDelegate.h; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicAppDelegate.h"; sourceTree = "<group>"; };
+		929DE7F414AB590100B9CCFF /* OmSlicJsApiProtcol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OmSlicJsApiProtcol.m; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicJsApiProtcol.m"; sourceTree = "<group>"; };
+		929DE7F514AB590100B9CCFF /* OmSlicViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OmSlicViewController.h; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicViewController.h"; sourceTree = "<group>"; };
+		929DE7F614AB590100B9CCFF /* OmSlicConnectionHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OmSlicConnectionHandler.h; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicConnectionHandler.h"; sourceTree = "<group>"; };
+		929DE7F714AB590100B9CCFF /* OmSlicConnectionHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OmSlicConnectionHandler.m; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicConnectionHandler.m"; sourceTree = "<group>"; };
+		929DE7F814AB590100B9CCFF /* network.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = network.m; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/network.m"; sourceTree = "<group>"; };
+		929DE7F914AB590100B9CCFF /* OmSlicJsApiProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OmSlicJsApiProtocol.h; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/OmSlicJsApiProtocol.h"; sourceTree = "<group>"; };
+		929DE7FA14AB590100B9CCFF /* props.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = props.m; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/props.m"; sourceTree = "<group>"; };
+		929DE7FB14AB590100B9CCFF /* prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = prefs.m; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/c/prefs.m"; sourceTree = "<group>"; };
+		929DE80514AB591C00B9CCFF /* openmeap-ios-api.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "openmeap-ios-api.js"; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-ios/src/js/openmeap-ios-api.js"; sourceTree = "<group>"; };
+		929DE80714AB593900B9CCFF /* update.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = update.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/update.c"; sourceTree = "<group>"; };
+		929DE80814AB593900B9CCFF /* storage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = storage.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/storage.c"; sourceTree = "<group>"; };
+		929DE80914AB593900B9CCFF /* storage-default.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "storage-default.c"; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/storage-default.c"; sourceTree = "<group>"; };
+		929DE80A14AB593900B9CCFF /* config.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = config.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/config.c"; sourceTree = "<group>"; };
+		929DE80B14AB593900B9CCFF /* list.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = list.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/list.c"; sourceTree = "<group>"; };
+		929DE80C14AB593900B9CCFF /* string.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = string.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/string.c"; sourceTree = "<group>"; };
+		929DE80D14AB593900B9CCFF /* dict.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dict.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/dict.c"; sourceTree = "<group>"; };
+		929DE80E14AB593900B9CCFF /* digest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = digest.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/digest.c"; sourceTree = "<group>"; };
+		929DE80F14AB593900B9CCFF /* zip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zip.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/zip.c"; sourceTree = "<group>"; };
+		929DE81014AB593900B9CCFF /* mem.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mem.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/mem.c"; sourceTree = "<group>"; };
+		929DE81114AB593900B9CCFF /* openmeap-slic-core.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "openmeap-slic-core.c"; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/openmeap-slic-core.c"; sourceTree = "<group>"; };
+		929DE81214AB593900B9CCFF /* error.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = error.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/error.c"; sourceTree = "<group>"; };
+		929DE81314AB593900B9CCFF /* network.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = network.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/network.c"; sourceTree = "<group>"; };
+		929DE81414AB593900B9CCFF /* prefs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = prefs.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/prefs.c"; sourceTree = "<group>"; };
+		929DE81514AB593900B9CCFF /* props.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = props.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/src/props.c"; sourceTree = "<group>"; };
+		929DE82614AB598900B9CCFF /* unzip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = unzip.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/minzip-1.01h/unzip.c"; sourceTree = "<group>"; };
+		929DE82714AB598900B9CCFF /* zip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zip.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/minzip-1.01h/zip.c"; sourceTree = "<group>"; };
+		929DE82814AB598900B9CCFF /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ioapi.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/minzip-1.01h/ioapi.c"; sourceTree = "<group>"; };
+		929DE82C14AB599C00B9CCFF /* zip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = zip.h; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/minzip-1.01h/zip.h"; sourceTree = "<group>"; };
+		929DE82D14AB599C00B9CCFF /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = unzip.h; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/minzip-1.01h/unzip.h"; sourceTree = "<group>"; };
+		929DE82E14AB599C00B9CCFF /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ioapi.h; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/minzip-1.01h/ioapi.h"; sourceTree = "<group>"; };
+		929DE83014AB59B500B9CCFF /* cJSON.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cJSON.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/cJSON/cJSON.c"; sourceTree = "<group>"; };
+		929DE83114AB59B500B9CCFF /* cJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cJSON.h; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/cJSON/cJSON.h"; sourceTree = "<group>"; };
+		929DE83414AB59CF00B9CCFF /* sha1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sha1.h; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/digest-sha1/sha1.h"; sourceTree = "<group>"; };
+		929DE83514AB59CF00B9CCFF /* sha1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sha1.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/digest-sha1/sha1.c"; sourceTree = "<group>"; };
+		929DE83814AB59EA00B9CCFF /* md5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = md5.h; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/digest-md5/md5.h"; sourceTree = "<group>"; };
+		929DE83914AB59EA00B9CCFF /* md5.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = md5.c; path = "../../@@OPENMEAP_HOME@@/clients/c/openmeap-slic-core/3rd_party/digest-md5/md5.c"; sourceTree = "<group>"; };
 		929DE85014AB60E200B9CCFF /* original */ = {isa = PBXFileReference; lastKnownFileType = folder; name = original; path = ../original; sourceTree = "<group>"; };
 		929DE85314AB63D200B9CCFF /* slic-config.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "slic-config.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -202,10 +206,10 @@
 			children = (
 				929DE85314AB63D200B9CCFF /* slic-config.plist */,
 				929DE85014AB60E200B9CCFF /* original */,
-				929DE7A214AB571800B9CCFF /* OpenMEAP-Info.plist */,
+				929DE7A214AB571800B9CCFF /* @@PROJECT_NAME@@-Info.plist */,
 				929DE7A314AB571800B9CCFF /* InfoPlist.strings */,
 				929DE7A614AB571800B9CCFF /* main.m */,
-				929DE7A814AB571800B9CCFF /* OpenMEAP-Prefix.pch */,
+				929DE7A814AB571800B9CCFF /* @@PROJECT_NAME@@-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -235,6 +239,7 @@
 				929DE7E714AB589000B9CCFF /* Resources */,
 				929DE7E614AB587D00B9CCFF /* Source */,
 				929DE7E514AB585E00B9CCFF /* Libraries */,
+				8442CB8519F301AD009A842F /* Images.xcassets */,
 			);
 			name = @@PROJECT_NAME@@;
 			sourceTree = "<group>";
@@ -314,6 +319,7 @@
 		929DE7E714AB589000B9CCFF /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8442CB8319F3017A009A842F /* splash.png */,
 				929DE80514AB591C00B9CCFF /* openmeap-ios-api.js */,
 				929DE7E814AB58CC00B9CCFF /* icon.png */,
 				929DE7E914AB58CC00B9CCFF /* OmSlicLoginViewController.xib */,
@@ -408,7 +414,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastTestingUpgradeCheck = 0600;
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0600;
 			};
 			buildConfigurationList = 929DE79014AB571800B9CCFF /* Build configuration list for PBXProject "@@PROJECT_NAME@@" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -437,6 +443,8 @@
 				929DE83F14AB5B8700B9CCFF /* openmeap-ios-api.js in Resources */,
 				929DE7A514AB571800B9CCFF /* InfoPlist.strings in Resources */,
 				929DE7AE14AB571800B9CCFF /* MainStoryboard_iPhone.storyboard in Resources */,
+				8442CB8619F301AD009A842F /* Images.xcassets in Resources */,
+				8442CB8419F3017A009A842F /* splash.png in Resources */,
 				929DE7B114AB571800B9CCFF /* MainStoryboard_iPad.storyboard in Resources */,
 				929DE7EB14AB58CC00B9CCFF /* icon.png in Resources */,
 				929DE7EC14AB58CC00B9CCFF /* OmSlicLoginViewController.xib in Resources */,
@@ -568,9 +576,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -580,8 +595,12 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					"${OPENMEAP_HOME}/clients/c/openmeap-slic-core/3rd_party",
@@ -589,7 +608,8 @@
 					"${OPENMEAP_HOME}/clients/c/openmeap-slic-core/include",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				OPENMEAP_HOME = @@OPENMEAP_HOME@@;
+				ONLY_ACTIVE_ARCH = YES;
+				OPENMEAP_HOME = ../../@@OPENMEAP_HOME@@;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -599,13 +619,24 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					"${OPENMEAP_HOME}/clients/c/openmeap-slic-core/3rd_party",
@@ -613,7 +644,7 @@
 					"${OPENMEAP_HOME}/clients/c/openmeap-slic-core/include",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				OPENMEAP_HOME = @@OPENMEAP_HOME@@;
+				OPENMEAP_HOME = ../../@@OPENMEAP_HOME@@;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -624,6 +655,8 @@
 		929DE7CD14AB571800B9CCFF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "@@PROJECT_NAME@@/@@PROJECT_NAME@@-Prefix.pch";
 				INFOPLIST_FILE = "@@PROJECT_NAME@@/@@PROJECT_NAME@@-Info.plist";
@@ -635,6 +668,8 @@
 		929DE7CE14AB571800B9CCFF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "@@PROJECT_NAME@@/@@PROJECT_NAME@@-Prefix.pch";
 				INFOPLIST_FILE = "@@PROJECT_NAME@@/@@PROJECT_NAME@@-Info.plist";
