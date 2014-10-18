@@ -203,6 +203,8 @@ OM_EXPORT om_bool om_storage_create_directories_for_path(om_storage_ptr storage,
  */
 OM_EXPORT om_file_input_stream_ptr om_storage_get_import_archive_input_stream(om_storage_ptr storage);
 
+OM_EXPORT char * om_storage_file_get_contents(om_storage_ptr storage, const char *fullFilePath);
+
 /**
  * @return An output stream to the truncated import archive file
  */

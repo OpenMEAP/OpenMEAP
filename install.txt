@@ -94,8 +94,6 @@
 
     Open your command-line tool and type ant -v and Java -version
 
- If you get errors, read the Ant and Java install guide.
-
  Setup Your Path & Environment Variables - Mac
 
  Set OpenMEAP Home Path

@@ -26,6 +26,7 @@
 
 #import "OmSlicViewController.h"
 #import "OmSlicJsApiProtocol.h"
+#include <openmeap/storage.h>
 
 @implementation OmSlicViewController
 

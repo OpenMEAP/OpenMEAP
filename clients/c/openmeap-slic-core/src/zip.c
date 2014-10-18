@@ -24,11 +24,10 @@
 
 #include <stdio.h>
 #include "unzip.h"
-
 #include <openmeap-slic-core.h>
-
 #include <errno.h>
 #include <dirent.h>
+#include <sys/stat.h>
 
 OM_PRIVATE_FUNC int __om_unzip_mymkdir(om_unzip_archive_ptr archive, const char* dirname);
 OM_PRIVATE_FUNC int __om_unzip_makedir(om_unzip_archive_ptr archive, const char *rootExportPath, char *newdir);

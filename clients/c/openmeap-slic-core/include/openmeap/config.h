@@ -148,6 +148,8 @@ OM_EXPORT void om_config_release(om_config_ptr cfg);
  */
 OM_EXPORT void * om_config_get(om_config_ptr cfg, int om_config_enum);
 
+OM_EXPORT const char * om_config_map_to_str(int om_config_enum);
+
 /**
  * Pulls the value originally packaged with the application.
  */
