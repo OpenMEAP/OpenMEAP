@@ -38,14 +38,14 @@
 
  iOS Development
 
-    Intel-based computer with Mac OS X 10.6 and above
-    Download and install Xcode from Apple Developer Portal http://developer.apple.com
+    Intel-based computer with Mac OS X 10.9 and above
+    Download and install Xcode 6 or greater from Apple Developer Portal http://developer.apple.com
     Apple iOS device (iPhone, iPad)
     iOS developer program
 
  Android Development
 
-    Windows 7 (32-bit and 64-bit) or Mac OS X 10.6 and above
+    Windows 7 (32-bit and 64-bit) or Mac OS X 10.9 and above
     Download and install Android SDK https://developer.android.com/sdk/
     Android device
 
@@ -57,7 +57,7 @@
 
  BlackBerry Development
 
-    Windows 7 (32-bit and 64-bit) or Mac OS X 10.6 and above
+    Windows 7 (32-bit and 64-bit) or Mac OS X 10.9 and above
     BlackBerry 10 device
 
 =================================================================================
@@ -149,7 +149,7 @@
  From your slic folder, set the environment variable
 
     $ %OPENMEAP_HOME%/build-tools/scripts/setEnv.bat - Windows
-    $ . ~/Applications/OpenMEAP/build-tools/scripts/setEnv.sh - Mac
+    $ . ~/OpenMEAP/build-tools/scripts/setEnv.sh - Mac
 
  Create and build your iOS project
 
