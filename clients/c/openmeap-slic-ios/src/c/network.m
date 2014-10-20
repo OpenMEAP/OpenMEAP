@@ -73,7 +73,6 @@ OM_EXPORT om_http_response_ptr om_net_do_http_get_to_file_output_stream(const ch
 	NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:nsUrl];
 	[request setHTTPMethod:@"GET"];
 	[request setCachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData];
-    NSLog(@"%@",ostream);
 	NSOutputStream * stream = [NSOutputStream 
 							   outputStreamToFileAtPath:[NSString stringWithUTF8String:ostream->device_path] 
 							   append:NO];
