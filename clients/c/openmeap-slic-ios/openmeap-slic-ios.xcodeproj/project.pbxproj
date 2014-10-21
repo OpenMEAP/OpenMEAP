@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		84A7C90E19F7281200761AAC /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84A7C90D19F7281200761AAC /* CoreLocation.framework */; };
 		920C061514CE5C700005C293 /* cJSON.c in Sources */ = {isa = PBXBuildFile; fileRef = 920C061414CE5C700005C293 /* cJSON.c */; };
 		921B8C4414536E9500C485ED /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 921B8C4214536E9500C485ED /* libz.dylib */; settings = {ATTRIBUTES = (Required, ); }; };
 		921B8C461453700700C485ED /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 921B8C4214536E9500C485ED /* libz.dylib */; };
@@ -85,6 +86,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		84A7C90D19F7281200761AAC /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		920C061414CE5C700005C293 /* cJSON.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cJSON.c; path = "../openmeap-slic-core/3rd_party/cJSON/cJSON.c"; sourceTree = "<group>"; };
 		921B8C4214536E9500C485ED /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		921B8C4C1453704B00C485ED /* unit-tests-debug-main-iPad.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "unit-tests-debug-main-iPad.xib"; path = "iPad/unit-tests-debug-main-iPad.xib"; sourceTree = "<group>"; };
@@ -181,6 +183,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84A7C90E19F7281200761AAC /* CoreLocation.framework in Frameworks */,
 				AACBBE4A0F95108600F1A2B1 /* Foundation.framework in Frameworks */,
 				921B8C4414536E9500C485ED /* libz.dylib in Frameworks */,
 			);
@@ -219,6 +222,7 @@
 		0867D69AFE84028FC02AAC07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				84A7C90D19F7281200761AAC /* CoreLocation.framework */,
 				9221E75213AA3638001A3F95 /* UIKit.framework */,
 				AACBBE490F95108600F1A2B1 /* Foundation.framework */,
 			);
