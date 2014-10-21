@@ -82,7 +82,7 @@ OpenMEAP_Core = {
 	
 	getApiUrl:function(url) {
 		var request = new XMLHttpRequest();
-		request.open('GET', url, false);
+		request.open('GET', url, true);
 		request.send(null);
 		if (request.status == 0) {
 			return eval(request.responseText);
