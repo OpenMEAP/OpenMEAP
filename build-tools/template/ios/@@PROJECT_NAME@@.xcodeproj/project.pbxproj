@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		84A7C90C19F726D300761AAC /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84A7C90B19F726D300761AAC /* CoreLocation.framework */; };
 		84FDA0F619F34E89009E9231 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84FDA0F419F34E89009E9231 /* Default-568h@2x.png */; };
 		84FDA0F719F34E89009E9231 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 84FDA0F519F34E89009E9231 /* icon.png */; };
 		929DE79B14AB571800B9CCFF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 929DE79A14AB571800B9CCFF /* UIKit.framework */; };
@@ -69,6 +70,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		84A7C90B19F726D300761AAC /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		84FDA0F419F34E89009E9231 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		84FDA0F519F34E89009E9231 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
 		929DE79614AB571800B9CCFF /* @@PROJECT_NAME@@.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = @@PROJECT_NAME@@.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -140,6 +142,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84A7C90C19F726D300761AAC /* CoreLocation.framework in Frameworks */,
 				929DE7DF14AB57CC00B9CCFF /* libz.dylib in Frameworks */,
 				929DE79B14AB571800B9CCFF /* UIKit.framework in Frameworks */,
 				929DE79D14AB571800B9CCFF /* Foundation.framework in Frameworks */,
@@ -182,6 +185,7 @@
 		929DE79914AB571800B9CCFF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				84A7C90B19F726D300761AAC /* CoreLocation.framework */,
 				929DE79A14AB571800B9CCFF /* UIKit.framework */,
 				929DE79C14AB571800B9CCFF /* Foundation.framework */,
 				929DE79E14AB571800B9CCFF /* CoreGraphics.framework */,
@@ -412,6 +416,11 @@
 			attributes = {
 				LastTestingUpgradeCheck = 0600;
 				LastUpgradeCheck = 0600;
+				TargetAttributes = {
+					929DE79514AB571800B9CCFF = {
+						DevelopmentTeam = 68CQGZLBUH;
+					};
+				};
 			};
 			buildConfigurationList = 929DE79014AB571800B9CCFF /* Build configuration list for PBXProject "@@PROJECT_NAME@@" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -651,6 +660,7 @@
 		929DE7CD14AB571800B9CCFF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "@@PROJECT_NAME@@/@@PROJECT_NAME@@-Prefix.pch";
 				INFOPLIST_FILE = "@@PROJECT_NAME@@/@@PROJECT_NAME@@-Info.plist";
@@ -662,6 +672,7 @@
 		929DE7CE14AB571800B9CCFF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "@@PROJECT_NAME@@/@@PROJECT_NAME@@-Prefix.pch";
 				INFOPLIST_FILE = "@@PROJECT_NAME@@/@@PROJECT_NAME@@-Info.plist";
