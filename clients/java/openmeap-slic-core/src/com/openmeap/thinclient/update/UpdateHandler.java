@@ -1,7 +1,7 @@
 /*
  ###############################################################################
  #                                                                             #
- #    Copyright (C) 2011-2014 OpenMEAP, Inc.                                   #
+ #    Copyright (C) 2011-2015 OpenMEAP, Inc.                                   #
  #    Credits to Jonathan Schang & Rob Thacher                                 #
  #                                                                             #
  #    Released under the LGPLv3                                                #
@@ -548,7 +548,7 @@ public class UpdateHandler {
 					activity.runOnUiThread(new Runnable() {
 						public void run() {
 							activity.doToast(
-									"MANDATORY UPDATE\n\nThere is an immediate update.  The application will restart once the update is completed.",
+									"APPLICATION UPDATE\n\nThe application will restart once the update is completed.",
 									true);
 							// webView.clearView();
 						}

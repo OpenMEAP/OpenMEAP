@@ -1,6 +1,6 @@
  ###############################################################################
  #                                                                             #
- #    Copyright (C) 2011-2014 OpenMEAP, Inc.                                   #
+ #    Copyright (C) 2011-2015 OpenMEAP, Inc.                                   #
  #    Credits to Jonathan Schang & Rob Thacher                                 #
  #                                                                             #
  #    Released under the LGPLv3                                                #
@@ -20,117 +20,101 @@
  #                                                                             #
  ###############################################################################
  
- Please visit our wiki.openmeap.com, forum.openmeap.com or youtube.com/OpenMEAP 
+ Software Prerequisites
 
- Software prerequisites
-
- OpenMEAP was created in Eclipse IDE for Java EE Developers with IvyDE
-    http://www.eclipse.org/
-    http://ant.apache.org/ivy/ivyde/
-
- OpenMEAP SLIC clients were created in Eclipse, Xcode and WP8
-    http://developer.windowsphone.com/
-    https://developer.apple.com/xcode/
-
- OpenMEAP web projects default to Apache Tomcat 7.0
-    http://tomcat.apache.org/
+ OpenMEAP was created in Xcode, WP8 and Eclipse using the IvyDE plugin. Please 
+ visit our wiki.openmeap.com or youtube.com/OpenMEAP for installation help.
 
  OpenMEAP command-line requires Apache Ant 1.8 or greater.
-    http://ant.apache.org/
+    Download and install Ant from http://ant.apache.org/
 
- OpenMEAP and Ant requires Java 
+ OpenMEAP and Ant requires Java JDK 7 or greater.
+    Download and install Java 
     http://www.oracle.com/technetwork/java/javase/downloads/index.html 
- 
+
 =================================================================================
  
- Install Eclipse Plugins 
- 
- IvyDE Plugin for Eclipse
+ Client Prerequisites
 
-    Open the Eclipse IDE
-    From the menu Select Help > Install New Software
-    Click the Add button
-    Name: <Leave Blank>
-    Location: http://www.apache.org/dist/ant/ivyde/updatesite
-    Make sure you select show all version and select the non beta version.
-    Check the box next to the IvyDE plugin
-    Click Next until Finish 
+ iOS Development
 
- ADT Plugin for Eclipse
+    Intel-based computer with Mac OS X 10.9 and above
+    Download and install Xcode 6 or greater from Apple Developer Portal http://developer.apple.com
+    Apple iOS device (iPhone, iPad)
+    iOS developer program
 
-    Open the Eclipse IDE
-    From the menu Select Help > Install New Software
-    Click the Add button
-    Name: <Leave Blank>
-    Location: https://dl-ssl.google.com/android/eclipse/
-    Check the box next to the Developer Tools and select the ADT plugin
-    Click Next until Finish 
+ Android Development
 
- BlackBerry Plug-in for Android Development Tools
+    Windows 7 (32-bit and 64-bit) or Mac OS X 10.9 and above
+    Download and install Android SDK https://developer.android.com/sdk/
+    Android device
 
-    Open the Eclipse IDE
-    From the menu Select Help > Install New Software
-    Click the Add button
-    Name: <Leave Blank>
-    Location:  http://developer.blackberry.com/android/downloads/eclipseplugin/
-    Click Next until Finish 
-	
- Google API's
+ Windows Development
 
-    Go to Android SDK Manager
-    Check Android 2.2 (API 8)
-    Check SDK PLatform and Google APIs
-    Click Install Package 
-	
+    Windows 7 Pro (32-bit and 64-bit) and above
+    Download and install WP8 SDK http://developer.windowsphone.com
+    Windows device
+
+ BlackBerry Development
+
+    Windows 7 (32-bit and 64-bit) or Mac OS X 10.9 and above
+    BlackBerry 10 device
+
 =================================================================================
 
- Path & Environment Variables - Windows
+ Setup Your Path and Environment Variables - Windows
 
  Set ANT_HOME
-     Open System Properties -> Advanced -> Environment Variables
-     Create a new system variable
-     Variable name: ANT_HOME
-     Variable value: e.g. C:\apache-ant
+
+    Open System Properties -> Advanced -> Environment Variables
+    Create a new system variable
+    Variable name: ANT_HOME
+    Variable value: e.g. C:\apache-ant
  
  Set JAVA_HOME
-     Open System Properties -> Advanced -> Environment Variables
-     Create a new system variable
-     Variable name: JAVA_HOME
-     Variable value: e.g. C:\Program Files\Java\jdk1.7.0_02
+
+    Open System Properties -> Advanced -> Environment Variables
+    Create a new system variable
+    Variable name: JAVA_HOME
+    Variable value: e.g. C:\Program Files\Java\jdk1.7.0_02
 
  Set OPENMEAP_HOME
-     Open System Properties -> Advanced -> Environment Variables
-     Create a new system variable
-     Variable name: OPENMEAP_HOME
-     Variable value: e.g. C:\OpenMEAP
+
+    Open System Properties -> Advanced -> Environment Variables
+    Create a new system variable
+    Variable name: OPENMEAP_HOME
+    Variable value: e.g. C:\OpenMEAP
 
  Open System Properties -> Advanced -> Environment Variables
-     Under system variables, edit PATH
-     Add ;%ANT_HOME%\bin;%JAVA_HOME%\bin to the end of the PATH value 
+
+    Under system variables, edit PATH
+    Add ;%ANT_HOME%\bin;%JAVA_HOME%\bin to the end of the PATH value 
 
  Verify that ANT and Java are installed
-     Open your command-line tool and type ant -v and Java -version
 
- If you get errors, read the Ant install guide. You may also need to copy the
- tools.jar file over from the JRE7/lib folder to your JDK/lib folder. 
+    Open your command-line tool and type ant -v and Java -version
 
- Path & Environment Variables - Mac
+ Setup Your Path & Environment Variables - Mac
 
  Set OpenMEAP Home Path
-     export -x OPENMEAP_HOME=/Applications/OpenMEAP
+
+    export -x OPENMEAP_HOME=/Applications/OpenMEAP
 
  Add the new version of Ant to current terminal session
-     export PATH=/usr/local/apache-ant/bin:"$PATH"
+
+    export PATH=/usr/local/apache-ant/bin:"$PATH"
 
  Add the new version of Ant to future terminal sessions
-     echo 'export PATH=/usr/local/apache-ant/bin:"$PATH"' >> ~/.profile
+
+    echo 'export PATH=/usr/local/apache-ant/bin:"$PATH"' >> ~/.profile
 
  Verify that ANT and Java are installed
+
     Open your command-line tool and type ant -v and java -version
 
 =================================================================================
 
- Correct the environment variables in this file to match your environment
+ Correct the environment variables in the setEnv file to match your environment
 
     OpenMEAP/build-tools/scripts/setEnv.bat - Windows
     OpenMEAP/build-tools/scripts/setEnv.sh - Mac
@@ -144,15 +128,8 @@
     $ ant publish-local-slic-core
 	
  The openmeap-admin-web.war and openmeap-services-web.war files will be located 
- in /build-tools/dist. These need to be dropped in apache tomcat's webapps 
- directory if you plan to use the OpenMEAP server.
-
- Update the tomcat-users.xml in tomcat's conf directory with the info below
-
-    <role rolename="openmeap-admin"/>
-    <role rolename="openmeap-user"/>
-    <user name="admin" password="openmeap" roles="tomcat,openmeap-user,openmeap-admin"/>
-    <user name="user" password="openmeap" roles="openmeap-user"/>
+ in /build-tools/dist. These will need to be dropped in Apache Tomcat's webapps 
+ directory if you plan to deploy the OpenMEAP server in QA or Production.
 
 =================================================================================
 
@@ -165,14 +142,14 @@
 
     Create a slic folder
     Copy the OpenMEAP/build-tools/template/client.properties file to the slic folder
-    Create an assets folder inside of the slice folder
+    Create an assets folder inside of the slic folder
     Copy the OpenMEAP/samples/banking/banking-app/original/ contents to the assets folder
     Edit the client.properties file to match your environment
  
  From your slic folder, set the environment variable
 
-    %OPENMEAP_HOME%/build-tools/scripts/setEnv.bat - Windows
-    $ . ~/Applications/OpenMEAP/build-tools/scripts/setEnv.sh - Mac
+    $ %OPENMEAP_HOME%/build-tools/scripts/setEnv.bat - Windows
+    $ . ~/OpenMEAP/build-tools/scripts/setEnv.sh - Mac
 
  Create and build your iOS project
 
@@ -190,21 +167,64 @@
     $ om_android.bat create-project -propertyfile client.properties - Windows
     $ om_android.sh create-project -propertyfile client.properties - Mac
 
-Note: if you want to create multiple apps, in your client.properties file, change 
-the name at the end of the naming convention. For example, com.openmeap to com.newappname.
-Once you have completed your changes to the client.properties file, save it as 
-client.properties.newappname. This way, when you want to build this client, you would 
-run these commands below to build for each platform.
+ Note: if you want to create multiple apps, in your client.properties file, change 
+ the name at the end of the naming convention. For example, com.openmeap to com.newappname.
+ Once you have completed your changes to the client.properties file, save it as 
+ client.properties.newappname. This way, when you want to build this client, you would 
+ run these commands below to build for each platform.
 
-Mac:
+ Mac:
+    
+    om_ios.sh create-project -propertyfile client.properties.newappname
+    om_android.sh create-project -propertyfile client.properties.newappname
 
-om_ios.sh create-project -propertyfile client.properties.newappname
-om_android.sh create-project -propertyfile client.properties.newappname
+ Windows:
+    
+    om_win.bat create-project -propertyfile client.properties.newappname
+    om_android.bat create-project -propertyfile client.properties.newappname
+	
+=================================================================================
 
-Windows:
+ Install Eclipse and Plugins 
 
-om_win.bat create-project -propertyfile client.properties.newappname
-om_android.bat create-project -propertyfile client.properties.newappname
+ Download Eclipse IDE for Java EE Developers https://www.eclipse.org/downloads/
+ 
+ IvyDE Plugin for Eclipse
+    
+    Open the Eclipse IDE
+    From the menu Select Help > Install New Software
+    Click the Add button
+    Name: <Leave Blank>
+    Location: http://www.apache.org/dist/ant/ivyde/updatesite
+    Make sure you select show all version and select the non beta version.
+    Check the box next to the IvyDE plugin
+    Click Next until Finish 
+
+ ADT Plugin for Eclipse
+    
+    Open the Eclipse IDE
+    From the menu Select Help > Install New Software
+    Click the Add button
+    Name: <Leave Blank>
+    Location: https://dl-ssl.google.com/android/eclipse/
+    Check the box next to the Developer Tools and select the ADT plugin
+    Click Next until Finish 
+
+ BlackBerry Plug-in for Android Development Tools
+    
+    Open the Eclipse IDE
+    From the menu Select Help > Install New Software
+    Click the Add button
+    Name: <Leave Blank>
+    Location:  http://developer.blackberry.com/android/downloads/eclipseplugin/
+    Click Next until Finish 
+	
+ Google API's
+
+    Go to Android SDK Manager
+    Check Android 2.2 (API 8)
+    Check SDK Platform and Google APIs
+    Click Install Package 
 	
 =================================================================================
 
@@ -236,12 +256,14 @@ om_android.bat create-project -propertyfile client.properties.newappname
  Import and build the projects in groups in the order below
 
     openmeap-shared, openmeap-shared-serverside, openmeap-shared-jdk5
-    openmeap-admin-web, openmeap-services-web, banking-web
+    openmeap-admin-web, openmeap-services-web
     openmeap-slic-core, openmeap-slic-android
 
 =================================================================================
 	
- Deploying OpenMEAP Admin to the Tomcat Server
+ Installing and Deploying OpenMEAP Admin to the Tomcat Server
+
+    Download and extract Tomcat http://tomcat.apache.org/download-70.cgi
 
     In eclipse, add a new server.
     Select the openmeap-admin-web, openmeap-services-web and banking-web projects

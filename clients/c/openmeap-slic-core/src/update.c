@@ -1,7 +1,7 @@
 /*
  ###############################################################################
  #                                                                             #
- #    Copyright (C) 2011-2014 OpenMEAP, Inc.                                   #
+ #    Copyright (C) 2011-2015 OpenMEAP, Inc.                                   #
  #    Credits to Jonathan Schang & Rob Thacher                                 #
  #                                                                             #
  #    Released under the LGPLv3                                                #
@@ -24,7 +24,9 @@
 
 #include <openmeap-slic-core.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
+#include <openmeap/config.h>
 #include "cJSON.h"
 
 const char * OmUpdateCheckErrorClient = "CLIENT";

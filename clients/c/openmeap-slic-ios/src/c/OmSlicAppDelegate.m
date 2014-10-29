@@ -1,7 +1,7 @@
 /*
  ###############################################################################
  #                                                                             #
- #    Copyright (C) 2011-2014 OpenMEAP, Inc.                                   #
+ #    Copyright (C) 2011-2015 OpenMEAP, Inc.                                   #
  #    Credits to Jonathan Schang & Rob Thacher                                 #
  #                                                                             #
  #    Released under the LGPLv3                                                #
@@ -297,7 +297,7 @@ static OmSlicAppDelegate *__globalOmSlicAppDelegateInstance;
         if( updateHeader->type==OM_UPDATE_TYPE_IMMEDIATE ) {
             
             // TODO: show IMMEDIATE update intercepting screen, kill webview
-            [self showAlert:@"There is an immediate update.  The application will restart once the update is completed." withTitle:@"MANDATORY UPDATE"];
+            [self showAlert:@"The application will restart once the update is completed." withTitle:@"APPLICATION UPDATE"];
             
             NSLog(@"-- performing IMMEDIATE update");
             const char * updateResult = om_update_perform(self->config,self->storage,updateHeader);

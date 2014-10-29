@@ -1,7 +1,7 @@
 /*
  ###############################################################################
  #                                                                             #
- #    Copyright (C) 2011-2014 OpenMEAP, Inc.                                   #
+ #    Copyright (C) 2011-2015 OpenMEAP, Inc.                                   #
  #    Credits to Jonathan Schang & Rob Thacher                                 #
  #                                                                             #
  #    Released under the LGPLv3                                                #
@@ -82,7 +82,7 @@ OpenMEAP_Core = {
 	
 	getApiUrl:function(url) {
 		var request = new XMLHttpRequest();
-		request.open('GET', url, false);
+		request.open('GET', url, true);
 		request.send(null);
 		if (request.status == 0) {
 			return eval(request.responseText);

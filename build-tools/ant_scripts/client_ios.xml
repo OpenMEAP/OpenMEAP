@@ -2,7 +2,7 @@
 <!--
  ###############################################################################
  #                                                                             #
- #    Copyright (C) 2011-2014 OpenMEAP, Inc.                                   #
+ #    Copyright (C) 2011-2015 OpenMEAP, Inc.                                   #
  #    Credits to Jonathan Schang & Rob Thacher                                 #
  #                                                                             #
  #    Released under the LGPLv3                                                #
@@ -82,7 +82,8 @@
 	<target name="create-project" depends="-setup-client-properties" description="Creates an OpenMEAP iOS SLIC from the specified properties.">
 		
 		<mkdir dir="${openmeap.slic.ios.path}/${openmeap.slic.packagedAppRoot}"/>
-		<copy file="${openmeap.slic.icon}" tofile="${openmeap.slic.ios.path}/icon.png"/>
+		<copy file="${openmeap.slic.appicon}" tofile="${openmeap.slic.ios.path}/icon.png"/>
+		<copy file="${openmeap.slic.splash}" tofile="${openmeap.slic.ios.path}/Default-568h@2x.png"/>
 
 		<!-- Test project files -->
 		<copy file="${openmeap.build.template.ios}/@@PROJECT_NAME@@Tests/@@PROJECT_NAME@@Tests-Info.plist" 
@@ -91,6 +92,9 @@
 			tofile="${openmeap.slic.ios.path}/${openmeap.slic.ios.projectName}Tests/${openmeap.slic.ios.projectName}Tests.h" overwrite="true"/>
 		<copy file="${openmeap.build.template.ios}/@@PROJECT_NAME@@Tests/@@PROJECT_NAME@@Tests.m" 
 			tofile="${openmeap.slic.ios.path}/${openmeap.slic.ios.projectName}Tests/${openmeap.slic.ios.projectName}Tests.m" overwrite="true"/>
+		<copy todir="${openmeap.slic.ios.path}/${openmeap.slic.ios.projectName}Tests/en.lproj" includeEmptyDirs="true">
+			<fileset dir="${openmeap.build.template.ios}/@@PROJECT_NAME@@Tests/en.lproj" includes="*"/>
+		</copy>
 		
 		<!-- Main project files -->
 		<copy file="${openmeap.build.template.ios}/@@PROJECT_NAME@@/@@PROJECT_NAME@@-Info.plist" 
@@ -120,7 +124,7 @@
 			</or>
 		</condition>
 		
-		<echo>openmeap.slic.pullUpdates: ${openmeap.slic.developmentMode}</echo>
+		<echo>openmeap.slic.developmentMode: ${openmeap.slic.developmentMode}</echo>
 		<condition property="openmeap.slic.ios.developmentMode" value="1" else="0">
 			<or>
 				<equals arg1="true" arg2="${openmeap.slic.developmentMode}" trim="yes" casesensitive="no"/>

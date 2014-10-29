@@ -1,7 +1,7 @@
 /*
  ###############################################################################
  #                                                                             #
- #    Copyright (C) 2011-2014 OpenMEAP, Inc.                                   #
+ #    Copyright (C) 2011-2015 OpenMEAP, Inc.                                   #
  #    Credits to Jonathan Schang & Rob Thacher                                 #
  #                                                                             #
  #    Released under the LGPLv3                                                #
@@ -73,7 +73,6 @@ OM_EXPORT om_http_response_ptr om_net_do_http_get_to_file_output_stream(const ch
 	NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:nsUrl];
 	[request setHTTPMethod:@"GET"];
 	[request setCachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData];
-	
 	NSOutputStream * stream = [NSOutputStream 
 							   outputStreamToFileAtPath:[NSString stringWithUTF8String:ostream->device_path] 
 							   append:NO];

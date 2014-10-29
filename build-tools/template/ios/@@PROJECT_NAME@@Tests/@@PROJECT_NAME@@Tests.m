@@ -1,7 +1,7 @@
 /*
  ###############################################################################
  #                                                                             #
- #    Copyright (C) 2011-2014 OpenMEAP, Inc.                                   #
+ #    Copyright (C) 2011-2015 OpenMEAP, Inc.                                   #
  #    Credits to Jonathan Schang & Rob Thacher                                 #
  #                                                                             #
  #    Released under the LGPLv3                                                #
@@ -24,6 +24,10 @@
 
 #import "@@PROJECT_NAME@@Tests.h"
 
+@interface @@PROJECT_NAME@@Tests : XCTestCase
+
+@end
+
 @implementation @@PROJECT_NAME@@Tests
 
 - (void)setUp
@@ -42,7 +46,7 @@
 
 - (void)testExample
 {
-    STFail(@"Unit tests are not implemented yet in @@PROJECT_NAME@@Tests");
+    XCTFail(@"Unit tests are not implemented yet in @@PROJECT_NAME@@Tests");
 }
 
 @end

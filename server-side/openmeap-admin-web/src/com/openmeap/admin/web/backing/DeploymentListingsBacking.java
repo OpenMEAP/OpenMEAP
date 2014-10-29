@@ -1,7 +1,7 @@
 /*
  ###############################################################################
  #                                                                             #
- #    Copyright (C) 2011-2014 OpenMEAP, Inc.                                   #
+ #    Copyright (C) 2011-2015 OpenMEAP, Inc.                                   #
  #    Credits to Jonathan Schang & Rob Thacher                                 #
  #                                                                             #
  #    Released under the LGPLv3                                                #
@@ -108,7 +108,7 @@ public class DeploymentListingsBacking extends AbstractTemplatedSectionBacking {
 					modelManager.begin();
 					depl = modelManager.addModify(depl,events);
 					modelManager.commit(events);
-					events.add( new MessagesEvent("Deployment successfully create!") );
+					events.add( new MessagesEvent("Deployment successfully completed.") );
 				} catch (Exception pe) {
 					modelManager.rollback();
 					Throwable root = ExceptionUtils.getRootCause(pe);

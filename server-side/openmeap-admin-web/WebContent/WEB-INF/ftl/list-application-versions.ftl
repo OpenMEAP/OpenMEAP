@@ -14,9 +14,8 @@ Input params:
 	<input type="hidden" name="processTarget" value="${processTarget?html}"/>
 	[#if mayCreateDeployments]
 		<select name="deploymentType">
-			<option selected>REQUIRED</option>
-			<option>OPTIONAL</option>
-			<option>IMMEDIATE</option>
+			<option selected>IMMEDIATE</option>
+			<option>REQUIRED</option>
 		</select>
 		<input type="submit" name="submit" value="Deploy"/>
 	[/#if]

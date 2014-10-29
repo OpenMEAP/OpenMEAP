@@ -1,7 +1,7 @@
 /*
  ###############################################################################
  #                                                                             #
- #    Copyright (C) 2011-2014 OpenMEAP, Inc.                                   #
+ #    Copyright (C) 2011-2015 OpenMEAP, Inc.                                   #
  #    Credits to Jonathan Schang & Rob Thacher                                 #
  #                                                                             #
  #    Released under the LGPLv3                                                #
@@ -202,6 +202,8 @@ OM_EXPORT om_bool om_storage_create_directories_for_path(om_storage_ptr storage,
  * @return An input stream to use for reading the import archive.  Null if it does not exist.
  */
 OM_EXPORT om_file_input_stream_ptr om_storage_get_import_archive_input_stream(om_storage_ptr storage);
+
+OM_EXPORT char * om_storage_file_get_contents(om_storage_ptr storage, const char *fullFilePath);
 
 /**
  * @return An output stream to the truncated import archive file
