@@ -133,12 +133,7 @@
 
 =================================================================================
 
- Setup for creating and building clients - Using the installer
-
-    cd OpenMEAP/slic
-    edit the client.properties file to match your environment
-
- Setup for creating and building clients - Using the Github zip
+ Setup for creating and building clients
 
     Create a slic folder
     Copy the OpenMEAP/build-tools/template/client.properties file to the slic folder
@@ -154,18 +149,18 @@
  Create and build your iOS project
 
     $ om_ios.sh create-project -propertyfile client.properties - Mac
+ 
+ Create and build your android project 
 
+    $ om_android.bat create-project -propertyfile client.properties - Windows
+    $ om_android.sh create-project -propertyfile client.properties - Mac
+    
  Create and build your windows phone project 
 
  Note: Please use the Windows project folder under clients/c/openmeap-slic-win to load 
        the Windows Phone Alpha Project.
  	
     $ om_win.bat create-project -propertyfile client.properties - Windows
- 
- Create and build your android project 
-
-    $ om_android.bat create-project -propertyfile client.properties - Windows
-    $ om_android.sh create-project -propertyfile client.properties - Mac
 
  Note: if you want to create multiple apps, in your client.properties file, change 
  the name at the end of the naming convention. For example, com.openmeap to com.newappname.
