@@ -1,6 +1,6 @@
  ###############################################################################
  #                                                                             #
- #    Copyright (C) 2011-2015 OpenMEAP, Inc.                                   #
+ #    Copyright (C) 2011-2016 OpenMEAP, Inc.                                   #
  #    Credits to Jonathan Schang & Rob Thacher                                 #
  #                                                                             #
  #    Released under the LGPLv3                                                #
@@ -98,7 +98,7 @@
 
  Set OpenMEAP Home Path
 
-    export -x OPENMEAP_HOME=/Applications/OpenMEAP
+    export OPENMEAP_HOME=/PathTo/OpenMEAP
 
  Add the new version of Ant to current terminal session
 
