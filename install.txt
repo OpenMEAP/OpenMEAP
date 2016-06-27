@@ -259,6 +259,11 @@
  Installing and Deploying OpenMEAP Admin to the Tomcat Server
 
     Download and extract Tomcat http://tomcat.apache.org/download-70.cgi
+    
+    Edit the users file at /tomcat7/tomcat-users.xml
+    Add the line '<role rolename="openmeap-admin"/>'
+    Add the line '<user name="user"password roles="openmeap-admin"/>' Update the user and password values.
+    You will also need to restart Tomcat.
 
     In eclipse, add a new server.
     Select the openmeap-admin-web, openmeap-services-web and banking-web projects
