@@ -273,8 +273,6 @@
 	
  login to http://localhost:8080/openmeap-admin-web/interface/ and setup the server
 
- See the OpenMEAP wiki for server setup samples. http://wiki.openmeap.com
-
  Deploy the Welcome.zip app located in samples for your first mobile application
 
 =================================================================================
