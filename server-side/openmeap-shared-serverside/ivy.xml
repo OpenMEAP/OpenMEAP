@@ -43,7 +43,7 @@
 	
 	<dependencies>
 	
-		<dependency org="javax.transaction" name="jta" rev="1.0.1B" conf="compile->default"/>
+		<dependency org="javax.transaction" name="jta" rev="1.1" conf="compile->default"/>
 	
 		<dependency org="org.apache.tomcat" name="servlet-api" rev="6.0.35" conf="compile->default"/>
 	
