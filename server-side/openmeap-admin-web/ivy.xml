@@ -100,7 +100,7 @@
 	  	
 	  	<!-- ide->default -->
 		<dependency org="javax.persistence" name="persistence-api" rev="1.0.2" conf="ide->default"/>
-		<dependency org="javax.transaction" name="jta" rev="1.0.1B" conf="ide->default"/>
+		<dependency org="javax.transaction" name="jta" rev="1.1" conf="ide->default"/>
 	  
 	</dependencies>
 	
